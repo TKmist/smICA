@@ -1,12 +1,12 @@
-# PTU2CONC
-Software for analysis of the concentration of fluorescent molecules inside living cells from single-molecule FLIM imaging data.
+# Phot2Conc
+A GUI Software for analysis of the concentration of fluorescent molecules inside living cells from single-molecule FLIM imaging data.
 The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script containing the data extracted from the _.ptu_ files. __Note _PTU2CONC_ script does not read the _.ptu_ files directly. It is necessary to use _EXTRACT_FROM_PTU_FLIM.py_ first!__
 
 ## HOW TO USE
 
 1. To run the script, type in the command line:
 
-            python PTU2CONC.py    
+            python Phot2Conc.py    
 
     It will start the graphical interface that will help to navigate through the process,    
     ![image info](./docs/figures/PTU2CONC_init.png)    
@@ -40,7 +40,7 @@ The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script
     
     In this example, the file contains data only for Channel 2.    
     
-4. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or in ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
+4. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
 
     ![image info](./docs/figures/PTU2CONC_data_ROI.png)    
     
