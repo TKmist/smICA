@@ -1,0 +1,14 @@
+{
+    "Channel_1":{
+        "omega":[0.210,0.02],
+        "kappa":[5.5,0.1],
+        "V0":[0.224,0.075],
+        "Mol.Brightness":[1500,400]
+    },
+    "Channel_2":{
+        "omega":[],
+        "kappa":[],
+        "V0":[],
+        "Mol.Brightness":[]        
+    }
+}
