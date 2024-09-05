@@ -1,5 +1,5 @@
 # REWRITE_ROI_GUI
-This script runs GUI for the script, rewriting the ROI files from the format created with ImageJ into the format readable by the scripts in the PTU2CONC folder.
+This script runs GUI for the script, rewriting the ROI files from the format created with ImageJ into the format readable by the scripts in the Phot2Conc folder.
 
 ## HOW TO USE
 ### Preparation of the ROI files
