@@ -68,13 +68,9 @@ The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script
 
     ![image info](./docs/figures/PTU2CONC_SD_Error.png)
        
-   In the first way (unmarked checkbox), the error is returned as the mean over the maximal errors calculated for each pixel. Those errors includes error for $V_0$ and the molecular brightness.
+   In the first way (unmarked checkbox), the error is returned as the mean over the maximal errors calculated for each pixel. Those errors include errors for $V_0$ and the molecular brightness.
 
-   The second method of error calculateion (makred checkbox), returns the standard deviation $SD$, calculated from all pixels, and devided by the square root of the number of all pixels, $N_\mathrm{px}:
-
-   \begin{equation}
-   \delta N_p = \frac{SD}{\sqrt{N_\mathrm{px}}}
-   \end{equation}
+   The second error calculation method (marked checkbox) returns the standard deviation $SD$, calculated from all pixels, and divided by the square root of the number of all pixels.
 
    
 9. Press 'Add to results' to store the results in the memory.    
