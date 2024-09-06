@@ -102,7 +102,8 @@ _some-file_LT_ch_1.npy_  - the numpy array for fluorescence lifetime values (fil
 _some-file_LT_ch_2.npy_  - the numpy array for fluorescence lifetime values (filtered) per pixel; Channel 2,    
 _some-file_taus_ch_1.pck_  - the decay pattern for Channel 1 stored in the form of pandas pickle,    
 _some-file_taus_ch_2.pck_  - the decay pattern for Channel 2 is stored as a pandas pickle.    
-
+_some-1317_fulltaus_ch_1.pck_  - the decay pattern for Channel 1 stored in the form of pandas pickle, recorded for full time spectrum (important in PIE mode),
+_some-1317_fulltaus_ch_1.pck_  - the decay pattern for Channel 2 is stored as a pandas pickle, recorded for full time spectrum (important in PIE mode).  
 
 
 ## References
