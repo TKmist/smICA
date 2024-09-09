@@ -1,6 +1,6 @@
 # Phot2Conc
 A GUI Software for analysis of the concentration of fluorescent molecules inside living cells from single-molecule FLIM imaging data.
-The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script containing the data extracted from the _.ptu_ files. __Note _PTU2CONC_ script does not read the _.ptu_ files directly. It is necessary to use _EXTRACT_FROM_PTU_FLIM.py_ first!__
+The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script containing the data extracted from the _.ptu_ files. __Note _Phot2Conc_ script does not read the _.ptu_ files directly. It is necessary to use _EXTRACT_FROM_PTU_FLIM.py_ first!__
 
 ## HOW TO USE
 
