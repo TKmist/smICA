@@ -14,7 +14,11 @@ init_image_width1 = image_width1 = 1224
 init_image_height1 = image_height1 = 200
 init_var_def_group_1_spacer = var_def_group_1_spacer =20
 global ratio_w,ratio_h
-
+global directory,files,last_directory,TT_directory,ROI_directory,DF,DF2
+directory = None
+ROI_directory =None
+PTU_directory = None
+calib_directory = None
 ratio_w =1
 ratio_h = 1
 hist_scaller =1.1
@@ -192,7 +196,7 @@ math_expr =['arccos','arccosh','arcsin','arcsinh','arctan','arctan2',
 
 
 
-global directory,files,last_directory,TT_directory,ROI_directory,DF,DF2
+
 last_directory=''
 files=()
 ROI_directory = None

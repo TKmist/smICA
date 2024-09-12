@@ -211,7 +211,7 @@ def Export_result_dataframe_to_file(sender,app_data):
 
 
 def Load_Save_Calib_file(sender,app_data,user_data):
-    global directory, new_directory,last_directory
+    global directory, new_directory,last_directory,calib_directory
     # print(app_data)
     directory = app_data['current_path']
     new_directory=directory
@@ -220,7 +220,7 @@ def Load_Save_Calib_file(sender,app_data,user_data):
     
     if user_data == 'Load_calib_button':
         path_to_json_file = app_data['file_path_name']
-
+        calib_directory = path_to_json_file
 
         with open(path_to_json_file) as json_file:
             data = json.load(json_file)
@@ -291,6 +291,7 @@ def Load_Save_Calib_file(sender,app_data,user_data):
         
     elif user_data == 'Save_calib_button':  
         path_to_json_file = app_data['file_path_name']
+        calib_directory = path_to_json_file
         omega_1 = [dpg.get_value('omega_input_ch_1'),dpg.get_value('omega_err_input_ch_1')]
         kappa_1 = [dpg.get_value('kappa_input_ch_1'),dpg.get_value('kappa_err_input_ch_1')]
         V0_1 = [dpg.get_value('focal_vol_input_ch_1'),dpg.get_value('focal_vol_err_input_ch_1')]
@@ -2201,8 +2202,9 @@ def callback_directory_select(sender,app_data):
     
     global files, anal_file
     files=()
-    global directory, new_directory,last_directory
+    global directory, new_directory,last_directory,PTU_directory
     directory = app_data['file_path_name']
+    PTU_directory = directory
     new_directory=directory
     last_directory=directory
     update_dialogs_default_directory(last_directory)
@@ -3961,3 +3963,52 @@ def wdt_hgt_pos(item,wdth,hght,pos):
         
     
 
+def callback_exportsettings(sender,app_data):
+    global ROI_directory,PTU_directory,calib_directory
+    setts = {
+        'Calib_data':{
+                        'Calib_file_path': calib_directory,
+                        'Ch_1_omega': dpg.get_value('omega_input_ch_1'),
+                        'Ch_1_omega_err': dpg.get_value('omega_err_input_ch_1'),
+                        'Ch_1_kappa': dpg.get_value('kappa_input_ch_1'),
+                        'Ch_1_kappa_err': dpg.get_value('kappa_err_input_ch_1'),
+                        'Ch_1_V0': dpg.get_value('focal_vol_input_ch_1'),
+                        'Ch_1_V0_err': dpg.get_value('focal_vol_err_input_ch_1'),
+                        'Ch_1_B': dpg.get_value('Brightness_input_ch_1'),
+                        'Ch_1_B_err': dpg.get_value('Brightness_err_input_ch_1'),
+                        'Ch_2_omega': dpg.get_value('omega_input_ch_2'),
+                        'Ch_2_omega_err': dpg.get_value('omega_err_input_ch_2'),
+                        'Ch_2_kappa': dpg.get_value('kappa_input_ch_2'),
+                        'Ch_2_kappa_err': dpg.get_value('kappa_err_input_ch_2'),
+                        'Ch_2_V0': dpg.get_value('focal_vol_input_ch_2'),
+                        'Ch_2_V0_err': dpg.get_value('focal_vol_err_input_ch_2'),
+                        'Ch_2_B': dpg.get_value('Brightness_input_ch_2'),
+                        'Ch_2_B_err': dpg.get_value('Brightness_err_input_ch_2'),
+            
+                     },
+        'PTU_files_dir':PTU_directory,
+        'ROI_file_dir': ROI_directory,
+        'Export_opts':{
+                        'Photons to array':dpg.get_value('Photons_array_checkbox'),
+                        'Photons to heatmap':dpg.get_value('Photons_Hmaps_checkbox'),
+                        'N_p to array':dpg.get_value('Np_array_checkbox'),
+                        'N_p to heatmap':dpg.get_value('Np_Hmaps_checkbox'),
+                        'Conc. to array':dpg.get_value('C_array_checkbox'),
+                        'Conc. to heatmap':dpg.get_value('C_Hmaps_checkbox')
+            
+            
+                        },
+        'Error_notation':dpg.get_value('Error_type_checkbox')
+        
+        
+            }
+    
+    
+    
+    print(setts)
+    if PTU_directory !=None:
+        path_to_json_file = os.path.join(PTU_directory,'workspace_info.json')
+        with open(path_to_json_file, 'w') as f:
+            json.dump(setts, f, indent=4, sort_keys=False)
+    else:
+        print('Select PTU directory, at least!')

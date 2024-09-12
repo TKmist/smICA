@@ -1,0 +1,32 @@
+{
+    "Calib_data": {
+        "Calib_file_path": null,
+        "Ch_1_omega": 0.20000000298023224,
+        "Ch_1_omega_err": 0.019999999552965164,
+        "Ch_1_kappa": 5.0,
+        "Ch_1_kappa_err": 0.5,
+        "Ch_1_V0": 0.22273312509059906,
+        "Ch_1_V0_err": 0.07043439894914627,
+        "Ch_1_B": 1,
+        "Ch_1_B_err": 1,
+        "Ch_2_omega": 0.20000000298023224,
+        "Ch_2_omega_err": 0.019999999552965164,
+        "Ch_2_kappa": 5.0,
+        "Ch_2_kappa_err": 0.5,
+        "Ch_2_V0": 0.22273312509059906,
+        "Ch_2_V0_err": 0.07043439894914627,
+        "Ch_2_B": 1,
+        "Ch_2_B_err": 1
+    },
+    "PTU_files_dir": null,
+    "ROI_file_dir": null,
+    "Export_opts": {
+        "Photons to array": true,
+        "Photons to heatmap": false,
+        "N_p to array": true,
+        "N_p to heatmap": false,
+        "Conc. to array": true,
+        "Conc. to heatmap": false
+    },
+    "Error_notation": false
+}
