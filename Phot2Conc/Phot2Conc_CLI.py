@@ -8,6 +8,7 @@ import sys
 import os
 import numpy as np
 from dep.CLI_classes import CLI
+import time
 # Check if an argument is provided
 print(sys.argv[0])
 if len(sys.argv) != 4:
@@ -62,15 +63,17 @@ cli.print_init()
 # cli.print_pretty_dict(cli.setts)
 
 # cli.ptu_files
-
-for f in cli.ptu_files:
+print()
+for i,f in enumerate(cli.ptu_files):
     cli.load_ptu_file(f,cli.PTU_directory_path)
     cli.calculate(cli.an_file)
 #     print(cli.Current_image_1)
 #     print(cli.Current_image_2)
     # print(cli.Sing_Results_DF)
     cli.export_results()
-
+    cli.progress_bar_function(i+1, len(cli.ptu_files), prefix="Progress: ")
+    # time.sleep(1)
+print()
 
 # In[8]:
 

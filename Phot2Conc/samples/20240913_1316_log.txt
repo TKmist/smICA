@@ -1,0 +1,28 @@
+Path to PTU folder:	/home/tomekk/Projekty/CODING/github/smICA/BRANCHES/MAIN/Phot2Conc/samples/PTU
+Path to ROI folder:	/home/tomekk/Projekty/CODING/github/smICA/BRANCHES/MAIN/Phot2Conc/samples/ROI
+Path to output folder:	samples/
+output file format:	csv
+
+Calibration data:
+	Path to calibration file:
+		/home/tomekk/Projekty/CODING/github/smICA/BRANCHES/MAIN/Phot2Conc/samples/Callibration_example.json
+	Channel 1
+		Molecular brightness (cnts/molecule/sec):	1500+/-400
+		Focal volume (fL):				0.2240000069141388+/-0.07500000298023224
+		Structutre parameter, κ:			5.5+/-0.10000000149011612
+		Width of focal volume, ω (μm):			0.20999999344348907+/-0.019999999552965164
+	Channel 2
+		Molecular brightness (cnts/molecule/sec):	2000+/-600
+		Focal volume (fL):				0.2639999985694885+/-0.0949999988079071
+		Structutre parameter, κ:			5.400000095367432+/-0.15000000596046448
+		Width of focal volume , ω (μm):			0.20499999821186066+/-0.009999999776482582
+
+	Errors as SD:	False
+
+	Export options:	
+		 Photons to array:			True
+		 Photons to heatmap:			False
+		 Number of molecules to array:		True
+		 Number of molecules to heatmap:	False
+		 Concentration to array:		True
+		 Concentration to heatmap:		False

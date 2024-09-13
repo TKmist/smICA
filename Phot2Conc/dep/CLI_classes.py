@@ -88,6 +88,12 @@ class CLI:
             print('This is not a right workspace file!')
             print('TERMINATING')
             sys.exit(1)
+
+    def progress_bar_function(self,current, total, prefix="", size=60, file=sys.stdout):
+        x = int(size * current / total)
+        file.write(f"{prefix}[{'#' * x}{'.' * (size - x)}] {current}/{total}\r")
+        file.flush()
+    
     def log_it(self,text_to_log,mode):
     
         logf = open(self.logfile_path, mode)
