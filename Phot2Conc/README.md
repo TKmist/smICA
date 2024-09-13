@@ -2,7 +2,7 @@
 A GUI Software for analysis of the concentration of fluorescent molecules inside living cells from single-molecule FLIM imaging data.
 The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script containing the data extracted from the _.ptu_ files. __Note _Phot2Conc_ script does not read the _.ptu_ files directly. It is necessary to use _EXTRACT_FROM_PTU_FLIM.py_ first!__
 
-Alternatively to GUI script, one can use the command line tool Phot2Conc_CLI.py (usage is described at the end of this page).
+Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2Conc_CLI.py.
 <a id='HTU_GUI'></a>
 ## HOW TO USE
 
@@ -95,7 +95,7 @@ Alternatively to GUI script, one can use the command line tool Phot2Conc_CLI.py 
 
     ![image info](./docs/figures/Phot2Conc_results_export_all.png)
 
-
+<a id='HTU_CLI'></a>
 ## HOW TO USE Phot2Conc_CLI.py
 The script requires three input arguments:
 1. ARG1 - path to JSON workspace file
