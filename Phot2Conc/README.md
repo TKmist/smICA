@@ -54,7 +54,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     ![image info](./docs/figures/Phot2Conc_image_ROI.png)
     
-5. If you wish to export the settings of the workspace to run the command line tool press Menu and click Export settings:
+5.<a id='HT_export'></a> If you wish to export the settings of the workspace to run the command line tool press Menu and click Export settings:
 
    ![image info](./docs/figures/Phot2Conc_settings_export.png)
    
@@ -102,6 +102,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     ![image info](./docs/figures/Phot2Conc_results_export_all.png)
 
 <a id='HTU_CLI'></a>
+
 ## HOW TO USE Phot2Conc_CLI.py
 
 To run the script, type in the command line:
@@ -109,9 +110,9 @@ To run the script, type in the command line:
             python Phot2Conc_CLI.py ARG1 ARG2 ARG3
 
 `ARG1` is the path to JSON workspace file. An example of the JSON workspace file is located in: samples/PTU/workspace_info.json
-The file can be also generated using the [GUI](#HTU_GUI).    
+The file can be also generated using the [GUI](#HTU_GUI), by clicking the [Export settings](#HT_export) in the Menu.    
 
-`ARG2` is the path to output folder where the result file, in the format "%Y%m%d_%H%M_results.???", will be saved.   
+`ARG2` is the path to output folder where the result file, in the format "%Y%m%d_%H%M_results", will be saved.   
 
 `ARG3` is the format in which the result file will be saved. There are four formats allowed: Excel (.xlsx), data, (.dat), csv (.csv), and pickle (.pickle - binary file for pandas DataFrame).
 
