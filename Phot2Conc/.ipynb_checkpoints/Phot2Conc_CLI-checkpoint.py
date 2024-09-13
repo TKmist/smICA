@@ -63,7 +63,7 @@ cli.print_init()
 
 # cli.ptu_files
 
-for f in cli.ptu_files[:2]:
+for f in cli.ptu_files:
     cli.load_ptu_file(f,cli.PTU_directory_path)
     cli.calculate(cli.an_file)
 #     print(cli.Current_image_1)
