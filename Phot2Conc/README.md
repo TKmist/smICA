@@ -26,7 +26,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
 
    ![image info](./docs/figures/Phot2Conc_calib_save.png)
     
-4. Browse for the folder containing the _.ptu_ files (should be the same folder where the output files of the _EXTRACT_FROM_PTU_FLIM.py_ script were created).   
+4. <a id='PTU_folder'></a> Browse for the folder containing the _.ptu_ files (should be the same folder where the output files of the _EXTRACT_FROM_PTU_FLIM.py_ script were created).   
 
     ![image info](./docs/figures/Phot2Conc_Browse_for_ptu.png)
     
@@ -45,9 +45,8 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     ![image info](./docs/figures/Phot2Conc_data_image.png)
     
     In this example, the file contains data only for Channel 2.    
-    
-5. 
-6. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
+  
+7. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
 
     ![image info](./docs/figures/Phot2Conc_data_ROI.png)
     
@@ -55,7 +54,13 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     ![image info](./docs/figures/Phot2Conc_image_ROI.png)
     
-7. To analyze the images and calculate concentrations for a single image, press 'Calculate single',    
+5. If you wish to export the settings of the workspace to run the command line tool press Menu and click Export settings:
+
+   ![image info](./docs/figures/Phot2Conc_settings_export.png)
+   
+   This will produce a _workspace_info.json_ file located in the [folder containing PTU files](#PTU_folder).
+   
+9. To analyze the images and calculate concentrations for a single image, press 'Calculate single',    
 
     ![image info](./docs/figures/Phot2Conc_caluclate_single.png)
     
@@ -67,7 +72,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     ![image info](./docs/figures/Phot2Conc_results_dist.png)
 
-8. The errors displayed in the RESULTS window can be calculated in two ways. Errors as SD switch changes between them:
+10. The errors displayed in the RESULTS window can be calculated in two ways. Errors as SD switch changes between them:
 
     ![image info](./docs/figures/Phot2Conc_SD_Error.png)
        
@@ -76,23 +81,23 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
    The second error calculation method (marked checkbox) returns the standard deviation $SD$, calculated from all pixels, and divided by the square root of the number of all pixels.
 
    
-9. Press 'Add to results' to store the results in the memory.    
+11. Press 'Add to results' to store the results in the memory.    
     
     ![image info](./docs/figures/Phot2Conc_add_to_results.png)
     
-10. Alternatively, one can perform automatic analysis for all listed files by pressing 'Calculate all':    
+12. Alternatively, one can perform automatic analysis for all listed files by pressing 'Calculate all':    
 
     ![image info](./docs/figures/Phot2Conc_caluclate_all.png)
     
     In this mode, results will be stored automatically in the memory.
-11. During calculation, the data will be automatically exported according to rules marked in the export panel.   
+13. During calculation, the data will be automatically exported according to rules marked in the export panel.   
     
     ![image info](./docs/figures/Phot2Conc_results_export.png)
     
     "to array" means that it will create the file containing the array (size of the image) containing a number of photons, molecules, or concentration in a given pixel.    
     "to heatmap" means that the heatmap will be exported as the _.png_ file.   
 
-12. To export the averaged data as a table, press the "Export all data" button.
+14. To export the averaged data as a table, press the "Export all data" button.
 
     ![image info](./docs/figures/Phot2Conc_results_export_all.png)
 
@@ -104,7 +109,7 @@ To run the script, type in the command line:
             python Phot2Conc_CLI.py ARG1 ARG2 ARG3
 
 `ARG1` is the path to JSON workspace file. An example of the JSON workspace file is located in: samples/PTU/workspace_info.json
-The file can be also generated using the [GUI](#HTU_GUI)    
+The file can be also generated using the [GUI](#HTU_GUI).    
 
 `ARG2` is the path to output folder where the result file, in the format "%Y%m%d_%H%M_results.???", will be saved.   
 
