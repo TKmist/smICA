@@ -2,6 +2,8 @@
 A GUI Software for analysis of the concentration of fluorescent molecules inside living cells from single-molecule FLIM imaging data.
 The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script containing the data extracted from the _.ptu_ files. __Note _Phot2Conc_ script does not read the _.ptu_ files directly. It is necessary to use _EXTRACT_FROM_PTU_FLIM.py_ first!__
 
+Alternatively to GUI script, one can use the command line tool Phot2Conc_CLI.py (usage is described at the end of this page).
+<a id='HTU_GUI'></a>
 ## HOW TO USE
 
 1. To run the script, type in the command line:
@@ -20,7 +22,7 @@ The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script
     ![image info](./docs/figures/Phot2Conc_calib_manual_input.png)
     
     __Note. When you load the file, it needs to have a proper structure.__ For more details check the Calliberation_exmaple files (_.json_) in the smaples folder.
-   The calibration values provided manualy can be saved by presasing the save button
+   The calibration values provided manually can be saved by pressing the save button
 
    ![image info](./docs/figures/Phot2Conc_calib_save.png)
     
@@ -92,6 +94,17 @@ The script can read the files created with the _EXTRACT_FROM_PTU_FLIM.py_ script
 12. To export the averaged data as a table, press the "Export all data" button.
 
     ![image info](./docs/figures/Phot2Conc_results_export_all.png)
-    
-    
-    
+
+
+## HOW TO USE Phot2Conc_CLI.py
+The script requires three input arguments:
+1. ARG1 - path to JSON workspace file
+2. ARG2 - path to output folder
+3. ARG3 - format of the output file
+To run the script, type in the command line:
+
+            python Phot2Conc_CLI.py ARG1 ARG2 ARG3
+
+An example of the JSON workspace file is located in: samples/PTU/workspace_info.json
+The file can be also generated using the [GUI](#HTU_GUI)   
+
