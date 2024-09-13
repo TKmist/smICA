@@ -46,7 +46,8 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     In this example, the file contains data only for Channel 2.    
     
-5. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
+5. 
+6. You may wish to limit the image analysis to a given region of interest (created in the SymPhoTime software or ImageJ and rewritten with the _REWRITE_ROI.py_ script). For this purpose, press the 'Browse for the ROI folder' button:    
 
     ![image info](./docs/figures/Phot2Conc_data_ROI.png)
     
@@ -54,7 +55,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     ![image info](./docs/figures/Phot2Conc_image_ROI.png)
     
-6. To analyze the images and calculate concentrations for a single image, press 'Calculate single',    
+7. To analyze the images and calculate concentrations for a single image, press 'Calculate single',    
 
     ![image info](./docs/figures/Phot2Conc_caluclate_single.png)
     
@@ -66,7 +67,7 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
     
     ![image info](./docs/figures/Phot2Conc_results_dist.png)
 
-7. The errors displayed in the RESULTS window can be calculated in two ways. Errors as SD switch changes between them:
+8. The errors displayed in the RESULTS window can be calculated in two ways. Errors as SD switch changes between them:
 
     ![image info](./docs/figures/Phot2Conc_SD_Error.png)
        
@@ -97,14 +98,16 @@ Alternatively to GUI script, one can use the [command line tool](#HTU_CLI) Phot2
 
 <a id='HTU_CLI'></a>
 ## HOW TO USE Phot2Conc_CLI.py
-The script requires three input arguments:
-1. ARG1 - path to JSON workspace file
-2. ARG2 - path to output folder
-3. ARG3 - format of the output file
+
 To run the script, type in the command line:
 
             python Phot2Conc_CLI.py ARG1 ARG2 ARG3
 
-An example of the JSON workspace file is located in: samples/PTU/workspace_info.json
-The file can be also generated using the [GUI](#HTU_GUI)   
+`ARG1` is the path to JSON workspace file. An example of the JSON workspace file is located in: samples/PTU/workspace_info.json
+The file can be also generated using the [GUI](#HTU_GUI)    
+
+`ARG2` is the path to output folder where the result file, in the format "%Y%m%d_%H%M_results.???", will be saved.   
+
+`ARG3` is the format in which the result file will be saved. There are four formats allowed: Excel (.xlsx), data, (.dat), csv (.csv), and pickle (.pickle - binary file for pandas DataFrame).
+
 
