@@ -1,1 +1,18 @@
-STARTED on 2024-09-11 14:00:50.736734
+STARTED on 2024-12-16 15:29:10.076846
+Modules loaded
+Functions loaded
+Init parameters loaded
+Themes loaded
+Fonts loaded
+Menu bar created
+Dialogs created
+Executing function: load_ptu
+	File
+		 /home/tomekk/Projekty/CODING/github/smICA/BRANCHES/UPDATE_12_24/Phot2Conc/samples/PTU/cell1-1159-cyt1-GFP-None_200nm_4.36us_2uW.ptu
+	loaded.
+Using statistical filters
+Executing function: callback_apply_to_all_ptus
+Executing function: extract_from_ptu
+Executing function: extract_from_ptu
+Executing function: extract_from_ptu
+FINISHED on 2024-12-16 15:29:47.316097

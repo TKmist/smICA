@@ -1928,8 +1928,12 @@ def extract_from_ptu(folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
     ntchannels = flim_data_stack.shape[3]
 
 
-    with open(os.path.join(folder,infoname), "w") as outL_file:
-        json.dump(info_dict, outL_file, indent=4, sort_keys=False)
+    json_pickle_all = {'File info':info_dict
+                      }
+
+    
+    # with open(os.path.join(folder,infoname), "w") as outL_file:
+    #     json.dump(info_dict, outL_file, indent=4, sort_keys=False)
 
     
     
@@ -2176,20 +2180,28 @@ def extract_from_ptu(folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
 
         im = Image.fromarray(np.uint8(to_png))
         im.save(os.path.join(folder,png_name))
-
+        
         export_df = pd.DataFrame(channel_data)
-        dpg.configure_item('loading_status',label='Exporting data to csv - Channel '+str(channel+1))
-        export_df.to_csv(os.path.join(folder,csv_name), sep=',',index=False,header=False)
-        dpg.configure_item('loading_status',label='Exporting data to pickle - Channel '+str(channel+1))
-        export_df.to_pickle(os.path.join(folder,pickle_name))
-        taus.to_pickle(os.path.join(folder,tau_pickle_name))
-        fulltaus.to_pickle(os.path.join(folder,full_tau_pickle_name))
-        dpg.configure_item('loading_status',label='Exporting data to numpy array - Channel '+str(channel+1))
-        np.save(os.path.join(folder,np_LT_name), lifetimes) 
-        np.save(os.path.join(folder,np_int_name), intensity)
+        # dpg.configure_item('loading_status',label='Exporting data to csv - Channel '+str(channel+1))
+        # export_df.to_csv(os.path.join(folder,csv_name), sep=',',index=False,header=False)
+        # dpg.configure_item('loading_status',label='Exporting data to pickle - Channel '+str(channel+1))
+        # export_df.to_pickle(os.path.join(folder,pickle_name))
+        # taus.to_pickle(os.path.join(folder,tau_pickle_name))
+        # fulltaus.to_pickle(os.path.join(folder,full_tau_pickle_name))
+        # dpg.configure_item('loading_status',label='Exporting data to numpy array - Channel '+str(channel+1))
+        # np.save(os.path.join(folder,np_LT_name), lifetimes) 
+        # np.save(os.path.join(folder,np_int_name), intensity)
     
+
+
+        json_pickle_all['export_df_'+str(channels[channel]+1)]=export_df
+        json_pickle_all['taus_'+str(channels[channel]+1)]=taus
+        json_pickle_all['fulltaus_'+str(channels[channel]+1)]=fulltaus
+        json_pickle_all['lifetimes_'+str(channels[channel]+1)]=lifetimes
+        json_pickle_all['intensity_'+str(channels[channel]+1)]=intensity
     
-    
+    with open(os.path.join(folder,file+'.pkl'), 'wb') as pklf:
+        pickle.dump(json_pickle_all, pklf)
 
 
 @trace

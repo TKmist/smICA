@@ -21,6 +21,7 @@ from lmfit import Model, Parameters
 import ast
 import webbrowser
 import sys
+import pickle
 np.seterr(divide='ignore')
 from scipy.stats import median_abs_deviation
 mpl.use('Agg')

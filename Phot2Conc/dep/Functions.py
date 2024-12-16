@@ -664,17 +664,7 @@ def callback_Keyword_key(sender,app_data):
 
 
 
-def callback_PTU_directory_select(sender,app_data):
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+def callback_PTU_directory_select(sender,app_data): 
     global directory, files,new_directory,last_directory,anal_file,pck_files,PTU_directory
     global sync_rate,pixel_dwell, number_of_frames
     global Sing_Results_DF,ratio_w
@@ -682,16 +672,14 @@ def callback_PTU_directory_select(sender,app_data):
 
     files=()
     dpg.set_value('AUTO_ROI_checkbox',False)
-    
     directory = app_data['file_path_name']
     new_directory=directory
     PTU_directory = directory
     last_directory=directory
     update_dialogs_default_directory(last_directory)
     files = tuple(np.sort([f for f in os.listdir(PTU_directory) if f.endswith('.ptu')]))
-    pck_files = list(np.sort([f for f in os.listdir(PTU_directory) if f.endswith('.pck')]))
-    
-    
+    pck_files = list(np.sort([f for f in os.listdir(PTU_directory) if f.endswith('.pkl')]))
+
     try:
         hide_histograms()
     except:
@@ -703,39 +691,9 @@ def callback_PTU_directory_select(sender,app_data):
         
         stop=False
         
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
-        
-        
-        
-        
+               
         for file in filenames:
-            
-            
-            
-            
-            
+                     
             ptufile = file+'.ptu'
             for f in pck_files:
                 if file in f:
@@ -745,12 +703,11 @@ def callback_PTU_directory_select(sender,app_data):
                 else:
                     stop = False
                     
-                    
-            
+             
             if stop:
                 pass
             else:
-                show_error_no_files('No .pck files found. Run the PTU2pck.py script and try again. Mising file: '+ffile)
+                show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again. Mising file: '+ffile)
                 
                 try:
                     pass
@@ -759,66 +716,6 @@ def callback_PTU_directory_select(sender,app_data):
                     pass
                 
                 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    
-
-                    
-                    
-        
-        
-        
-        
-        
-        
-        
-            
-                
-    
     if len(pck_files)!=0:
         update_flist(filenames)
 
@@ -830,40 +727,8 @@ def callback_PTU_directory_select(sender,app_data):
         
     else:
         
-        show_error_no_files('No .pck files found. Run the PTU2pck.py script and try again.')
+        show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again.')
     
-    
-    
-    
-    
-    
-
-
-
-    
-
-
-
-
-        
-
-
-
-
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
 
 
 def callback_ROI_directory_select(sender,app_data):
@@ -3230,12 +3095,14 @@ def load_PTU_images(an_file):
     
     
     
+    pickle_file = os.path.join(PTU_directory,an_file+'.pkl')
+
+    with open(pickle_file, 'rb') as pcklf:
+        pkl = pickle.load(pcklf)
     
-    
-    
-    info_file = os.path.join(PTU_directory,an_file+'.info')
-    f = open(info_file)
-    ptu_meta = json.load(f)    
+    # info_file = os.path.join(PTU_directory,an_file+'.info')
+    # f = open(info_file)
+    ptu_meta = pkl['File info']#json.load(f)    
     try:
         DF=DF2=[]
     except:
@@ -3275,11 +3142,13 @@ def load_PTU_images(an_file):
 
     
     
-    npy_files = list(np.sort([f for f in os.listdir(PTU_directory) if f.startswith(an_file+'_')]))
-    npy_files = [f for f in npy_files if f.endswith('.npy')]
+    # npy_files = list(np.sort([f for f in os.listdir(PTU_directory) if f.startswith(an_file+'_')]))
+    # npy_files = [f for f in npy_files if f.endswith('.npy')]
 
-    Channels = [f[-8:-4].split('_')[1] for f in npy_files if '_INT_ch_'in f]
-
+    # Channels = [f[-8:-4].split('_')[1] for f in npy_files if '_INT_ch_'in f]
+    Channels = list(pkl.keys())
+    Channels = [f for f in Channels if f.startswith('export_df')]
+    Channels = [ch[-1] for ch in Channels]
     
     
     if dpg.get_value('AUTO_ROI_checkbox'):
@@ -3290,9 +3159,9 @@ def load_PTU_images(an_file):
                 
                 if len(Channels)==1:
                     if '1' in Channels[0]:
-                        Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                        Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
-                        Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                        Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                         lt_mask = Lifetime_1/Lifetime_1
                         Intensity_1 = Intensity_1*lt_mask
 
@@ -3314,9 +3183,9 @@ def load_PTU_images(an_file):
                         Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
                         display_images([Current_image_1,Current_image_2],channel)
                     elif '2' in Channels[0]:
-                        Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                        Intensity_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
-                        Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                        Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                         lt_mask = Lifetime_2/Lifetime_2
                         Intensity_2 = Intensity_2*lt_mask
                         
@@ -3346,8 +3215,8 @@ def load_PTU_images(an_file):
             else:
                 if len(Channels)==1:
                     if '1' in Channels[0]:
-                        Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
-                        Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                        Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                        Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                         
                         Intensity_1 = Intensity_1
 
@@ -3366,9 +3235,9 @@ def load_PTU_images(an_file):
                         Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
                         display_images([Current_image_1,Current_image_2],channel)
                     elif '2' in Channels[0]:
-                        Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                        Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
-                        Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                        Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                         lt_mask = Lifetime_2/Lifetime_2
                         Intensity_2 = Intensity_2
 
@@ -3400,10 +3269,10 @@ def load_PTU_images(an_file):
              
                 elif len(Channels)==2:
                     
-                    Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
-                    Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
                     lt_mask = Lifetime_1/Lifetime_1
                     Intensity_1 = Intensity_1
                     lt_mask = Lifetime_2/Lifetime_2
@@ -3431,8 +3300,8 @@ def load_PTU_images(an_file):
         if dpg.get_value('LT_TO_ROI_checkbox'):
             if len(Channels)==1:
                 if '1' in Channels[0]:
-                    Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                     lt_mask = Lifetime_1/Lifetime_1
                     Intensity_1 = Intensity_1*lt_mask
                     channel = 'both'
@@ -3442,8 +3311,8 @@ def load_PTU_images(an_file):
                     Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
                     display_images([Current_image_1,Current_image_2],channel)
                 elif '2' in Channels[0]:
-                    Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                     lt_mask = Lifetime_2/Lifetime_2
                     Intensity_2 = Intensity_2*lt_mask
     
@@ -3464,11 +3333,11 @@ def load_PTU_images(an_file):
                 else:
                     pass
             elif len(Channels)==2:
-                Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 Current_image_1 = (Intensity_1,Lifetime_1)
-                Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
-                Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
+                Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
                 lt_mask = Lifetime_1/Lifetime_1
                 Intensity_1 = Intensity_1*lt_mask
                 lt_mask = Lifetime_2/Lifetime_2
@@ -3480,8 +3349,8 @@ def load_PTU_images(an_file):
         else:
             if len(Channels)==1:
                 if '1' in Channels[0]:
-                    Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                     lt_mask = Lifetime_1/Lifetime_1
                     Intensity_1 = Intensity_1
                     channel = 'both'
@@ -3491,8 +3360,8 @@ def load_PTU_images(an_file):
                     Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
                     display_images([Current_image_1,Current_image_2],channel)
                 elif '2' in Channels[0]:
-                    Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                     lt_mask = Lifetime_2/Lifetime_2
                     Intensity_2 = Intensity_2
     
@@ -3513,11 +3382,11 @@ def load_PTU_images(an_file):
                 else:
                     pass
             elif len(Channels)==2:
-                Intensity_1 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                Lifetime_1 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+                Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 Current_image_1 = (Intensity_1,Lifetime_1)
-                Intensity_2 = np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
-                Lifetime_2 = np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
+                Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
                 lt_mask = Lifetime_1/Lifetime_1
                 Intensity_1 = Intensity_1
                 lt_mask = Lifetime_2/Lifetime_2
