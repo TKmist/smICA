@@ -29,7 +29,7 @@ resizable_width = ['mvAppItemType::mvListbox',
 
 file_panel_items = [
                     'file_box',
-    'Browse_directory_button',
+    # 'Browse_directory_button',
     'Brightness_input_ch_1',
     'Brightness_err_input_ch_1',
     'Brightness_input_ch_2',
@@ -48,8 +48,8 @@ file_panel_items = [
     'kappa_err_input_ch_2',
     'focal_vol_input_ch_2',
     'focal_vol_err_input_ch_2',
-    'Add_ROI_1_button',
-    'Add_ROI_2_button',
+    # 'Add_ROI_1_button',
+    # 'Add_ROI_2_button',
     'Browse_ROI_directory_button',
     'Pixel_dwell_output',
     'Nframes_output',
@@ -2243,7 +2243,21 @@ def callback_select_lt_to_roi(sender,app_data):
 
 def callback_select_roi(sender,app_data):
     global anal_file
+    if dpg.get_value(sender):
+        dpg.configure_item('Browse_ROI_directory_button',enabled=True)
+        dpg.set_value('Auto_ROI_checkbox',False)
+    else:
+        dpg.configure_item('Browse_ROI_directory_button',enabled=False)
     load_PTU_images(anal_file)
+    
+def callback_select_autoroi(sender,app_data):
+    global anal_file
+    if dpg.get_value(sender):
+        dpg.configure_item('Browse_ROI_directory_button',enabled=False)
+        dpg.set_value('FILE_ROI_checkbox',False)
+    # else:
+    #     dpg.configure_item('Browse_ROI_directory_button',enabled=False)
+    # load_PTU_images(anal_file)
     
     
     

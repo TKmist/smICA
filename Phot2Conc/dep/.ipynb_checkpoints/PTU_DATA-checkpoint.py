@@ -11,25 +11,25 @@ with dpg.window(label='',
                 tag='PTU_DATA_window',
                 show=True
                ):
-    dpg.add_text(default_value='PTU DATA',show=True,tag='PTU_TITLE')
+#     dpg.add_text(default_value='PTU DATA',show=True,tag='PTU_TITLE')
     
-    dpg.add_separator(tag ='PTU_DATA_top_sep',show=True)
+#     dpg.add_separator(tag ='PTU_DATA_top_sep',show=True)
     
-    with dpg.group(tag='dir_sel_group',horizontal=True,horizontal_spacing=init_group_spacer):
+#     with dpg.group(tag='dir_sel_group',horizontal=True,horizontal_spacing=init_group_spacer):
         
         
         
         
         
-        dpg.add_button(label="Browse for the directory with PTU files",
-                   callback=lambda: dpg.show_item("PTU_file_dialog_id"),
-                   width = init_widths['Browse_directory_button'],
-                   tag='Browse_directory_button',
-                   show=True,enabled=True
-                  )
-        dpg.bind_item_theme('Browse_directory_button', 'fit_button_theme')
-        with dpg.tooltip('Browse_directory_button'):
-            dpg.add_text("Open to extract the photon data from PTU files. Browse for directory with PTU files.")
+#         dpg.add_button(label="Browse for the directory with PTU files",
+#                    callback=lambda: dpg.show_item("PTU_file_dialog_id"),
+#                    width = init_widths['Browse_directory_button'],
+#                    tag='Browse_directory_button',
+#                    show=True,enabled=True
+#                   )
+#         dpg.bind_item_theme('Browse_directory_button', 'fit_button_theme')
+#         with dpg.tooltip('Browse_directory_button'):
+#             dpg.add_text("Open to extract the photon data from PTU files. Browse for directory with PTU files.")
             
     dpg.add_text(default_value='PTU metadata',show=True,tag='PTU_meta') 
     
@@ -101,29 +101,29 @@ with dpg.window(label='',
     
     
         
-    with dpg.group(tag='ROI_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
-        dpg.add_button(label="Add manualy ROI 1",
-                   callback=callback_add_ROI,
-                   width = init_widths['Add_ROI_1_button'],
-                   tag='Add_ROI_1_button',
-                   show=True,enabled=True
-                  )
+    # with dpg.group(tag='ROI_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
+    #     dpg.add_button(label="Add manualy ROI 1",
+    #                callback=callback_add_ROI,
+    #                width = init_widths['Add_ROI_1_button'],
+    #                tag='Add_ROI_1_button',
+    #                show=True,enabled=True
+    #               )
         
-        dpg.bind_item_theme('Add_ROI_1_button', 'fit_button_theme')
-        with dpg.tooltip('Add_ROI_1_button'):
-            dpg.add_text("Add ROI to channel 1.")
-        dpg.add_button(label="Add manualy ROI 2",
-                   callback=callback_add_ROI,
-                   width = init_widths['Add_ROI_2_button'],
-                   tag='Add_ROI_2_button',
-                   show=True,enabled=True
-                  )
-        dpg.bind_item_theme('Add_ROI_2_button', 'fit_button_theme')
-        with dpg.tooltip('Add_ROI_2_button'):
-            dpg.add_text("Add ROI to channel 2.")
+    #     dpg.bind_item_theme('Add_ROI_1_button', 'fit_button_theme')
+    #     with dpg.tooltip('Add_ROI_1_button'):
+    #         dpg.add_text("Add ROI to channel 1.")
+    #     dpg.add_button(label="Add manualy ROI 2",
+    #                callback=callback_add_ROI,
+    #                width = init_widths['Add_ROI_2_button'],
+    #                tag='Add_ROI_2_button',
+    #                show=True,enabled=True
+    #               )
+    #     dpg.bind_item_theme('Add_ROI_2_button', 'fit_button_theme')
+    #     with dpg.tooltip('Add_ROI_2_button'):
+    #         dpg.add_text("Add ROI to channel 2.")
     with dpg.group(tag='ROI_check_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
         dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,callback=callback_select_roi)
-        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False#,callback=None
+        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False,callback=callback_select_autoroi
                         )
         
     
@@ -131,7 +131,7 @@ with dpg.window(label='',
                callback=lambda: dpg.show_item("ROI_folder_dialog_id"),
                width = init_widths['Browse_ROI_directory_button'],
                tag='Browse_ROI_directory_button',
-               show=True,enabled=True
+               show=True,enabled=False
               )
     dpg.bind_item_theme('Browse_ROI_directory_button', 'fit_button_theme')
     with dpg.tooltip('Browse_ROI_directory_button'):
