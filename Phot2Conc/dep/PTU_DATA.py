@@ -101,28 +101,30 @@ with dpg.window(label='',
     
     
         
-    with dpg.group(tag='ROI_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
-        dpg.add_button(label="Add manualy ROI 1",
-                   callback=callback_add_ROI,
-                   width = init_widths['Add_ROI_1_button'],
-                   tag='Add_ROI_1_button',
-                   show=True,enabled=True
-                  )
+    # with dpg.group(tag='ROI_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
+    #     dpg.add_button(label="Add manualy ROI 1",
+    #                callback=callback_add_ROI,
+    #                width = init_widths['Add_ROI_1_button'],
+    #                tag='Add_ROI_1_button',
+    #                show=True,enabled=True
+    #               )
         
-        dpg.bind_item_theme('Add_ROI_1_button', 'fit_button_theme')
-        with dpg.tooltip('Add_ROI_1_button'):
-            dpg.add_text("Add ROI to channel 1.")
-        dpg.add_button(label="Add manualy ROI 2",
-                   callback=callback_add_ROI,
-                   width = init_widths['Add_ROI_2_button'],
-                   tag='Add_ROI_2_button',
-                   show=True,enabled=True
-                  )
-        dpg.bind_item_theme('Add_ROI_2_button', 'fit_button_theme')
-        with dpg.tooltip('Add_ROI_2_button'):
-            dpg.add_text("Add ROI to channel 2.")
+    #     dpg.bind_item_theme('Add_ROI_1_button', 'fit_button_theme')
+    #     with dpg.tooltip('Add_ROI_1_button'):
+    #         dpg.add_text("Add ROI to channel 1.")
+    #     dpg.add_button(label="Add manualy ROI 2",
+    #                callback=callback_add_ROI,
+    #                width = init_widths['Add_ROI_2_button'],
+    #                tag='Add_ROI_2_button',
+    #                show=True,enabled=True
+    #               )
+    #     dpg.bind_item_theme('Add_ROI_2_button', 'fit_button_theme')
+    #     with dpg.tooltip('Add_ROI_2_button'):
+    #         dpg.add_text("Add ROI to channel 2.")
     with dpg.group(tag='ROI_check_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
-        dpg.add_checkbox(label='ROI from files (batch)', tag='AUTO_ROI_checkbox',default_value = False,callback=callback_select_roi)
+        dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,callback=callback_select_roi)
+        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False#,callback=None
+                        )
         
     
     dpg.add_button(label="Browse for the ROI folder",

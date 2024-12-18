@@ -122,7 +122,9 @@ with dpg.window(label='',
         with dpg.tooltip('Add_ROI_2_button'):
             dpg.add_text("Add ROI to channel 2.")
     with dpg.group(tag='ROI_check_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
-        dpg.add_checkbox(label='ROI from files (batch)', tag='AUTO_ROI_checkbox',default_value = False,callback=callback_select_roi)
+        dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,callback=callback_select_roi)
+        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False#,callback=None
+                        )
         
     
     dpg.add_button(label="Browse for the ROI folder",

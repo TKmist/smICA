@@ -671,7 +671,7 @@ def callback_PTU_directory_select(sender,app_data):
     Sing_Results_DF = pd.DataFrame(columns=['File', 'Channel','<Counts>','Counts_std','<N_p>','N_p_err','<C>', 'C_err','C_median', 'C_median_abs_err'])
 
     files=()
-    dpg.set_value('AUTO_ROI_checkbox',False)
+    dpg.set_value('FILE_ROI_checkbox',False)
     directory = app_data['file_path_name']
     new_directory=directory
     PTU_directory = directory
@@ -738,8 +738,8 @@ def callback_ROI_directory_select(sender,app_data):
     ROI_directory = app_data['file_path_name']
     last_directory =ROI_directory
     update_dialogs_default_directory(last_directory)
-    dpg.set_value('AUTO_ROI_checkbox',True)
-    callback_select_roi('AUTO_ROI_checkbox',True)
+    dpg.set_value('FILE_ROI_checkbox',True)
+    callback_select_roi('FILE_ROI_checkbox',True)
     
     
     
@@ -3151,7 +3151,7 @@ def load_PTU_images(an_file):
     Channels = [ch[-1] for ch in Channels]
     
     
-    if dpg.get_value('AUTO_ROI_checkbox'):
+    if dpg.get_value('FILE_ROI_checkbox'):
         if ROI_directory == None:
             show_error_no_files('No ROI folder defined. Try again.')
         else:
