@@ -1,3 +1,4 @@
+
 with open('../LICENSE', 'r') as file:
     Licence = file.read()
 with open('../VERSION', 'r') as file:
@@ -12,6 +13,73 @@ def execfile(filepath, globals=globals(), locals=None):
     })
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), globals, locals)
+
+
+def _resizer(sender,app_data):
+    import numpy as np
+    init_resizable_items = []
+    # cmn_resizable_items = []
+    obj_var = [eval('init.'+str(m)) for m in vars(init)]
+    for m in obj_var:
+        if type(m) == dict:
+            if 'name' in m.keys():
+                init_resizable_items.append(m['name'])
+        else:
+            pass
+    # obj_var = [eval('method_cmn.'+str(m)) for m in vars(method_cmn)]
+    # for m in obj_var:
+    #     if type(m) == dict:
+    #         if 'name' in m.keys():
+    #             cmn_resizable_items.append(m['name'])
+    #     else:
+    #         pass    
+        
+        
+    
+    ratio = {'width': np.round(app_data[0]/inV.VIEWPORT_prop['width'],4),
+             'height': np.round(app_data[1]/inV.VIEWPORT_prop['height'],4)} 
+    # print(ratio)
+    inV.init_size_ratio = ratio
+    fnt_ratio = (ratio['width']+ratio['height'])/2
+    new_font_size=int(np.round(inV.init_font_size*fnt_ratio,0))
+    # print('==============================================================')
+    # print(method_init.__init__.__code__.co_varnames)
+    
+    temp_inits = init.__init__.__code__.co_varnames
+    temp_inits = [v for v in temp_inits if v != 'self']
+    temp_inits = [v for v in temp_inits if v != 'size_ratio']
+    temp_inits = [v for v in temp_inits if v != 'font_size']
+    
+    temp_inits_values  = {}
+    for v in temp_inits:
+        temp_inits_values[v] = eval('init.'+v)
+    last_dir = init.last_directory
+    init.__init__(inV.init_size_ratio,
+                         inV.init_left_indent,
+                         inV.init_internal_indent,
+                         inV.init_right_indent,
+                         inV.init_bottom_indent,
+                         inV.init_top_indent,
+                         inV.init_group_spacer,
+                          inV.init_font_size,
+                         last_dir)
+    
+    for item in init_resizable_items:
+        # print(item)
+        props =eval('init.'+item) 
+        if 'width' in props.keys():
+            dpg.configure_item(item,width=props['width'])
+        if 'height' in props.keys():
+            dpg.configure_item(item,height=props['height'])
+        if 'pos' in props.keys():
+            dpg.configure_item(item,pos=props['pos'])
+    dpg.delete_item('DejaVu')
+    dpg.delete_item('Font_registry')
+    lprint(inV.init_font_size,init.font_size)
+    add_font_to_registry(init.font_size)
+
+
+
 import platform
 import os
 if platform.system().upper() == "LINUX":
@@ -21,16 +89,20 @@ import dearpygui.dearpygui as dpg
 # import os
 import datetime
 
-from dep.INIT import inits, _init_Menu
+from dep.INIT import inits, _init_Menu,_init_varaibles,_basicF
 
 
-init = inits()
+
+inV=_init_varaibles()
+viewport = inV.VIEWPORT_prop
+
+basf = _basicF()
 
 menu = _init_Menu(VERSION)
-
+# globalITEMS = init.items
 
     
-lprint=init.lnprint
+lprint=basf.lnprint
 
 
 
@@ -69,20 +141,18 @@ execfile(os.path.join('dep','Fonts.py'))
 
 
 
-lprint('1')
-
-lprint(init.size_pos['VIEWPORT'])
 
 dpg.create_viewport(title='AutoROI   ver:'+VERSION,
-                    width=init.size_pos['VIEWPORT']['width'], 
-                    height=init.size_pos['VIEWPORT']['height'],
-                    x_pos=init.size_pos['VIEWPORT']['pos'][0],
-                    y_pos  =init.size_pos['VIEWPORT']['pos'][1])    
+                    width=viewport['width'],
+                    height=viewport['height'],
+                    x_pos=viewport['pos'][0],
+                    y_pos  =viewport['pos'][1])    
+
+dpg.set_viewport_resize_callback(_resizer)
+lprint(dpg.get_viewport_height())
+   
 
 
-
-
-lprint('2')
 # execfile(os.path.join('dep','Menu_bar.py'))           
 
 
@@ -91,9 +161,18 @@ lprint('2')
 
 dpg.setup_dearpygui()
 dpg.show_viewport()
-lprint('3')
-menu.mount_main_Menu_bar()
 
+menu.mount_main_Menu_bar()
+init = inits(inV.init_size_ratio,
+                 inV.init_left_indent,
+                 inV.init_internal_indent,
+                 inV.init_right_indent,
+                 inV.init_bottom_indent,
+                 inV.init_top_indent,
+                 inV.init_group_spacer,
+                 inV.init_font_size,
+                 inV.last_directory)
+execfile(os.path.join('dep','Layout.py'))
 # execfile(os.path.join('dep','Dialogs.py'))                     
 
 # execfile(os.path.join('dep','Files_window.py'))

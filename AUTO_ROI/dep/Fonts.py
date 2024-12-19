@@ -16,7 +16,7 @@ def add_font_to_registry(font_size):
 
 
 
-add_font_to_registry(init.init_font_size)
+add_font_to_registry(inV.init_font_size)
 
 
 
