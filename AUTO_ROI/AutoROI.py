@@ -1,4 +1,4 @@
-
+import numpy as np
 with open('../LICENSE', 'r') as file:
     Licence = file.read()
 with open('../VERSION', 'r') as file:
@@ -39,7 +39,7 @@ def _resizer(sender,app_data):
     ratio = {'width': np.round(app_data[0]/inV.VIEWPORT_prop['width'],4),
              'height': np.round(app_data[1]/inV.VIEWPORT_prop['height'],4)} 
     # print(ratio)
-    inV.init_size_ratio = ratio
+    # inV.init_size_ratio = ratio
     fnt_ratio = (ratio['width']+ratio['height'])/2
     new_font_size=int(np.round(inV.init_font_size*fnt_ratio,0))
     # print('==============================================================')
@@ -49,12 +49,19 @@ def _resizer(sender,app_data):
     temp_inits = [v for v in temp_inits if v != 'self']
     temp_inits = [v for v in temp_inits if v != 'size_ratio']
     temp_inits = [v for v in temp_inits if v != 'font_size']
+    temp_inits = [v for v in temp_inits if v != 'callbacks']
+    
+    temp_inits = [v for v in temp_inits if v != 'tex_1_name']
+    temp_inits = [v for v in temp_inits if v != 'tex_2_name']
+    
     
     temp_inits_values  = {}
     for v in temp_inits:
+        print(v)
         temp_inits_values[v] = eval('init.'+v)
-    last_dir = init.last_directory
-    init.__init__(inV.init_size_ratio,
+    last_dir = callback.last_directory
+    init.__init__(ratio,
+        # inV.init_size_ratio,
                          inV.init_left_indent,
                          inV.init_internal_indent,
                          inV.init_right_indent,
@@ -62,7 +69,9 @@ def _resizer(sender,app_data):
                          inV.init_top_indent,
                          inV.init_group_spacer,
                           inV.init_font_size,
-                         last_dir)
+                         last_dir,
+                         inV.tex_1_name,
+                         inV.tex_2_name)
     
     for item in init_resizable_items:
         # print(item)
@@ -75,9 +84,65 @@ def _resizer(sender,app_data):
             dpg.configure_item(item,pos=props['pos'])
     dpg.delete_item('DejaVu')
     dpg.delete_item('Font_registry')
-    lprint(inV.init_font_size,init.font_size)
+    # lprint(inV.init_font_size,init.font_size)
     add_font_to_registry(init.font_size)
+    w = int(np.round(dpg.get_item_width('image_window_1')))-15*ratio['width']
+    h = w
+    dpg_image_1 = update_texture(callback.Current_image_1)
+    if init.tex_1_name in dpg.get_aliases():
+        dpg.delete_item(init.tex_1_name)
+        
+        dpg.remove_alias(init.tex_1_name)
+        # print('line 2639','img1_passed0')
+        dpg.delete_item('texture_CH_1')
+        # print('line 2641','img1_passed')
+        # if 'new' in init.tex_1_name:
+        #     new = 'texture_tag_chan_1-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
+        #     init.tex_1_name =new
+            
+            
+            
+        # else:
+            
+        #     init.tex_1_name = 'texture_tag_chan_1-new_1'
+        
+        dpg.add_dynamic_texture(width=w,
+                        height=h,
+                        default_value=dpg_image_1,
+                        tag=init.tex_1_name,
+                        parent = 'texture_reg')
+        
+        dpg.add_image(init.tex_1_name,parent = 'image_window_1'
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1')
+        
+    dpg_image_2 = update_texture(callback.Current_image_2)
+    if init.tex_2_name in dpg.get_aliases():
+        dpg.delete_item(init.tex_2_name)
+        
+        dpg.remove_alias(init.tex_2_name)
+        # print('line 2639','img1_passed0')
+        dpg.delete_item('texture_CH_2')
+        # print('line 2641','img1_passed')
+        # if 'new' in init.tex_2_name:
+        #     new = 'texture_tag_chan_2-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
+        #     init.tex_2_name =new
+            
+            
+            
+        # else:
+            
+        #     init.tex_2_name = 'texture_tag_chan_2-new_1'
+        
+        dpg.add_dynamic_texture(width=w,
+                        height=h,
+                        default_value=dpg_image_2,
+                        tag=init.tex_2_name,
+                        parent = 'texture_reg')
+        
+        dpg.add_image(init.tex_2_name,parent = 'image_window_2'
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2')
 
+    
 
 
 import platform
@@ -89,7 +154,7 @@ import dearpygui.dearpygui as dpg
 # import os
 import datetime
 
-from dep.INIT import inits, _init_Menu,_init_varaibles,_basicF
+from dep.INIT import inits, _init_Menu,_init_varaibles,_basicF,callbacks,oth
 
 
 
@@ -99,11 +164,12 @@ viewport = inV.VIEWPORT_prop
 basf = _basicF()
 
 menu = _init_Menu(VERSION)
+
 # globalITEMS = init.items
 
     
 lprint=basf.lnprint
-
+callback = callbacks(inV.last_directory,basf,inV)
 
 
 
@@ -133,7 +199,7 @@ dpg.create_context()
 execfile(os.path.join('dep','Fonts.py'))              
 
 # execfile(os.path.join('dep','Handlers.py'))           
-# execfile(os.path.join('dep','Texture_registry.py'))   
+ 
 
 
 
@@ -149,7 +215,7 @@ dpg.create_viewport(title='AutoROI   ver:'+VERSION,
                     y_pos  =viewport['pos'][1])    
 
 dpg.set_viewport_resize_callback(_resizer)
-lprint(dpg.get_viewport_height())
+# lprint(dpg.get_viewport_height())
    
 
 
@@ -171,7 +237,12 @@ init = inits(inV.init_size_ratio,
                  inV.init_top_indent,
                  inV.init_group_spacer,
                  inV.init_font_size,
-                 inV.last_directory)
+                 callback,
+                 inV.tex_1_name,
+                 inV.tex_2_name,
+            )
+
+execfile(os.path.join('dep','Texture_registry.py'))  
 execfile(os.path.join('dep','Layout.py'))
 # execfile(os.path.join('dep','Dialogs.py'))                     
 
@@ -214,7 +285,7 @@ execfile(os.path.join('dep','Layout.py'))
 
 
 
-lprint('4')
+# lprint('4')
 
 
 

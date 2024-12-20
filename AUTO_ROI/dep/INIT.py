@@ -1,6 +1,24 @@
 import inspect
 import dearpygui.dearpygui as dpg
 import numpy as np
+import os
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.gridspec as gridspec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib as mpl
+import pickle
+from PIL import Image
+from io import BytesIO
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
+import time
+import cv2
+from matplotlib.transforms import Bbox
+
+
+
 class _init_varaibles:
     def __init__(self):
         
@@ -18,6 +36,8 @@ class _init_varaibles:
                               'pos':(0,0)
                                 }
         self.last_directory = 'samples'
+        self.tex_1_name = 'texture_tag_chan_1'
+        self.tex_2_name = 'texture_tag_chan_2'
         
     
 class inits:
@@ -30,7 +50,10 @@ class inits:
                  top_indent,
                  group_spacer,
                  font_size,
-                 last_directory,
+                 callbacks,
+                 tex_1_name,
+                 tex_2_name
+                 
                 ):
         self.size_ratio=size_ratio
         self.top_indent = int(top_indent*self.size_ratio['width'])
@@ -41,11 +64,14 @@ class inits:
         self.fnt_ratio = (self.size_ratio['width']+self.size_ratio['height'])/2
         self.font_size  = int(np.round(font_size*self.fnt_ratio,0))
         self.group_spacer  = int(group_spacer*self.size_ratio['width'])
+
+        self.callback=callbacks
+        self.tex_1_name = tex_1_name
+        self.tex_2_name = tex_2_name
+
+
         
         
-        self.items=[]
-        self.last_directory = last_directory
-        self.directory = ''
 
 
         self.file_window = {'name':'file_window',
@@ -54,9 +80,20 @@ class inits:
                             'pos':(self.left_indent,self.top_indent)
                             }
 
+        self.file_window = {'name':'file_window',
+                            'width':int(340*self.size_ratio['width']),
+                            'height':dpg.get_viewport_height()-4*self.bottom_indent,
+                            'pos':(self.left_indent,self.top_indent)
+                            }
+        self.file_dialog_id = {'name':'file_dialog_id',
+                               'width':int(dpg.get_viewport_width())-11*self.left_indent,
+                               'height':int(dpg.get_viewport_height()*3/4)
+                              }
+        
+        
         self.image_window_1 = {'name':'image_window_1',
-                            'width':(dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,
-                            'height':(dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,
+                            'width':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0)),
+                            'height':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0))+35,
                             'pos':(self.left_indent+self.file_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
@@ -67,6 +104,11 @@ class inits:
                             'pos':(self.image_window_1['pos'][0]+self.image_window_1['width']+self.internal_indent,
                                    self.top_indent)
                             }
+
+        self.file_box = {'name':'file_box',
+                         'width':-1,
+                         'num_items':30
+                        }
         
 class _basicF:      
     def lnprint(self,*args, **kwargs):
@@ -93,9 +135,101 @@ class _basicF:
         if i == 3: return (255*p, 255*q, 255*v)
         if i == 4: return (255*t, 255*p, 255*v)
         if i == 5: return (255*v, 255*p, 255*q)
+
+
+    def plot_IMAGE(self,img,width,height):
+        width = int(width)
+        height = int(height)
+        if img.shape != (height, width):  # Resize if necessary
+            resized_img = cv2.resize(img, (width, height))  # Resize to (width, height)
+        else:
+            resized_img = img
+
+        # Check if grayscale (2D) or already RGB (3D)
+        if len(resized_img.shape) == 2:  # Grayscale image (H, W)
+            rgb_img = np.stack([resized_img] * 3, axis=2)  # Convert (H, W) to (H, W, 3)
+        else:
+            rgb_img = resized_img  # Already RGB (H, W, 3)
+        
+        # Ensure pixel values are in range [0, 255]
+        if rgb_img.max() <= 1.0:  # If the image is in range [0, 1]
+            rgb_img = (rgb_img * 255).astype(np.uint8)  # Convert to [0, 255]
+        else:
+            rgb_img = rgb_img.astype(np.uint8)  # Ensure dtype is uint8
+
+        return rgb_img
+        # fg_color = 'white'
+        # px = 1/plt.rcParams['figure.dpi']
+        # # print(width,height)
         
         
+        # fig,ax = plt.subplots(figsize=((width*px),(height*px)),facecolor='black')
         
+        
+        # fig.subplots_adjust(top=0.9, bottom=0.1, right=1, left=0, hspace=0, wspace=0)
+        # ax.margins(0, 0,)
+        # ax.axis('off')
+
+        # pa = ax.imshow(img,cmap='gray')
+        
+        # plt.axis('tight')
+        # b =BytesIO()
+        # FigureCanvas(fig).print_png(b)
+        # plt.close(fig)
+        # b.seek(0)
+        # image=Image.open(b)
+        # return image
+        
+    def create_textures(self,curr_img_1,curr_img_2,w,h):
+        image_1=self.plot_IMAGE(curr_img_1,w,h)
+        image_2=self.plot_IMAGE(curr_img_2,w,h)
+        # dpg_image_1 = []
+        # for i in range(0, image_1._size[1]):
+        #     for j in range(0, image_1._size[0]):
+        #         pixel = image_1.getpixel((j, i))
+                
+        #         dpg_image_1.append(pixel[0]/255)
+        #         dpg_image_1.append(pixel[1]/255)
+        #         dpg_image_1.append(pixel[2]/255)
+        #         dpg_image_1.append(255/255)
+                
+        # dpg_image_2 = []
+        # for i in range(0, image_2._size[1]):
+        #     for j in range(0, image_2._size[0]):
+        #         pixel = image_2.getpixel((j, i))
+                
+        #         dpg_image_2.append(pixel[0]/255)
+        #         dpg_image_2.append(pixel[1]/255)
+        #         dpg_image_2.append(pixel[2]/255)
+        #         dpg_image_2.append(255/255)
+        dpg_image_1 = self.convert_to_texture(image_1)
+        dpg_image_2 = self.convert_to_texture(image_2)
+        
+        return dpg_image_1, dpg_image_2
+        # return dpg_image_1,dpg_image_2
+
+
+
+    def convert_to_texture(self, img):
+        height, width, channels = img.shape
+        
+        # Ensure the image is in range [0, 255]
+        if img.max() <= 1.0:  # If the image is in range [0, 1]
+            img = (img * 255).astype(np.uint8)
+        
+        # Add alpha channel (255) to every pixel
+        alpha_channel = np.full((height, width, 1), 255, dtype=np.uint8)  # Full opacity
+        img_rgba = np.concatenate((img, alpha_channel), axis=2)  # (H, W, 4)
+        
+        # Normalize pixel values from [0, 255] to [0, 1] (convert to float32)
+        img_rgba_normalized = img_rgba.astype(np.float32) / 255.0
+        
+        # Flatten the array into a 1D list for DearPyGui
+        return img_rgba_normalized.flatten().tolist()
+    
+    
+
+
 class _init_Menu:
     
     
@@ -111,11 +245,173 @@ class _init_Menu:
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
-            with dpg.menu(label="File",tag='menu_file_dropout'):
-                dpg.add_menu_item(label="Open PTU folder",callback=None,tag='menu_item_open_ptu')
+            with dpg.menu(label="Menu",tag='menu_file_dropout'):
+                dpg.add_menu_item(label="Open PTU folder",callback=lambda: dpg.show_item('file_dialog_id'),tag='menu_item_open_ptu')
                 dpg.add_menu_item(label="Open png folder",callback=None,tag='menu_item_open_p[ng')
                 dpg.add_menu_item(label="Open csv folder",callback=None,tag='menu_item_open_csv')
+                dpg.add_separator(tag ='menu_sep_left_1',parent = 'menu_file_dropout',
+                  before = 'menu_item_open_output_folder',)
+                dpg.add_menu_item(label="Open OUTPUT folder",callback=None,tag='menu_item_open_output_folder')
+                dpg.add_separator(tag ='menu_sep_left_2',parent = 'menu_file_dropout',
+                  before = 'menu_item_exit',)
+                
                 dpg.add_menu_item(label="Exit",callback=lambda: dpg.stop_dearpygui(),tag='menu_item_exit')
-            
+
+class oth:
+    def __init__(self,basf,inV):
+        self.basf = basf
+        self.inV=inV
+
+    def update_texture(self,np_imgage_input):
+    # global ratio_w,dif_vp0_width
+        ratio = {'width': np.round(dpg.get_viewport_width()/self.inV.VIEWPORT_prop['width'],4),
+             'height': np.round(dpg.get_viewport_height()/self.inV.VIEWPORT_prop['height'],4)} 
+        ratio_w = ratio['width']
+        width = np_imgage_input.shape[0]
+        height = np_imgage_input.shape[1]
+        
+        w = int(np.round(dpg.get_item_width('image_window_1')))-int(np.round(15*ratio_w))
+        h = w
+        t0 = time.time()
+        image=self.basf.plot_IMAGE(np_imgage_input,w,h)
+        t1 = time.time()
+
+        dpg_image = self.basf.convert_to_texture(image)
+        # image_array = np.array(image, dtype=np.float32) / 255
+        # t2 = time.time()
+        
+    
+    
+        # dpg_image = image_array[:, :, [0, 1, 2, 3]].reshape(-1).tolist()
+        # t3 = time.time()
+        # print(t1-t0,t2-t1,t3-t2)
+        return dpg_image
+
+class callbacks:
+    def __init__(self,last_directory,basf,inV):
+        self.items=[]
+        self.last_directory = last_directory
+        self.directory = ''
+        self.files = ()
+        self.anal_file = ''
+        self.basf=basf
+        self.inV=inV
+        
+        
+        
+    
 
     
+    
+    
+    def callback_listbox(self,sender,app_data):
+        self.anal_file = app_data
+        file = os.path.join(self.last_directory,self.anal_file)
+        self.load_PTU_images(file)
+
+    def display_images(self,channel):
+        ot = oth(self.basf,self.inV)
+                  
+        if channel == 1:
+            dpg_image_1 = ot.update_texture(self.Current_image_1)
+            # print('ch1')   
+            dpg.set_value(self.inV.tex_1_name, dpg_image_1)
+        elif channel == 2:
+            dpg_image_2 = ot.update_texture(self.Current_image_2)
+            # print('ch2')   
+            dpg.set_value(self.inV.tex_2_name, dpg_image_2)
+        elif channel =='both':
+
+            # print(np.max(self.Current_image_1))
+            dpg_image_1 = ot.update_texture(self.Current_image_1)
+            # print(np.max(self.Current_image_2))
+            dpg_image_2 = ot.update_texture(self.Current_image_2)
+            # print('ch12')   
+            dpg.set_value(self.inV.tex_1_name, dpg_image_1)
+            dpg.set_value(self.inV.tex_2_name, dpg_image_2)
+
+    def callback_empty(self,sender,app_data):
+        '''Empty function. Do nothing.'''
+        pass
+
+    def update_dialogs_default_directory(self,last_directory):
+    # print(last_directory)
+        pass
+        # dpg.configure_item('TT_file_dialog_id_ch_2',default_path=last_directory)
+        # dpg.configure_item('TT_file_dialog_id_ch_1',default_path=last_directory)
+        
+        # dpg.configure_item('ROI_folder_dialog_id',default_path=last_directory)
+        # dpg.configure_item('file_dialog_id',default_path=last_directory)
+        # dpg.configure_item('PTU_file_dialog_id',default_path=last_directory)
+        # dpg.configure_item('Select_ROI_dialog',default_path=last_directory)
+        # dpg.configure_item('file_dialog_export',default_path=last_directory)
+        # dpg.configure_item('Calib_file_dialog_id',default_path=last_directory)
+
+    def update_flist(self,fs):
+        '''Updates the filelist. '''
+        
+        
+        if not len(fs)==0:
+            try:
+                dpg.configure_item("file_box", items=fs)
+    
+                dpg.configure_item("file_box", default_value=fs[0])
+            except:
+                pass
+        else:
+            dpg.configure_item("file_box", items=())
+            dpg.configure_item("file_box", default_value='')   
+    
+    def callback_directory_select(self,sender,app_data):
+        self.directory = app_data['file_path_name']
+        # new_directory=directory
+        self.PTU_directory = self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
+        self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
+
+        filenames = [f.replace('.ptu','') for f in self.files]
+
+        if len(self.pck_files)!=0:
+            self.update_flist(filenames)
+    
+    
+            self.anal_file=filenames[0]
+            dpg.configure_item('file_box', default_value=self.anal_file)
+
+            self.load_PTU_images(self.anal_file)
+        
+        
+    def load_PTU_images(self,an_file):
+        pickle_file = os.path.join(self.PTU_directory,an_file+'.pkl')
+        
+        with open(pickle_file, 'rb') as pcklf:
+            pkl = pickle.load(pcklf)
+
+        Channels = list(pkl.keys())
+        Channels = [f for f in Channels if f.startswith('export_df')]
+        Channels = [ch[-1] for ch in Channels]
+
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                Intensity_1 = pkl['intensity_1']
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = self.NO_IMAGE_TEXTURE
+                self.display_images(channel)
+            elif '2' in Channels[0]:
+                Intensity_2 = pkl['intensity_2']
+                channel = 'both'
+                self.Current_image_1 = self.NO_IMAGE_TEXTURE
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.display_images(channel)
+        elif len(Channels)==2:
+            Intensity_1 = pkl['intensity_1']
+            Intensity_2 = pkl['intensity_2']
+            channel = 'both'
+
+            self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+            self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+            self.display_images(channel)
+

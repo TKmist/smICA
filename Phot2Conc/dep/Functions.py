@@ -2533,7 +2533,7 @@ def display_images(dframes,channel):
 
     global tex_1_name,tex_2_name
 
-
+    
 
     if channel == 'both':
         df = dframes[0]
