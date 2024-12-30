@@ -67,17 +67,20 @@ dpg.add_image(init.tex_1_name,
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_1',
-                  parent='image_window_1')
-
+                  parent='image_window_1',before='IMAGE_CH1_top_sep_2')
+dpg.add_separator(tag ='IMAGE_CH1_top_sep_2',show=True,parent='image_window_1')
 dpg.add_text('Channel 2',tag='Img_2_window_text_title',parent='image_window_2')
 dpg.add_separator(tag ='IMAGE_CH2_top_sep',show=True,parent='image_window_2')
+dpg.add_checkbox(label='Search for nucleus', tag='nucleus_search_1',default_value = False,callback=None,parent='image_window_1')
+
     
 dpg.add_image(init.tex_2_name,
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_2',
-                  parent='image_window_2')
-
+                  parent='image_window_2',before='IMAGE_CH2_top_sep_2')
+dpg.add_separator(tag ='IMAGE_CH2_top_sep_2',show=True,parent='image_window_2')
+dpg.add_checkbox(label='Search for nucleus', tag='nucleus_search_2',default_value = False,callback=None,parent='image_window_2')
 
 
 #########################################################################
@@ -95,5 +98,5 @@ dpg.add_file_dialog(directory_selector=True,
                     callback=callback.callback_directory_select,
                     cancel_callback=callback.callback_empty,
                     tag="file_dialog_id",
-                    modal=False
+                    modal=False,
                    )

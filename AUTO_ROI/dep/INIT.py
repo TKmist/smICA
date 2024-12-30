@@ -38,6 +38,7 @@ class _init_varaibles:
         self.last_directory = 'samples'
         self.tex_1_name = 'texture_tag_chan_1'
         self.tex_2_name = 'texture_tag_chan_2'
+        self.loadmode = None
         
     
 class inits:
@@ -93,7 +94,7 @@ class inits:
         
         self.image_window_1 = {'name':'image_window_1',
                             'width':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0)),
-                            'height':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0))+35,
+                            'height':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0))+71,
                             'pos':(self.left_indent+self.file_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
@@ -233,22 +234,41 @@ class _basicF:
 class _init_Menu:
     
     
-    def __init__(self,VERSION):
+    def __init__(self,VERSION,inV):
         self.VERSION = VERSION
+        self.inV=inV
         
         
     
     
-    
-    
+    def callback_open_ptu_diaolog(self,sender,app_data):
+        # print(self.inV.loadmode)
+        dpg.show_item('file_dialog_id')
+        self.inV.loadmode = 'PTU' 
+        # print(self.inV.loadmode)
+
+
+
+    def callback_open_npy_diaolog(self,sender,app_data):
+        # print(self.inV.loadmode)
+        dpg.show_item('file_dialog_id')
+        self.inV.loadmode = 'NPY' 
+        # print(self.inV.loadmode)
+
+    def callback_open_png_diaolog(self,sender,app_data):
+        # print(self.inV.loadmode)
+        dpg.show_item('file_dialog_id')
+        self.inV.loadmode = 'PNG' 
+        # print(self.inV.loadmode)
+
     
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
             with dpg.menu(label="Menu",tag='menu_file_dropout'):
-                dpg.add_menu_item(label="Open PTU folder",callback=lambda: dpg.show_item('file_dialog_id'),tag='menu_item_open_ptu')
-                dpg.add_menu_item(label="Open png folder",callback=None,tag='menu_item_open_p[ng')
-                dpg.add_menu_item(label="Open csv folder",callback=None,tag='menu_item_open_csv')
+                dpg.add_menu_item(label="Open PTU folder",callback=self.callback_open_ptu_diaolog ,tag='menu_item_open_ptu')
+                dpg.add_menu_item(label="Open npy folder",callback=self.callback_open_npy_diaolog,tag='menu_item_open_npy')
+                dpg.add_menu_item(label="Open png folder",callback=self.callback_open_png_diaolog,tag='menu_item_open_png')
                 dpg.add_separator(tag ='menu_sep_left_1',parent = 'menu_file_dropout',
                   before = 'menu_item_open_output_folder',)
                 dpg.add_menu_item(label="Open OUTPUT folder",callback=None,tag='menu_item_open_output_folder')
@@ -296,18 +316,31 @@ class callbacks:
         self.anal_file = ''
         self.basf=basf
         self.inV=inV
-        
-        
+        self.npy_channels = []
+        self.png_channels = []
         
     
 
     
-    
+        
     
     def callback_listbox(self,sender,app_data):
         self.anal_file = app_data
         file = os.path.join(self.last_directory,self.anal_file)
-        self.load_PTU_images(file)
+        
+
+        if self.inV.loadmode == 'PTU':
+            self.load_PTU_images(file)
+        elif self.inV.loadmode == 'NPY':
+            self.npy_channels = self.filenames_dict[self.anal_file]
+            channels = self.npy_channels
+            self.load_NPY_images(file,channels)
+        elif self.inV.loadmode == 'PNG':
+            self.npy_channels = self.filenames_dict[self.anal_file]
+            channels = self.npy_channels
+            self.load_PNG_images(file,channels)
+        
+    
 
     def display_images(self,channel):
         ot = oth(self.basf,self.inV)
@@ -363,26 +396,179 @@ class callbacks:
             dpg.configure_item("file_box", default_value='')   
     
     def callback_directory_select(self,sender,app_data):
+        print('clab',self.inV.loadmode)
         self.directory = app_data['file_path_name']
         # new_directory=directory
+        
         self.PTU_directory = self.directory
         self.last_directory=self.directory
         self.update_dialogs_default_directory(self.last_directory)
-        self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
-        self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
 
-        filenames = [f.replace('.ptu','') for f in self.files]
-
-        if len(self.pck_files)!=0:
-            self.update_flist(filenames)
+        if self.inV.loadmode == 'PTU':
+        
+            self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
+            self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
     
+            filenames = [f.replace('.ptu','') for f in self.files]
     
-            self.anal_file=filenames[0]
-            dpg.configure_item('file_box', default_value=self.anal_file)
-
-            self.load_PTU_images(self.anal_file)
+            if len(self.pck_files)!=0:
+                self.update_flist(filenames)
         
         
+                self.anal_file=filenames[0]
+                dpg.configure_item('file_box', default_value=self.anal_file)
+    
+                self.load_PTU_images(self.anal_file)
+                print(self.anal_file)
+        elif self.inV.loadmode == 'NPY':
+        
+            self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.npy')]))
+            # self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
+    
+            filenames = [f.replace('.npy','') for f in self.files]
+
+            self.filenames_dict = {}
+
+            for name in filenames:
+                base_name, channel_part = name.split('_ch_')
+                channel = channel_part.split('.')[0]  # Extract the channel number
+                if base_name not in self.filenames_dict:
+                    self.filenames_dict[base_name] = []
+                self.filenames_dict[base_name].append(channel)
+            
+            
+            for base_name in self.filenames_dict:
+                self.filenames_dict[base_name].sort()
+            print(self.filenames_dict)
+            if self.filenames_dict.keys()!=0:
+                self.update_flist(list(self.filenames_dict.keys()))
+        
+        
+                self.anal_file=list(self.filenames_dict.keys())[0]
+                self.npy_channels=self.filenames_dict[self.anal_file]
+
+                print(self.anal_file)
+                print(self.npy_channels)
+                self.load_NPY_images(self.anal_file,self.npy_channels)
+        elif self.inV.loadmode == 'PNG':
+            self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.png')]))
+            # self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
+    
+            filenames = [f.replace('.png','') for f in self.files]
+            self.filenames_dict = {}
+
+            for name in filenames:
+                base_name, channel_part = name.split('_ch_')
+                channel = channel_part.split('.')[0]  # Extract the channel number
+                if base_name not in self.filenames_dict:
+                    self.filenames_dict[base_name] = []
+                self.filenames_dict[base_name].append(channel)
+            
+            
+            for base_name in self.filenames_dict:
+                self.filenames_dict[base_name].sort()
+            print(self.filenames_dict)
+            if self.filenames_dict.keys()!=0:
+                self.update_flist(list(self.filenames_dict.keys()))
+        
+        
+                self.anal_file=list(self.filenames_dict.keys())[0]
+                self.npy_channels=self.filenames_dict[self.anal_file]
+
+                print(self.anal_file)
+                print(self.npy_channels)
+                self.load_PNG_images(self.anal_file,self.npy_channels)
+            # dpg.configure_item('file_box', default_value=self.anal_file)
+    
+                
+                
+        
+            
+    
+            # filenames_dict = {}
+
+            # for name in filenames_dict.keys():
+            #     base_name, channel_part = name.split('_ch_')
+            #     channel = channel_part.split('.')[0]  # Extract the channel number
+            #     if base_name not in filenames_dict:
+            #         filenames_dict[base_name] = []
+            #     filenames_dict[base_name].append(channel)
+            
+            
+            # for base_name in filenames_dict:
+            #     filenames_dict[base_name].sort()
+            
+            # if filenames!=0:
+            #     self.update_flist(filenames)
+        
+        
+            #     self.anal_file=filenames[0]
+            #     dpg.configure_item('file_box', default_value=self.anal_file)
+    
+                
+            #     self.load_PNG_images(filenames_dict[self.anal_file],channels)
+    def load_NPY_images(self,an_file,Channels):
+        print(an_file,Channels)
+        
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
+                Intensity_1 = np.load(npy_file)
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = self.NO_IMAGE_TEXTURE
+                self.display_images(channel)
+            elif '2' in Channels[0]:
+                npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
+                Intensity_2 = np.load(npy_file)
+                channel = 'both'
+                self.Current_image_1 = self.NO_IMAGE_TEXTURE
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.display_images(channel)
+        elif len(Channels)==2:
+            npy_file_1 = os.path.join(self.PTU_directory,an_file+'_ch_1.npy')
+            npy_file_2 = os.path.join(self.PTU_directory,an_file+'_ch_2.npy')
+            Intensity_1 = np.load(npy_file_1)
+            Intensity_2 = np.load(npy_file_2)
+            channel = 'both'
+
+            self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+            self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+            self.display_images(channel)
+        
+
+    def load_PNG_images(self,an_file,Channels):
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                pass
+                png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
+                
+                Intensity_1 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = self.NO_IMAGE_TEXTURE
+                self.display_images(channel)
+            elif '2' in Channels[0]:
+                pass
+                png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
+                Intensity_2 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
+                channel = 'both'
+                self.Current_image_1 = self.NO_IMAGE_TEXTURE
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.display_images(channel)
+        elif len(Channels)==2:
+            # pass
+            png_file_1 = os.path.join(self.PTU_directory,an_file+'_ch_1.png')
+            png_file_2 = os.path.join(self.PTU_directory,an_file+'_ch_2.png')
+            Intensity_1 = cv2.imread(png_file_1,cv2.IMREAD_GRAYSCALE)
+            Intensity_2 = cv2.imread(png_file_2,cv2.IMREAD_GRAYSCALE)
+            channel = 'both'
+
+            self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+            self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+            self.display_images(channel)
+
+    
     def load_PTU_images(self,an_file):
         pickle_file = os.path.join(self.PTU_directory,an_file+'.pkl')
         
@@ -391,8 +577,9 @@ class callbacks:
 
         Channels = list(pkl.keys())
         Channels = [f for f in Channels if f.startswith('export_df')]
+        # print(Channels)
         Channels = [ch[-1] for ch in Channels]
-
+        # print(Channels)
         if len(Channels)==1:
             if '1' in Channels[0]:
                 Intensity_1 = pkl['intensity_1']

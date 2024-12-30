@@ -17,6 +17,7 @@ def execfile(filepath, globals=globals(), locals=None):
 
 def _resizer(sender,app_data):
     import numpy as np
+    
     init_resizable_items = []
     # cmn_resizable_items = []
     obj_var = [eval('init.'+str(m)) for m in vars(init)]
@@ -72,7 +73,7 @@ def _resizer(sender,app_data):
                          last_dir,
                          inV.tex_1_name,
                          inV.tex_2_name)
-    
+    ot = oth(basf,inV)
     for item in init_resizable_items:
         # print(item)
         props =eval('init.'+item) 
@@ -88,7 +89,7 @@ def _resizer(sender,app_data):
     add_font_to_registry(init.font_size)
     w = int(np.round(dpg.get_item_width('image_window_1')))-15*ratio['width']
     h = w
-    dpg_image_1 = update_texture(callback.Current_image_1)
+    dpg_image_1 = ot.update_texture(callback.Current_image_1)
     if init.tex_1_name in dpg.get_aliases():
         dpg.delete_item(init.tex_1_name)
         
@@ -113,9 +114,9 @@ def _resizer(sender,app_data):
                         parent = 'texture_reg')
         
         dpg.add_image(init.tex_1_name,parent = 'image_window_1'
-                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1')
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',before='IMAGE_CH1_top_sep_2')
         
-    dpg_image_2 = update_texture(callback.Current_image_2)
+    dpg_image_2 = ot.update_texture(callback.Current_image_2)
     if init.tex_2_name in dpg.get_aliases():
         dpg.delete_item(init.tex_2_name)
         
@@ -140,7 +141,7 @@ def _resizer(sender,app_data):
                         parent = 'texture_reg')
         
         dpg.add_image(init.tex_2_name,parent = 'image_window_2'
-                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2')
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',before='IMAGE_CH2_top_sep_2')
 
     
 
@@ -163,7 +164,7 @@ viewport = inV.VIEWPORT_prop
 
 basf = _basicF()
 
-menu = _init_Menu(VERSION)
+menu = _init_Menu(VERSION,inV)
 
 # globalITEMS = init.items
 
