@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import time
 import cv2
 from matplotlib.transforms import Bbox
+from dep.automated_roi_TK import ImageROIProcessor
 
 
 
@@ -94,7 +95,7 @@ class inits:
         
         self.image_window_1 = {'name':'image_window_1',
                             'width':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0)),
-                            'height':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0))+71,
+                            'height':int(np.round((dpg.get_viewport_width()-self.file_window['width']-self.file_window['pos'][0]-2*self.internal_indent-self.right_indent)/2,0))+75,
                             'pos':(self.left_indent+self.file_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
@@ -307,6 +308,8 @@ class oth:
         # print(t1-t0,t2-t1,t3-t2)
         return dpg_image
 
+    
+
 class callbacks:
     def __init__(self,last_directory,basf,inV):
         self.items=[]
@@ -351,7 +354,8 @@ class callbacks:
             dpg.set_value(self.inV.tex_1_name, dpg_image_1)
         elif channel == 2:
             dpg_image_2 = ot.update_texture(self.Current_image_2)
-            # print('ch2')   
+            # print('ch2')
+            print(self.inV.tex_2_name)
             dpg.set_value(self.inV.tex_2_name, dpg_image_2)
         elif channel =='both':
 
@@ -362,6 +366,7 @@ class callbacks:
             # print('ch12')   
             dpg.set_value(self.inV.tex_1_name, dpg_image_1)
             dpg.set_value(self.inV.tex_2_name, dpg_image_2)
+            
 
     def callback_empty(self,sender,app_data):
         '''Empty function. Do nothing.'''
@@ -514,27 +519,40 @@ class callbacks:
             if '1' in Channels[0]:
                 npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
                 Intensity_1 = np.load(npy_file)
+                self.processor_1 = ImageROIProcessor(npy_file, npy_file, False)
+                self.processor_1.image=Intensity_1
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                 self.Current_image_2 = self.NO_IMAGE_TEXTURE
                 self.display_images(channel)
+                self._update_textures_roi('cell_tresh_ratio_1', 1.0)
             elif '2' in Channels[0]:
                 npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
                 Intensity_2 = np.load(npy_file)
+                self.processor_2 = ImageROIProcessor(npy_file, npy_file, False)
+                self.processor_2.image=Intensity_2
                 channel = 'both'
                 self.Current_image_1 = self.NO_IMAGE_TEXTURE
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.display_images(channel)
+                self._update_textures_roi('cell_tresh_ratio_2', 1.0)
         elif len(Channels)==2:
             npy_file_1 = os.path.join(self.PTU_directory,an_file+'_ch_1.npy')
             npy_file_2 = os.path.join(self.PTU_directory,an_file+'_ch_2.npy')
+            
             Intensity_1 = np.load(npy_file_1)
             Intensity_2 = np.load(npy_file_2)
+            self.processor_1 = ImageROIProcessor(npy_file_1, npy_file_1, False)
+            self.processor_1.image=Intensity_1
+            self.processor_2 = ImageROIProcessor(npy_file_2, npy_file_2, False)
+            self.processor_2.image=Intensity_2
             channel = 'both'
 
             self.Current_image_1 = Intensity_1/np.max(Intensity_1)
             self.Current_image_2 = Intensity_2/np.max(Intensity_2)
             self.display_images(channel)
+            self._update_textures_roi('cell_tresh_ratio_1', 1.0)
+            self._update_textures_roi('cell_tresh_ratio_2', 1.0)
         
 
     def load_PNG_images(self,an_file,Channels):
@@ -544,29 +562,44 @@ class callbacks:
                 png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
                 
                 Intensity_1 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
+                self.processor_1 = ImageROIProcessor(png_file, png_file, False)
+                self.processor_1.image=Intensity_1
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                 self.Current_image_2 = self.NO_IMAGE_TEXTURE
                 self.display_images(channel)
+                self._update_textures_roi('cell_tresh_ratio_1', 1.0)
+            
             elif '2' in Channels[0]:
                 pass
                 png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
                 Intensity_2 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
+                self.processor_2 = ImageROIProcessor(png_file, png_file, False)
+                self.processor_2.image=Intensity_2
                 channel = 'both'
                 self.Current_image_1 = self.NO_IMAGE_TEXTURE
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.display_images(channel)
+                
+                self._update_textures_roi('cell_tresh_ratio_2', 1.0)
         elif len(Channels)==2:
             # pass
             png_file_1 = os.path.join(self.PTU_directory,an_file+'_ch_1.png')
             png_file_2 = os.path.join(self.PTU_directory,an_file+'_ch_2.png')
             Intensity_1 = cv2.imread(png_file_1,cv2.IMREAD_GRAYSCALE)
             Intensity_2 = cv2.imread(png_file_2,cv2.IMREAD_GRAYSCALE)
+
+            self.processor_1 = ImageROIProcessor(png_file_1, png_file_1, False)
+            self.processor_1.image=Intensity_1
+            self.processor_2 = ImageROIProcessor(png_file_2, png_file_2, False)
+            self.processor_2.image=Intensity_2
             channel = 'both'
 
             self.Current_image_1 = Intensity_1/np.max(Intensity_1)
             self.Current_image_2 = Intensity_2/np.max(Intensity_2)
             self.display_images(channel)
+            self._update_textures_roi('cell_tresh_ratio_1', 1.0)
+            self._update_textures_roi('cell_tresh_ratio_2', 1.0)
 
     
     def load_PTU_images(self,an_file):
@@ -583,22 +616,165 @@ class callbacks:
         if len(Channels)==1:
             if '1' in Channels[0]:
                 Intensity_1 = pkl['intensity_1']
+                self.processor_1 = ImageROIProcessor(pcklf, pcklf, False)
+                self.processor_1.image=Intensity_1
+                
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+
+                
                 self.Current_image_2 = self.NO_IMAGE_TEXTURE
+                
                 self.display_images(channel)
+                self._update_textures_roi('cell_tresh_ratio_1', 1.0)
             elif '2' in Channels[0]:
                 Intensity_2 = pkl['intensity_2']
+
+                self.processor_2 = ImageROIProcessor(pcklf, pcklf, False)
+                self.processor_2.image=Intensity_2
+                
                 channel = 'both'
                 self.Current_image_1 = self.NO_IMAGE_TEXTURE
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.display_images(channel)
+                self._update_textures_roi('cell_tresh_ratio_2', 1.0)
         elif len(Channels)==2:
             Intensity_1 = pkl['intensity_1']
             Intensity_2 = pkl['intensity_2']
+            self.processor_1 = ImageROIProcessor(pcklf, pcklf, False)
+            self.processor_1.image=Intensity_1
+            self.processor_2 = ImageROIProcessor(pcklf, pcklf, False)
+            self.processor_2.image=Intensity_2
+            
             channel = 'both'
 
             self.Current_image_1 = Intensity_1/np.max(Intensity_1)
             self.Current_image_2 = Intensity_2/np.max(Intensity_2)
             self.display_images(channel)
+            self._update_textures_roi('cell_tresh_ratio_1', 1.0)
+            self._update_textures_roi('cell_tresh_ratio_2', 1.0)
+    
+    
+    
+    # def cell_roi_detect(self,img):
 
+    def create_rgba_texture(self,image_data):
+        # Ensure the image data is 2D (grayscale)
+        if image_data.ndim != 2:
+            raise ValueError("Image data should be a 2D array.")
+        
+        # Convert to a 3D RGB array (3 channels)
+        rgba_data = np.stack([image_data] * 3, axis=-1)  # Duplicate grayscale data for RGB channels
+        rgba_data = np.concatenate([rgba_data, np.ones((image_data.shape[0], image_data.shape[1], 1), dtype=np.uint8) * 255], axis=-1)  # Add alpha channel (fully opaque)
+        
+        # Flatten the RGBA array into a 1D list for the dynamic texture
+        return rgba_data.flatten().tolist()    
+        
+    def _update_textures_roi(self,sender, app_data):
+        ratio = {'width': np.round(dpg.get_viewport_width()/self.inV.VIEWPORT_prop['width'],4),
+             'height': np.round(dpg.get_viewport_height()/self.inV.VIEWPORT_prop['height'],4)} 
+        ratio_w = ratio['width']
+        
+        
+        w = int(np.round(dpg.get_item_width('image_window_1')))-int(np.round(15*ratio_w))
+        h = w
+        ovrl = 15
+        
+        
+        # print(sender)
+        if sender[-1]=='1':
+            find_nucleus = dpg.get_value('nucleus_search_1')
+            cell_rat = dpg.get_value('cell_tresh_ratio_1')
+            nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
+            img = self.processor_1.image.astype(np.uint8)
+            
+            image_data =(img* (255 / img.max())).astype(np.uint8)
+            cell_roi_image = self.processor_1.detect_cell_roi(img,cell_rat)
+            if not find_nucleus:    
+                full_mask = cell_roi_image
+                # image_data =(img* (255 / img.max())).astype(np.uint8)
+                # image_data = np.multiply(image_data, cell_roi_image)
+            else:
+                nucleus_roi = self.processor_1.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
+                full_mask = self.processor_1.make_full_roi(cell_roi_image, nucleus_roi)
+                
+                # image_data =(img* (255 / img.max())).astype(np.uint8)
+                # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
+                # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
+                # image_data = np.multiply(image_data, full_mask)
+            # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
+            # new_texture_data = self.create_rgba_texture(image_data/255)
+            rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+            rgba_image[..., 0] = img  # Red channel
+            rgba_image[..., 1] = img  # Green channel
+            rgba_image[..., 2] = img  # Blue channel
+            rgba_image[..., 3] = 255
+
+            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+            rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+            rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+            rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+            rgba_image[full_mask > 0, 3] = overlay_alpha
+
+            rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+            rgba_image=rgba_image.astype(np.float32) /255
+            
+            new_texture_data = rgba_image.flatten().tolist()
+            dpg.set_value(self.inV.tex_1_name, new_texture_data)
+            
+                
+        elif sender[-1]=='2':
+            find_nucleus = dpg.get_value('nucleus_search_2')
+            cell_rat = dpg.get_value('cell_tresh_ratio_2')
+            nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
+            img = self.processor_2.image.astype(np.uint8)
+            print(type(img))
+            cell_roi_image = self.processor_2.detect_cell_roi(img,cell_rat)
+            if not find_nucleus:    
+                full_mask = cell_roi_image
+                # image_data =(img* (255 / img.max())).astype(np.uint8)
+                # image_data = np.multiply(image_data, cell_roi_image)
+            else:
+                nucleus_roi = self.processor_2.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
+                full_mask = self.processor_2.make_full_roi(cell_roi_image, nucleus_roi)
+                
+                # image_data =(img* (255 / img.max())).astype(np.uint8)
+                # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
+                # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
+                # image_data = np.multiply(image_data, full_mask)
+            # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
+            # new_texture_data = self.create_rgba_texture(image_data/255)
+            rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+            rgba_image[..., 0] = img  # Red channel
+            rgba_image[..., 1] = img  # Green channel
+            rgba_image[..., 2] = img  # Blue channel
+            rgba_image[..., 3] = 255
+
+            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+            rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+            rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+            rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+            rgba_image[full_mask > 0, 3] = overlay_alpha
+
+            rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+            rgba_image=rgba_image.astype(np.float32) /np.max(img)
+            new_texture_data = rgba_image.flatten().tolist()
+            
+            dpg.set_value(self.inV.tex_2_name, new_texture_data)
+            
+        else:
+            pass
+        
+        # image_data = processor.image
+
+        
+        # image_data =(image_data* (255 / image_data.max())).astype(np.uint8)
+        
+        
+        # cell_roi = processor.roi_image
+       
+
+        
+
+        
+        
