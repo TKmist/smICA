@@ -56,7 +56,26 @@ list_box = dpg.add_listbox(items=callback.files,
                            callback=callback.callback_listbox
 
                       )
+dpg.add_separator(tag ='sep_left_2',parent='file_window')
+dpg.add_button(label="Save single roi",
+                               tag='save_roi_button',
+                               parent = 'file_window',
+                               width = init.save_roi_button['width'],
+                               callback=callback.callback_save_single_roi,
+               enabled=False
+                              )
+# with dpg.tooltip('save_roi_button',tag='save_roi_button_tooltip'):
+#     dpg.add_text('This button is enabled only if the output directory is defined. Open "File" -> "Open output directory"',tag='Correlate_all_button_tooltip_text')
+dpg.bind_item_theme('save_roi_button', 'fit_button_theme')
 
+dpg.add_button(label="Save all roi",
+                               tag='save_all_roi_button',
+                               parent = 'file_window',
+                               width = init.save_roi_button['width'],
+                               callback=callback.callback_save_all_roi,
+               enabled=False
+                              )
+dpg.bind_item_theme('save_all_roi_button', 'fit_button_theme')
 #########################################################################
 '''Items image windows'''
 #########################################################################

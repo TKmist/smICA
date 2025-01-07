@@ -196,7 +196,7 @@ execfile(os.path.join('dep','Required.py'))
 dpg.create_context()                        
 # execfile(os.path.join('dep','init.py'))               
 
-# execfile(os.path.join('dep','Themes.py'))             
+execfile(os.path.join('dep','Themes.py'))             
 execfile(os.path.join('dep','Fonts.py'))              
 
 # execfile(os.path.join('dep','Handlers.py'))           

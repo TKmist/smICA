@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 from tqdm import tqdm
-
+import pickle
 
 class ImageROIProcessor:
     def __init__(self, input_path, output_path, find_nucleus):
@@ -16,6 +16,7 @@ class ImageROIProcessor:
         self.roi_image = None
         self.all_contours = None
         self.all_hierarchy = None
+        
 
     def load_image(self):
         """

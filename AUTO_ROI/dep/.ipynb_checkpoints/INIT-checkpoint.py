@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import time
 import cv2
 from matplotlib.transforms import Bbox
-from dep.automated_roi_TK import ImageROIProcessor
+from dep.automated_roi import ImageROIProcessor
 
 
 
@@ -111,6 +111,9 @@ class inits:
                          'width':-1,
                          'num_items':30
                         }
+        self.save_roi_button={'name':'save_roi_button',
+                            'width':-1,
+                             }
         
 class _basicF:      
     def lnprint(self,*args, **kwargs):
@@ -321,6 +324,8 @@ class callbacks:
         self.inV=inV
         self.npy_channels = []
         self.png_channels = []
+        self.pkl_data = {}
+        
         
     
 
@@ -330,8 +335,16 @@ class callbacks:
     def callback_listbox(self,sender,app_data):
         self.anal_file = app_data
         file = os.path.join(self.last_directory,self.anal_file)
-        
 
+        print(file)
+        pkl_file = self.anal_file+'.rpck'
+        pkl_path = os.path.join(self.last_directory,pkl_file)
+        if os.path.exists(pkl_path):
+            print('loading_pkl')
+            self.load_pkl(pkl_path)
+        else:
+             self.pkl_data = {}
+            
         if self.inV.loadmode == 'PTU':
             self.load_PTU_images(file)
         elif self.inV.loadmode == 'NPY':
@@ -343,7 +356,7 @@ class callbacks:
             channels = self.npy_channels
             self.load_PNG_images(file,channels)
         
-    
+        
 
     def display_images(self,channel):
         ot = oth(self.basf,self.inV)
@@ -372,6 +385,36 @@ class callbacks:
         '''Empty function. Do nothing.'''
         pass
 
+    def callback_save_single_roi(self,sender,app_data):
+        path = self.last_directory
+        print(self.anal_file)
+        file=self.anal_file+'.rpck'
+        pkl_path = os.path.join(path,file)
+        print(self.pkl_data)
+        with open(pkl_path, 'wb') as f:
+            pickle.dump(self.pkl_data, f)
+        # roi_file_1 = self.anal_file+'_roi_ch_1.txt'
+        # roi_file_2 = self.anal_file+'_roi_ch_2.txt'
+        
+        
+        for chan in self.pkl_data.keys():
+            rfile = self.anal_file+'_roi_ch_'+chan[-1]+'.txt'
+            rpath = os.path.join(self.last_directory,rfile)
+            
+            np.savetxt(os.path.join(rpath), self.pkl_data[chan]['ROI'], delimiter="\t", fmt="%d") 
+    
+    def callback_save_all_roi(self,sender,app_data):
+
+
+        items = dpg.get_item_configuration("file_box")['items']
+        
+        for item in items:
+            dpg.configure_item("file_box", default_value=item)
+            self.callback_listbox('file_box',item)
+            
+            self.callback_save_single_roi('save_roi_button',None)
+        
+    
     def update_dialogs_default_directory(self,last_directory):
     # print(last_directory)
         pass
@@ -399,16 +442,43 @@ class callbacks:
         else:
             dpg.configure_item("file_box", items=())
             dpg.configure_item("file_box", default_value='')   
+
+
+
     
+    def load_pkl(self,path):
+        with open(path, 'rb') as file:
+            self.pkl_data = pickle.load(file)
+        try:
+            dpg.set_value('cell_tresh_ratio_1',self.pkl_data['channel_1']['cell_treshold'])
+            dpg.set_value('nucleus_search_1',self.pkl_data['channel_1']['nucl_chk'])
+            dpg.set_value('nucl_tresh_ratio_1',self.pkl_data['channel_1']['nucl_treshold'])
+        except:
+            pass
+        
+        
+        try:
+            dpg.set_value('cell_tresh_ratio_2',self.pkl_data['channel_2']['cell_treshold'])
+            dpg.set_value('nucleus_search_2',self.pkl_data['channel_2']['nucl_chk'])
+            dpg.set_value('nucl_tresh_ratio_2',self.pkl_data['channel_2']['nucl_treshold'])
+        
+        except:
+            pass
+                
+        
+        
+        
+        
     def callback_directory_select(self,sender,app_data):
         print('clab',self.inV.loadmode)
         self.directory = app_data['file_path_name']
         # new_directory=directory
-        
+        dpg.configure_item('save_roi_button',enabled=True)
+        dpg.configure_item('save_all_roi_button',enabled=True)
         self.PTU_directory = self.directory
         self.last_directory=self.directory
         self.update_dialogs_default_directory(self.last_directory)
-
+        
         if self.inV.loadmode == 'PTU':
         
             self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
@@ -422,7 +492,11 @@ class callbacks:
         
                 self.anal_file=filenames[0]
                 dpg.configure_item('file_box', default_value=self.anal_file)
-    
+                pkl_file = self.anal_file+'.rpck'
+                pkl_path = os.path.join(self.last_directory,pkl_file)
+                if os.path.exists(pkl_path):
+                    self.load_pkl(pkl_path)
+                        
                 self.load_PTU_images(self.anal_file)
                 print(self.anal_file)
         elif self.inV.loadmode == 'NPY':
@@ -452,8 +526,12 @@ class callbacks:
                 self.anal_file=list(self.filenames_dict.keys())[0]
                 self.npy_channels=self.filenames_dict[self.anal_file]
 
-                print(self.anal_file)
-                print(self.npy_channels)
+                # print(self.anal_file)
+                # print(self.npy_channels)
+                pkl_file = self.anal_file+'.rpck'
+                pkl_path = os.path.join(self.last_directory,pkl_file)
+                if os.path.exists(pkl_path):
+                    self.load_pkl(pkl_path)
                 self.load_NPY_images(self.anal_file,self.npy_channels)
         elif self.inV.loadmode == 'PNG':
             self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.png')]))
@@ -480,8 +558,14 @@ class callbacks:
                 self.anal_file=list(self.filenames_dict.keys())[0]
                 self.npy_channels=self.filenames_dict[self.anal_file]
 
-                print(self.anal_file)
-                print(self.npy_channels)
+                # print(self.anal_file)
+                # print(self.npy_channels)
+
+
+                pkl_file = self.anal_file+'.rpck'
+                pkl_path = os.path.join(self.last_directory,pkl_file)
+                if os.path.exists(pkl_path):
+                    self.load_pkl(pkl_path)
                 self.load_PNG_images(self.anal_file,self.npy_channels)
             # dpg.configure_item('file_box', default_value=self.anal_file)
     
@@ -653,6 +737,9 @@ class callbacks:
             self.display_images(channel)
             self._update_textures_roi('cell_tresh_ratio_1', 1.0)
             self._update_textures_roi('cell_tresh_ratio_2', 1.0)
+
+           
+
     
     
     
@@ -704,6 +791,14 @@ class callbacks:
                 # image_data = np.multiply(image_data, full_mask)
             # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
             # new_texture_data = self.create_rgba_texture(image_data/255)
+            self.pkl_data['channel_1']={
+                'image':self.processor_1.image,
+                'ROI':full_mask,
+                'cell_treshold':cell_rat,
+                'nucl_chk':find_nucleus,
+                'nucl_treshold':nucl_rat,
+            }
+            
             rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
             rgba_image[..., 0] = img  # Red channel
             rgba_image[..., 1] = img  # Green channel
@@ -744,6 +839,14 @@ class callbacks:
                 # image_data = np.multiply(image_data, full_mask)
             # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
             # new_texture_data = self.create_rgba_texture(image_data/255)
+            self.pkl_data['channel_2']={
+                'image':self.processor_2.image,
+                'ROI':full_mask,
+                'cell_treshold':cell_rat,
+                'nucl_chk':find_nucleus,
+                'nucl_treshold':nucl_rat,
+            }
+            
             rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
             rgba_image[..., 0] = img  # Red channel
             rgba_image[..., 1] = img  # Green channel

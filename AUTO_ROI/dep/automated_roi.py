@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 from tqdm import tqdm
-
+import pickle
 
 class ImageROIProcessor:
     def __init__(self, input_path, output_path, find_nucleus):
@@ -16,6 +16,7 @@ class ImageROIProcessor:
         self.roi_image = None
         self.all_contours = None
         self.all_hierarchy = None
+        
 
     def load_image(self):
         """
@@ -61,6 +62,66 @@ class ImageROIProcessor:
         self.all_contours = contours
         self.all_hierarchy = hierarchy
 
+    def detect_cell_roi(self,image_to_process,ratio):
+        """
+        Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
+        """
+        if image_to_process is None:
+            raise ValueError("Obraz nie został załadowany. Użyj metody load_image().")
+
+        # Preprocessing: rozmycie i progowanie
+        thresholded = self._preprocess_image_dynamic(image_to_process,ratio)
+
+        # Znajdowanie konturów
+        contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours or hierarchy is None:
+            raise ValueError("Nie znaleziono konturów w obrazie.")
+
+        # Klasyfikacja konturów
+        external_contour, internal_contour = self._classify_contours_by_area(contours, hierarchy)
+
+        # Dopasowanie elipsy i stworzenie maski ROI
+        # ellipse_mask = np.zeros(image_to_processshape, dtype=np.uint8)
+        # if self.find_nucleus and internal_contour is not None:
+        #     ellipse_mask, _ = self._fit_ellipse_to_contour(internal_contour, image_to_process.shape)
+
+        # Tworzenie maski zewnętrznego konturu
+        external_mask = self._create_external_mask(external_contour, image_to_process.shape)
+
+        # Łączenie masek w finalną ROI
+        # roi_image = self._create_final_mask(external_mask, ellipse_mask, image_to_process.shape)
+        # self.all_contours = contours
+        # self.all_hierarchy = hierarchy
+
+        return external_mask
+
+    def detect_nucleus_roi(self,original_image,cell_roi,ratio):
+        
+        processed_image = cv2.bitwise_not(original_image)*(cell_roi).astype(int)
+        print(processed_image)
+        processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
+        
+        nucleus_roi = self.detect_cell_roi(processed_image,ratio)
+        return nucleus_roi
+
+    def make_full_roi(self,cell_roi,nucleus_roi):
+        
+        full_mask = cell_roi-nucleus_roi
+        return full_mask
+        
+    # def invert_and_apply_mask(self):
+    #     """
+    #     Inverts the ROI mask and applies it to make the mask transparent where the mask is black and non-transparent where the mask is white.
+    #     """
+    #     if self.roi_image is None:
+    #         raise ValueError("ROI mask is not available. Ensure detect_roi() was called successfully.")
+    
+    #     # Invert the ROI mask: 0 becomes 255, and 255 becomes 0
+    #     inverted_mask = cv2.bitwise_not(self.roi_image)
+
+    #     return inverted_mask
+
+        
     def save_roi(self):
         """
         Zapisuje wynikowy obraz ROI do wyjściowej ścieżki.
@@ -98,6 +159,24 @@ class ImageROIProcessor:
 
         return thresh
 
+    @staticmethod
+    def _preprocess_image_dynamic(image,ratio):
+        """
+        Preprocess the image: reduce noise, blure and apply thresholding.
+        """
+
+        # Step 2: Apply Gaussian blur for noise reduction
+        blurred = cv2.GaussianBlur(image, (5, 5), 0)
+
+        # Step 3: Adaptive thresholding or Otsu's method
+        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+        # Optional: Modify the threshold dynamically based on the Otsu result
+        # If you want to increase or decrease the threshold level
+        dynamic_threshold = _ * ratio  # Example: Increase the threshold by 20%
+        _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
+    
+        return dynamic_thresh
     @staticmethod
     def _classify_contours_by_area(contours, hierarchy):
         largest_external_contour = None
