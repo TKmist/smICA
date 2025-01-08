@@ -603,7 +603,7 @@ class callbacks:
             if '1' in Channels[0]:
                 npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
                 Intensity_1 = np.load(npy_file)
-                self.processor_1 = ImageROIProcessor(npy_file, npy_file, False)
+                self.processor_1 = ImageROIProcessor()
                 self.processor_1.image=Intensity_1
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
@@ -613,7 +613,7 @@ class callbacks:
             elif '2' in Channels[0]:
                 npy_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.npy')
                 Intensity_2 = np.load(npy_file)
-                self.processor_2 = ImageROIProcessor(npy_file, npy_file, False)
+                self.processor_2 = ImageROIProcessor()
                 self.processor_2.image=Intensity_2
                 channel = 'both'
                 self.Current_image_1 = self.NO_IMAGE_TEXTURE
@@ -626,9 +626,9 @@ class callbacks:
             
             Intensity_1 = np.load(npy_file_1)
             Intensity_2 = np.load(npy_file_2)
-            self.processor_1 = ImageROIProcessor(npy_file_1, npy_file_1, False)
+            self.processor_1 = ImageROIProcessor()
             self.processor_1.image=Intensity_1
-            self.processor_2 = ImageROIProcessor(npy_file_2, npy_file_2, False)
+            self.processor_2 = ImageROIProcessor()
             self.processor_2.image=Intensity_2
             channel = 'both'
 
@@ -646,7 +646,7 @@ class callbacks:
                 png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
                 
                 Intensity_1 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
-                self.processor_1 = ImageROIProcessor(png_file, png_file, False)
+                self.processor_1 = ImageROIProcessor()
                 self.processor_1.image=Intensity_1
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
@@ -658,7 +658,7 @@ class callbacks:
                 pass
                 png_file = os.path.join(self.PTU_directory,an_file+'_ch_'+Channels[0]+'.png')
                 Intensity_2 = cv2.imread(png_file,cv2.IMREAD_GRAYSCALE)
-                self.processor_2 = ImageROIProcessor(png_file, png_file, False)
+                self.processor_2 = ImageROIProcessor()
                 self.processor_2.image=Intensity_2
                 channel = 'both'
                 self.Current_image_1 = self.NO_IMAGE_TEXTURE
@@ -673,9 +673,9 @@ class callbacks:
             Intensity_1 = cv2.imread(png_file_1,cv2.IMREAD_GRAYSCALE)
             Intensity_2 = cv2.imread(png_file_2,cv2.IMREAD_GRAYSCALE)
 
-            self.processor_1 = ImageROIProcessor(png_file_1, png_file_1, False)
+            self.processor_1 = ImageROIProcessor()
             self.processor_1.image=Intensity_1
-            self.processor_2 = ImageROIProcessor(png_file_2, png_file_2, False)
+            self.processor_2 = ImageROIProcessor()
             self.processor_2.image=Intensity_2
             channel = 'both'
 
@@ -700,7 +700,7 @@ class callbacks:
         if len(Channels)==1:
             if '1' in Channels[0]:
                 Intensity_1 = pkl['intensity_1']
-                self.processor_1 = ImageROIProcessor(pcklf, pcklf, False)
+                self.processor_1 = ImageROIProcessor()
                 self.processor_1.image=Intensity_1
                 
                 channel = 'both'
@@ -714,7 +714,7 @@ class callbacks:
             elif '2' in Channels[0]:
                 Intensity_2 = pkl['intensity_2']
 
-                self.processor_2 = ImageROIProcessor(pcklf, pcklf, False)
+                self.processor_2 = ImageROIProcessor()
                 self.processor_2.image=Intensity_2
                 
                 channel = 'both'
@@ -725,9 +725,9 @@ class callbacks:
         elif len(Channels)==2:
             Intensity_1 = pkl['intensity_1']
             Intensity_2 = pkl['intensity_2']
-            self.processor_1 = ImageROIProcessor(pcklf, pcklf, False)
+            self.processor_1 = ImageROIProcessor()
             self.processor_1.image=Intensity_1
-            self.processor_2 = ImageROIProcessor(pcklf, pcklf, False)
+            self.processor_2 = ImageROIProcessor()
             self.processor_2.image=Intensity_2
             
             channel = 'both'

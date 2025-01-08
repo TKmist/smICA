@@ -27,6 +27,53 @@ with dpg.window(label = 'Channel 1',
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_1')
+
+    dpg.add_separator(tag ='IMAGE_CH1_top_sep_2',show=True,parent='image_window_ch1')
+    
+    
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_1_table',parent='image_window_1'):
+            # Add headers
+            dpg.add_table_column(label="",tag='img_win_1_table_col1', width = int(width_1/3))
+            dpg.add_table_column(label="",tag='img_win_1_table_col2', width = int(width_1/3))
+            dpg.add_table_column(label="",tag='img_win_1_table_col3', width = int(width_1/3))
+    
+            # Add rows and columns
+            with dpg.table_row(tag='img_win_1_table_row1'):
+                dpg.add_drag_float(tag='cell_tresh_ratio_1',
+                                   default_value =1.0,
+                                   max_value=2.,
+                                   min_value=0.0,
+                                   speed=0.01,
+                                   enabled=False,
+                                   width=-1,
+                                   callback=_update_textures__dynamic_roi
+                                  )
+    
+    
+                
+                # with dpg.group(tag='log_checkbox_group', horizontal=True,
+                #    horizontal_spacing=init.group_spacer,
+                #    show=True):
+                dpg.add_checkbox(label='Find nucleus', 
+                                 tag='nucleus_search_1',
+                                 default_value = False,
+                                 enabled=False,
+                                 # width=-1,
+                                 callback=_update_textures__dynamic_roi,
+                                 # parent='image_window_1'
+                                )
+                dpg.add_drag_float(tag='nucl_tresh_ratio_1',
+                                   default_value =1.5,
+                                   max_value=3.,
+                                   min_value=0.0,
+                                   speed=0.01,
+                                   width=-1,
+                                   enabled=False,
+                                   callback = _update_textures__dynamic_roi
+                                  )
     
 with dpg.window(label = 'Channel 2',
                 tag='image_window_ch2',
@@ -49,6 +96,53 @@ with dpg.window(label = 'Channel 2',
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_2')
+
+    dpg.add_separator(tag ='IMAGE_CH2_top_sep_2',show=True,parent='image_window_ch2')
+    
+    
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
+            # Add headers
+            dpg.add_table_column(label="",tag='img_win_2_table_col1', width = int(width_2/3))
+            dpg.add_table_column(label="",tag='img_win_2_table_col2', width = int(width_2/3))
+            dpg.add_table_column(label="",tag='img_win_2_table_col3', width = int(width_2/3))
+    
+            # Add rows and columns
+            with dpg.table_row(tag='img_win_2_table_row1'):
+                dpg.add_drag_float(tag='cell_tresh_ratio_2',
+                                   default_value =1.0,
+                                   max_value=2.,
+                                   min_value=0.0,
+                                   speed=0.01,
+                                   width=-1,
+                                   enabled=False,
+                                   callback=_update_textures__dynamic_roi
+                                  )
+    
+    
+                
+                # with dpg.group(tag='log_checkbox_group', horizontal=True,
+                #    horizontal_spacing=init.group_spacer,
+                #    show=True):
+                dpg.add_checkbox(label='Find nucleus', 
+                                 tag='nucleus_search_2',
+                                 default_value = False,
+                                 enabled=False,
+                                 # width=-1,
+                                 callback=_update_textures__dynamic_roi,
+                                 # parent='image_window_1'
+                                )
+                dpg.add_drag_float(tag='nucl_tresh_ratio_2',
+                                   default_value =1.5,
+                                   max_value=3.,
+                                   min_value=0.0,
+                                   speed=0.01,
+                                   width=-1,
+                                   enabled=False,
+                                   callback = _update_textures__dynamic_roi
+                                  )
 
 
 

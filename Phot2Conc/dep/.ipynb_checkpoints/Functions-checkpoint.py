@@ -50,7 +50,7 @@ file_panel_items = [
     'focal_vol_err_input_ch_2',
     # 'Add_ROI_1_button',
     # 'Add_ROI_2_button',
-    'Browse_ROI_directory_button',
+    # 'Browse_ROI_directory_button',
     'Pixel_dwell_output',
     'Nframes_output',
     'Resolution_output',
@@ -425,6 +425,8 @@ def add_single_result_to_DF(sender,app_data):
     
     
     Sing_Results_DF=pd.concat([Sing_Results_DF,Sing_Results_DF_tmp]).reset_index(drop=True)
+
+    _pkl_file()
     
     
     
@@ -729,18 +731,20 @@ def callback_PTU_directory_select(sender,app_data):
         
         show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again.')
     
-
+    dpg.configure_item('FILE_ROI_checkbox', enabled=True)
+    dpg.configure_item('Auto_ROI_checkbox', enabled=True)
 
 def callback_ROI_directory_select(sender,app_data):
-    global ROI_directory,last_directory
+    global ROI_directory,last_directory,anal_file
     
-    
+    # print(anal_file)
     ROI_directory = app_data['file_path_name']
     last_directory =ROI_directory
     update_dialogs_default_directory(last_directory)
     dpg.set_value('FILE_ROI_checkbox',True)
     callback_select_roi('FILE_ROI_checkbox',True)
-    
+    dpg.hide_item('ROI_folder_dialog_id')
+    load_PTU_images(anal_file)
     
     
         
@@ -1006,7 +1010,7 @@ def callback_calculate(sender,app_data):
     mean_Molecules_ch_2=std_Molecules_ch_2=mean_Concentration_ch_2=std_Concentration_ch_2=std_err_Concentration_ch_2=median_C_ch_2=median_err_C_ch_2=mean_Photons_ch_2=mean_Photons_err_ch_2=None
     
     global PTU_N_frames,PTU_Px_dwell
-    
+    global image_1_times_roi,image_2_times_roi
     
     
     
@@ -1019,7 +1023,9 @@ def callback_calculate(sender,app_data):
             brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
             Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
             Veff_err_ch_1 = 1e-15*dpg.get_value('focal_vol_err_input_ch_1')
-            DF = Current_image_1[0]
+            # DF = Current_image_1
+            
+            DF = image_1_times_roi
             Photons_1 = pd.DataFrame(DF)
             n_pixels_1 =  Photons_1.stack().reset_index(drop=True).dropna().count()
             
@@ -1222,10 +1228,12 @@ def callback_calculate(sender,app_data):
             brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2') 
             Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15*dpg.get_value('focal_vol_err_input_ch_2')
-            DF2 = Current_image_2[0]
+            # DF2 = Current_image_2
+            # print(type(image_2_times_roi),np.max(image_2_times_roi))
+            DF2 = image_2_times_roi
             Photons_2 = pd.DataFrame(DF2)
             n_pixels_2 =  Photons_2.stack().reset_index(drop=True).dropna().count()
-            
+            # print(Photons_2)
             mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
             mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
             Molecules_ch_2 = calc_molecules(DF2,PTU_Px_dwell,PTU_N_frames,brightness_ch_2,brightness_err_ch_2)[0]
@@ -1429,7 +1437,8 @@ def callback_calculate(sender,app_data):
         brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
         Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
         Veff_err_ch_1 = 1e-15*dpg.get_value('focal_vol_err_input_ch_1')
-        DF = Current_image_1[0]
+        # DF = Current_image_1
+        DF = image_1_times_roi
         Photons_1 = pd.DataFrame(DF)
         n_pixels_1 =  Photons_1.stack().reset_index(drop=True).dropna().count()
         
@@ -1630,7 +1639,8 @@ def callback_calculate(sender,app_data):
         brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2') 
         Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
         Veff_err_ch_2 = 1e-15*dpg.get_value('focal_vol_err_input_ch_2')
-        DF2 = Current_image_2[0]
+        # DF2 = Current_image_2
+        DF2 = image_2_times_roi
         Photons_2 = pd.DataFrame(DF2)
         n_pixels_2 =  Photons_2.stack().reset_index(drop=True).dropna().count()
         
@@ -1947,6 +1957,7 @@ def callback_directory_select(sender,app_data):
     anal_file=files[0]
     dpg.configure_item('file_box', default_value=anal_file)
     
+    
 
 
 
@@ -2242,22 +2253,53 @@ def callback_select_lt_to_roi(sender,app_data):
 
 
 def callback_select_roi(sender,app_data):
-    global anal_file
+    global anal_file,ROI_directory
+    
     if dpg.get_value(sender):
-        dpg.configure_item('Browse_ROI_directory_button',enabled=True)
+        # dpg.configure_item('Browse_ROI_directory_button',enabled=True)
         dpg.set_value('Auto_ROI_checkbox',False)
+        
+        dpg.configure_item('cell_tresh_ratio_1',enabled=False)
+        dpg.configure_item('nucleus_search_1',enabled=False)
+        dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
+        dpg.configure_item('cell_tresh_ratio_2',enabled=False)
+        dpg.configure_item('nucleus_search_2',enabled=False)
+        dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
     else:
-        dpg.configure_item('Browse_ROI_directory_button',enabled=False)
-    load_PTU_images(anal_file)
+        pass
+        # dpg.configure_item('Browse_ROI_directory_button',enabled=False)
+    if ROI_directory!=None:
+        load_PTU_images(anal_file)
+        
+    else:
+        dpg.show_item('ROI_folder_dialog_id')
+    # callback_calculate(sender,app_data)
     
 def callback_select_autoroi(sender,app_data):
     global anal_file
     if dpg.get_value(sender):
-        dpg.configure_item('Browse_ROI_directory_button',enabled=False)
+        # dpg.configure_item('Browse_ROI_directory_button',enabled=False)
         dpg.set_value('FILE_ROI_checkbox',False)
-    # else:
-    #     dpg.configure_item('Browse_ROI_directory_button',enabled=False)
-    # load_PTU_images(anal_file)
+        dpg.configure_item('cell_tresh_ratio_1',enabled=True)
+        dpg.configure_item('nucleus_search_1',enabled=True)
+        dpg.configure_item('nucl_tresh_ratio_1',enabled=True)
+        dpg.configure_item('cell_tresh_ratio_2',enabled=True)
+        dpg.configure_item('nucleus_search_2',enabled=True)
+        dpg.configure_item('nucl_tresh_ratio_2',enabled=True)
+        
+    else:
+        # dpg.configure_item('Browse_ROI_directory_button',enabled=False)
+        dpg.configure_item('cell_tresh_ratio_1',enabled=False)
+        dpg.configure_item('nucleus_search_1',enabled=False)
+        dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
+        dpg.configure_item('cell_tresh_ratio_2',enabled=False)
+        dpg.configure_item('nucleus_search_2',enabled=False)
+        dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
+    load_PTU_images(anal_file)
+    # callback_calculate(sender,app_data)
+    
+
+
     
     
     
@@ -2387,15 +2429,15 @@ def callback_windows_size(sender,app_data):
         # print('line 2639','img1_passed0')
         dpg.delete_item('texture_CH_1')
         # print('line 2641','img1_passed')
-        if 'new' in tex_1_name:
-            new = 'texture_tag_chan_1-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
-            tex_1_name =new
+        # if 'new' in tex_1_name:
+        #     new = 'texture_tag_chan_1-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
+        #     tex_1_name =new
             
             
             
-        else:
+        # else:
             
-            tex_1_name = 'texture_tag_chan_1-new_1'
+        #     tex_1_name = 'texture_tag_chan_1-new_1'
         
         dpg.add_dynamic_texture(width=new_width,
                         height=new_height,
@@ -2423,15 +2465,15 @@ def callback_windows_size(sender,app_data):
         # print('line 2675','img2_passed0')
         dpg.delete_item('texture_CH_2')
         # print('line 2677','img2_passed')
-        if 'new' in tex_2_name:
-            new = 'texture_tag_chan_2-new_'+str(int(tex_2_name.split('-')[1].split('_')[1])+1)
-            tex_2_name =new
+        # if 'new' in tex_2_name:
+        #     new = 'texture_tag_chan_2-new_'+str(int(tex_2_name.split('-')[1].split('_')[1])+1)
+        #     tex_2_name =new
             
             
             
-        else:
+        # else:
             
-            tex_2_name = 'texture_tag_chan_2-new_1'
+        #     tex_2_name = 'texture_tag_chan_2-new_1'
         dpg.add_dynamic_texture(width=new_width,
                         height=new_height,
                         default_value=dpg_image_2,
@@ -2549,149 +2591,12 @@ def display_images(dframes,channel):
         pass
 
 
-        
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    
-    
-
-    
-
-    
-    
-
-
-        
-
-        
-
-           
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-        
-
-
-
-        
-
-
-            
-
-        
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-        
-
- 
-
-        
     if channel == 1:
         dpg_image_1 = update_texture(Current_image_1)
         
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
-
-
-
-
-
-
-
-
         dpg.set_value(tex_1_name, dpg_image_1)
     elif channel == 2:
         dpg_image_2 = update_texture(Current_image_2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
 
         dpg.set_value(tex_2_name, dpg_image_2)
     elif channel =='both':
@@ -2699,139 +2604,9 @@ def display_images(dframes,channel):
         dpg_image_2 = update_texture(Current_image_2)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
         dpg.set_value(tex_1_name, dpg_image_1)
         dpg.set_value(tex_2_name, dpg_image_2)
     
-
-
-
-            
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-            
-            
-            
-            
-            
-            
-            
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-        
 
 
 def extract_PTU(Directory,ptu_file,):
@@ -2916,6 +2691,30 @@ def hide_histograms():
     dpg.hide_item('hist_phot_plot_ch2')
     
 
+def plot_IMAGE(img,width,height):
+        width = int(width)
+        height = int(height)
+        # print(time.strftime("%H:%M:%S"),type(img),img.shape,np.max(img))
+        if img.shape != (height, width):  # Resize if necessary
+            resized_img = cv2.resize(img, (width, height))  # Resize to (width, height)
+        else:
+            resized_img = img
+
+        # Check if grayscale (2D) or already RGB (3D)
+        if len(resized_img.shape) == 2:  # Grayscale image (H, W)
+            rgb_img = np.stack([resized_img] * 3, axis=2)  # Convert (H, W) to (H, W, 3)
+        else:
+            rgb_img = resized_img  # Already RGB (H, W, 3)
+        
+        # Ensure pixel values are in range [0, 255]
+        if rgb_img.max() <= 1.0:  # If the image is in range [0, 1]
+            rgb_img = (rgb_img * 255).astype(np.uint8)  # Convert to [0, 255]
+        else:
+            rgb_img = rgb_img.astype(np.uint8)  # Ensure dtype is uint8
+
+        return rgb_img
+
+
 
 def image_INT_LT(img,width,height):
     dct = locals()
@@ -2936,22 +2735,22 @@ def image_INT_LT(img,width,height):
         ax.axis('off')
 
         pa = ax.imshow(img[0],cmap='gray')
-        cba = plt.colorbar(pa,shrink=0.69,location = 'right',anchor=(-0.25,0.98))
-        pb = ax.imshow(img[1],cmap='rainbow',alpha=0.5)
-        cbb = plt.colorbar(pb,location = 'bottom',shrink=0.95,anchor=(0.5,2.15))
-        cba.ax.yaxis.set_tick_params(color=fg_color)
-        cba.set_label('Intensity', color=fg_color)
+        # cba = plt.colorbar(pa,shrink=0.69,location = 'right',anchor=(-0.25,0.98))
+        # pb = ax.imshow(img[1],cmap='rainbow',alpha=0.5)
+        # cbb = plt.colorbar(pb,location = 'bottom',shrink=0.95,anchor=(0.5,2.15))
+        # cba.ax.yaxis.set_tick_params(color=fg_color)
+        # cba.set_label('Intensity', color=fg_color)
 
-        cba.outline.set_edgecolor(fg_color)
+        # cba.outline.set_edgecolor(fg_color)
 
 
-        cbb.ax.xaxis.set_tick_params(color=fg_color, rotation=90)
+        # cbb.ax.xaxis.set_tick_params(color=fg_color, rotation=90)
 
-        cbb.set_label('Lifetime', color=fg_color)
+        # cbb.set_label('Lifetime', color=fg_color)
 
-        cbb.outline.set_edgecolor(fg_color)
-        plt.setp(plt.getp(cbb.ax.axes, 'xticklabels'), color=fg_color)
-        plt.setp(plt.getp(cba.ax.axes, 'yticklabels'), color=fg_color)
+        # cbb.outline.set_edgecolor(fg_color)
+        # plt.setp(plt.getp(cbb.ax.axes, 'xticklabels'), color=fg_color)
+        # plt.setp(plt.getp(cba.ax.axes, 'yticklabels'), color=fg_color)
         plt.axis('tight')
         b =BytesIO()
         FigureCanvas(fig).print_png(b)
@@ -2974,7 +2773,7 @@ def image_INT_LT(img,width,height):
         ax.axis('off')
 
         pa = ax.imshow(img[0],cmap='gray')
-        cba = plt.colorbar(pa,shrink=1,location = 'right',anchor=(-0.3,1))
+        # cba = plt.colorbar(pa,shrink=1,location = 'right',anchor=(-0.3,1))
         
         
         cba.ax.yaxis.set_tick_params(color=fg_color)
@@ -3099,13 +2898,14 @@ def join_dicts(dict1,dict2):
 def load_PTU_images(an_file):
     
     global anal_file, pck_files,PTU_directory, DF, DF2,pck_list,ROI_directory,roi_1,roi_2,Channels,last_directory
-
+    # print('ROI_directory',ROI_directory)
     global PTU_Resolution,PTU_Px_size,PTU_N_frames,PTU_Px_dwell
     global Current_image_1,Current_image_2
-    global NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME
-    
-    
-    
+    global image_1_times_roi,image_2_times_roi
+    global NO_IMAGE_INTENSITY#,NO_IMAGE_LIFETIME
+    global processor_1,processor_2
+    global pkl_data
+    pkl_data = {}
     
     
     
@@ -3163,252 +2963,253 @@ def load_PTU_images(an_file):
     Channels = list(pkl.keys())
     Channels = [f for f in Channels if f.startswith('export_df')]
     Channels = [ch[-1] for ch in Channels]
+
+    
     
     
     if dpg.get_value('FILE_ROI_checkbox'):
-        if ROI_directory == None:
-            show_error_no_files('No ROI folder defined. Try again.')
-        else:
-            if dpg.get_value('LT_TO_ROI_checkbox'):
+        
+    
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 
-                if len(Channels)==1:
-                    if '1' in Channels[0]:
-                        Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
-
-                        Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                        lt_mask = Lifetime_1/Lifetime_1
-                        Intensity_1 = Intensity_1*lt_mask
-
-                        
+                Intensity_1 = Intensity_1
+                processor_1 = ImageROIProcessor()
+                processor_1.image=Intensity_1
 
 
 
-    
-    
-                        roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
-                        roi_1 = load_ROI(roi_1_path).to_numpy()
-    
-                        Intensity_1 = Intensity_1*roi_1
-                        Lifetime_1 = Lifetime_1*roi_1
-                        channel = 'both'
+                roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+                roi_1 = load_ROI(roi_1_path).to_numpy()
 
-                        Current_image_1 = (Intensity_1,Lifetime_1)
-                        
-                        Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                        display_images([Current_image_1,Current_image_2],channel)
-                    elif '2' in Channels[0]:
-                        Intensity_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = Intensity_1
+                # Lifetime_1 = Lifetime_1
+                channel = 'both'
 
-                        Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                        lt_mask = Lifetime_2/Lifetime_2
-                        Intensity_2 = Intensity_2*lt_mask
-                        
-                        
+                Current_image_1 = Intensity_1/np.max(Intensity_1)
+                image_1_times_roi = Current_image_1
+                Current_image_2 = NO_IMAGE_INTENSITY
+                display_images([Current_image_1,Current_image_2],channel)
+                _update_textures_static_roi('ch1',roi_1)
+            elif '2' in Channels[0]:
+                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
-    
-    
-                        roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
-                        roi_2 = load_ROI(roi_2_path).to_numpy()
-    
-                        Intensity_2 = Intensity_2*roi_2
-                        Lifetime_2 = Lifetime_2*roi_2
-                        channel = 'both'
-                        Current_image_1 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                        Current_image_2 = (Intensity_2,Lifetime_2)
-                        display_images([Current_image_1,Current_image_2],channel)
-    
-    
-    
-    
-    
-    
-    
-    
-                    else:
-                        pass
+                # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                # lt_mask = Lifetime_2/Lifetime_2
+                Intensity_2 = Intensity_2
+                
+                processor_2 = ImageROIProcessor()
+                processor_2.image=Intensity_2
+
+
+                roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+                roi_2 = load_ROI(roi_2_path).to_numpy()
+                # print('roi2',roi_2)
+                # Intensity_2 = Intensity_2#*roi_2
+                # Lifetime_2 = Lifetime_2*roi_2
+                channel = 'both'
+                Current_image_1 = NO_IMAGE_INTENSITY
+                Current_image_2 = Intensity_2/np.max(Intensity_2)
+                image_2_times_roi = Current_image_2
+                display_images([Current_image_1,Current_image_2],channel)
+                _update_textures_static_roi('ch2',roi_2)
+
+
+
+
+
+
+
+
             else:
-                if len(Channels)==1:
-                    if '1' in Channels[0]:
-                        Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
-                        Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                        
-                        Intensity_1 = Intensity_1
-
-
-    
-    
-                        roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
-                        roi_1 = load_ROI(roi_1_path).to_numpy()
-    
-                        Intensity_1 = Intensity_1*roi_1
-                        Lifetime_1 = Lifetime_1*roi_1
-                        channel = 'both'
-
-                        Current_image_1 = (Intensity_1,Lifetime_1)
-                        
-                        Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                        display_images([Current_image_1,Current_image_2],channel)
-                    elif '2' in Channels[0]:
-                        Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
-
-                        Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                        lt_mask = Lifetime_2/Lifetime_2
-                        Intensity_2 = Intensity_2
-
-
-    
-    
-                        roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
-                        roi_2 = load_ROI(roi_2_path).to_numpy()
-    
-                        Intensity_2 = Intensity_2*roi_2
-                        Lifetime_2 = Lifetime_2*roi_2
-                        channel = 'both'
-                        Current_image_1 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                        Current_image_2 = (Intensity_2,Lifetime_2)
-                        display_images([Current_image_1,Current_image_2],channel)
-    
-    
-    
-    
-    
-    
-    
-    
-                    else:
-                        pass
+                pass
 
 
 
-             
-                elif len(Channels)==2:
-                    
-                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
-                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
-                    lt_mask = Lifetime_1/Lifetime_1
-                    Intensity_1 = Intensity_1
-                    lt_mask = Lifetime_2/Lifetime_2
-                    Intensity_2 = Intensity_2
-                    roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
-                    roi_1 = load_ROI(roi_1_path).to_numpy()
-                    Intensity_1 = Intensity_1*roi_1
-                    Lifetime_1 = Lifetime_1*roi_1
-                    roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
-                    roi_2 = load_ROI(roi_2_path).to_numpy()
-                    Intensity_2 = Intensity_2*roi_2
-                    Lifetime_2 = Lifetime_2*roi_2
+     
+        elif len(Channels)==2:
+            
+            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+            # lt_mask = Lifetime_1/Lifetime_1
+            Intensity_1 = Intensity_1
+            processor_1 = ImageROIProcessor()
+            processor_1.image=Intensity_1
+            # lt_mask = Lifetime_2/Lifetime_2
+            Intensity_2 = Intensity_2
+            processor_2 = ImageROIProcessor()
+            processor_2.image=Intensity_2
+            roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+            roi_1 = load_ROI(roi_1_path).to_numpy()
+            Intensity_1 = Intensity_1#*roi_1
+            # Lifetime_1 = Lifetime_1*roi_1
+            roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+            roi_2 = load_ROI(roi_2_path).to_numpy()
+            Intensity_2 = Intensity_2#*roi_2
+            # Lifetime_2 = Lifetime_2*roi_2
 
 
-                    channel = 'both'
+            channel = 'both'
 
-                    Current_image_1 = (Intensity_1,Lifetime_1)
-                    Current_image_2 = (Intensity_2,Lifetime_2)
-                    display_images([Current_image_1,Current_image_2],channel)
+            Current_image_1 = Intensity_1/np.max(Intensity_1)
+            Current_image_2 = Intensity_2/np.max(Intensity_2)
+            image_1_times_roi = Current_image_1
+            image_2_times_roi = Current_image_2
+            display_images([Current_image_1,Current_image_2],channel)
+            _update_textures_static_roi('ch1',roi_1)
+            _update_textures_static_roi('ch1',roi_2)
                     
             
                 
                 
-    else:
-        if dpg.get_value('LT_TO_ROI_checkbox'):
-            if len(Channels)==1:
-                if '1' in Channels[0]:
-                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    lt_mask = Lifetime_1/Lifetime_1
-                    Intensity_1 = Intensity_1*lt_mask
-                    channel = 'both'
-
-                    Current_image_1 = (Intensity_1,Lifetime_1)
-                    
-                    Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                    display_images([Current_image_1,Current_image_2],channel)
-                elif '2' in Channels[0]:
-                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    lt_mask = Lifetime_2/Lifetime_2
-                    Intensity_2 = Intensity_2*lt_mask
-    
-
-
-    
-
-                    lt_mask = Lifetime_2/Lifetime_2
-                    Intensity_2 = Intensity_2*lt_mask
-                    channel = 'both'
-                    Current_image_1 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                    Current_image_2 = (Intensity_2,Lifetime_2)
-                    display_images([Current_image_1,Current_image_2],channel)
-    
-
-
-    
-                else:
-                    pass
-            elif len(Channels)==2:
-                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                Current_image_1 = (Intensity_1,Lifetime_1)
-                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
-                Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
-                lt_mask = Lifetime_1/Lifetime_1
-                Intensity_1 = Intensity_1*lt_mask
-                lt_mask = Lifetime_2/Lifetime_2
-                Intensity_2 = Intensity_2*lt_mask
-
-                channel = 'both'
-                Current_image_2 = (Intensity_2,Lifetime_2)
-                display_images([Current_image_1,Current_image_2],channel)
-        else:
-            if len(Channels)==1:
-                if '1' in Channels[0]:
-                    Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    lt_mask = Lifetime_1/Lifetime_1
-                    Intensity_1 = Intensity_1
-                    channel = 'both'
-
-                    Current_image_1 = (Intensity_1,Lifetime_1)
-                    
-                    Current_image_2 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                    display_images([Current_image_1,Current_image_2],channel)
-                elif '2' in Channels[0]:
-                    Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                    Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                    lt_mask = Lifetime_2/Lifetime_2
-                    Intensity_2 = Intensity_2
-    
-
-
-    
-
-                    
-                    
-                    channel = 'both'
-                    Current_image_1 = (NO_IMAGE_INTENSITY,NO_IMAGE_LIFETIME)
-                    Current_image_2 = (Intensity_2,Lifetime_2)
-                    display_images([Current_image_1,Current_image_2],channel)
-    
-
-
-    
-                else:
-                    pass
-            elif len(Channels)==2:
-                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-                Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-                Current_image_1 = (Intensity_1,Lifetime_1)
-                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))                    
-                Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
-                lt_mask = Lifetime_1/Lifetime_1
+    elif dpg.get_value('Auto_ROI_checkbox'):
+        
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                
                 Intensity_1 = Intensity_1
-                lt_mask = Lifetime_2/Lifetime_2
+
+                processor_1 = ImageROIProcessor()
+                processor_1.image=Intensity_1
+
+
+                # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+                # roi_1 = load_ROI(roi_1_path).to_numpy()
+
+                # Intensity_1 = Intensity_1*roi_1
+                # Lifetime_1 = Lifetime_1*roi_1
+                channel = 'both'
+
+                Current_image_1 = Intensity_1/np.max(Intensity_1)
+                image_1_times_roi = Current_image_1
+                Current_image_2 = NO_IMAGE_INTENSITY
+                display_images([Current_image_1,Current_image_2],channel)
+
+                _update_textures__dynamic_roi('cell_tresh_ratio_1', 1.0)
+            elif '2' in Channels[0]:
+                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+
+                # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                # lt_mask = Lifetime_2/Lifetime_2
                 Intensity_2 = Intensity_2
 
+                processor_2 = ImageROIProcessor()
+                processor_2.image=Intensity_2
+
+
+                # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+                # roi_2 = load_ROI(roi_2_path).to_numpy()
+
+                # Intensity_2 = Intensity_2*roi_2
+                # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
-                Current_image_2 = (Intensity_2,Lifetime_2)
+                Current_image_1 = NO_IMAGE_INTENSITY
+                Current_image_2 = Intensity_2/np.max(Intensity_2)
+                image_2_times_roi = Current_image_2
                 display_images([Current_image_1,Current_image_2],channel)
+                # print(Intensity_2.shape)
+                _update_textures__dynamic_roi('cell_tresh_ratio_2', 1.0)
+
+
+
+
+
+
+
+            else:
+                pass
+
+
+
+     
+        elif len(Channels)==2:
+            
+            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+            lt_mask = Lifetime_1/Lifetime_1
+            Intensity_1 = Intensity_1
+            lt_mask = Lifetime_2/Lifetime_2
+            Intensity_2 = Intensity_2
+            # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+            # roi_1 = load_ROI(roi_1_path).to_numpy()
+            # Intensity_1 = Intensity_1*roi_1
+            # Lifetime_1 = Lifetime_1*roi_1
+            # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+            # roi_2 = load_ROI(roi_2_path).to_numpy()
+            # Intensity_2 = Intensity_2*roi_2
+            # Lifetime_2 = Lifetime_2*roi_2
+
+            processor_1 = ImageROIProcessor()
+            processor_1.image=Intensity_1
+            processor_2 = ImageROIProcessor()
+            processor_2.image=Intensity_2
+
+            channel = 'both'
+
+            Current_image_1 = Intensity_1/np.max(Intensity_1)
+            Current_image_2 = Intensity_2/np.max(Intensity_2)
+            image_1_times_roi = Current_image_1
+            image_2_times_roi = Current_image_2
+            display_images([Current_image_1,Current_image_2],channel)
+
+            _update_textures__dynamic_roi('cell_tresh_ratio_1', 1.0)
+            _update_textures__dynamic_roi('cell_tresh_ratio_2', 1.0)
+
+    else:
+
+        if len(Channels)==1:
+            if '1' in Channels[0]:
+                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                
+                Intensity_1 = Intensity_1
+
+                processor_1 = ImageROIProcessor()
+                processor_1.image=Intensity_1
+
+
+                # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+                roi_1 = np.zeros(Current_image_1.shape)
+
+                Intensity_1 = Intensity_1
+                # Lifetime_1 = Lifetime_1
+                channel = 'both'
+
+                Current_image_1 = Intensity_1/np.max(Intensity_1)
+                image_1_times_roi = Current_image_1
+                Current_image_2 = NO_IMAGE_INTENSITY
+                display_images([Current_image_1,Current_image_2],channel)
+                _update_textures_static_roi('ch1',roi_1)
+            elif '2' in Channels[0]:
+                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+
+                # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+                # lt_mask = Lifetime_2/Lifetime_2
+                Intensity_2 = Intensity_2
+                processor_2 = ImageROIProcessor()
+                processor_2.image=Intensity_2
+
+
+
+                # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+                # roi_2 = load_ROI(roi_2_path).to_numpy()
+                roi_2 = np.zeros(Current_image_2.shape)
+                Intensity_2 = Intensity_2
+                image_2_times_roi = Current_image_2
+                # Lifetime_2 = Lifetime_2
+                channel = 'both'
+                Current_image_1 = NO_IMAGE_INTENSITY
+                Current_image_2 = Intensity_2/np.max(Intensity_2)
+                display_images([Current_image_1,Current_image_2],channel)
+                _update_textures_static_roi('ch2',roi_2)
 
 
 
@@ -3417,13 +3218,299 @@ def load_PTU_images(an_file):
 
 
 
+            else:
+                pass
 
 
 
+     
+        elif len(Channels)==2:
+            
+            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+            lt_mask = Lifetime_1/Lifetime_1
+            Intensity_1 = Intensity_1
+            lt_mask = Lifetime_2/Lifetime_2
+            Intensity_2 = Intensity_2
+            # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
+            # roi_1 = load_ROI(roi_1_path).to_numpy()
+            roi_1 = np.zeros(Current_image_1.shape)
+            Intensity_1 = Intensity_1
+            # Lifetime_1 = Lifetime_1
+            # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+            # roi_2 = load_ROI(roi_2_path).to_numpy()
+            roi_2 = np.zeros(Current_image_2.shape)
+            Intensity_2 = Intensity_2
+            # Lifetime_2 = Lifetime_2
+            processor_1 = ImageROIProcessor()
+            processor_1.image=Intensity_1
+            processor_2 = ImageROIProcessor()
+            processor_2.image=Intensity_2
+
+            channel = 'both'
+
+            Current_image_1 = Intensity_1/np.max(Intensity_1)
+            Current_image_2 = Intensity_2/np.max(Intensity_2)
+            image_1_time_roi = Current_image_1
+            image_2_time_roi = Current_image_2
+            display_images([Current_image_1,Current_image_2],channel)
+            _update_textures_static_roi('ch1',roi_1)
+            _update_textures_static_roi('ch2',roi_2)
 
 
+
+def _update_textures_static_roi(sender,roi):
+    global pkl_data,_fin_im_size
+    global processor_1,processor_2
+    global tex_1_name,tex_2_name
+    global Current_image_1,Current_image_2
+    global image_1_times_roi, image_2_times_roi
+    # global anal_file, PTU_directory, ROI_directory,roi_1,roi_2,last_directory
+
+    ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
+         'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
+    ratio_w = ratio['width']
+    
+    _fin_im_size[0]
+    w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
+    h = _fin_im_size[1]
+    ovrl = 15
+    
+    
+    # print(sender)
+    if sender[-1]=='1':
+        
+        img = processor_1.image.astype(np.uint8)
+        
+        full_mask = roi
+        
+        image_1_times_roi = img*full_mask
+        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+        rgba_image[..., 0] = img  # Red channel
+        rgba_image[..., 1] = img  # Green channel
+        rgba_image[..., 2] = img  # Blue channel
+        rgba_image[..., 3] = 255
+        if np.max(roi) != 0:
+            image_1_times_roi = img*full_mask
+            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+            rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+            rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+            rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+            rgba_image[full_mask > 0, 3] = overlay_alpha
+            
+        else:
+            image_1_times_roi = img
+        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+        rgba_image=rgba_image.astype(np.float32) /255
+        
+        new_texture_data = rgba_image.flatten().tolist()
+        dpg.set_value(tex_1_name, new_texture_data)
+    elif sender[-1]=='2':
+        # find_nucleus = dpg.get_value('nucleus_search_2')
+        # cell_rat = dpg.get_value('cell_tresh_ratio_2')
+        # nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
+        img = processor_2.image.astype(np.uint8)
+        # print(img.shape)
+        # print(type(img))
+        # cell_roi_image = processor_2.detect_cell_roi(img,cell_rat)
+        # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
+        full_mask = roi
+        # print('fm',full_mask)
+        # print('im',img)
+        
+        # if not find_nucleus:    
+        #     full_mask = cell_roi_image
+        #     # image_data =(img* (255 / img.max())).astype(np.uint8)
+        #     # image_data = np.multiply(image_data, cell_roi_image)
+        # else:
+        #     nucleus_roi = processor_2.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
+        #     full_mask = processor_2.make_full_roi(cell_roi_image, nucleus_roi)
+            
+            # image_data =(img* (255 / img.max())).astype(np.uint8)
+            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
+            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
+            # image_data = np.multiply(image_data, full_mask)
+        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
+        # new_texture_data = self.create_rgba_texture(image_data/255)
+        # pkl_data['channel_2']={
+        #     'image':processor_2.image,
+        #     'ROI':full_mask,
+        #     'cell_treshold':cell_rat,
+        #     'nucl_chk':find_nucleus,
+        #     'nucl_treshold':nucl_rat,
+        # }
+        
+        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+        rgba_image[..., 0] = img  # Red channel
+        rgba_image[..., 1] = img  # Green channel
+        rgba_image[..., 2] = img  # Blue channel
+        rgba_image[..., 3] = 255
+        if np.max(roi) != 0:
+            image_2_times_roi = img*full_mask
+            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+            rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+            rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+            rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+            rgba_image[full_mask > 0, 3] = overlay_alpha
+        else:
+            image_2_times_roi = img
+
+        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+        rgba_image=rgba_image.astype(np.float32) /np.max(img)
+        new_texture_data = rgba_image.flatten().tolist()
+        
+        dpg.set_value(tex_2_name, new_texture_data)
+       
+    else:
+        pass
+
+    callback_calculate(sender,None)
+
+
+def _update_textures__dynamic_roi(sender, app_data):
+    global pkl_data,_fin_im_size
+    global processor_1,processor_2
+    global tex_1_name,tex_2_name
+    global Current_image_1,Current_image_2
+    global image_1_times_roi, image_2_times_roi
+    ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
+         'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
+    ratio_w = ratio['width']
+    
+    _fin_im_size[0]
+    w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
+    h = _fin_im_size[1]
+    ovrl = 15
+    
+    
+    # print(sender)
+    if sender[-1]=='1':
+        find_nucleus = dpg.get_value('nucleus_search_1')
+        cell_rat = dpg.get_value('cell_tresh_ratio_1')
+        nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
+        img = processor_1.image.astype(np.uint8)
+        
+        # image_data =(img* (255 / img.max())).astype(np.uint8)
+        cell_roi_image = processor_1.detect_cell_roi(img,cell_rat)
+        
+        if not find_nucleus:    
+            full_mask = cell_roi_image
+            # image_data =(img* (255 / img.max())).astype(np.uint8)
+            # image_data = np.multiply(image_data, cell_roi_image)
+        else:
+            nucleus_roi = processor_1.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
+            full_mask = processor_1.make_full_roi(cell_roi_image, nucleus_roi)
+            
+            # image_data =(img* (255 / img.max())).astype(np.uint8)
+            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
+            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
+            # image_data = np.multiply(image_data, full_mask)
+        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
+        # new_texture_data = self.create_rgba_texture(image_data/255)
+        roi=full_mask/np.max(full_mask)
 
         
+        image_1_times_roi = img*roi
+        pkl_data['channel_1']={
+            'image':processor_1.image,
+            'ROI':full_mask,
+            'cell_treshold':cell_rat,
+            'nucl_chk':find_nucleus,
+            'nucl_treshold':nucl_rat,
+        }
+        
+        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+        rgba_image[..., 0] = img  # Red channel
+        rgba_image[..., 1] = img  # Green channel
+        rgba_image[..., 2] = img  # Blue channel
+        rgba_image[..., 3] = 255
+
+        overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+        rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+        rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+        rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+        rgba_image[full_mask > 0, 3] = overlay_alpha
+
+        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+        rgba_image=rgba_image.astype(np.float32) /255
+        
+        new_texture_data = rgba_image.flatten().tolist()
+        dpg.set_value(tex_1_name, new_texture_data)
+        
+            
+    elif sender[-1]=='2':
+        find_nucleus = dpg.get_value('nucleus_search_2')
+        cell_rat = dpg.get_value('cell_tresh_ratio_2')
+        nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
+        img = processor_2.image.astype(np.uint8)
+        # print(img.shape)
+        # print(type(img))
+        cell_roi_image = processor_2.detect_cell_roi(img,cell_rat)
+        # print(np.max(cell_roi_image))
+        if not find_nucleus:    
+            full_mask = cell_roi_image
+            # image_data =(img* (255 / img.max())).astype(np.uint8)
+            # image_data = np.multiply(image_data, cell_roi_image)
+        else:
+            nucleus_roi = processor_2.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
+            full_mask = processor_2.make_full_roi(cell_roi_image, nucleus_roi)
+            
+            # image_data =(img* (255 / img.max())).astype(np.uint8)
+            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
+            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
+            # image_data = np.multiply(image_data, full_mask)
+        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
+        # new_texture_data = self.create_rgba_texture(image_data/255)
+        # print('fm',full_mask)
+        roi=full_mask/np.max(full_mask)
+        # print('im',img)
+        image_2_times_roi = img*roi
+        # print(np.max(image_2_times_roi),np.max(full_mask))
+        pkl_data['channel_2']={
+            'image':processor_2.image,
+            'ROI':full_mask,
+            'cell_treshold':cell_rat,
+            'nucl_chk':find_nucleus,
+            'nucl_treshold':nucl_rat,
+        }
+        
+        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
+        rgba_image[..., 0] = img  # Red channel
+        rgba_image[..., 1] = img  # Green channel
+        rgba_image[..., 2] = img  # Blue channel
+        rgba_image[..., 3] = 255
+        # print(rgba_image.shape)
+        overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
+        rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
+        rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
+        rgba_image[full_mask > 0, 2] = img[full_mask > 0]  # Blend blue
+        rgba_image[full_mask > 0, 3] = overlay_alpha
+
+        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+        rgba_image=rgba_image.astype(np.float32) /np.max(img)
+        new_texture_data = rgba_image.flatten().tolist()
+        
+        dpg.set_value(tex_2_name, new_texture_data)
+        
+    else:
+        pass
+
+    callback_calculate(sender,None)
+
+
+def create_rgba_texture(image_data):
+        # Ensure the image data is 2D (grayscale)
+        if image_data.ndim != 2:
+            raise ValueError("Image data should be a 2D array.")
+        
+        # Convert to a 3D RGB array (3 channels)
+        rgba_data = np.stack([image_data] * 3, axis=-1)  # Duplicate grayscale data for RGB channels
+        rgba_data = np.concatenate([rgba_data, np.ones((image_data.shape[0], image_data.shape[1], 1), dtype=np.uint8) * 255], axis=-1)  # Add alpha channel (fully opaque)
+        
+        # Flatten the RGBA array into a 1D list for the dynamic texture
+        return rgba_data.flatten().tolist()
 
     
     
@@ -3752,10 +3839,54 @@ def callback_exportsettings(sender,app_data):
     
     
     
-    print(setts)
+    # print(setts)
     if PTU_directory !=None:
         path_to_json_file = os.path.join(PTU_directory,'workspace_info.json')
         with open(path_to_json_file, 'w') as f:
             json.dump(setts, f, indent=4, sort_keys=False)
     else:
         print('Select PTU directory, at least!')
+
+
+def _pkl_file():
+    global anal_file
+    global last_directory
+    print(last_directory)
+    pkl = {
+        'filename' : anal_file,
+        'ROI_mode' : (dpg.get_value('FILE_ROI_checkbox'),'Auto_ROI_checkbox'),
+        'FCS_data' : {
+                        'omega_1':dpg.get_value('omega_input_ch_1'),
+                        'omega_2':dpg.get_value('omega_input_ch_2'),
+                        'omega_err_1':dpg.get_value('omega_err_input_ch_1'),
+                        'omega_err_2':dpg.get_value('omega_err_input_ch_2'),
+                        'kappa_1':dpg.get_value('kappa_input_ch_1'),
+                        'kappa_2':dpg.get_value('kappa_input_ch_2'),
+                        'kappa_err_1':dpg.get_value('kappa_err_input_ch_1'),
+                        'kappa_err_2':dpg.get_value('kappa_err_input_ch_2'),
+                        'fv_1':dpg.get_value('focal_vol_input_ch_1'),
+                        'fv_2':dpg.get_value('focal_vol_input_ch_2'),
+                        'fv_err_1':dpg.get_value('focal_vol_err_input_ch_1'),
+                        'fv_err_2':dpg.get_value('focal_vol_err_input_ch_2'),
+                        'Br_1':dpg.get_value('Brightness_input_ch_1'),
+                        'Br_2':dpg.get_value('Brightness_input_ch_2'),
+                        'Br_err_1':dpg.get_value('Brightness_err_input_ch_1'),
+                        'Br_err_2':dpg.get_value('Brightness_err_input_ch_2'),
+                        },
+        'autoroi_tresh':{
+                        'cell_1':dpg.get_value('cell_tresh_ratio_1'),
+                        'cell_2':dpg.get_value('cell_tresh_ratio_2'),
+                        'check_1':dpg.get_value('nucleus_search_1'),
+                        'check_2':dpg.get_value('nucleus_search_2'),
+                        'nucl_1':dpg.get_value('nucl_tresh_ratio_1'),
+                        'nucl_2':dpg.get_value('nucl_tresh_ratio_2')
+                        
+            
+                        }
+    
+        }
+    print(pkl)
+    pkl_path = os.path.join(last_directory,anal_file+'.rpk')
+    with open(pkl_path, 'wb') as f:
+            pickle.dump(pkl, f)
+    

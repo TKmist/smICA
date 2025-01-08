@@ -122,20 +122,20 @@ with dpg.window(label='',
     #     with dpg.tooltip('Add_ROI_2_button'):
     #         dpg.add_text("Add ROI to channel 2.")
     with dpg.group(tag='ROI_check_sel_group',horizontal=True,horizontal_spacing=init_group_spacer+1):
-        dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,callback=callback_select_roi)
-        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False,callback=callback_select_autoroi
+        dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,callback=callback_select_roi,enabled=False)
+        dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False,callback=callback_select_autoroi,enabled=False
                         )
         
     
-    dpg.add_button(label="Browse for the ROI folder",
-               callback=lambda: dpg.show_item("ROI_folder_dialog_id"),
-               width = init_widths['Browse_ROI_directory_button'],
-               tag='Browse_ROI_directory_button',
-               show=True,enabled=False
-              )
-    dpg.bind_item_theme('Browse_ROI_directory_button', 'fit_button_theme')
-    with dpg.tooltip('Browse_ROI_directory_button'):
-        dpg.add_text("Press to browse for the folder containing ROI files. Files need to have the same name as PTU file ended wiith roi_ch_1.dat, for channel 1 and roi_ch_2.dat for channel 2.")
+    # dpg.add_button(label="Browse for the ROI folder",
+    #            callback=lambda: dpg.show_item("ROI_folder_dialog_id"),
+    #            width = init_widths['Browse_ROI_directory_button'],
+    #            tag='Browse_ROI_directory_button',
+    #            show=True,enabled=False
+    #           )
+    # dpg.bind_item_theme('Browse_ROI_directory_button', 'fit_button_theme')
+    # with dpg.tooltip('Browse_ROI_directory_button'):
+    #     dpg.add_text("Press to browse for the folder containing ROI files. Files need to have the same name as PTU file ended wiith roi_ch_1.dat, for channel 1 and roi_ch_2.dat for channel 2.")
     
     
     
