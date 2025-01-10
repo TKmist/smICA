@@ -83,6 +83,19 @@ ratio_w = ratio_h = 1
 
 log_it('Functions.py -loaded on '+str(datetime.datetime.now()),'a')
 
+def lnprint(*args, **kwargs):
+ # Get the current frame's caller information (go one level up)
+    caller_frame = inspect.currentframe().f_back
+    line_number = caller_frame.f_lineno
+    # Get the filename of the script
+    file_name = caller_frame.f_code.co_filename
+    function_name = caller_frame.f_code.co_name
+    # Print the line number and filename first
+    print(f"File {file_name}, Function '{function_name}', Line {line_number}: ", end="\n")
+
+    # Pass all arguments and keyword arguments to the built-in print function
+    print(*args, **kwargs)
+
 
 def CNTR_FIT(x,SLOPE):
     
@@ -167,7 +180,7 @@ def Exception(tried):
 
 def Export_result_dataframe_to_file(sender,app_data):
     global directory, new_directory,last_directory
-    # print(app_data)
+
     directory = app_data['current_path']
     new_directory=directory
     last_directory=directory
@@ -212,7 +225,7 @@ def Export_result_dataframe_to_file(sender,app_data):
 
 def Load_Save_Calib_file(sender,app_data,user_data):
     global directory, new_directory,last_directory,calib_directory
-    # print(app_data)
+
     directory = app_data['current_path']
     new_directory=directory
     last_directory=directory
@@ -682,6 +695,9 @@ def callback_PTU_directory_select(sender,app_data):
     files = tuple(np.sort([f for f in os.listdir(PTU_directory) if f.endswith('.ptu')]))
     pck_files = list(np.sort([f for f in os.listdir(PTU_directory) if f.endswith('.pkl')]))
 
+    dpg.configure_item('FILE_ROI_checkbox', enabled=True)
+    dpg.configure_item('Auto_ROI_checkbox', enabled=True)
+    
     try:
         hide_histograms()
     except:
@@ -723,21 +739,24 @@ def callback_PTU_directory_select(sender,app_data):
 
 
         anal_file=filenames[0]
-        dpg.configure_item('file_box', default_value=anal_file)
 
-        load_PTU_images(anal_file)
+        
+
+        
+        dpg.configure_item('file_box', default_value=anal_file)
+        callback_listbox('file_box',anal_file)
+        # load_PTU_images(anal_file)
         
     else:
         
         show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again.')
     
-    dpg.configure_item('FILE_ROI_checkbox', enabled=True)
-    dpg.configure_item('Auto_ROI_checkbox', enabled=True)
+    
 
 def callback_ROI_directory_select(sender,app_data):
     global ROI_directory,last_directory,anal_file
     
-    # print(anal_file)
+
     ROI_directory = app_data['file_path_name']
     last_directory =ROI_directory
     update_dialogs_default_directory(last_directory)
@@ -1229,11 +1248,11 @@ def callback_calculate(sender,app_data):
             Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15*dpg.get_value('focal_vol_err_input_ch_2')
             # DF2 = Current_image_2
-            # print(type(image_2_times_roi),np.max(image_2_times_roi))
+
             DF2 = image_2_times_roi
             Photons_2 = pd.DataFrame(DF2)
             n_pixels_2 =  Photons_2.stack().reset_index(drop=True).dropna().count()
-            # print(Photons_2)
+
             mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
             mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
             Molecules_ch_2 = calc_molecules(DF2,PTU_Px_dwell,PTU_N_frames,brightness_ch_2,brightness_err_ch_2)[0]
@@ -2096,9 +2115,9 @@ def callback_listbox(sender,app_data):
 
     pkl_file = anal_file+'.rpk'
     pkl_path = os.path.join(last_directory,pkl_file)
-    print(pkl_file)
+    # lnprint(pkl_file)
     if os.path.exists(pkl_path):
-        print('loading_pkl')
+        # lnprint('loading_pkl')
         pkl = _load_pkl_file(pkl_path)
         
     else:
@@ -2352,14 +2371,14 @@ def callback_windows_size(sender,app_data):
     global Current_image_1,Current_image_2
     global tex_1_name,tex_2_name,dif_vp0_width
     global inf_w
-    # print('RUNNING: callback_windows_size')
+    # lnprint('RUNNING: callback_windows_size')
     inf_w = dpg.get_viewport_width()-dif_vp0_width
     
     inf_h = dpg.get_viewport_height()
     
     items = dpg.get_aliases()
     
-    # print('reseize',inf_w,inf_h)
+    # lnprint('reseize',inf_w,inf_h)
 
     item_types = []
     for item in items:
@@ -2376,7 +2395,7 @@ def callback_windows_size(sender,app_data):
     items = [item for item in items if dpg.get_item_type(item) in resizable_items ]
     ratio_w = inf_w/(init_widths['VIEWPORT']-dif_vp0_width)
     ratio_h = inf_h/init_heights['VIEWPORT']
-    # print('line 2577',ratio_w,ratio_h)
+    # lnprint('line 2577',ratio_w,ratio_h)
 
     
     top_indent = int(init_top_indent*ratio_h)
@@ -2390,7 +2409,7 @@ def callback_windows_size(sender,app_data):
     var_def_group_1_spacer = int(init_var_def_group_1_spacer*ratio_w)
     
     item = 'PTU_DATA_window'
-    # print('line 2591',item)
+    # lnprint('line 2591',item)
     new_width = int(init_widths[item]*ratio_w)
     new_height = int(init_heights[item]*ratio_h)
     new_pos = (left_indent,top_indent)
@@ -2398,7 +2417,7 @@ def callback_windows_size(sender,app_data):
     wdt_hgt_pos(item,new_width,new_height,new_pos)
     
     item = 'file_window'
-    # print('line 2599',item)
+    # lnprint('line 2599',item)
     new_width = dpg.get_item_width('PTU_DATA_window')
     
     new_height = int(init_heights[item]*ratio_h)
@@ -2409,11 +2428,11 @@ def callback_windows_size(sender,app_data):
     
     
     item1 = 'image_window_ch1'
-    # print('line 2610',item1)
+    # lnprint('line 2610',item1)
     item2 = 'image_window_ch2'
-    # print('line 2612',item2)
+    # lnprint('line 2612',item2)
     mult = ((init_widths['VIEWPORT']-dif_vp0_width)*ratio_w -left_indent-2*internal_indent-init_widths['PTU_DATA_window']-internal_indent- right_indent-5)/2/init_widths[item1]
-    # print('line 2614',mult)
+    # lnprint('line 2614',mult)
     
     
     
@@ -2425,22 +2444,22 @@ def callback_windows_size(sender,app_data):
                   top_indent)
     
     
-    # print('line 2626',image_position_1)
-    # print(Current_image_1)
+    # lnprint('line 2626',image_position_1)
+    # lnprint(Current_image_1)
     dpg_image_1 = update_texture(Current_image_1)
     dpg.set_item_pos('image_window_ch1',image_position_1)
-    # print('line 2630',tex_1_name)
+    # lnprint('line 2630',tex_1_name)
     # ites = dpg.get_aliases()
     # ites = [it for it in ites if it.startswith('texture')]
-    # print(ites)
+    # lnprint(ites)
     
     if tex_1_name in dpg.get_aliases():
         dpg.delete_item(tex_1_name)
         
         dpg.remove_alias(tex_1_name)
-        # print('line 2639','img1_passed0')
+        # lnprint('line 2639','img1_passed0')
         dpg.delete_item('texture_CH_1')
-        # print('line 2641','img1_passed')
+        # lnprint('line 2641','img1_passed')
         # if 'new' in tex_1_name:
         #     new = 'texture_tag_chan_1-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
         #     tex_1_name =new
@@ -2467,16 +2486,16 @@ def callback_windows_size(sender,app_data):
     image_position_2 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
                   top_indent)
     
-    # print('line 2668',image_position_2)
+    # lnprint('line 2668',image_position_2)
     dpg_image_2 = update_texture(Current_image_2)
     dpg.set_item_pos('image_window_ch2',image_position_2)
     if tex_2_name in dpg.get_aliases():
         dpg.delete_item(tex_2_name)
-        # print('line 2673','img2_passed00')
+        # lnprint('line 2673','img2_passed00')
         dpg.remove_alias(tex_2_name)
-        # print('line 2675','img2_passed0')
+        # lnprint('line 2675','img2_passed0')
         dpg.delete_item('texture_CH_2')
-        # print('line 2677','img2_passed')
+        # lnprint('line 2677','img2_passed')
         # if 'new' in tex_2_name:
         #     new = 'texture_tag_chan_2-new_'+str(int(tex_2_name.split('-')[1].split('_')[1])+1)
         #     tex_2_name =new
@@ -2496,7 +2515,7 @@ def callback_windows_size(sender,app_data):
                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2')
     
     item = 'FCS_window'
-    # print('line 2697',item)
+    # lnprint('line 2697',item)
     new_weight = int(init_widths[item]*ratio_w)
     new_height = int(init_heights[item]*ratio_h)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent+dpg.get_item_width(tex_2_name)+2*internal_indent
@@ -2505,7 +2524,7 @@ def callback_windows_size(sender,app_data):
     wdt_hgt_pos(item,new_weight,new_height,new_pos)
     
     item = 'results_window'
-    # print('line 2706',item)
+    # lnprint('line 2706',item)
     new_weight = int(init_widths[item]*ratio_w)
     new_height = int(init_heights[item]*ratio_h)
     new_pos = (dpg.get_item_pos('FCS_window')[0],dpg.get_item_pos('FCS_window')[1]+dpg.get_item_height('FCS_window')+internal_indent)
@@ -2518,7 +2537,7 @@ def callback_windows_size(sender,app_data):
     
     
     item = 'hist_window_ch1'
-    # print('line 2719',item)
+    # lnprint('line 2719',item)
     new_width = dpg.get_item_width(tex_1_name)+int(1.5*init_internal_indent)
     new_height = dpg.get_item_height(tex_1_name)*hist_scaller+int(1.5*init_internal_indent)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
@@ -2528,7 +2547,7 @@ def callback_windows_size(sender,app_data):
     
     
     item = 'hist_window_ch2'
-    # print('line 2729',item)
+    # lnprint('line 2729',item)
     new_width = dpg.get_item_width(tex_2_name)+int(1.5*init_internal_indent)
     new_height = dpg.get_item_height(tex_2_name)*hist_scaller+int(1.5*init_internal_indent)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
@@ -2546,7 +2565,7 @@ def callback_windows_size(sender,app_data):
     
     
     for item in file_panel_items:
-        # print(item)
+        # lnprint(item)
         new_weight = int(init_widths[item]*ratio_w)
         wdt_hgt_pos(item,new_weight,None,None)
         
@@ -2556,7 +2575,7 @@ def callback_windows_size(sender,app_data):
 
     
     for item in dialogs:
-        # print(item)
+        # lnprint(item)
         new_weight = int(init_widths[item]*ratio_w)
         new_height = int(init_heights[item]*ratio_h)
 
@@ -2569,7 +2588,7 @@ def callback_windows_size(sender,app_data):
     
     '''Group spacer resizing'''
     for item in item_types_dict['mvAppItemType::mvGroup']:
-        # print(item)
+        # lnprint(item)
         if dpg.get_item_configuration(item)['horizontal']:
             
             dpg.configure_item(item,horizontal_spacing = group_spacer)
@@ -2706,7 +2725,7 @@ def hide_histograms():
 def plot_IMAGE(img,width,height):
         width = int(width)
         height = int(height)
-        # print(time.strftime("%H:%M:%S"),type(img),img.shape,np.max(img))
+        # lnprint(time.strftime("%H:%M:%S"),type(img),img.shape,np.max(img))
         if img.shape != (height, width):  # Resize if necessary
             resized_img = cv2.resize(img, (width, height))  # Resize to (width, height)
         else:
@@ -2905,12 +2924,13 @@ def join_dicts(dict1,dict2):
 
 
 
+    
 
 
 def load_PTU_images(an_file):
     
     global anal_file, pck_files,PTU_directory, DF, DF2,pck_list,ROI_directory,roi_1,roi_2,Channels,last_directory
-    # print('ROI_directory',ROI_directory)
+    # lnprint('ROI_directory',ROI_directory)
     global PTU_Resolution,PTU_Px_size,PTU_N_frames,PTU_Px_dwell
     global Current_image_1,Current_image_2
     global image_1_times_roi,image_2_times_roi
@@ -2921,16 +2941,7 @@ def load_PTU_images(an_file):
 
 
 
-    global pkl
-    pkl_file = anal_file+'.rpk'
-    pkl_path = os.path.join(last_directory,pkl_file)
-    print(pkl_file)
-    if os.path.exists(pkl_path):
-        print('loading_pkl')
-        pkl = _load_pkl_file(pkl_path)
-        
-    else:
-         pkl = {}
+    
     
     
     
@@ -3031,7 +3042,7 @@ def load_PTU_images(an_file):
 
                 roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
                 roi_2 = load_ROI(roi_2_path).to_numpy()
-                # print('roi2',roi_2)
+                # lnprint('roi2',roi_2)
                 # Intensity_2 = Intensity_2#*roi_2
                 # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
@@ -3138,7 +3149,7 @@ def load_PTU_images(an_file):
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 image_2_times_roi = Current_image_2
                 display_images([Current_image_1,Current_image_2],channel)
-                # print(Intensity_2.shape)
+                # lnprint(Intensity_2.shape)
                 _update_textures__dynamic_roi('cell_tresh_ratio_2', 1.0)
 
 
@@ -3304,7 +3315,7 @@ def _update_textures_static_roi(sender,roi):
     ovrl = 15
     
     
-    # print(sender)
+    # lnprint(sender)
     if sender[-1]=='1':
         
         img = processor_1.image.astype(np.uint8)
@@ -3337,13 +3348,13 @@ def _update_textures_static_roi(sender,roi):
         # cell_rat = dpg.get_value('cell_tresh_ratio_2')
         # nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
         img = processor_2.image.astype(np.uint8)
-        # print(img.shape)
-        # print(type(img))
+        # lnprint(img.shape)
+        # lnprint(type(img))
         # cell_roi_image = processor_2.detect_cell_roi(img,cell_rat)
         # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
         full_mask = roi
-        # print('fm',full_mask)
-        # print('im',img)
+        # lnprint('fm',full_mask)
+        # lnprint('im',img)
         
         # if not find_nucleus:    
         #     full_mask = cell_roi_image
@@ -3410,7 +3421,7 @@ def _update_textures__dynamic_roi(sender, app_data):
     ovrl = 15
     
     
-    # print(sender)
+    # lnprint(sender)
     if sender[-1]=='1':
         find_nucleus = dpg.get_value('nucleus_search_1')
         cell_rat = dpg.get_value('cell_tresh_ratio_1')
@@ -3470,10 +3481,10 @@ def _update_textures__dynamic_roi(sender, app_data):
         cell_rat = dpg.get_value('cell_tresh_ratio_2')
         nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
         img = processor_2.image.astype(np.uint8)
-        # print(img.shape)
-        # print(type(img))
+        # lnprint(img.shape)
+        # lnprint(type(img))
         cell_roi_image = processor_2.detect_cell_roi(img,cell_rat)
-        # print(np.max(cell_roi_image))
+        # lnprint(np.max(cell_roi_image))
         if not find_nucleus:    
             full_mask = cell_roi_image
             # image_data =(img* (255 / img.max())).astype(np.uint8)
@@ -3488,11 +3499,11 @@ def _update_textures__dynamic_roi(sender, app_data):
             # image_data = np.multiply(image_data, full_mask)
         # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
         # new_texture_data = self.create_rgba_texture(image_data/255)
-        # print('fm',full_mask)
+        # lnprint('fm',full_mask)
         roi=full_mask/np.max(full_mask)
-        # print('im',img)
+        # lnprint('im',img)
         image_2_times_roi = img*roi
-        # print(np.max(image_2_times_roi),np.max(full_mask))
+        # lnprint(np.max(image_2_times_roi),np.max(full_mask))
         pkl_data['channel_2']={
             'image':processor_2.image,
             'ROI':full_mask,
@@ -3506,7 +3517,7 @@ def _update_textures__dynamic_roi(sender, app_data):
         rgba_image[..., 1] = img  # Green channel
         rgba_image[..., 2] = img  # Blue channel
         rgba_image[..., 3] = 255
-        # print(rgba_image.shape)
+        # lnprint(rgba_image.shape)
         overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
         rgba_image[full_mask > 0, 0] = 255  # Red channel set to max for mask
         rgba_image[full_mask > 0, 1] = img[full_mask > 0]  # Blend green
@@ -3771,7 +3782,7 @@ def unmount_bright_table(sender):
 
 
 def update_dialogs_default_directory(last_directory):
-    # print(last_directory)
+    # lnprint(last_directory)
     dpg.configure_item('TT_file_dialog_id_ch_2',default_path=last_directory)
     dpg.configure_item('TT_file_dialog_id_ch_1',default_path=last_directory)
     
@@ -3864,13 +3875,13 @@ def callback_exportsettings(sender,app_data):
     
     
     
-    # print(setts)
+    # lnprint(setts)
     if PTU_directory !=None:
         path_to_json_file = os.path.join(PTU_directory,'workspace_info.json')
         with open(path_to_json_file, 'w') as f:
             json.dump(setts, f, indent=4, sort_keys=False)
     else:
-        print('Select PTU directory, at least!')
+        lnprint('Select PTU directory, at least!')
 
 
 def _pkl_file():
@@ -3910,7 +3921,7 @@ def _pkl_file():
                         }
     
         }
-    print(pkl)
+    lnprint(pkl)
     pkl_path = os.path.join(last_directory,anal_file+'.rpk')
     with open(pkl_path, 'wb') as f:
         pickle.dump(pkl, f)
@@ -3924,7 +3935,7 @@ def _load_pkl_file(path):
      
     with open(path, 'rb') as file:
         pkl = pickle.load(file)
-    print(pkl)
+    # lnprint(pkl)
     
     dpg.set_value('omega_input_ch_1',pkl['FCS_data']['omega_1'])
     dpg.set_value('omega_input_ch_2',pkl['FCS_data']['omega_2'])
@@ -3951,6 +3962,16 @@ def _load_pkl_file(path):
 
     dpg.set_value('FILE_ROI_checkbox',pkl['ROI_mode'][0])
     dpg.set_value('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+    if pkl['ROI_mode'][1]:
+        callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+        
+    else:
+        callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+        
+    
+
+
+    
     return pkl
 
     

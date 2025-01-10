@@ -98,7 +98,7 @@ class ImageROIProcessor:
     def detect_nucleus_roi(self,original_image,cell_roi,ratio):
         
         processed_image = cv2.bitwise_not(original_image)*(cell_roi).astype(int)
-        print(processed_image)
+        # print(processed_image)
         processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
         
         nucleus_roi = self.detect_cell_roi(processed_image,ratio)
