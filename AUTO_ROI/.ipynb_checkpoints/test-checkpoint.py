@@ -2,7 +2,7 @@ import dearpygui.dearpygui as dpg
 import numpy as np
 import cv2
 import os
-from dep.automated_roi_TK import ImageROIProcessor
+from dep.automated_roi import ImageROIProcessor
 
 dpg.create_context()
 
@@ -25,9 +25,9 @@ im_size=[500,500]
 
 # Create and register the dynamic texture
 input_path = os.path.join('samples/npy/','cell-201-01200_INT_ch_2.npy')
-processor = ImageROIProcessor(input_path, input_path, False)
+processor = ImageROIProcessor()
 
-processor.load_image()
+processor.image = np.load(input_path).astype(np.uint8)
 
 image_data = processor.image
 print(type(processor.image))

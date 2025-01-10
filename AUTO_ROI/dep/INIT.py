@@ -336,7 +336,7 @@ class callbacks:
         self.anal_file = app_data
         file = os.path.join(self.last_directory,self.anal_file)
 
-        print(file)
+        # print(file)
         pkl_file = self.anal_file+'.rpck'
         pkl_path = os.path.join(self.last_directory,pkl_file)
         if os.path.exists(pkl_path):

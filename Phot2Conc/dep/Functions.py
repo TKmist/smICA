@@ -1860,8 +1860,9 @@ def callback_calculate_all(sender,app_data):
         anal_file=an_file
         
         dpg.configure_item('file_box', default_value=an_file)
-        load_PTU_images(an_file)
-        callback_calculate(sender,app_data)
+        callback_listbox('file_box',anal_file)
+        # load_PTU_images(an_file)
+        # callback_calculate(sender,app_data)
         
         
         
@@ -2090,8 +2091,19 @@ def callback_licence(sender,app_data):
 
 
 def callback_listbox(sender,app_data):
-    global anal_file
+    global anal_file,pkl,last_directory
     anal_file = app_data
+
+    pkl_file = anal_file+'.rpk'
+    pkl_path = os.path.join(last_directory,pkl_file)
+    print(pkl_file)
+    if os.path.exists(pkl_path):
+        print('loading_pkl')
+        pkl = _load_pkl_file(pkl_path)
+        
+    else:
+         pkl = {}
+    
     load_PTU_images(anal_file)
     hide_histograms()
     callback_calculate(sender,app_data)
@@ -2906,17 +2918,30 @@ def load_PTU_images(an_file):
     global processor_1,processor_2
     global pkl_data
     pkl_data = {}
+
+
+
+    global pkl
+    pkl_file = anal_file+'.rpk'
+    pkl_path = os.path.join(last_directory,pkl_file)
+    print(pkl_file)
+    if os.path.exists(pkl_path):
+        print('loading_pkl')
+        pkl = _load_pkl_file(pkl_path)
+        
+    else:
+         pkl = {}
     
     
     
     pickle_file = os.path.join(PTU_directory,an_file+'.pkl')
 
     with open(pickle_file, 'rb') as pcklf:
-        pkl = pickle.load(pcklf)
+        pklf = pickle.load(pcklf)
     
     # info_file = os.path.join(PTU_directory,an_file+'.info')
     # f = open(info_file)
-    ptu_meta = pkl['File info']#json.load(f)    
+    ptu_meta = pklf['File info']#json.load(f)    
     try:
         DF=DF2=[]
     except:
@@ -2960,7 +2985,7 @@ def load_PTU_images(an_file):
     # npy_files = [f for f in npy_files if f.endswith('.npy')]
 
     # Channels = [f[-8:-4].split('_')[1] for f in npy_files if '_INT_ch_'in f]
-    Channels = list(pkl.keys())
+    Channels = list(pklf.keys())
     Channels = [f for f in Channels if f.startswith('export_df')]
     Channels = [ch[-1] for ch in Channels]
 
@@ -2972,7 +2997,7 @@ def load_PTU_images(an_file):
     
         if len(Channels)==1:
             if '1' in Channels[0]:
-                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
                 # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 
                 Intensity_1 = Intensity_1
@@ -2994,7 +3019,7 @@ def load_PTU_images(an_file):
                 display_images([Current_image_1,Current_image_2],channel)
                 _update_textures_static_roi('ch1',roi_1)
             elif '2' in Channels[0]:
-                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
                 # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 # lt_mask = Lifetime_2/Lifetime_2
@@ -3031,9 +3056,9 @@ def load_PTU_images(an_file):
      
         elif len(Channels)==2:
             
-            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
             # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
             # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
             # lt_mask = Lifetime_1/Lifetime_1
             Intensity_1 = Intensity_1
@@ -3070,7 +3095,7 @@ def load_PTU_images(an_file):
         
         if len(Channels)==1:
             if '1' in Channels[0]:
-                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
                 # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 
                 Intensity_1 = Intensity_1
@@ -3093,7 +3118,7 @@ def load_PTU_images(an_file):
 
                 _update_textures__dynamic_roi('cell_tresh_ratio_1', 1.0)
             elif '2' in Channels[0]:
-                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
                 # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 # lt_mask = Lifetime_2/Lifetime_2
@@ -3130,13 +3155,13 @@ def load_PTU_images(an_file):
      
         elif len(Channels)==2:
             
-            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-            Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
-            Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
-            lt_mask = Lifetime_1/Lifetime_1
+            Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+            Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+            # lt_mask = Lifetime_1/Lifetime_1
             Intensity_1 = Intensity_1
-            lt_mask = Lifetime_2/Lifetime_2
+            # lt_mask = Lifetime_2/Lifetime_2
             Intensity_2 = Intensity_2
             # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
             # roi_1 = load_ROI(roi_1_path).to_numpy()
@@ -3167,7 +3192,7 @@ def load_PTU_images(an_file):
 
         if len(Channels)==1:
             if '1' in Channels[0]:
-                Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
                 # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 
                 Intensity_1 = Intensity_1
@@ -3189,7 +3214,7 @@ def load_PTU_images(an_file):
                 display_images([Current_image_1,Current_image_2],channel)
                 _update_textures_static_roi('ch1',roi_1)
             elif '2' in Channels[0]:
-                Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
+                Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))
 
                 # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
                 # lt_mask = Lifetime_2/Lifetime_2
@@ -3226,13 +3251,13 @@ def load_PTU_images(an_file):
      
         elif len(Channels)==2:
             
-            Intensity_1 = pkl['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
-            Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
-            Intensity_2 = pkl['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
-            Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
-            lt_mask = Lifetime_1/Lifetime_1
+            Intensity_1 = pklf['intensity_1'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[0]+'.npy'))                    
+            # Lifetime_1 = pkl['lifetimes_1'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[0]+'.npy'))
+            Intensity_2 = pklf['intensity_2'] #np.load(os.path.join(PTU_directory,an_file+'_INT_ch_'+Channels[1]+'.npy'))
+            # Lifetime_2 = pkl['lifetimes_2'] #np.load(os.path.join(PTU_directory,an_file+'_LT_ch_'+Channels[1]+'.npy'))
+            # lt_mask = Lifetime_1/Lifetime_1
             Intensity_1 = Intensity_1
-            lt_mask = Lifetime_2/Lifetime_2
+            # lt_mask = Lifetime_2/Lifetime_2
             Intensity_2 = Intensity_2
             # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
             # roi_1 = load_ROI(roi_1_path).to_numpy()
@@ -3851,10 +3876,10 @@ def callback_exportsettings(sender,app_data):
 def _pkl_file():
     global anal_file
     global last_directory
-    print(last_directory)
+
     pkl = {
         'filename' : anal_file,
-        'ROI_mode' : (dpg.get_value('FILE_ROI_checkbox'),'Auto_ROI_checkbox'),
+        'ROI_mode' : (dpg.get_value('FILE_ROI_checkbox'),dpg.get_value('Auto_ROI_checkbox')),
         'FCS_data' : {
                         'omega_1':dpg.get_value('omega_input_ch_1'),
                         'omega_2':dpg.get_value('omega_input_ch_2'),
@@ -3888,5 +3913,48 @@ def _pkl_file():
     print(pkl)
     pkl_path = os.path.join(last_directory,anal_file+'.rpk')
     with open(pkl_path, 'wb') as f:
-            pickle.dump(pkl, f)
+        pickle.dump(pkl, f)
+
+
+def _load_pkl_file(path):
+    global anal_file
+    global last_directory
+
+    # path = os.path.join(last_directory,anal_file+'.rpk')
+     
+    with open(path, 'rb') as file:
+        pkl = pickle.load(file)
+    print(pkl)
+    
+    dpg.set_value('omega_input_ch_1',pkl['FCS_data']['omega_1'])
+    dpg.set_value('omega_input_ch_2',pkl['FCS_data']['omega_2'])
+    dpg.set_value('omega_err_input_ch_1',pkl['FCS_data']['omega_err_1'])
+    dpg.set_value('omega_err_input_ch_2',pkl['FCS_data']['omega_err_2'])
+    dpg.set_value('kappa_input_ch_1',pkl['FCS_data']['kappa_1'])
+    dpg.set_value('kappa_input_ch_2',pkl['FCS_data']['kappa_2'])
+    dpg.set_value('kappa_err_input_ch_1',pkl['FCS_data']['kappa_err_1'])
+    dpg.set_value('kappa_err_input_ch_2',pkl['FCS_data']['kappa_err_2'])
+    dpg.set_value('focal_vol_input_ch_1',pkl['FCS_data']['fv_1'])
+    dpg.set_value('focal_vol_input_ch_2',pkl['FCS_data']['fv_2'])
+    dpg.set_value('focal_vol_err_input_ch_1',pkl['FCS_data']['fv_err_1'])
+    dpg.set_value('focal_vol_err_input_ch_2',pkl['FCS_data']['fv_err_2'])
+    dpg.set_value('Brightness_input_ch_1',pkl['FCS_data']['Br_1'])
+    dpg.set_value('Brightness_input_ch_2',pkl['FCS_data']['Br_2'])
+    dpg.set_value('Brightness_err_input_ch_1',pkl['FCS_data']['Br_err_1'])
+    dpg.set_value('Brightness_err_input_ch_2',pkl['FCS_data']['Br_err_2'])
+    dpg.set_value('cell_tresh_ratio_1',pkl['autoroi_tresh']['cell_1'])
+    dpg.set_value('cell_tresh_ratio_2',pkl['autoroi_tresh']['cell_2'])
+    dpg.set_value('nucleus_search_1',pkl['autoroi_tresh']['check_1'])
+    dpg.set_value('nucleus_search_2',pkl['autoroi_tresh']['check_2'])
+    dpg.set_value('nucl_tresh_ratio_1',pkl['autoroi_tresh']['nucl_1'])
+    dpg.set_value('nucl_tresh_ratio_2',pkl['autoroi_tresh']['nucl_2'])
+
+    dpg.set_value('FILE_ROI_checkbox',pkl['ROI_mode'][0])
+    dpg.set_value('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+    return pkl
+
+    
+
+
+    
     
