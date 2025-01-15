@@ -75,10 +75,11 @@ class ImageROIProcessor:
         # Znajdowanie konturów
         contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         if not contours or hierarchy is None:
-            raise ValueError("Nie znaleziono konturów w obrazie.")
-
+            # raise ValueError("Nie znaleziono konturów w obrazie.")
+            external_mask = self._create_external_mask(None, image_to_process.shape)
+        else:
         # Klasyfikacja konturów
-        external_contour, internal_contour = self._classify_contours_by_area(contours, hierarchy)
+            external_contour, internal_contour = self._classify_contours_by_area(contours, hierarchy)
 
         # Dopasowanie elipsy i stworzenie maski ROI
         # ellipse_mask = np.zeros(image_to_processshape, dtype=np.uint8)
@@ -86,7 +87,7 @@ class ImageROIProcessor:
         #     ellipse_mask, _ = self._fit_ellipse_to_contour(internal_contour, image_to_process.shape)
 
         # Tworzenie maski zewnętrznego konturu
-        external_mask = self._create_external_mask(external_contour, image_to_process.shape)
+            external_mask = self._create_external_mask(external_contour, image_to_process.shape)
 
         # Łączenie masek w finalną ROI
         # roi_image = self._create_final_mask(external_mask, ellipse_mask, image_to_process.shape)

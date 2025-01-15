@@ -109,20 +109,36 @@ Current_image_1 = NO_IMAGE_INTENSITY
 Current_image_2 = NO_IMAGE_INTENSITY
 
 
+processor_1 = ImageROIProcessor()
+processor_1.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+
+processor_2 = ImageROIProcessor()
+processor_2.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+
+rgba_image_1 = im_to_rgbim(processor_1.image.astype(np.uint8))
+rgba_image_2 = im_to_rgbim(processor_2.image.astype(np.uint8))
+
+rgba_image_1  =cv2.resize(rgba_image_1, (w, h), interpolation=cv2.INTER_CUBIC)
+rgba_image_2  =cv2.resize(rgba_image_2, (w, h), interpolation=cv2.INTER_CUBIC)
 
 
+dpg_image_1=(rgba_image_1.astype(np.float32) /np.max(processor_1.image.astype(np.uint8))).flatten().tolist()
+dpg_image_2=(rgba_image_2.astype(np.float32) /np.max(processor_2.image.astype(np.uint8))).flatten().tolist()
 
+# dpg.set_value(tex_name, new_texture_data)
 
+# _update_textures_both_roi('ch1',None)
+# _update_textures_both_roi('ch2',None)
 
 # image_1=image_INT_LT(Current_image_1,w,h)
 # image_2=image_INT_LT(Current_image_2,w,h)
 
-image_1=plot_IMAGE(Current_image_1,w,h)
-image_2=plot_IMAGE(Current_image_2,w,h)
+# image_1=plot_IMAGE(Current_image_1,w,h)
+# image_2=plot_IMAGE(Current_image_2,w,h)
 
 
 
-dpg_image_1 = convert_to_texture(image_1)
+# dpg_image_1 = convert_to_texture(image_1)
 # dpg_image_1 = []
 # for i in range(0, image_1._size[1]):
 #     for j in range(0, image_1._size[0]):
@@ -143,7 +159,7 @@ dpg_image_1 = convert_to_texture(image_1)
 #         dpg_image_2.append(pixel[2]/255)
 #         dpg_image_2.append(255/255)
 
-dpg_image_2 = convert_to_texture(image_2)
+# dpg_image_2 = convert_to_texture(image_2)
 
 
 

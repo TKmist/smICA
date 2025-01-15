@@ -1,4 +1,4 @@
-STARTED on 2025-01-09 11:58:51.430584
+STARTED on 2025-01-14 11:03:51.178275
 Modules loaded
 Functions loaded
 Init parameters loaded
@@ -12,4 +12,8 @@ Executing function: load_ptu
 	loaded.
 Using statistical filters
 Using statistical filters
-Using statistical filters
+Executing function: callback_apply_to_all_ptus
+Executing function: extract_from_ptu
+Executing function: extract_from_ptu
+Executing function: extract_from_ptu
+FINISHED on 2025-01-14 11:12:12.607493

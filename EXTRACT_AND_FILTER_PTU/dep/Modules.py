@@ -20,6 +20,7 @@ from numpy.linalg import inv, det,cond,pinv
 log_it('Modules loaded','a') 
 import warnings
 warnings.filterwarnings('ignore')
+import cv2
 
 
 

@@ -2156,30 +2156,46 @@ def extract_from_ptu(folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
         channel_data = np.sum(flim_data_stack[:,:,channels[channel],:],axis=2)
 
         dpg.configure_item('loading_status',label='Exporting data to png - Channel '+str(channel+1))
-        to_png = channel_data*1/(np.max(channel_data)/255)
-
-        px = 1/plt.rcParams['figure.dpi']
-        width = channel_data.shape[0]
-        height = channel_data.shape[1]
 
 
-        fig = Figure(figsize=(width*px,height*px),facecolor='black')
-        ax = fig.add_subplot()
-        fig.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
-        ax.margins(0, 0,)
-        ax.axis('off')
-        ax.imshow(to_png,cmap='nipy_spectral')
-        b =BytesIO()
-        FigureCanvas(fig).print_png(b)
-        plt.close()
 
-        b.seek(0)
-        image=Image.open(b)
-        image.save(os.path.join(folder,png_FC_name))
-        del(b)
+        
+        # to_png = channel_data*1/(np.max(channel_data)/255)
 
-        im = Image.fromarray(np.uint8(to_png))
-        im.save(os.path.join(folder,png_name))
+        # px = 1/plt.rcParams['figure.dpi']
+        # width = channel_data.shape[0]
+        # height = channel_data.shape[1]
+
+
+        # fig = Figure(figsize=(width*px,height*px),facecolor='black')
+        # ax = fig.add_subplot()
+        # fig.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
+        # ax.margins(0, 0,)
+        # ax.axis('off')
+        # ax.imshow(to_png,cmap='nipy_spectral')
+        # b =BytesIO()
+        # FigureCanvas(fig).print_png(b)
+        # plt.close()
+
+        # b.seek(0)
+        # image=Image.open(b)
+        # image.save(os.path.join(folder,png_FC_name))
+        # del(b)
+
+        # im = Image.fromarray(np.uint8(to_png))
+        # im.save(os.path.join(folder,png_name))
+
+        to_png = (channel_data / np.max(channel_data) * 255).astype(np.uint8)
+        # to_png_8bit = cv2.normalize(to_png, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
+        colormap = cv2.COLORMAP_JET
+
+        colored_image = cv2.applyColorMap(to_png, colormap)
+
+        cv2.imwrite(os.path.join(folder, png_FC_name), colored_image)
+
+        cv2.imwrite(os.path.join(folder, png_name), to_pngpyth)
+
         
         export_df = pd.DataFrame(channel_data)
         # dpg.configure_item('loading_status',label='Exporting data to csv - Channel '+str(channel+1))

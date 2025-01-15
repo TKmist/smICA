@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib as mpl
-
+import pickle
 
 from PIL import Image
 import pyautogui
@@ -20,6 +20,7 @@ from numpy.linalg import inv, det,cond,pinv
 log_it('Modules loaded','a') 
 import warnings
 warnings.filterwarnings('ignore')
+import cv2
 
 
 
