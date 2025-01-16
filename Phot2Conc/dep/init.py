@@ -26,6 +26,8 @@ hist_scaller =1.1
 global dif_vp0_width
 dif_vp0_width =  380
 
+rescalable_item = []
+
 init_widths = {
     'VIEWPORT':1205+dif_vp0_width,
     'results_window':380,
@@ -36,8 +38,8 @@ init_widths = {
     'image_window':1110,
     'image_window_ch1':366,
     'image_window_ch2':366,
-    'hist_window_ch1':366,
-    'hist_window_ch2':366,
+    'hist_window_ch1':106,
+    'hist_window_ch2':306,
     
     
     'file_box':370,

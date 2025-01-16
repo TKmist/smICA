@@ -26,7 +26,7 @@ with dpg.window(label = 'Channel 1',
     dpg.add_image(tex_1_name,
                   uv_min=(0,0),
                   uv_max=(1,1),
-                  tag = 'texture_CH_1')
+                  tag = 'texture_CH_1',before='img_win_1_table')
 
     dpg.add_separator(tag ='IMAGE_CH1_top_sep_2',show=True,parent='image_window_ch1')
     
@@ -78,7 +78,7 @@ with dpg.window(label = 'Channel 1',
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
                                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                                    no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-                                   no_clip=True,tag='img_win_1_table_2',parent='image_window_1'):
+                                   no_clip=True,tag='img_win_1_table_2',parent='image_window_1',before='texture_CH_1'):
             # Add headers
             dpg.add_table_column(label="",tag='img_win_1_table_2_col1', width = int(width_1/3))
             dpg.add_table_column(label="",tag='img_win_1_table_2_col2', width = int(width_1/3))
@@ -164,7 +164,7 @@ with dpg.window(label = 'Channel 2',
     dpg.add_image(tex_2_name,
                   uv_min=(0,0),
                   uv_max=(1,1),
-                  tag = 'texture_CH_2')
+                  tag = 'texture_CH_2',before='img_win_2_table')
 
     dpg.add_separator(tag ='IMAGE_CH2_top_sep_2',show=True,parent='image_window_ch2')
     
@@ -227,13 +227,13 @@ with dpg.window(label = 'Channel 2',
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
                                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                                    no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-                                   no_clip=True,tag='img_win_2_table_2_2',parent='image_window_2'):
+                                   no_clip=True,tag='img_win_2_table_2_2',parent='image_window_2',before='texture_CH_2'):
             # Add headers
             dpg.add_table_column(label="",tag='img_win_2_table_2_col1', width = int(width_2/3))
             dpg.add_table_column(label="",tag='img_win_2_table_2_col2', width = int(width_2/3))
             dpg.add_table_column(label="",tag='img_win_2_table_2_col3', width = int(width_2/3))
             with dpg.table_row(tag='img_win_2_table_2_row1'):
-            
+                
                 dpg.add_drag_float(tag='img_contrast_2',
                                    format ='Contrast: %.1f',
                                    default_value =1.0,
@@ -286,7 +286,7 @@ with dpg.window(label = 'Channel 2',
 
 
 
-
+lnprint(dpg.get_item_width('img_win_2_table_2_2'))
 
 
 

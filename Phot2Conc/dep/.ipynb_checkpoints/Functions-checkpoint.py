@@ -2436,10 +2436,12 @@ def callback_windows_size(sender,app_data):
     # lnprint('line 2599',item)
     new_width = dpg.get_item_width('PTU_DATA_window')
     
-    new_height = int(init_heights[item]*ratio_h)
+    #int(init_heights[item]*ratio_h)
     
     new_pos = (dpg.get_item_pos('PTU_DATA_window')[0],
                top_indent+dpg.get_item_height('PTU_DATA_window')+internal_indent)
+
+    new_height = dpg.get_viewport_height() -(new_pos[1]+bottom_indent)
     wdt_hgt_pos(item,new_width,new_height,new_pos)
     
     
@@ -2493,7 +2495,7 @@ def callback_windows_size(sender,app_data):
                         parent = 'texture_reg')
         
         dpg.add_image(tex_1_name,parent = 'image_window_ch1'
-                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1')
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',before='img_win_1_table')
 
     
     
@@ -2528,7 +2530,7 @@ def callback_windows_size(sender,app_data):
                         parent = 'texture_reg')
         
         dpg.add_image(tex_2_name,parent = 'image_window_ch2'
-                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2')
+                              ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',before='img_win_2_table')
     
     item = 'FCS_window'
     # lnprint('line 2697',item)
@@ -2553,21 +2555,21 @@ def callback_windows_size(sender,app_data):
     
     
     item = 'hist_window_ch1'
-    # lnprint('line 2719',item)
+    # print('line 2719',item)
     new_width = dpg.get_item_width(tex_1_name)+int(1.5*init_internal_indent)
-    new_height = dpg.get_item_height(tex_1_name)*hist_scaller+int(1.5*init_internal_indent)
+    new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
-               top_indent+dpg.get_item_height(tex_1_name)+100+int(4.5*init_internal_indent))
+               2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent))
     
     wdt_hgt_pos(item,new_width,new_height,new_pos)
     
     
     item = 'hist_window_ch2'
-    # lnprint('line 2729',item)
+    # print('line 2729',item)
     new_width = dpg.get_item_width(tex_2_name)+int(1.5*init_internal_indent)
-    new_height = dpg.get_item_height(tex_2_name)*hist_scaller+int(1.5*init_internal_indent)
+    new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
-               top_indent+dpg.get_item_height(tex_2_name)+100+int(4.5*init_internal_indent))
+               2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent))
     
     wdt_hgt_pos(item,new_width,new_height,new_pos)
     
@@ -2615,8 +2617,8 @@ def callback_windows_size(sender,app_data):
         
         dpg.set_viewport_resizable(False)
 
-    
 
+    lnprint(dpg.get_item_width('img_win_2_table_2_2'))
 
 def display_images(dframes,channel):
 

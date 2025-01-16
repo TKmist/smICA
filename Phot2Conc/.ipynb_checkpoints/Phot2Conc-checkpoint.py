@@ -132,7 +132,7 @@ execfile(os.path.join('dep','Results_window.py'))
 VP_w = dpg.get_viewport_width() -dif_vp0_width           
 VP_h = dpg.get_viewport_height()           
 dpg.set_viewport_resize_callback(callback_auto_adjust)
-dpg.maximize_viewport()       
+# dpg.maximize_viewport()       
 
 
 
@@ -159,6 +159,7 @@ dpg.maximize_viewport()
 dpg.show_viewport()
 dpg.set_viewport_width(init_widths['VIEWPORT'])
 dpg.set_viewport_height(init_heights['VIEWPORT'])
+lnprint(dpg.get_viewport_height())
 dpg.start_dearpygui()
 # dpg.set_viewport_resizable(False)
 
