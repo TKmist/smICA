@@ -26,7 +26,7 @@ class ImageROIProcessor:
 
         loaded_image = np.load(self.input_path)
 
-        self.image = (loaded_image * (255 / loaded_image.max())).astype(np.uint8)
+        # self.image = (loaded_image * (255 / loaded_image.max())).astype(np.uint8)
 
         if self.image is None:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
@@ -37,7 +37,7 @@ class ImageROIProcessor:
         """
         if self.image is None:
             raise ValueError("Obraz nie został załadowany. Użyj metody load_image().")
-
+        image = self.image.astype(np.float32)
         # Preprocessing: rozmycie i progowanie
         thresholded = self._preprocess_image(self.image)
 
@@ -66,13 +66,16 @@ class ImageROIProcessor:
         """
         Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
         """
+        
         if image_to_process is None:
             raise ValueError("Obraz nie został załadowany. Użyj metody load_image().")
-
+        image_to_process = np.clip((image_to_process/np.max(image_to_process))*255 ,0,255).astype(np.uint8)   
+        # image_to_process = np.clip(image_to_process,0,255).astype(np.uint8)
         # Preprocessing: rozmycie i progowanie
         thresholded = self._preprocess_image_dynamic(image_to_process,ratio)
 
         # Znajdowanie konturów
+        # thresholded_uint8 = np.clip(thresholded, 0, 255).astype(np.uint8)
         contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         if not contours or hierarchy is None:
             # raise ValueError("Nie znaleziono konturów w obrazie.")
@@ -153,6 +156,7 @@ class ImageROIProcessor:
         """
 
         # Step 2: Apply Gaussian blur for noise reduction
+        
         blurred = cv2.GaussianBlur(image, (5, 5), 0)
 
         # Step 3: Adaptive thresholding or Otsu's method

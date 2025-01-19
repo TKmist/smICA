@@ -1,17 +1,17 @@
-STARTED on 2025-01-19 08:52:59.527454
-Modules - loaded on 2025-01-19 08:52:59.528157
-Functions.py -loaded on 2025-01-19 08:53:02.321535
-init - loaded on 2025-01-19 08:53:02.326719
-Themes - loaded on 2025-01-19 08:53:02.327674
-Fonts.py -loaded on 2025-01-19 08:53:02.329160
-Handlers -loaded on 2025-01-19 08:53:02.330297
-Texture_registry - loaded on 2025-01-19 08:53:02.331529
-menu_bar - loaded on 2025-01-19 08:53:02.553246
-Dialog - loaded on 2025-01-19 08:53:02.557520
-Files_window - loaded on 2025-01-19 08:53:02.559409
-PTU_an_window - loaded on 2025-01-19 08:53:02.560722
-Image_window.py - loaded on 2025-01-19 08:53:02.562615
-FCS_window - loaded on 2025-01-19 08:53:02.565642
-histograms_window.py - loaded on 2025-01-19 08:53:02.568670
-Results_window - loaded on 2025-01-19 08:53:02.572233
-FINISHED on 2025-01-19 08:53:36.676471
+STARTED on 2025-01-19 09:28:55.910114
+Modules - loaded on 2025-01-19 09:28:55.910545
+Functions.py -loaded on 2025-01-19 09:28:57.545847
+init - loaded on 2025-01-19 09:28:57.547035
+Themes - loaded on 2025-01-19 09:28:57.547806
+Fonts.py -loaded on 2025-01-19 09:28:57.548512
+Handlers -loaded on 2025-01-19 09:28:57.548772
+Texture_registry - loaded on 2025-01-19 09:28:57.549427
+menu_bar - loaded on 2025-01-19 09:28:57.732390
+Dialog - loaded on 2025-01-19 09:28:57.735002
+Files_window - loaded on 2025-01-19 09:28:57.736143
+PTU_an_window - loaded on 2025-01-19 09:28:57.737438
+Image_window.py - loaded on 2025-01-19 09:28:57.739319
+FCS_window - loaded on 2025-01-19 09:28:57.742255
+histograms_window.py - loaded on 2025-01-19 09:28:57.745322
+Results_window - loaded on 2025-01-19 09:28:57.748234
+FINISHED on 2025-01-19 09:30:03.819236

@@ -95,8 +95,8 @@ h =init_heights['image_window_ch1']
 
 NO_IMAGE_INTENSITY = np.load(os.path.join('res','NO_image_INT.npy'))
 # NO_IMAGE_LIFETIME = np.load(os.path.join('res','NO_image_LT.npy'))
-
-
+lnprint(NO_IMAGE_INTENSITY.dtype)
+# _fin_im_size = NO_IMAGE_INTENSITY.shape
 global Current_image_1,Current_image_2
 
 
@@ -110,21 +110,26 @@ Current_image_2 = NO_IMAGE_INTENSITY
 
 
 processor_1 = ImageROIProcessor()
-processor_1.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+# processor_1.image=np.clip((NO_IMAGE_INTENSITY*255),0,255).astype(np.uint8)
 
+# lnprint(np.max(processor_1.image))
 processor_2 = ImageROIProcessor()
-processor_2.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+# processor_2.image=np.clip((NO_IMAGE_INTENSITY*255),0,255).astype(np.uint8)
 
-rgba_image_1 = im_to_rgbim(processor_1.image.astype(np.uint8))
-rgba_image_2 = im_to_rgbim(processor_2.image.astype(np.uint8))
+rgba_image_1 = im_to_rgbim(processor_1.image)#.astype(np.uint8))
+rgba_image_2 = im_to_rgbim(processor_2.image)#.astype(np.uint8))
 
 rgba_image_1  =cv2.resize(rgba_image_1, (w, h), interpolation=cv2.INTER_CUBIC)
 rgba_image_2  =cv2.resize(rgba_image_2, (w, h), interpolation=cv2.INTER_CUBIC)
-
-
-dpg_image_1=(rgba_image_1.astype(np.float32) /np.max(processor_1.image.astype(np.uint8))).flatten().tolist()
-dpg_image_2=(rgba_image_2.astype(np.float32) /np.max(processor_2.image.astype(np.uint8))).flatten().tolist()
-
+# lnprint(np.max(processor_1.image))
+# lnprint(rgba_image_1[...,3].astype(np.float32) /np.max(rgba_image_1[...,3]))
+dpg_image_1=(rgba_image_1.astype(np.float64) /np.max(rgba_image_1)).flatten().tolist()
+dpg_image_2=(rgba_image_2.astype(np.float64) /np.max(rgba_image_2)).flatten().tolist()
+# dpg_image_1=rgba_image_1.flatten().tolist()
+# dpg_image_2=rgba_image_2.flatten().tolist()
+# lnprint(dpg_image_1)
 # dpg.set_value(tex_name, new_texture_data)
 
 # _update_textures_both_roi('ch1',None)
@@ -183,3 +188,5 @@ dpg.add_dynamic_texture(width=w,
                         parent = 'texture_reg')
 
 
+
+_fin_im_size = (dpg.get_item_width(tex_1_name),dpg.get_item_height(tex_1_name))

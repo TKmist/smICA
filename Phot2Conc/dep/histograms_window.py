@@ -7,11 +7,16 @@ log_it('histograms_window.py - loaded on '+str(datetime.datetime.now()),'a')
 # height_2 =init_heights['image_window_ch2']
 # position_2 = init_position['image_window_ch2']
 
+
+
+
+
 with dpg.window(label = 'Results channel 1',
                 tag='hist_window_ch1',
                 width = dpg.get_item_width(tex_1_name)+int(1.5*init_internal_indent),
-                height = 366,#dpg.get_item_height(tex_1_name)*hist_scaller,
-                pos = init_position['hist_window_ch1'],
+                height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent),
+                pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
+               2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent)),
                 autosize=False,
                 no_resize=True,
                 no_close=True,
@@ -101,8 +106,9 @@ with dpg.window(label = 'Results channel 1',
 with dpg.window(label = 'Results channel 2',
                 tag='hist_window_ch2',
                 width = dpg.get_item_width(tex_2_name)+int(1.5*init_internal_indent),
-                height = 366,#dpg.get_item_height(tex_2_name)*hist_scaller,
-                pos = init_position['hist_window_ch2'],
+                height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent),
+                pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
+               2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent)),
                 autosize=False,
                 no_resize=True,
                 no_close=True,

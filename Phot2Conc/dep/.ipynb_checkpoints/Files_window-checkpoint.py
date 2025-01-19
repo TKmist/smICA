@@ -8,7 +8,7 @@ log_it('Files_window - loaded on '+str(datetime.datetime.now()),'a')
 with dpg.window(label='',
                 pos=init_position['file_window'],
                 width=init_widths['file_window'],
-                height=init_heights['file_window'],
+                height=dpg.get_viewport_height() -(init_position['file_window'][1]+bottom_indent),
                 no_move=True,
                 no_close=True,
                 no_title_bar=True,

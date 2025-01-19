@@ -1452,7 +1452,7 @@ def callback_calculate(sender,app_data):
             pass
     
     
-    if len(Channels) == 2:
+    elif len(Channels) == 2:
         brightness_ch_1 = dpg.get_value('Brightness_input_ch_1')
         brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
         Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
@@ -1864,7 +1864,8 @@ def callback_calculate(sender,app_data):
         else:
             pass
     
-    
+    else:
+        pass
     
     
    
@@ -2455,38 +2456,41 @@ def callback_windows_size(sender,app_data):
     
     
     
-    new_width = (dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2
+    new_width = int((dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2)
     new_height = new_width
 
     image_position_1 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
                   top_indent)
     
+    img = processor_1.image#.astype(np.uint8)
+    # lnprint(np.max(img))
+    rgba_image = im_to_rgbim(img)
+            
+    # lnprint(img.shape,rgba_image.shape,(new_width, new_height))
+    rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+    # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
     
-    # lnprint('line 2626',image_position_1)
-    # lnprint(Current_image_1)
-    dpg_image_1 = update_texture(Current_image_1)
+    dpg_image_1 = rgba_image.flatten().tolist()
+    
+    # rgba_to_dpgtex(rgba_image,np.max(disp),tex_1_name)
+
+    
+
+    # dpg_image_1 = update_texture(Current_image_1)
+
+    
+    
+    # lnprint('_update_textures_both_roi 1 in')
+    # _update_textures_both_roi('ch1',None)
+    # lnprint('_update_textures_both_roi 1 out')
     dpg.set_item_pos('image_window_ch1',image_position_1)
-    # lnprint('line 2630',tex_1_name)
-    # ites = dpg.get_aliases()
-    # ites = [it for it in ites if it.startswith('texture')]
-    # lnprint(ites)
+
     
     if tex_1_name in dpg.get_aliases():
         dpg.delete_item(tex_1_name)
         
         dpg.remove_alias(tex_1_name)
-        # lnprint('line 2639','img1_passed0')
         dpg.delete_item('texture_CH_1')
-        # lnprint('line 2641','img1_passed')
-        # if 'new' in tex_1_name:
-        #     new = 'texture_tag_chan_1-new_'+str(int(tex_1_name.split('-')[1].split('_')[1])+1)
-        #     tex_1_name =new
-            
-            
-            
-        # else:
-            
-        #     tex_1_name = 'texture_tag_chan_1-new_1'
         
         dpg.add_dynamic_texture(width=new_width,
                         height=new_height,
@@ -2497,32 +2501,29 @@ def callback_windows_size(sender,app_data):
         dpg.add_image(tex_1_name,parent = 'image_window_ch1'
                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',before='img_win_1_table')
 
-    
+    _update_textures_both_roi('ch1',None)  
     
     
 
     image_position_2 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
                   top_indent)
     
-    # lnprint('line 2668',image_position_2)
-    dpg_image_2 = update_texture(Current_image_2)
+    
+    # dpg_image_2 = update_texture(Current_image_2)
+    img = processor_2.image#.astype(np.uint8)
+    rgba_image = im_to_rgbim(img)
+            
+    
+    rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+    # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
+    
+    dpg_image_2 = rgba_image.flatten().tolist() 
+   
     dpg.set_item_pos('image_window_ch2',image_position_2)
     if tex_2_name in dpg.get_aliases():
         dpg.delete_item(tex_2_name)
-        # lnprint('line 2673','img2_passed00')
         dpg.remove_alias(tex_2_name)
-        # lnprint('line 2675','img2_passed0')
         dpg.delete_item('texture_CH_2')
-        # lnprint('line 2677','img2_passed')
-        # if 'new' in tex_2_name:
-        #     new = 'texture_tag_chan_2-new_'+str(int(tex_2_name.split('-')[1].split('_')[1])+1)
-        #     tex_2_name =new
-            
-            
-            
-        # else:
-            
-        #     tex_2_name = 'texture_tag_chan_2-new_1'
         dpg.add_dynamic_texture(width=new_width,
                         height=new_height,
                         default_value=dpg_image_2,
@@ -2532,8 +2533,8 @@ def callback_windows_size(sender,app_data):
         dpg.add_image(tex_2_name,parent = 'image_window_ch2'
                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',before='img_win_2_table')
     
+    _update_textures_both_roi('ch2',None)
     item = 'FCS_window'
-    # lnprint('line 2697',item)
     new_weight = int(init_widths[item]*ratio_w)
     new_height = int(init_heights[item]*ratio_h)
     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent+dpg.get_item_width(tex_2_name)+2*internal_indent
@@ -2542,7 +2543,6 @@ def callback_windows_size(sender,app_data):
     wdt_hgt_pos(item,new_weight,new_height,new_pos)
     
     item = 'results_window'
-    # lnprint('line 2706',item)
     new_weight = int(init_widths[item]*ratio_w)
     new_height = int(init_heights[item]*ratio_h)
     new_pos = (dpg.get_item_pos('FCS_window')[0],dpg.get_item_pos('FCS_window')[1]+dpg.get_item_height('FCS_window')+internal_indent)
@@ -2613,12 +2613,12 @@ def callback_windows_size(sender,app_data):
         else:
             pass
         
-    if platform.system().upper() == "LINUX":
+    # if platform.system().upper() == "LINUX":
         
-        dpg.set_viewport_resizable(False)
+    #     dpg.set_viewport_resizable(False)
 
 
-    lnprint(dpg.get_item_width('img_win_2_table_2_2'))
+    # lnprint(dpg.get_item_width('img_win_2_table_2_2'))
 
 def display_images(dframes,channel):
 
@@ -3039,7 +3039,7 @@ def load_PTU_images(an_file):
                 
                 Intensity_1 = Intensity_1
                 processor_1 = ImageROIProcessor()
-                processor_1.image=Intensity_1
+                processor_1.image=Intensity_1.astype(np.uint16)
 
 
 
@@ -3056,7 +3056,7 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
                 # _update_textures_static_roi('ch1',roi_1)
@@ -3068,7 +3068,7 @@ def load_PTU_images(an_file):
                 Intensity_2 = Intensity_2
                 
                 processor_2 = ImageROIProcessor()
-                processor_2.image=Intensity_2
+                processor_2.image=Intensity_2.astype(np.uint16)
 
 
                 roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
@@ -3082,7 +3082,7 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 image_2_times_roi = Current_image_2
@@ -3111,11 +3111,11 @@ def load_PTU_images(an_file):
             # lt_mask = Lifetime_1/Lifetime_1
             Intensity_1 = Intensity_1
             processor_1 = ImageROIProcessor()
-            processor_1.image=Intensity_1
+            processor_1.image=Intensity_1.astype(np.uint16)
             # lt_mask = Lifetime_2/Lifetime_2
             Intensity_2 = Intensity_2
             processor_2 = ImageROIProcessor()
-            processor_2.image=Intensity_2
+            processor_2.image=Intensity_2.astype(np.uint16)
             roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
             # lnprint('load_PTU_images two channel 1')
             roi_1 = load_ROI(roi_1_path).to_numpy()
@@ -3156,7 +3156,7 @@ def load_PTU_images(an_file):
                 Intensity_1 = Intensity_1
 
                 processor_1 = ImageROIProcessor()
-                processor_1.image=Intensity_1
+                processor_1.image=Intensity_1.astype(np.uint16)
 
 
                 # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
@@ -3169,7 +3169,7 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
 
@@ -3182,8 +3182,8 @@ def load_PTU_images(an_file):
                 Intensity_2 = Intensity_2
 
                 processor_2 = ImageROIProcessor()
-                processor_2.image=Intensity_2
-
+                processor_2.image=Intensity_2.astype(np.uint16)
+                
 
                 # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
                 # roi_2 = load_ROI(roi_2_path).to_numpy()
@@ -3192,7 +3192,7 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 image_2_times_roi = Current_image_2
@@ -3232,9 +3232,9 @@ def load_PTU_images(an_file):
             # Lifetime_2 = Lifetime_2*roi_2
 
             processor_1 = ImageROIProcessor()
-            processor_1.image=Intensity_1
+            processor_1.image=Intensity_1.astype(np.uint16)
             processor_2 = ImageROIProcessor()
-            processor_2.image=Intensity_2
+            processor_2.image=Intensity_2.astype(np.uint16)
 
             channel = 'both'
 
@@ -3257,8 +3257,8 @@ def load_PTU_images(an_file):
                 Intensity_1 = Intensity_1
 
                 processor_1 = ImageROIProcessor()
-                processor_1.image=Intensity_1
-
+                processor_1.image=Intensity_1.astype(np.uint16)
+                
 
                 # roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
                 roi_1 = np.zeros(Current_image_1.shape)
@@ -3270,7 +3270,7 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
                 # _update_textures_static_roi('ch1',roi_1)
@@ -3281,8 +3281,8 @@ def load_PTU_images(an_file):
                 # lt_mask = Lifetime_2/Lifetime_2
                 Intensity_2 = Intensity_2
                 processor_2 = ImageROIProcessor()
-                processor_2.image=Intensity_2
-
+                processor_2.image=Intensity_2.astype(np.uint16)
+                lnprint(processor_2.image.dtype)
 
 
                 # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
@@ -3293,7 +3293,7 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=(NO_IMAGE_INTENSITY*255).astype(np.uint8)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 display_images([Current_image_1,Current_image_2],channel)
@@ -3333,9 +3333,9 @@ def load_PTU_images(an_file):
             Intensity_2 = Intensity_2
             # Lifetime_2 = Lifetime_2
             processor_1 = ImageROIProcessor()
-            processor_1.image=Intensity_1
+            processor_1.image=Intensity_1.astype(np.uint16)
             processor_2 = ImageROIProcessor()
-            processor_2.image=Intensity_2
+            processor_2.image=Intensity_2.astype(np.uint16)
 
             channel = 'both'
 
@@ -3350,176 +3350,20 @@ def load_PTU_images(an_file):
 
 
 
-def _update_textures_static_roi(sender,roi):
-    global pkl_data,_fin_im_size
-    global processor_1,processor_2
-    global tex_1_name,tex_2_name
-    global Current_image_1,Current_image_2
-    global image_1_times_roi, image_2_times_roi
-    # global anal_file, PTU_directory, ROI_directory,roi_1,roi_2,last_directory
-    # lnprint('static',time.time())
-    ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
-         'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
-    ratio_w = ratio['width']
-    
-    _fin_im_size[0]
-    w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
-    h = _fin_im_size[1]
-    ovrl = 15
-    
-    with_roi = dpg.get_value('FILE_ROI_checkbox')
-    # lnprint(sender)
-    if sender[-1]=='1':
-        contrast = dpg.get_value("img_contrast_1")
-        brightness = dpg.get_value("img_Brightness_1")
-        img = processor_1.image.astype(np.uint8)
-        disp = processor_1.image.astype(np.uint8)
-        full_mask = np.where(roi!=np.nan,255,0)
-        # lnprint(roi)
-        # image_1_times_roi = img*full_mask
-        roi=full_mask/np.max(full_mask)
-        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
-        rgba_image[..., 0] = disp  # Red channel
-        rgba_image[..., 1] = disp  # Green channel
-        rgba_image[..., 2] = disp  # Blue channel
-        rgba_image[..., 3] = 255
-
-
-        rgb = rgba_image[..., :3]
-        # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-        adjusted_image = rgb * contrast + brightness
-        adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-        rgba_image[..., :3] = adjusted_rgb
-        mask_image=rgba_image.copy()
-        
-        if np.max(roi) != 0:
-            image_1_times_roi = img*roi
-            # displayed_image = disp*full_mask
-            overlay_alpha = ovrl
-            alpha_normalized = overlay_alpha / 255.0
-            mask_image[full_mask > 0, 0] = (disp[full_mask > 0] * (1-alpha_normalized) + 255 * alpha_normalized).astype(np.uint8)  # Red channel set to max for mask
-            mask_image[full_mask > 0, 1] = disp[full_mask > 0]  # Blend green
-            mask_image[full_mask > 0, 2] = disp[full_mask > 0]  # Blend blue
-            mask_image[full_mask > 0, 3] = overlay_alpha
-
-            for i in range(3):  # Loop over RGB channels
-                rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized).astype(np.uint8)
-
-    # Use the maximum alpha value of the two images
-            rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
-            
-        else:
-            image_1_times_roi = img
-            # displayed_image = disp
-        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
-        rgba_image=rgba_image.astype(np.float32) /np.max(img)#255
-        
-        new_texture_data = rgba_image.flatten().tolist()
-        dpg.set_value(tex_1_name, new_texture_data)
-    elif sender[-1]=='2':
-        contrast = dpg.get_value("img_contrast_2")
-        brightness = dpg.get_value("img_Brightness_2")
-        # find_nucleus = dpg.get_value('nucleus_search_2')
-        # cell_rat = dpg.get_value('cell_tresh_ratio_2')
-        # nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
-        img = processor_2.image.astype(np.uint8)
-        disp = processor_2.image.astype(np.uint8)
-        # lnprint(img.shape)
-        # lnprint(type(img))
-        # cell_roi_image = processor_2.detect_cell_roi(img,cell_rat)
-        # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
-        # full_mask = roi
-        full_mask = np.where(roi!=np.nan,0,255)
-        full_mask
-        # lnprint(roi)
-        roi=full_mask/np.max(full_mask)
-        # lnprint(np.max(full_mask))
-        # lnprint(roi)
-        # lnprint('fm',full_mask)
-        # lnprint('im',img)
-        
-        # if not find_nucleus:    
-        #     full_mask = cell_roi_image
-        #     # image_data =(img* (255 / img.max())).astype(np.uint8)
-        #     # image_data = np.multiply(image_data, cell_roi_image)
-        # else:
-        #     nucleus_roi = processor_2.detect_nucleus_roi(img, cell_roi_image, nucl_rat)
-        #     full_mask = processor_2.make_full_roi(cell_roi_image, nucleus_roi)
-            
-            # image_data =(img* (255 / img.max())).astype(np.uint8)
-            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
-            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
-            # image_data = np.multiply(image_data, full_mask)
-        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
-        # new_texture_data = self.create_rgba_texture(image_data/255)
-        # pkl_data['channel_2']={
-        #     'image':processor_2.image,
-        #     'ROI':full_mask,
-        #     'cell_treshold':cell_rat,
-        #     'nucl_chk':find_nucleus,
-        #     'nucl_treshold':nucl_rat,
-        # }
-        
-        rgba_image = np.zeros((img.shape[1], img.shape[0], 4), dtype=np.uint8)
-        rgba_image[..., 0] = disp  # Red channel
-        rgba_image[..., 1] = disp  # Green channel
-        rgba_image[..., 2] = disp  # Blue channel
-        rgba_image[..., 3] = 255
-
-        rgb = rgba_image[..., :3]
-        # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-        adjusted_image = rgb * contrast + brightness
-        adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-        rgba_image[..., :3] = adjusted_rgb
-        mask_image=rgba_image.copy()
-        
-        if np.max(roi) != 0:
-            image_2_times_roi = img*roi
-            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
-            alpha_normalized = overlay_alpha / 255.0
-            mask_image[full_mask > 0, 0] = (disp[full_mask > 0] * (1 - alpha_normalized) + 255 * alpha_normalized).astype(np.uint8)  # Red channel set to max for mask
-            mask_image[full_mask > 0, 1] = disp[full_mask > 0]  # Blend green
-            mask_image[full_mask > 0, 2] = disp[full_mask > 0]  # Blend blue
-            mask_image[full_mask > 0, 3] = overlay_alpha
-
-            for i in range(3):  # Loop over RGB channels
-                rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized).astype(np.uint8)
-
-    # Use the maximum alpha value of the two images
-            rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
-
-            
-        else:
-            image_2_times_roi = img
-
-        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
-        rgba_image=rgba_image.astype(np.float32) /np.max(img)
-        new_texture_data = rgba_image.flatten().tolist()
-        
-        dpg.set_value(tex_2_name, new_texture_data)
-       
-    else:
-        pass
-
-    callback_calculate(sender,None)
 
 
 def im_to_rgbim(im):
 
-    rgba_image = np.zeros((im.shape[1], im.shape[0], 4), dtype=np.uint8)
-    rgba_image[..., 0] = im  # Red channel
-    rgba_image[..., 1] = im  # Green channel
-    rgba_image[..., 2] = im  # Blue channel
-    rgba_image[..., 3] = 255
+    rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
+    rgba_image[..., 0] = im#/np.max(im)  # Red channel
+    rgba_image[..., 1] = im#/np.max(im)  # Green channel
+    rgba_image[..., 2] = im#/np.max(im)  # Blue channel
+    rgba_image[..., 3] = 65536#1
+    # rgba_image = (rgba_image * 255).astype(np.uint8)
 
-    # rgb = rgba_image[..., :3]
-    # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-    # rgba_image[..., :3] = adjusted_rgb
-    # rgb = rgba_image[..., :3]
-    # # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
+
+
     
-    # adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-    # rgba_image[..., :3] = adjusted_rgb
     return rgba_image
 
 
@@ -3536,7 +3380,7 @@ def overlayrgba(im,rgba_image,mask_image,full_mask,ovrl):
     
 
     for i in range(3):  # Loop over RGB channels
-        rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized).astype(np.uint8)
+        rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized)#.astype(np.uint8)
 
 # Use the maximum alpha value of the two images
     rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
@@ -3549,194 +3393,21 @@ def rgba_to_dpgtex(rgba_image,gs_im_max,tex_name):
     h = w
     # lnprint(w,h)
     # lnprint('rgba_image',type(rgba_image),rgba_image.shape)
-    rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
-    rgba_image=rgba_image.astype(np.float32) /gs_im_max#np.max(rgba_image)#255
+    # zoom_factors = (h / rgba_image.shape[0], w / rgba_image.shape[1], 1)
+    
+    rgba_image =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+    # rgba_image = zoom(rgba_image, zoom_factors, order=3)
+    rgba_image=rgba_image.astype(np.float64) /np.max(gs_im_max)#np.max(gs_im_max)
     
     new_texture_data = rgba_image.flatten().tolist()
+    # lnprint(new_texture_data)
     dpg.set_value(tex_name, new_texture_data)
-
-def _update_textures__dynamic_roi(sender, app_data):
-    
-    global pkl_data,_fin_im_size
-    global processor_1,processor_2
-    global tex_1_name,tex_2_name
-    global Current_image_1,Current_image_2
-    global image_1_times_roi, image_2_times_roi
-    ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
-         'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
-    ratio_w = ratio['width']
-    # lnprint('dynamic',time.time())
-    _fin_im_size[0]
-    w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
-    h = _fin_im_size[1]
-    ovrl = 50
-    
-    with_roi = dpg.get_value('Auto_ROI_checkbox')
-    # lnprint(sender)
-    if sender[-1]=='1':
-
-        contrast = dpg.get_value("img_contrast_1")
-        brightness = dpg.get_value("img_Brightness_1")
-        
-        find_nucleus = dpg.get_value('nucleus_search_1')
-        cell_rat = dpg.get_value('cell_tresh_ratio_1')
-        nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
-        img = processor_1.image.astype(np.uint8)
-        disp = processor_1.image.astype(np.uint8)
-
-        # disp = cv2.convertScaleAbs(disp, alpha=contrast, beta=brightness)
-        # adjusted_image = disp * contrast + brightness
-        # disp = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-        
-        # image_data =(img* (255 / img.max())).astype(np.uint8)
-        
-        cell_roi_image = processor_1.detect_cell_roi(disp,cell_rat)
-        
-        if not find_nucleus:    
-            full_mask = cell_roi_image
-            # image_data =(img* (255 / img.max())).astype(np.uint8)
-            # image_data = np.multiply(image_data, cell_roi_image)
-        else:
-            nucleus_roi = processor_1.detect_nucleus_roi(disp, cell_roi_image, nucl_rat)
-            full_mask = processor_1.make_full_roi(cell_roi_image, nucleus_roi)
-            
-            # image_data =(img* (255 / img.max())).astype(np.uint8)
-            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
-            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
-            # image_data = np.multiply(image_data, full_mask)
-        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
-        # new_texture_data = self.create_rgba_texture(image_data/255)
-        roi=full_mask/np.max(full_mask)
-
-       
-            
-        pkl_data['channel_1']={
-            'image':processor_1.image,
-            'ROI':full_mask,
-            'cell_treshold':cell_rat,
-            'nucl_chk':find_nucleus,
-            'nucl_treshold':nucl_rat,
-        }
-        rgba_image = im_to_rgbim(disp)
-        mask_image=rgba_image.copy()        
-        # rgba_image = np.zeros((disp.shape[1], disp.shape[0], 4), dtype=np.uint8)
-        # rgba_image[..., 0] = disp  # Red channel
-        # rgba_image[..., 1] = disp  # Green channel
-        # rgba_image[..., 2] = disp  # Blue channel
-        # rgba_image[..., 3] = 255
-
-        # # rgb = rgba_image[..., :3]
-        # # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-        # # rgba_image[..., :3] = adjusted_rgb
-        # rgb = rgba_image[..., :3]
-        # # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-        # adjusted_image = rgb * contrast + brightness
-        # adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-        # rgba_image[..., :3] = adjusted_rgb
-        # mask_image=rgba_image.copy()
-        if with_roi:
-            image_1_times_roi = img*roi
-            rgba_image = overlayrgba(disp,full_mask,ovrl)
-            
-        elif not with_roi:
-            image_1_times_roi = img
-            
-        rgba_to_dpgtex(rgba_image,np.max(disp),w,h,tex_1_name)
-        # rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
-        # rgba_image=rgba_image.astype(np.float32) /np.max(rgba_image)#255
-        
-        # new_texture_data = rgba_image.flatten().tolist()
-        # dpg.set_value(tex_1_name, new_texture_data)
-        
-            
-    elif sender[-1]=='2':
-        contrast = dpg.get_value("img_contrast_2")
-        brightness = dpg.get_value("img_Brightness_2")
-        find_nucleus = dpg.get_value('nucleus_search_2')
-        cell_rat = dpg.get_value('cell_tresh_ratio_2')
-        nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
-        img = processor_2.image.astype(np.uint8)
-        disp = processor_2.image.astype(np.uint8)
-        
-        # disp = cv2.convertScaleAbs(disp, alpha=contrast, beta=brightness)
-        
-        # lnprint(img.shape)
-        # lnprint(type(img))
-        cell_roi_image = processor_2.detect_cell_roi(disp,cell_rat)
-        # lnprint(np.max(cell_roi_image))
-        if not find_nucleus:    
-            full_mask = cell_roi_image
-            # image_data =(img* (255 / img.max())).astype(np.uint8)
-            # image_data = np.multiply(image_data, cell_roi_image)
-        else:
-            nucleus_roi = processor_2.detect_nucleus_roi(disp, cell_roi_image, nucl_rat)
-            full_mask = processor_2.make_full_roi(cell_roi_image, nucleus_roi)
-            
-            # image_data =(img* (255 / img.max())).astype(np.uint8)
-            # nucleus_roi = self.processor_1.detect_nucleus_roi(img,cell_roi,nucl_rat)
-            # full_mask = self.processor_1.make_full_roi(cell_roi,nucleus_roi)
-            # image_data = np.multiply(image_data, full_mask)
-        # image_data = cv2.resize(image_data, (w, h), interpolation=cv2.INTER_CUBIC)
-        # new_texture_data = self.create_rgba_texture(image_data/255)
-        # lnprint('fm',full_mask)
-        roi=full_mask/np.max(full_mask)
-        # lnprint('im',img)
-        
-        # lnprint(np.max(image_2_times_roi),np.max(full_mask))
-        pkl_data['channel_2']={
-            'image':processor_2.image,
-            'ROI':full_mask,
-            'cell_treshold':cell_rat,
-            'nucl_chk':find_nucleus,
-            'nucl_treshold':nucl_rat,
-        }
-        
-        rgba_image = np.zeros((disp.shape[1], disp.shape[0], 4), dtype=np.uint8)
-        rgba_image[..., 0] = disp  # Red channel
-        rgba_image[..., 1] = disp  # Green channel
-        rgba_image[..., 2] = disp  # Blue channel
-        rgba_image[..., 3] = 255
-        # lnprint(rgba_image.shape)
-
-        rgb = rgba_image[..., :3]
-        # adjusted_rgb = cv2.convertScaleAbs(rgb, alpha=contrast, beta=brightness)
-        adjusted_image = rgb * contrast + brightness
-        adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-        rgba_image[..., :3] = adjusted_rgb
-        mask_image=rgba_image.copy()
-        if with_roi:
-            image_2_times_roi = img*roi
-            overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
-            alpha_normalized = overlay_alpha / 255.0
-            mask_image[full_mask > 0, 0] = (disp[full_mask > 0] * (1 - alpha_normalized) + 255 * alpha_normalized).astype(np.uint8)  # Red channel set to max for mask
-            mask_image[full_mask > 0, 1] = disp[full_mask > 0]  # Blend green
-            mask_image[full_mask > 0, 2] = disp[full_mask > 0]  # Blend blue
-            mask_image[full_mask > 0, 3] = overlay_alpha
-
-            for i in range(3):  # Loop over RGB channels
-                rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized).astype(np.uint8)
-
-    # Use the maximum alpha value of the two images
-            rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
-
-        elif not with_roi:
-            image_2_times_roi = img
-        rgba_image  =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
-        rgba_image=rgba_image.astype(np.float32) /np.max(rgba_image)#255
-        new_texture_data = rgba_image.flatten().tolist()
-        
-        dpg.set_value(tex_2_name, new_texture_data)
-        
-    else:
-        pass
-
-    callback_calculate(sender,None)
 
 
 
 
 def _update_textures_both_roi(sender,app_data):
-    global pkl_data,_fin_im_size
+    global pkl_data#,_fin_im_size
     global processor_1,processor_2
     global tex_1_name,tex_2_name
     global Current_image_1,Current_image_2
@@ -3746,10 +3417,17 @@ def _update_textures_both_roi(sender,app_data):
     ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
          'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
     ratio_w = ratio['width']
+
     
-    _fin_im_size[0]
-    w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
-    h = _fin_im_size[1]
+    
+    # w = (dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2
+    # h = w
+    # w = dpg.get_item_width(tex_1_name)
+    # h = dpg.get_item_height(tex_1_name)
+    # lnprint(w,h)
+    # _fin_im_size = (w,h)
+    # w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
+    # h = _fin_im_size[1]
     # ovrl = 15
 
     auto_roi = dpg.get_value('Auto_ROI_checkbox')
@@ -3768,32 +3446,36 @@ def _update_textures_both_roi(sender,app_data):
         # find_nucleus = dpg.get_value('nucleus_search_1')
         # cell_rat = dpg.get_value('cell_tresh_ratio_1')
         # nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
-        img = processor_1.image.astype(np.uint8)
-        disp = processor_1.image.astype(np.uint8)
+        img = processor_1.image#.astype(np.uint16)
+        disp = processor_1.image
+        froi = np.clip(processor_1.image,0,255).astype(np.uint8)
 
         if no_roi:
+            # lnprint('im_to_rgbim')
             rgba_image = im_to_rgbim(disp)
             
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             image_1_times_roi = img
+            # lnprint('rgba_to_dpgtex in')
             rgba_to_dpgtex(rgba_image,np.max(disp),tex_1_name)
+            # lnprint('rgba_to_dpgtex in')
             
         elif auto_roi:
-            # lnprint('auto_roi',auto_roi)
+            
             find_nucleus = dpg.get_value('nucleus_search_1')
             cell_rat = dpg.get_value('cell_tresh_ratio_1')
             nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
-
-            cell_roi_image = processor_1.detect_cell_roi(disp,cell_rat)
+            lnprint('disp',disp.dtype)
+            cell_roi_image = processor_1.detect_cell_roi(froi,cell_rat)
             # lnprint(cell_rat,nucl_rat)
             if not find_nucleus:    
                 full_mask = cell_roi_image
             else:
-                nucleus_roi = processor_1.detect_nucleus_roi(disp, cell_roi_image, nucl_rat)
+                nucleus_roi = processor_1.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
                 full_mask = processor_1.make_full_roi(cell_roi_image, nucleus_roi)
 
             roi = np.where(full_mask==0,np.nan,1)
@@ -3812,7 +3494,7 @@ def _update_textures_both_roi(sender,app_data):
 
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             rgba_image = overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
@@ -3837,7 +3519,7 @@ def _update_textures_both_roi(sender,app_data):
 
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             rgba_image = overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
@@ -3851,32 +3533,35 @@ def _update_textures_both_roi(sender,app_data):
         brightness = dpg.get_value("img_Brightness_2")
         ovrl = dpg.get_value("img_roi_alpha_2")
         # dpg.set_value("img_roi_alpha_1",ovrl)
-        img = processor_2.image.astype(np.uint8)
-        disp = processor_2.image.astype(np.uint8)
+        img = processor_2.image#.astype(np.uint8)
+        disp = processor_2.image
+        froi = np.clip(processor_2.image,0,255).astype(np.uint8)
 
         if no_roi:
+            # lnprint('im_to_rgbim')
             rgba_image = im_to_rgbim(disp)
 
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             image_2_times_roi = img
+            # lnprint('rgba_to_dpgtex in')
             rgba_to_dpgtex(rgba_image,np.max(disp),tex_2_name)
-
+            # lnprint('rgba_to_dpgtex out')
         elif auto_roi:
             # lnprint('auto_roi',auto_roi)
             find_nucleus = dpg.get_value('nucleus_search_2')
             cell_rat = dpg.get_value('cell_tresh_ratio_2')
             nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
 
-            cell_roi_image = processor_2.detect_cell_roi(disp,cell_rat)
+            cell_roi_image = processor_2.detect_cell_roi(froi,cell_rat)
             # lnprint(cell_rat,nucl_rat)
             if not find_nucleus:    
                 full_mask = cell_roi_image.astype(np.uint8)
             else:
-                nucleus_roi = processor_2.detect_nucleus_roi(disp, cell_roi_image, nucl_rat)
+                nucleus_roi = processor_2.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
                 full_mask = processor_2.make_full_roi(cell_roi_image, nucleus_roi).astype(np.uint8)
             # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
             roi = np.where(full_mask==0,np.nan,1)
@@ -3903,7 +3588,7 @@ def _update_textures_both_roi(sender,app_data):
 
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             rgba_image = overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
@@ -3930,16 +3615,16 @@ def _update_textures_both_roi(sender,app_data):
 
             rgb = rgba_image[..., :3]
             adjusted_image = rgb * contrast + brightness
-            adjusted_rgb = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            adjusted_rgb = adjusted_image#.astype(np.uint8)
             rgba_image[..., :3] = adjusted_rgb
             
             rgba_image = overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
             # lnprint(np.max(disp))
             
             rgba_to_dpgtex(rgba_image,np.max(disp),tex_2_name)
-            
+    # lnprint('callback_calculate')
     callback_calculate(sender,None)
-
+    # lnprint(dpg.get_item_width(tex_1_name),dpg.get_item_height(tex_1_name))
 
 
 
