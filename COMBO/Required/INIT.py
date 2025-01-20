@@ -26,6 +26,17 @@ class _basicF:
         # Pass all arguments and keyword arguments to the built-in print function
         print(*args, **kwargs)
 
+    def add_font_to_registry(self,font_size):
+        font_path = os.path.join('res','Fonts','DejaVuSansCondensed.ttf')
+        with dpg.font_registry(tag='Font_registry'):
+            '''Add a font registry.'''
+            
+            with dpg.font(font_path, font_size,tag='DejaVu') as font_18:
+                dpg.add_font_range(0x0300, 0x03ff)
+                dpg.add_font_range(0x0200, 0x02ff)
+                dpg.add_font_range(0x2080, 0x209C)
+                default_font = font_18
+            dpg.bind_font(default_font)
         
     def _hsv_to_rgb(self,h, s, v):
         '''Funtion converts HSV color notation to the RGB values'''
@@ -40,7 +51,7 @@ class _basicF:
         if i == 5: return (255*v, 255*p, 255*q)
 
     def search_for_methods(self):
-        path = 'Methods'
+        path = 'Modes'
         methods = os.listdir(path)
         ind = []
         methods = [os.path.join(path,ad) for ad in methods if os.path.isdir(os.path.join(path,ad))]
@@ -155,10 +166,12 @@ class _init_varaibles:
         self.init_internal_indent = 11
         self.init_group_spacer = 2
         self.init_font_size = 18
-        self.VIEWPORT_prop = {'width':1400,
-                              'height':950,
+        self.VIEWPORT_prop = {'width':1585,
+                              'height':950+2*self.init_bottom_indent,
                               'pos':(0,0)
                                 }
+        self.mounted_method = None
+
 
 class _init_Menu:
     def __init__(self,VERSION):
@@ -220,7 +233,7 @@ class _init_Menu:
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
             with dpg.menu(label="File",tag='menu_file_dropout'):
                 dpg.add_menu_item(label="Exit",callback=lambda: dpg.stop_dearpygui(),tag='menu_item_exit')
-            with dpg.menu(label="Jobs",tag='menu_analysis_method_dropout'):
+            with dpg.menu(label="Mode",tag='menu_analysis_method_dropout'):
                 pass
             # with dpg.menu(label="Settings",tag='menu_settings_dropout'):
                 

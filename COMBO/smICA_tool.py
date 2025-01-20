@@ -71,14 +71,14 @@ VP_h = dpg.get_viewport_height()           # get initial height of the viewport
 # dpg.maximize_viewport() 
 menu.mount_main_Menu_bar()
 
-# inV.METHODS = basf.search_for_methods()
+inV.METHODS = basf.search_for_methods()
 
 
-# for method in inV.METHODS:
-#     # print(method)
-#     path =os.path.join(method,basf.path_to_method_anal_menu_item(method))
-#     # print(path)
-#     execfile(path)
+for method in inV.METHODS:
+    lprint(method)
+    path =os.path.join(method,basf.path_to_method_anal_menu_item(method))
+    lprint(path)
+    execfile(path)
 
 # print(vars(menu))
 

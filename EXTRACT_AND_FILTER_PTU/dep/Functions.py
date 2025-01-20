@@ -2194,7 +2194,7 @@ def extract_from_ptu(folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
 
         cv2.imwrite(os.path.join(folder, png_FC_name), colored_image)
 
-        cv2.imwrite(os.path.join(folder, png_name), to_pngpyth)
+        cv2.imwrite(os.path.join(folder, png_name), to_png)
 
         
         export_df = pd.DataFrame(channel_data)

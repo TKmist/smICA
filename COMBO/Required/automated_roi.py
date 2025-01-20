@@ -1,0 +1,1 @@
+/home/tomekk/Projekty/CODING/github/smICA/BRANCHES/UPDATE_12_24/AUTO_ROI/dep/automated_roi.py
