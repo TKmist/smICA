@@ -132,7 +132,7 @@ execfile(os.path.join('dep','Results_window.py'))
 VP_w = dpg.get_viewport_width() -dif_vp0_width           
 VP_h = dpg.get_viewport_height()           
 dpg.set_viewport_resize_callback(callback_auto_adjust)
-# dpg.maximize_viewport()       
+dpg.maximize_viewport()       
 
 
 

@@ -3369,21 +3369,42 @@ def im_to_rgbim(im):
 
 def overlayrgba(im,rgba_image,mask_image,full_mask,ovrl):
     overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
-    alpha_normalized = overlay_alpha / 100.0
+    alpha_normalized = np.clip(overlay_alpha / 100.0,0.,1.).astype(np.float32)
+    # lnprint(mask_image.dtype)
     # alpha_normalized = np.clip((ovrl / 100.0), 0, 1)
     # lnprint(ovrl,overlay_alpha,alpha_normalized)
-    mask_image[full_mask > 0, 0] = (im[full_mask > 0] * (1-alpha_normalized) + 255 * alpha_normalized).astype(np.uint8)  # Red channel set to max for mask
-    mask_image[full_mask > 0, 1] = im[full_mask > 0]  # Blend green
-    mask_image[full_mask > 0, 2] = im[full_mask > 0]  # Blend blue
-    mask_image[full_mask > 0, 3] = overlay_alpha
+    if alpha_normalized == 1:
+        mask_image[full_mask > 0, 0] = 65536  # Fully use the overlay color
+    else:
+        lnprint('im',im.dtype)
+        
+        lnprint(np.max(im[full_mask > 0]))
+        mask_image[full_mask > 0, 0] = (
+            im[full_mask > 0] * (1 - alpha_normalized) + 65536 * alpha_normalized            
+    ).astype(np.uint16)  # Red channel set to max for mask
+        lnprint(np.max(mask_image[full_mask > 0, 0]))
+    mask_image[full_mask > 0, 1] = im[full_mask > 0].astype(np.uint16)  # Blend green
+    mask_image[full_mask > 0, 2] = im[full_mask > 0].astype(np.uint16)  # Blend blue
+    mask_image[full_mask > 0, 3] = (alpha_normalized*65536).astype(np.uint16)
 
-    
+    # lnprint(mask_image[full_mask > 0, 0])
+    # lnprint(mask_image[full_mask > 0, 1])
+    # lnprint(mask_image[full_mask > 0, 2])
+    # lnprint(mask_image[full_mask > 0, 3])
 
     for i in range(3):  # Loop over RGB channels
         rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized)#.astype(np.uint8)
 
 # Use the maximum alpha value of the two images
     rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
+    # lnprint(np.max(rgba_image[..., 3]),np.max(mask_image[..., 3]))
+
+
+
+    rgba_image = np.clip(rgba_image, 0, 65536)
+    # max_value = np.max(rgba_image)
+    # if max_value > 0:
+    #     rgba_image = rgba_image / max_value * 65536
     
     return rgba_image
 
@@ -3395,9 +3416,9 @@ def rgba_to_dpgtex(rgba_image,gs_im_max,tex_name):
     # lnprint('rgba_image',type(rgba_image),rgba_image.shape)
     # zoom_factors = (h / rgba_image.shape[0], w / rgba_image.shape[1], 1)
     
-    rgba_image =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_CUBIC)
+    rgba_image =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_LINEAR)
     # rgba_image = zoom(rgba_image, zoom_factors, order=3)
-    rgba_image=rgba_image.astype(np.float64) /np.max(gs_im_max)#np.max(gs_im_max)
+    rgba_image=rgba_image.astype(np.float64) /gs_im_max#np.max(gs_im_max)
     
     new_texture_data = rgba_image.flatten().tolist()
     # lnprint(new_texture_data)
