@@ -3056,7 +3056,8 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
                 # _update_textures_static_roi('ch1',roi_1)
@@ -3082,7 +3083,8 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 image_2_times_roi = Current_image_2
@@ -3169,7 +3171,8 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
 
@@ -3192,7 +3195,8 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2*roi_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 image_2_times_roi = Current_image_2
@@ -3270,7 +3274,8 @@ def load_PTU_images(an_file):
                 Current_image_1 = Intensity_1/np.max(Intensity_1)
                 image_1_times_roi = Current_image_1
                 processor_2 = ImageROIProcessor()
-                processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_2.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_2 = NO_IMAGE_INTENSITY
                 display_images([Current_image_1,Current_image_2],channel)
                 # _update_textures_static_roi('ch1',roi_1)
@@ -3282,7 +3287,7 @@ def load_PTU_images(an_file):
                 Intensity_2 = Intensity_2
                 processor_2 = ImageROIProcessor()
                 processor_2.image=Intensity_2.astype(np.uint16)
-                lnprint(processor_2.image.dtype)
+                # lnprint(processor_2.image.dtype)
 
 
                 # roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
@@ -3293,7 +3298,8 @@ def load_PTU_images(an_file):
                 # Lifetime_2 = Lifetime_2
                 channel = 'both'
                 processor_1 = ImageROIProcessor()
-                processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                # processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+                processor_1.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                 Current_image_1 = NO_IMAGE_INTENSITY
                 Current_image_2 = Intensity_2/np.max(Intensity_2)
                 display_images([Current_image_1,Current_image_2],channel)
@@ -3353,14 +3359,19 @@ def load_PTU_images(an_file):
 
 
 def im_to_rgbim(im):
-
+    # lnprint(im.dtype)
+    # rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
+    # rgba_image[..., 0] = im#/np.max(im)  # Red channel
+    # rgba_image[..., 1] = im#/np.max(im)  # Green channel
+    # rgba_image[..., 2] = im#/np.max(im)  # Blue channel
+    # rgba_image[..., 3] = 65536#1
+    # rgba_image = (rgba_image * 255).astype(np.uint8)
     rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
     rgba_image[..., 0] = im#/np.max(im)  # Red channel
     rgba_image[..., 1] = im#/np.max(im)  # Green channel
     rgba_image[..., 2] = im#/np.max(im)  # Blue channel
-    rgba_image[..., 3] = 65536#1
-    # rgba_image = (rgba_image * 255).astype(np.uint8)
-
+    rgba_image[..., 3] = 1
+    
 
 
     
@@ -3369,23 +3380,32 @@ def im_to_rgbim(im):
 
 def overlayrgba(im,rgba_image,mask_image,full_mask,ovrl):
     overlay_alpha = ovrl  # Transparency level (0-255, where 255 is fully opaque)
-    alpha_normalized = np.clip(overlay_alpha / 100.0,0.,1.).astype(np.float32)
+    alpha_normalized = np.clip(overlay_alpha / 100.0,0.,1.).astype(np.float64)
     # lnprint(mask_image.dtype)
     # alpha_normalized = np.clip((ovrl / 100.0), 0, 1)
     # lnprint(ovrl,overlay_alpha,alpha_normalized)
     if alpha_normalized == 1:
-        mask_image[full_mask > 0, 0] = 65536  # Fully use the overlay color
+        # mask_image[full_mask > 0, 0] = 65536  # Fully use the overlay color
+        mask_image[full_mask > 0, 0] = 1  # Fully use the overlay color
     else:
-        lnprint('im',im.dtype)
+        # lnprint('im',im.dtype)
         
-        lnprint(np.max(im[full_mask > 0]))
+        # lnprint(np.max(im[full_mask > 0]))
+    #     mask_image[full_mask > 0, 0] = (
+    #         im[full_mask > 0] * (1 - alpha_normalized) + 65536 * alpha_normalized            
+    # ).astype(np.uint16)  # Red channel set to max for mask
         mask_image[full_mask > 0, 0] = (
-            im[full_mask > 0] * (1 - alpha_normalized) + 65536 * alpha_normalized            
-    ).astype(np.uint16)  # Red channel set to max for mask
-        lnprint(np.max(mask_image[full_mask > 0, 0]))
-    mask_image[full_mask > 0, 1] = im[full_mask > 0].astype(np.uint16)  # Blend green
-    mask_image[full_mask > 0, 2] = im[full_mask > 0].astype(np.uint16)  # Blend blue
-    mask_image[full_mask > 0, 3] = (alpha_normalized*65536).astype(np.uint16)
+            im[full_mask > 0] * (1 - alpha_normalized) + 1 * alpha_normalized            
+    ).astype(np.float64)  # Red channel set to max for mask
+        # lnprint(np.max(mask_image[full_mask > 0, 0]))
+    # mask_image[full_mask > 0, 1] = im[full_mask > 0].astype(np.uint16)  # Blend green
+    # mask_image[full_mask > 0, 2] = im[full_mask > 0].astype(np.uint16)  # Blend blue
+    # mask_image[full_mask > 0, 3] = (alpha_normalized*65536).astype(np.uint16)
+
+    mask_image[full_mask > 0, 1] = im[full_mask > 0].astype(np.float64)  # Blend green
+    mask_image[full_mask > 0, 2] = im[full_mask > 0].astype(np.float64)  # Blend blue
+    mask_image[full_mask > 0, 3] = (alpha_normalized).astype(np.float64)
+    
 
     # lnprint(mask_image[full_mask > 0, 0])
     # lnprint(mask_image[full_mask > 0, 1])
@@ -3396,12 +3416,13 @@ def overlayrgba(im,rgba_image,mask_image,full_mask,ovrl):
         rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized)#.astype(np.uint8)
 
 # Use the maximum alpha value of the two images
+    # lnprint('maximum',np.maximum(rgba_image[full_mask > 0, 3], mask_image[full_mask > 0, 3]))
     rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
     # lnprint(np.max(rgba_image[..., 3]),np.max(mask_image[..., 3]))
 
 
 
-    rgba_image = np.clip(rgba_image, 0, 65536)
+    rgba_image = np.clip(rgba_image, 0, 1)
     # max_value = np.max(rgba_image)
     # if max_value > 0:
     #     rgba_image = rgba_image / max_value * 65536
@@ -3461,14 +3482,15 @@ def _update_textures_both_roi(sender,app_data):
     if sender[-1]=='1':
 
         contrast = dpg.get_value("img_contrast_1")
-        brightness = dpg.get_value("img_Brightness_1")
+        brightness = dpg.get_value("img_Brightness_1")/255
         ovrl = dpg.get_value("img_roi_alpha_1")
         # dpg.set_value("img_roi_alpha_2",ovrl)
         # find_nucleus = dpg.get_value('nucleus_search_1')
         # cell_rat = dpg.get_value('cell_tresh_ratio_1')
         # nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
         img = processor_1.image#.astype(np.uint16)
-        disp = processor_1.image
+        # disp = processor_1.image
+        disp = np.clip(processor_1.image/np.max(processor_1.image),0,1).astype(np.float64)
         froi = np.clip(processor_1.image,0,255).astype(np.uint8)
 
         if no_roi:
@@ -3490,7 +3512,7 @@ def _update_textures_both_roi(sender,app_data):
             find_nucleus = dpg.get_value('nucleus_search_1')
             cell_rat = dpg.get_value('cell_tresh_ratio_1')
             nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
-            lnprint('disp',disp.dtype)
+            # lnprint('disp',disp.dtype)
             cell_roi_image = processor_1.detect_cell_roi(froi,cell_rat)
             # lnprint(cell_rat,nucl_rat)
             if not find_nucleus:    
@@ -3551,11 +3573,12 @@ def _update_textures_both_roi(sender,app_data):
             
     elif sender[-1]=='2': 
         contrast = dpg.get_value("img_contrast_2")
-        brightness = dpg.get_value("img_Brightness_2")
+        brightness = dpg.get_value("img_Brightness_2")/255
         ovrl = dpg.get_value("img_roi_alpha_2")
         # dpg.set_value("img_roi_alpha_1",ovrl)
         img = processor_2.image#.astype(np.uint8)
-        disp = processor_2.image
+        # disp = processor_2.image
+        disp = np.clip(processor_2.image/np.max(processor_2.image),0,1).astype(np.float64)
         froi = np.clip(processor_2.image,0,255).astype(np.uint8)
 
         if no_roi:

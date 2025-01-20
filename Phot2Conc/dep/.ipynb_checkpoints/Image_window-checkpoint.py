@@ -44,9 +44,9 @@ with dpg.window(label = 'Channel 1',
         with dpg.table_row(tag='img_win_1_table_row1'):
             dpg.add_drag_float(tag='cell_tresh_ratio_1',
                                default_value =1.0,
-                               max_value=2.,
+                               max_value=5.,
                                min_value=0.0,
-                               speed=0.01,
+                               speed=0.001,
                                enabled=False,
                                width=-1,
                                callback=_update_textures_both_roi
@@ -67,9 +67,9 @@ with dpg.window(label = 'Channel 1',
                             )
             dpg.add_drag_float(tag='nucl_tresh_ratio_1',
                                default_value =1.5,
-                               max_value=3.,
+                               max_value=5.,
                                min_value=0.0,
-                               speed=0.01,
+                               speed=0.001,
                                width=-1,
                                enabled=False,
                                callback = _update_textures_both_roi
@@ -88,9 +88,9 @@ with dpg.window(label = 'Channel 1',
                 dpg.add_drag_float(tag='img_contrast_1',
                                    format ='Contrast: %.1f',
                                    default_value =1.0,
-                                   max_value=5.,
+                                   max_value=10.,
                                    min_value=0.1,
-                                   speed=0.1,
+                                   speed=0.01,
                                    enabled=True,
                                    width=-1,
                                    callback=_update_textures_both_roi
@@ -104,7 +104,7 @@ with dpg.window(label = 'Channel 1',
                                    default_value =0.0,
                                    max_value=100.,
                                    min_value=-100,
-                                   speed=1,
+                                   speed=.1,
                                    enabled=True,
                                    width=-1,
                                    callback=_update_textures_both_roi
@@ -113,8 +113,8 @@ with dpg.window(label = 'Channel 1',
                                    # label="Brightness",
                                    format ='ROI alpha: %.d\u0025',
                                    default_value =33,
-                                   max_value=100.,
-                                   min_value=0,
+                                   max_value=100,
+                                   min_value=1,
                                    speed=1,
                                    enabled=True,
                                    width=-1,
@@ -182,9 +182,9 @@ with dpg.window(label = 'Channel 2',
         with dpg.table_row(tag='img_win_2_table_row1'):
             dpg.add_drag_float(tag='cell_tresh_ratio_2',
                                default_value =1.0,
-                               max_value=2.,
+                               max_value=5.,
                                min_value=0.0,
-                               speed=0.01,
+                               speed=0.001,
                                width=-1,
                                enabled=False,
                                callback=_update_textures_both_roi
@@ -205,9 +205,9 @@ with dpg.window(label = 'Channel 2',
                             )
             dpg.add_drag_float(tag='nucl_tresh_ratio_2',
                                default_value =1.5,
-                               max_value=3.,
+                               max_value=5.,
                                min_value=0.0,
-                               speed=0.01,
+                               speed=0.001,
                                width=-1,
                                enabled=False,
                                callback = _update_textures_both_roi
@@ -233,13 +233,13 @@ with dpg.window(label = 'Channel 2',
             dpg.add_table_column(label="",tag='img_win_2_table_2_col2', width = int(width_2/3))
             dpg.add_table_column(label="",tag='img_win_2_table_2_col3', width = int(width_2/3))
             with dpg.table_row(tag='img_win_2_table_2_row1'):
-            
+                
                 dpg.add_drag_float(tag='img_contrast_2',
                                    format ='Contrast: %.1f',
                                    default_value =1.0,
-                                   max_value=5.,
+                                   max_value=10.,
                                    min_value=0.1,
-                                   speed=0.1,
+                                   speed=0.01,
                                    enabled=True,
                                    width=-1,
                                    callback=_update_textures_both_roi
@@ -253,7 +253,7 @@ with dpg.window(label = 'Channel 2',
                                    default_value =0.0,
                                    max_value=100.,
                                    min_value=-100,
-                                   speed=1,
+                                   speed=.1,
                                    enabled=True,
                                    width=-1,
                                    callback=_update_textures_both_roi
@@ -263,7 +263,7 @@ with dpg.window(label = 'Channel 2',
                                    format ='ROI alpha: %.d\u0025',
                                    default_value =33,
                                    max_value=100.,
-                                   min_value=0,
+                                   min_value=1,
                                    speed=1,
                                    enabled=True,
                                    width=-1,
@@ -286,7 +286,7 @@ with dpg.window(label = 'Channel 2',
 
 
 
-
+# lnprint(dpg.get_item_width('img_win_2_table_2_2'))
 
 
 

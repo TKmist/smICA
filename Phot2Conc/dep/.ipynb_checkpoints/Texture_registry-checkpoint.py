@@ -95,7 +95,7 @@ h =init_heights['image_window_ch1']
 
 NO_IMAGE_INTENSITY = np.load(os.path.join('res','NO_image_INT.npy'))
 # NO_IMAGE_LIFETIME = np.load(os.path.join('res','NO_image_LT.npy'))
-lnprint(NO_IMAGE_INTENSITY.dtype)
+# lnprint(NO_IMAGE_INTENSITY.dtype)
 # _fin_im_size = NO_IMAGE_INTENSITY.shape
 global Current_image_1,Current_image_2
 
@@ -110,19 +110,21 @@ Current_image_2 = NO_IMAGE_INTENSITY
 
 
 processor_1 = ImageROIProcessor()
-processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+# processor_1.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+processor_1.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
 # processor_1.image=np.clip((NO_IMAGE_INTENSITY*255),0,255).astype(np.uint8)
 
 # lnprint(np.max(processor_1.image))
 processor_2 = ImageROIProcessor()
-processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+# processor_2.image=np.clip((NO_IMAGE_INTENSITY*65536),0,65536).astype(np.uint16)
+processor_2.image=np.clip((NO_IMAGE_INTENSITY),0,1).astype(np.float64)
 # processor_2.image=np.clip((NO_IMAGE_INTENSITY*255),0,255).astype(np.uint8)
 
 rgba_image_1 = im_to_rgbim(processor_1.image)#.astype(np.uint8))
 rgba_image_2 = im_to_rgbim(processor_2.image)#.astype(np.uint8))
 
-rgba_image_1  =cv2.resize(rgba_image_1, (w, h), interpolation=cv2.INTER_CUBIC)
-rgba_image_2  =cv2.resize(rgba_image_2, (w, h), interpolation=cv2.INTER_CUBIC)
+rgba_image_1  =cv2.resize(rgba_image_1, (w, h), interpolation=cv2.INTER_LINEAR)
+rgba_image_2  =cv2.resize(rgba_image_2, (w, h), interpolation=cv2.INTER_LINEAR)
 # lnprint(np.max(processor_1.image))
 # lnprint(rgba_image_1[...,3].astype(np.float32) /np.max(rgba_image_1[...,3]))
 dpg_image_1=(rgba_image_1.astype(np.float64) /np.max(rgba_image_1)).flatten().tolist()
