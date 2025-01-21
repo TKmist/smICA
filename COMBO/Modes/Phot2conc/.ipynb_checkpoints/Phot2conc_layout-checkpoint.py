@@ -154,8 +154,7 @@ mode_init = _Phot2conc_init(inV.init_size_ratio,
                             )
 
 
-method_cmn = _Phot2conc_vars_funct(method_init.size_ratio,
-                                     method_init.group_spacer,
+method_cmn = _Phot2conc_vars_funct(mode_init,
                                      globalITEMS.last_directory,
                                      basf
                                     )
@@ -164,7 +163,7 @@ method_cmn = _Phot2conc_vars_funct(method_init.size_ratio,
 # #########################################################################
 # '''Main windows of the method'''
 # #########################################################################
-
+'''PTU window items'''
 with dpg.window(label='',
                 pos=mode_init.PTU_DATA_window['pos'],
                 width=mode_init.PTU_DATA_window['width'],
@@ -176,8 +175,116 @@ with dpg.window(label='',
                 tag='PTU_DATA_window',
                 show=True
                ):
-    pass
+    dpg.add_text(default_value='PTU metadata',show=True,tag='PTU_meta')
+    dpg.add_separator(tag ='PTU_DATA_mid_sep_1',show=True)
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='Resol_Pix_size_table',parent='PTU_DATA_window'):
+    # with dpg.group(tag='Resol_Pix_size_group',horizontal=True,horizontal_spacing=mode_init.group_spacer):
+        dpg.add_table_column(label="",tag='Resol_Pix_size_table_col1', width = mode_init.Resol_Pix_size_table_col['width'])
+        dpg.add_table_column(label="",tag='Resol_Pix_size_table_col2', width = mode_init.Resol_Pix_size_table_col['width'])
+        with dpg.table_row(tag='Resol_Pix_size_table_row1'):
+             
 
+
+
+        
+            dpg.add_input_text(label='',
+                              tag='Resolution_output',
+                              width = mode_init.Resolution_output['width'],
+                             default_value ='Resolution: ',
+                               readonly=True,
+                             enabled=False,
+                               
+                            )
+            with dpg.tooltip('Resolution_output',tag='Resolution_output_tooltip'):
+                dpg.add_text("The resolution of the PTU image.",tag='Resolution_output_tooltip_text')
+            dpg.add_drag_int(label='',
+                              tag='Pixel_size_output',
+                              width = mode_init.Pixel_size_output['width'],
+                             default_value =0,
+                             format = 'Pixel size: %i [nm]',
+                             enabled=False
+                             )
+            with dpg.tooltip('Pixel_size_output',tag='Pixel_size_output_tooltip'):
+                dpg.add_text("Size of the of the pixell.",tag='Pixel_size_output_tooltip_text')
+
+        with dpg.table_row(tag='Resol_Pix_size_table_row2'):
+            dpg.add_drag_int(label='',
+                              tag='Nframes_output',
+                              width = mode_init.Nframes_output['width'],
+                             default_value =0,
+                             format = '# of frames: %i',
+                             enabled=False
+                             )
+            with dpg.tooltip('Nframes_output',tag='Nframes_output_tooltip'):
+                dpg.add_text("Number of frames in the PTU file.",tag='Nframes_output_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='Pixel_dwell_output',
+                              width = mode_init.Pixel_dwell_output['width'],
+                             default_value =0,
+                             format = 'Pixel dwell: %.2f [\u00B5s]',
+                               enabled=False
+                               )
+            with dpg.tooltip('Pixel_dwell_output', tag='Pixel_dwell_output_tooltip'):
+                dpg.add_text("Value of the pixell dwell", tag='Pixel_dwell_output_tooltip_text')
+            
+    dpg.add_text(default_value='ROI',show=True,tag='PTU_roi')
+    
+    dpg.add_separator(tag ='PTU_DATA_mid_sep_2',show=True)
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='ROI_table',parent='PTU_DATA_window'):
+    # with dpg.group(tag='Resol_Pix_size_group',horizontal=True,horizontal_spacing=mode_init.group_spacer):
+        dpg.add_table_column(label="",tag='ROI_table_col1', width = mode_init.ROI_table_col['width'])
+        dpg.add_table_column(label="",tag='ROI_table_col2', width = mode_init.ROI_table_col['width'])
+        with dpg.table_row(tag='ROI_table_row1'):
+            dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,
+                             # callback=callback_select_roi,
+                             enabled=False)
+            dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False,
+                             # callback=callback_select_autoroi,
+                             enabled=False)
+
+
+            
+globalITEMS.windows.extend(['PTU_DATA_window',
+                            'PTU_meta',
+                            'PTU_DATA_mid_sep_1',
+                            'Resol_Pix_size_table',
+                            'Resol_Pix_size_table_col1',
+                            'Resol_Pix_size_table_col2',
+                            'Resol_Pix_size_table_row1',
+                            'Resolution_output',
+                            'Resolution_output_tooltip',
+                            'Resolution_output_tooltip_text'
+                            
+                            'Pixel_size_output',
+                            'Pixel_size_output_tooltip',
+                            'Pixel_size_output_tooltip_text',
+                            'Resol_Pix_size_table_row2',
+                            'Nframes_output',
+                            'Nframes_output_tooltip',
+                            'Nframes_output_tooltip_text',
+                            'Pixel_dwell_output',
+                            'Pixel_dwell_output_tooltip',
+                            'Pixel_dwell_output_tooltip_text',
+                            'PTU_roi',
+                            'PTU_DATA_mid_sep_2',
+                            'ROI_table',
+                            'ROI_table_col1',
+                            'ROI_table_col2',
+                            'ROI_table_row1',
+                            'FILE_ROI_checkbox',
+                            'Auto_ROI_checkbox'
+                            
+                            
+                           ])
+
+'''Files window items'''
 with dpg.window(label='',
                 pos=mode_init.file_window['pos'],
                 width=mode_init.file_window['width'],
@@ -189,8 +296,128 @@ with dpg.window(label='',
                 tag='file_window',
                 show=True
                ):
-    pass
+    list_box = dpg.add_listbox(items=mode_init.file_box['items'],
+                               width=mode_init.file_box['width'],
+                               num_items=mode_init.file_box['num_items'],
+                               tag='file_box',
+                               # callback=callback_listbox
+                              )
+    dpg.add_separator(tag ='sep_left_6',show=True)
+    
+    
+    dpg.add_text(default_value='CALCULATE',show=True,tag='single_calc') 
+    
+    dpg.add_separator(tag ='FILES_mid_sep_1',show=True)
 
+    dpg.add_button(label="Calculate single",
+               # callback=callback_calculate,
+               width = mode_init.Calculate_button['width'],
+               tag='Calculate_button',
+               show=True,enabled=True
+              )
+    dpg.bind_item_theme('Calculate_button', 'fit_button_theme')
+    with dpg.tooltip('Calculate_button',tag='Calculate_button_tooltip'):
+        dpg.add_text("Press to make calculation on single file.",tag='Calculate_button_tooltip_text')
+
+    dpg.add_button(label="Add to Results",
+               # callback=add_single_result_to_DF,
+               width = mode_init.add_to_res_single_button['width'],
+               tag='add_to_res_single_button',
+               show=True,enabled=True
+              )
+    dpg.bind_item_theme('add_to_res_single_button', 'fit_button_theme')
+    with dpg.tooltip('add_to_res_single_button',tag='add_to_res_single_button_tooltip'):
+        dpg.add_text("Press to add current calculation to dataframe.",tag='add_to_res_single_button_tooltip_text') 
+
+    dpg.add_text(default_value='CALCULATE ALL',show=True,tag='All_calc') 
+    
+    dpg.add_separator(tag ='FILES_mid_sep_2',show=True)
+
+    dpg.add_button(label="Calculate all",
+               # callback=callback_calculate_all,
+               width = mode_init.Calculate_all_button['width'],
+               tag='Calculate_all_button',
+               show=True,enabled=True
+              )
+    dpg.bind_item_theme('Calculate_all_button', 'fit_button_theme')
+    with dpg.tooltip('Calculate_all_button',tag='Calculate_all_button_tooltip'):
+        dpg.add_text("Press to make calculation on all files.",tag='Calculate_all_button_tooltip_text')
+
+    dpg.add_text(default_value='EXPORT',show=True,tag='export_text') 
+    
+    dpg.add_separator(tag ='FILES_mid_sep_3',show=True)
+    
+    dpg.add_text(default_value='Export Images as arrays',show=True,tag='exp_data_to_img_csv')
+
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='EXPORT_ops_table',parent='file_window'):
+        dpg.add_table_column(label="",tag='EXPORT_ops_table_col1', width = mode_init.EXPORT_ops_table_col['width'])
+        dpg.add_table_column(label="",tag='EXPORT_ops_table_col2', width = mode_init.EXPORT_ops_table_col['width'])
+        with dpg.table_row(tag='EXPORT_ops_table_row1'):
+            dpg.add_checkbox(label='Photons to array.', tag='Photons_array_checkbox',default_value = True)
+            dpg.add_checkbox(label='Photons to heatmap.', tag='Photons_Hmaps_checkbox',default_value = False)
+        with dpg.table_row(tag='EXPORT_ops_table_row2'):
+            dpg.add_checkbox(label='N_p to array.', tag='Np_array_checkbox',default_value = True)
+            dpg.add_checkbox(label='N_p to heatmap.', tag='Np_Hmaps_checkbox',default_value = False)
+        with dpg.table_row(tag='EXPORT_ops_table_row3'):
+            dpg.add_checkbox(label='Conc. to array.', tag='C_array_checkbox',default_value = True)
+            dpg.add_checkbox(label='Conc. to heatmap.', tag='C_Hmaps_checkbox',default_value = False)
+    
+    dpg.add_button(label="Export all data",
+               callback=lambda: dpg.show_item('file_dialog_export'),
+               width = mode_init.Export_all_button['width'],
+               tag='Export_all_button',
+               show=True,enabled=True
+              )
+    dpg.bind_item_theme('Export_all_button', 'fit_button_theme')
+    with dpg.tooltip('Export_all_button',tag='Export_all_button_tooltip'):
+        dpg.add_text("Press to make calculation on all files.",tag='Export_all_button_tooltip_text')
+            
+    
+globalITEMS.windows.extend(['file_window',
+                            'file_box',
+                            'sep_left_6',
+                            'single_calc',
+                            'FILES_mid_sep_1',
+                            'Calculate_button',
+                            'Calculate_button_tooltip',
+                            'Calculate_button_tooltip_text',
+                            'add_to_res_single_button',
+                            'add_to_res_single_button_tooltip',
+                            'add_to_res_single_button_tooltip_text',
+                            'All_calc',
+                            'FILES_mid_sep_2',
+                            'Calculate_all_button',
+                            'Calculate_all_button_tooltip',
+                            'Calculate_all_button_tooltip_text',
+                            'export_text',
+                            'FILES_mid_sep_3',
+                            'exp_data_to_img_csv',
+                            'EXPORT_ops_table',
+                            'EXPORT_ops_table_col1',
+                            'EXPORT_ops_table_col2',
+                            'EXPORT_ops_table_row1',
+                            'Photons_array_checkbox',
+                            'Photons_Hmaps_checkbox',
+                            'EXPORT_ops_table_row2',
+                            'Np_array_checkbox',
+                            'Np_Hmaps_checkbox',
+                            'EXPORT_ops_table_row3',
+                            'C_array_checkbox',
+                            'C_Hmaps_checkbox',
+                            'Export_all_button',
+                            'Export_all_button_tooltip',
+                            'Export_all_button_tooltip_text'
+                            
+                            
+                        
+                            
+                            
+                           ])
+
+'''Image 1 window items'''
 with dpg.window(label = 'Channel 1',
                 tag='image_window_ch1',
                 width = mode_init.image_window_ch1['width'],
@@ -204,8 +431,123 @@ with dpg.window(label = 'Channel 1',
                 no_bring_to_front_on_focus=True,
                 show=True
                ):
-    pass
+    dpg.add_separator(tag ='IMAGE_CH1_top_sep',show=True)
+    
+    dpg.add_image(mode_init.tex_1_name,
+                  uv_min=(0,0),
+                  uv_max=(1,1),
+                  tag = 'texture_CH_1',before='img_win_1_table')
+    dpg.add_separator(tag ='IMAGE_CH1_top_sep_2',show=True,parent='image_window_ch1')
 
+
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_1_table',parent='image_window_1'):
+            # Add headers
+        dpg.add_table_column(label="",tag='img_win_1_table_col1', width = mode_init.img_win_1_table_col['width'])
+        dpg.add_table_column(label="",tag='img_win_1_table_col2', width = mode_init.img_win_1_table_col['width'])
+        dpg.add_table_column(label="",tag='img_win_1_table_col3', width = mode_init.img_win_1_table_col['width'])
+
+        # Add rows and columns
+        with dpg.table_row(tag='img_win_1_table_row1'):
+            dpg.add_drag_float(tag='cell_tresh_ratio_1',
+                               default_value =1.0,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               enabled=False,
+                               width=mode_init.cell_tresh_ratio_1['width'],
+                               # callback=_update_textures_both_roi
+                              )
+
+
+            
+            # with dpg.group(tag='log_checkbox_group', horizontal=True,
+            #    horizontal_spacing=init.group_spacer,
+            #    show=True):
+            dpg.add_checkbox(label='Find nucleus', 
+                             tag='nucleus_search_1',
+                             default_value = False,
+                             enabled=False,
+                             # width=-1,
+                             # callback=_update_textures_both_roi,
+                             # parent='image_window_1'
+                            )
+            dpg.add_drag_float(tag='nucl_tresh_ratio_1',
+                               default_value =1.5,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.nucl_tresh_ratio_1['width'],
+                               enabled=False,
+                               # callback = _update_textures_both_roi
+                              )
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_1_table_2',parent='image_window_1',before='texture_CH_1'):
+        dpg.add_table_column(label="",tag='img_win_1_table_2_col1', width = mode_init.img_win_1_table_2_col['width'])
+        dpg.add_table_column(label="",tag='img_win_1_table_2_col2', width = mode_init.img_win_1_table_2_col['width'])
+        dpg.add_table_column(label="",tag='img_win_1_table_2_col3', width = mode_init.img_win_1_table_2_col['width'])
+        with dpg.table_row(tag='img_win_1_table_2_row1'):
+            dpg.add_drag_float(tag='img_contrast_1',
+                                   format ='Contrast: %.1f',
+                                   default_value =1.0,
+                                   max_value=10.,
+                                   min_value=0.1,
+                                   speed=0.01,
+                                   enabled=True,
+                                   width=mode_init.img_contrast_1['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+            dpg.add_drag_float(tag='img_Brightness_1',
+                                   # label="Brightness",
+                                   format ='Brightness: %.1f',
+                                   default_value =0.0,
+                                   max_value=100.,
+                                   min_value=-100,
+                                   speed=.1,
+                                   enabled=True,
+                                   width=mode_init.img_Brightness_1['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+            dpg.add_drag_int(tag='img_roi_alpha_1',
+                                   # label="Brightness",
+                                   format ='ROI alpha: %.d\u0025',
+                                   default_value =33,
+                                   max_value=100,
+                                   min_value=1,
+                                   speed=1,
+                                   enabled=True,
+                                   width=mode_init.img_roi_alpha_1['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+        
+
+globalITEMS.windows.extend(['image_window_ch1',
+                            'IMAGE_CH1_top_sep',
+                            'texture_CH_1',
+                            'IMAGE_CH1_top_sep_2',
+                            'img_win_1_table',
+                            'img_win_1_table_col1',
+                            'img_win_1_table_col2',
+                            'img_win_1_table_col3',
+                            'img_win_1_table_row1',
+                            'cell_tresh_ratio_1',
+                            'nucleus_search_1',
+                            'nucl_tresh_ratio_1',
+                            'img_win_1_table_2',
+                            'img_win_1_table_2_col1',
+                            'img_win_1_table_2_col1',
+                            'img_win_1_table_2_col1',
+                            'img_win_1_table_2_row1',
+                            'img_contrast_1',
+                            'img_Brightness_1',
+                            'img_roi_alpha_1'
+                            
+                           ])
+'''Image 1 window items'''
 with dpg.window(label = 'Channel 2',
                 tag='image_window_ch2',
                 width = mode_init.image_window_ch2['width'],
@@ -219,8 +561,129 @@ with dpg.window(label = 'Channel 2',
                 no_bring_to_front_on_focus=True,
                 show=True
                ):
-    pass
+    dpg.add_separator(tag ='IMAGE_CH2_top_sep',show=True)
+    
+    dpg.add_image(mode_init.tex_2_name,
+                  uv_min=(0,0),
+                  uv_max=(1,1),
+                  tag = 'texture_CH_2',before='img_win_2_table')
 
+    dpg.add_separator(tag ='IMAGE_CH2_top_sep_2',show=True,parent='image_window_ch2')
+    
+    
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
+            # Add headers
+        dpg.add_table_column(label="",tag='img_win_2_table_col1', width = mode_init.img_win_2_table_col['width'])
+        dpg.add_table_column(label="",tag='img_win_2_table_col2', width = mode_init.img_win_2_table_col['width'])
+        dpg.add_table_column(label="",tag='img_win_2_table_col3', width = mode_init.img_win_2_table_col['width'])
+        
+
+        # Add rows and columns
+        with dpg.table_row(tag='img_win_2_table_row1'):
+            dpg.add_drag_float(tag='cell_tresh_ratio_2',
+                               default_value =1.0,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.cell_tresh_ratio_2['width'],
+                               enabled=False,
+                               # callback=_update_textures_both_roi
+                              )
+
+
+            
+            # with dpg.group(tag='log_checkbox_group', horizontal=True,
+            #    horizontal_spacing=init.group_spacer,
+            #    show=True):
+            dpg.add_checkbox(label='Find nucleus', 
+                             tag='nucleus_search_2',
+                             default_value = False,
+                             enabled=False,
+                             # width=-1,
+                             # callback=_update_textures_both_roi,
+                             # parent='image_window_1'
+                            )
+            dpg.add_drag_float(tag='nucl_tresh_ratio_2',
+                               default_value =1.5,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.nucl_tresh_ratio_2['width'],
+                               enabled=False,
+                               # callback = _update_textures_both_roi
+                              )
+
+    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
+                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+                                   no_clip=True,tag='img_win_2_table_2_2',parent='image_window_2',before='texture_CH_2'):
+            # Add headers
+            dpg.add_table_column(label="",tag='img_win_2_table_2_col1', width = mode_init.img_win_2_table_2_col['width'])
+            dpg.add_table_column(label="",tag='img_win_2_table_2_col2', width = mode_init.img_win_2_table_2_col['width'])
+            dpg.add_table_column(label="",tag='img_win_2_table_2_col3', width = mode_init.img_win_2_table_2_col['width'])
+            with dpg.table_row(tag='img_win_2_table_2_row1'):
+                
+                dpg.add_drag_float(tag='img_contrast_2',
+                                   format ='Contrast: %.1f',
+                                   default_value =1.0,
+                                   max_value=10.,
+                                   min_value=0.1,
+                                   speed=0.01,
+                                   enabled=True,
+                                   width=mode_init.img_contrast_2['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+                
+            #     dpg.add_text('',tag='img_contrast_text_1')
+
+                dpg.add_drag_float(tag='img_Brightness_2',
+                                   # label="Brightness",
+                                   format ='Brightness: %.1f',
+                                   default_value =0.0,
+                                   max_value=100.,
+                                   min_value=-100,
+                                   speed=.1,
+                                   enabled=True,
+                                   width=mode_init.img_Brightness_2['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+                dpg.add_drag_int(tag='img_roi_alpha_2',
+                                   # label="Brightness",
+                                   format ='ROI alpha: %.d\u0025',
+                                   default_value =33,
+                                   max_value=100.,
+                                   min_value=1,
+                                   speed=1,
+                                   enabled=True,
+                                   width=mode_init.img_roi_alpha_2['width'],
+                                   # callback=_update_textures_both_roi
+                                  )
+globalITEMS.windows.extend(['image_window_ch2',
+                            'IMAGE_CH2_top_sep',
+                            'texture_CH_2',
+                            'IMAGE_CH2_top_sep_2',
+                            'img_win_2_table',
+                            'img_win_2_table_col1',
+                            'img_win_2_table_col2',
+                            'img_win_2_table_col3',
+                            'img_win_2_table_row1',
+                            'cell_tresh_ratio_2',
+                            'nucleus_search_2',
+                            'nucl_tresh_ratio_2',
+                            'img_win_2_table_2',
+                            'img_win_2_table_2_col1',
+                            'img_win_2_table_2_col1',
+                            'img_win_2_table_2_col1',
+                            'img_win_2_table_2_row1',
+                            'img_contrast_2',
+                            'img_Brightness_2',
+                            'img_roi_alpha_2'
+                            
+                           ])
+'''Histogram 1 window items'''
 with dpg.window(label = 'Results channel 1',
                 tag='hist_window_ch1',
                 width = mode_init.hist_window_ch1['width'],
@@ -235,7 +698,9 @@ with dpg.window(label = 'Results channel 1',
                 show=True
                ):
     pass
-
+globalITEMS.windows.extend([
+    
+                            ])
 with dpg.window(label = 'Results channel 2',
                 tag='hist_window_ch2',
                 width = mode_init.hist_window_ch2['width'],
@@ -277,6 +742,9 @@ with dpg.window(label='',
                 show=True
                ):
     pass
+
+
+
 
 # # print('file_window -mounted')
 

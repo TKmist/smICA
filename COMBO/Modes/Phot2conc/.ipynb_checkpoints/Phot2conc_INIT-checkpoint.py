@@ -68,12 +68,12 @@ class _Phot2conc_init:
         self.fnt_ratio = (self.size_ratio['width']+self.size_ratio['height'])/2
         self.font_size = int(np.round(font_size*self.fnt_ratio,0))
         self.hist_scaller =1.1
-
+        self.files =[]
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
         
         dpg.add_texture_registry(show=False,tag='texture_reg')
-
+        
         
         
         
@@ -81,7 +81,7 @@ class _Phot2conc_init:
         
         self.PTU_DATA_window = {'name':'PTU_DATA_window',
                             'width':int(380*self.size_ratio['width']),
-                            'height':int(150*self.size_ratio['height']),
+                            'height':int(170*self.size_ratio['height']),
                             'pos':(self.left_indent,self.top_indent)
                             }
 
@@ -99,7 +99,7 @@ class _Phot2conc_init:
         self.image_window_ch2 = {'name':'image_window_ch2',
                             'width':int(366*self.size_ratio['width']),
                             'height':int(386*self.size_ratio['height']),
-                            'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
+                            'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+2*self.internal_indent,
                                    self.top_indent)
                             }
 
@@ -162,6 +162,109 @@ class _Phot2conc_init:
                             'width':int(380*self.size_ratio['width']),
                             'height':int(360*self.size_ratio['height']),
                             'pos':(self.FCS_window['pos'][0],self.top_indent+self.FCS_window['height']+self.internal_indent)
+                            }
+
+        
+        self.Resolution_output = {'name':'Resolution_output',
+                            'width':-1
+                                 }
+        
+        self.Pixel_size_output = {'name':'Pixel_size_output',
+                            'width':-1
+                                 }
+        self.Nframes_output = {'name':'Nframes_output',
+                            'width':-1
+                                 }
+        self.Pixel_dwell_output = {'name':'Pixel_dwell_output',
+                            'width':-1
+                                 }
+        self.Resol_Pix_size_table_col = {'name':'Resol_Pix_size_table_col',
+                            'width':int(self.PTU_DATA_window['width']/2)
+                                 }
+        self.ROI_table_col = {'name':'ROI_table_col',
+                            'width':int(self.PTU_DATA_window['width']/2)
+                                 }
+
+        self.file_box = {'name':'file_box',
+                            'width':-1,
+                            'num_items':11,
+                             'items':self.files
+                            
+                            }
+        self.Calculate_button = {'name':'Calculate_button',
+                            'width':-1
+                                 
+                            }
+        self.add_to_res_single_button = {'name':'add_to_res_single_button',
+                            'width':-1
+                                 
+                            }
+        self.Calculate_all_button = {'name':'Calculate_all_button',
+                            'width':-1
+                                 
+                            }
+        self.EXPORT_ops_table_col = {'name':'EXPORT_ops_table_col',
+                            'width':int(self.file_window['width']/2)
+                                    }
+    
+        self.Export_all_button = {'name':'Export_all_button',
+                            'width':-1
+                                 
+                            }
+
+        self.img_win_1_table_col = {'name':'img_win_1_table_col',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.cell_tresh_ratio_1 = {'name':'cell_tresh_ratio_1',
+                            'width':-1
+                                 
+                            }
+        
+        self.nucl_tresh_ratio_1 = {'name':'nucl_tresh_ratio_1',
+                            'width':-1
+                                 
+                            }
+        self.img_win_1_table_2_col = {'name':'img_win_1_table_2_col',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.img_contrast_1 = {'name':'img_contrast_1',
+                            'width':-1
+                                 
+                            }
+        self.img_Brightness_1 = {'name':'img_Brightness_1',
+                            'width':-1
+                                 
+                            }
+        self.img_roi_alpha_1 = {'name':'img_roi_alpha_1',
+                            'width':-1
+                                 
+                            }
+        self.img_win_2_table_col = {'name':'img_win_2_table_col',
+                            'width':int(self.image_window_ch2['width']/3)
+                                 }
+        self.cell_tresh_ratio_2 = {'name':'cell_tresh_ratio_2',
+                            'width':-1
+                                 
+                            }
+        
+        self.nucl_tresh_ratio_2 = {'name':'nucl_tresh_ratio_2',
+                            'width':-1
+                                 
+                            }
+        self.img_win_2_table_2_col = {'name':'img_win_2_table_2_col',
+                            'width':int(self.image_window_ch2['width']/3)
+                                 }
+        self.img_contrast_2 = {'name':'img_contrast_2',
+                            'width':-1
+                                 
+                            }
+        self.img_Brightness_2 = {'name':'img_Brightness_2',
+                            'width':-1
+                                 
+                            }
+        self.img_roi_alpha_2 = {'name':'img_roi_alpha_2',
+                            'width':-1
+                                 
                             }
     
     def im_to_rgbim(self,im):
@@ -329,7 +432,7 @@ class _Phot2conc_vars_funct:
         self.last_directory = last_directory
         self.size_ratio = self.method_init.size_ratio 
         
-
+        
 
     def define_file_menu_callbacks(self):
     
