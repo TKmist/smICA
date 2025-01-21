@@ -141,7 +141,7 @@
 # dpg.set_viewport_resize_callback(resizer)
 
 from Modes.Phot2conc.Phot2conc_INIT import _Phot2conc_init, _Phot2conc_vars_funct
-
+import numpy as np
 mode_init = _Phot2conc_init(inV.init_size_ratio,
                              inV.init_left_indent,
                              inV.init_internal_indent,
@@ -697,10 +697,82 @@ with dpg.window(label = 'Results channel 1',
                 no_move=True,
                 show=True
                ):
-    pass
-globalITEMS.windows.extend([
-    
+    dpg.add_separator(tag ='HIST_CH1_top_sep',show=True)
+    with dpg.tab_bar(tag='tab_bar_h1'):
+        with dpg.tab(label="Concentration/pixel",tag = 'tab_bar_conc_h1'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_conc_plot_ch1['height'],
+                          width=mode_init.hist_conc_plot_ch1['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_conc_plot_ch1',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_conc_plot_legend_ch1')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Concentration per pixel [nM]", no_gridlines=True, tag="hist_xc_axis_ch1")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_yc_axis_ch1")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch1',label='Cocnentration per pixel distribution',tag='c_dist_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch1',label='Mean = ',tag='c_mean_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch1',label='Median = ',tag='c_med_ser_ch_1')
+        with dpg.tab(label="N_p/pixel",tag = 'tab_bar_Np_h1'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_np_plot_ch1['height'],
+                          width=mode_init.hist_np_plot_ch1['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_np_plot_ch1',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_Np_plot_legend_ch1')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Number of molecules per pixel", no_gridlines=True, tag="hist_xnp_axis_ch1")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_ynp_axis_ch1")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch1',label='N_p per pixel distribution',tag='np_dist_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch1',label='Mean = ',tag='np_mean_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch1',label='Median = ',tag='np_med_ser_ch_1')
+        with dpg.tab(label="Photons/pixel",tag = 'tab_bar_phot_h1'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_phot_plot_ch1['height'],
+                          width=mode_init.hist_phot_plot_ch1['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_phot_plot_ch1',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_phot_plot_legend_ch1')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Photons per pixel", no_gridlines=True, tag="hist_xphot_axis_ch1")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_yphot_axis_ch1")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch1',label='Photons per pixel distribution',tag='phot_dist_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch1',label='Mean = ',tag='phot_mean_ser_ch_1')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch1',label='Median = ',tag='phot_med_ser_ch_1')
+            
+                
+globalITEMS.windows.extend(['hist_window_ch1',
+                            'HIST_CH1_top_sep',
+                            'tab_bar_h1',
+                            'tab_bar_conc_h1',
+                            'hist_conc_plot_ch1',
+                            'hist_conc_plot_legend_ch1',
+                            'hist_xc_axis_ch1',
+                            'hist_yc_axis_ch1',
+                            'c_dist_ser_ch_1',
+                            'c_mean_ser_ch_1',
+                            'c_med_ser_ch_1',
+                            'tab_bar_Np_h1',
+                            'hist_np_plot_ch1',
+                            'hist_Np_plot_legend_ch1',
+                            'hist_xnp_axis_ch1',
+                            'hist_ynp_axis_ch1',
+                            'np_dist_ser_ch_1',
+                            'np_mean_ser_ch_1',
+                            'np_med_ser_ch_1',
+                            'tab_bar_phot_h1',
+                            'hist_phot_plot_ch1',
+                            'hist_phot_plot_legend_ch1',
+                            'hist_xphot_axis_ch1',
+                            'hist_yphot_axis_ch1',
+                            'phot_dist_ser_ch_1',
+                            'phot_mean_ser_ch_1',
+                            'phot_med_ser_ch_1'
                             ])
+
+'''Histogram 2 window items'''
 with dpg.window(label = 'Results channel 2',
                 tag='hist_window_ch2',
                 width = mode_init.hist_window_ch2['width'],
@@ -714,8 +786,78 @@ with dpg.window(label = 'Results channel 2',
                 no_move=True,
                 show=True
                ):
-    pass
-
+    dpg.add_separator(tag ='HIST_CH2_top_sep',show=True)
+    with dpg.tab_bar(tag='tab_bar_h2'):
+        with dpg.tab(label="Concentration/pixel",tag = 'tab_bar_conc_h2'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_conc_plot_ch2['height'],
+                          width=mode_init.hist_conc_plot_ch2['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_conc_plot_ch2',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_conc_plot_legend_ch2')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Concentration per pixel [nM]", no_gridlines=True, tag="hist_xc_axis_ch2")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_yc_axis_ch2")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch2',label='Cocnentration per pixel distribution',tag='c_dist_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch2',label='Mean = ',tag='c_mean_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xc_axis_ch2',label='Median = ',tag='c_med_ser_ch_2')
+        with dpg.tab(label="N_p/pixel",tag = 'tab_bar_Np_h2'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_np_plot_ch2['height'],
+                          width=mode_init.hist_np_plot_ch2['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_np_plot_ch2',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_Np_plot_legend_ch2')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Number of molecules per pixel", no_gridlines=True, tag="hist_xnp_axis_ch2")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_ynp_axis_ch2")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch2',label='N_p per pixel distribution',tag='np_dist_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch2',label='Mean = ',tag='np_mean_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xnp_axis_ch2',label='Median = ',tag='np_med_ser_ch_2')
+        with dpg.tab(label="Photons/pixel",tag = 'tab_bar_phot_h2'):
+            with dpg.plot(label="",
+                          height=mode_init.hist_phot_plot_ch2['height'],
+                          width=mode_init.hist_phot_plot_ch2['width'],
+                          no_menus=True,
+                          no_box_select=True,no_mouse_pos=True,
+                         tag = 'hist_phot_plot_ch2',
+                         show=False):
+                dpg.add_plot_legend(outside=True,location =dpg.mvPlot_Location_South,tag='hist_phot_plot_legend_ch2')
+                dpg.add_plot_axis(dpg.mvXAxis, label="Photons per pixel", no_gridlines=True, tag="hist_xphot_axis_ch2")
+                dpg.add_plot_axis(dpg.mvYAxis, label="PDF", tag="hist_yphot_axis_ch2")
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch2',label='Photons per pixel distribution',tag='phot_dist_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch2',label='Mean = ',tag='phot_mean_ser_ch_2')
+                dpg.add_stem_series(np.empty(10),np.empty(10),parent = 'hist_xphot_axis_ch2',label='Median = ',tag='phot_med_ser_ch_2')
+globalITEMS.windows.extend(['hist_window_ch2',
+                            'HIST_CH2_top_sep',
+                            'tab_bar_h2',
+                            'tab_bar_conc_h2',
+                            'hist_conc_plot_ch2',
+                            'hist_conc_plot_legend_ch2',
+                            'hist_xc_axis_ch2',
+                            'hist_yc_axis_ch2',
+                            'c_dist_ser_ch_2',
+                            'c_mean_ser_ch_2',
+                            'c_med_ser_ch_2',
+                            'tab_bar_Np_h2',
+                            'hist_np_plot_ch2',
+                            'hist_Np_plot_legend_ch2',
+                            'hist_xnp_axis_ch2',
+                            'hist_ynp_axis_ch2',
+                            'np_dist_ser_ch_2',
+                            'np_mean_ser_ch_2',
+                            'np_med_ser_ch_2',
+                            'tab_bar_phot_h2',
+                            'hist_phot_plot_ch2',
+                            'hist_phot_plot_legend_ch2',
+                            'hist_xphot_axis_ch2',
+                            'hist_yphot_axis_ch2',
+                            'phot_dist_ser_ch_2',
+                            'phot_mean_ser_ch_2',
+                            'phot_med_ser_ch_2'
+                            ])
 with dpg.window(label='',
                 pos=mode_init.FCS_window['pos'],
                 width=mode_init.FCS_window['width'],

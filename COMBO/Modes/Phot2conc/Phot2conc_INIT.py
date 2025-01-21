@@ -266,6 +266,36 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
+        self.hist_conc_plot_ch1 = {'name':'hist_conc_plot_ch1',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
+        self.hist_np_plot_ch1 = {'name':'hist_np_plot_ch1',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
+        self.hist_phot_plot_ch1 = {'name':'hist_phot_plot_ch1',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
+        self.hist_conc_plot_ch2 = {'name':'hist_conc_plot_ch2',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
+        self.hist_np_plot_ch2 = {'name':'hist_np_plot_ch2',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
+        self.hist_phot_plot_ch2 = {'name':'hist_phot_plot_ch2',
+                            'width':-1,
+                            'height':-1
+                                 
+                            }
     
     def im_to_rgbim(self,im):
         '''Converts grayscale image into rgba(float) image.'''
