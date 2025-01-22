@@ -67,12 +67,11 @@ class _Phot2conc_init:
         self.group_spacer = int(group_spacer*self.size_ratio['width'])
         self.fnt_ratio = (self.size_ratio['width']+self.size_ratio['height'])/2
         self.font_size = int(np.round(font_size*self.fnt_ratio,0))
-        self.hist_scaller =1.1
+        self.im_scaller =int(32)#1.1
         self.files =[]
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
         
-        dpg.add_texture_registry(show=False,tag='texture_reg')
         
         
         
@@ -91,77 +90,97 @@ class _Phot2conc_init:
                             'pos':(self.left_indent,self.top_indent+self.PTU_DATA_window['height']+self.internal_indent)
                             }
         self.image_window_ch1 = {'name':'image_window_ch1',
-                            'width':int(366*self.size_ratio['width']),
-                            'height':int(386*self.size_ratio['height']),
-                            'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
+                            'width':int(386*self.size_ratio['width']),
+                            'height':int((386*self.size_ratio['width']+(2*40))),
+                            'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
         self.image_window_ch2 = {'name':'image_window_ch2',
-                            'width':int(366*self.size_ratio['width']),
-                            'height':int(386*self.size_ratio['height']),
-                            'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+2*self.internal_indent,
+                            'width':int(386*self.size_ratio['width']),
+                            'height':int(386*self.size_ratio['width']+2*40),
+                            'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
                                    self.top_indent)
                             }
 
-        self.tex_1_name = 'texture_tag_chan_1'
-        self.tex_2_name = 'texture_tag_chan_2'
-
-
-        self.processor_1 = ImageROIProcessor()
-        self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-        self.processor_2 = ImageROIProcessor()
-        self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-
-        self.rgba_image_1 = self.im_to_rgbim(self.processor_1.image)
-        self.rgba_image_2 = self.im_to_rgbim(self.processor_2.image)
-
-        self.rgba_image_1  =cv2.resize(self.rgba_image_1,
-                                  (self.image_window_ch1['width'], self.image_window_ch1['height']),
-                                  interpolation=cv2.INTER_LINEAR)
-        self.rgba_image_2  =cv2.resize(self.rgba_image_2,
-                                  (self.image_window_ch2['width'], self.image_window_ch2['height']),
-                                  interpolation=cv2.INTER_LINEAR)
-
-
-        dpg_image_1=(self.rgba_image_1.astype(np.float64) /np.max(self.rgba_image_1)).flatten().tolist()
-        dpg_image_2=(self.rgba_image_2.astype(np.float64) /np.max(self.rgba_image_2)).flatten().tolist()
-
-        dpg.add_dynamic_texture(width=self.image_window_ch1['width'],
-                                height=self.image_window_ch1['height'],
-                                default_value=dpg_image_1,
-                                tag=self.tex_1_name,
-                                parent = 'texture_reg')
-        dpg.add_dynamic_texture(width=self.image_window_ch2['width'],
-                                height=self.image_window_ch1['height'],
-                                default_value=dpg_image_2,
-                                tag=self.tex_2_name,
-                                parent = 'texture_reg')
+        if 'texture_reg' in dpg.get_aliases():
+            pass
+        else:
+            dpg.add_texture_registry(show=False,tag='texture_reg')
+            self.tex_1_name = 'texture_tag_chan_1'
+            self.tex_2_name = 'texture_tag_chan_2'
+    
+    
+            self.processor_1 = ImageROIProcessor()
+            self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+            self.processor_2 = ImageROIProcessor()
+            self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+    
+            self.rgba_image_1 = self.im_to_rgbim(self.processor_1.image)
+            self.rgba_image_2 = self.im_to_rgbim(self.processor_2.image)
+    
+            self.rgba_image_1  =cv2.resize(self.rgba_image_1,
+                                      (int(self.image_window_ch1['width']-self.im_scaller),
+                                       int(self.image_window_ch1['width']-self.im_scaller)),
+                                      interpolation=cv2.INTER_LINEAR)
+            self.rgba_image_2  =cv2.resize(self.rgba_image_2,
+                                      (int(self.image_window_ch2['width']-self.im_scaller), 
+                                       int(self.image_window_ch2['width']-self.im_scaller)),
+                                      interpolation=cv2.INTER_LINEAR)
+    
+    
+            dpg_image_1=(self.rgba_image_1.astype(np.float64) /np.max(self.rgba_image_1)).flatten().tolist()
+            dpg_image_2=(self.rgba_image_2.astype(np.float64) /np.max(self.rgba_image_2)).flatten().tolist()
+    
+            dpg.add_dynamic_texture(width=int(self.image_window_ch1['width']-self.im_scaller),
+                                    height=int(self.image_window_ch1['width']-self.im_scaller),
+                                    default_value=dpg_image_1,
+                                    tag=self.tex_1_name,
+                                    parent = 'texture_reg')
+            dpg.add_dynamic_texture(width=int(self.image_window_ch2['width']-self.im_scaller),
+                                    height=int(self.image_window_ch2['width']-self.im_scaller),
+                                    default_value=dpg_image_2,
+                                    tag=self.tex_2_name,
+                                    parent = 'texture_reg')
         
-        
+        # if self.size_ratio['width']>=1:
+        #     self.shift=int((self.image_window_ch1['width']/self.size_ratio['width']-dpg.get_item_width(self.tex_1_name))/4)
+        # else:
+        #     self.shift=int((self.image_window_ch1['width']-dpg.get_item_width(self.tex_1_name))/4)
+        self.shift = 8
+        lprint(self.size_ratio['width'],self.shift)
         self.hist_window_ch1 = {'name':'hist_window_ch1',
-                            'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
-                            'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
-                            'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
-                                   2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
+                            # 'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
+                            'width':self.image_window_ch1['width'],
+                            # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
+                            'height':dpg.get_viewport_height()-(self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent+self.bottom_indent),
+                            # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
+                            #        2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
+                            'pos': (self.image_window_ch1['pos'][0],self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent)
                             }
 
         self.hist_window_ch2 = {'name':'hist_window_ch2',
-                            'width':dpg.get_item_width(self.tex_2_name)+int(1.5*self.internal_indent),
-                            'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
-                            'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
-                                   2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
+                            # 'width':dpg.get_item_width(self.tex_2_name)+int(1.5*self.internal_indent),
+                                'width':self.image_window_ch2['width'],
+                            # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
+                            # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
+                            #        2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
+                             'height':dpg.get_viewport_height()-(self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent+self.bottom_indent),
+
+                            'pos': (self.image_window_ch2['pos'][0],self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent)   
                             }
 
         
         self.FCS_window = {'name':'FCS_window',
-                            'width':int(380*self.size_ratio['width']),
+                            # 'width':int(380*self.size_ratio['width']),
+                           'width':dpg.get_viewport_width()-(self.image_window_ch2['pos'][0]+self.image_window_ch2['width']+self.internal_indent+self.right_indent),
+                           
                             'height':int(400*self.size_ratio['height']),
-                            'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(2.5*self.internal_indent)+self.image_window_ch2['width']+int(2.5*self.internal_indent),
+                            'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(self.internal_indent)+self.image_window_ch2['width']+int(self.internal_indent),
                                    self.top_indent)
                             }
 
         self.results_window = {'name':'results_window',
-                            'width':int(380*self.size_ratio['width']),
+                            'width':self.FCS_window['width'],
                             'height':int(360*self.size_ratio['height']),
                             'pos':(self.FCS_window['pos'][0],self.top_indent+self.FCS_window['height']+self.internal_indent)
                             }
@@ -180,10 +199,16 @@ class _Phot2conc_init:
         self.Pixel_dwell_output = {'name':'Pixel_dwell_output',
                             'width':-1
                                  }
-        self.Resol_Pix_size_table_col = {'name':'Resol_Pix_size_table_col',
+        self.Resol_Pix_size_table_col1 = {'name':'Resol_Pix_size_table_col1',
                             'width':int(self.PTU_DATA_window['width']/2)
                                  }
-        self.ROI_table_col = {'name':'ROI_table_col',
+        self.Resol_Pix_size_table_col2 = {'name':'Resol_Pix_size_table_col2',
+                            'width':int(self.PTU_DATA_window['width']/2)
+                                 }
+        self.ROI_table_col1 = {'name':'ROI_table_col1',
+                            'width':int(self.PTU_DATA_window['width']/2)
+                                 }
+        self.ROI_table_col2 = {'name':'ROI_table_col2',
                             'width':int(self.PTU_DATA_window['width']/2)
                                  }
 
@@ -205,7 +230,10 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.EXPORT_ops_table_col = {'name':'EXPORT_ops_table_col',
+        self.EXPORT_ops_table_col1 = {'name':'EXPORT_ops_table_col1',
+                            'width':int(self.file_window['width']/2)
+                                    }
+        self.EXPORT_ops_table_col2 = {'name':'EXPORT_ops_table_col2',
                             'width':int(self.file_window['width']/2)
                                     }
     
@@ -214,7 +242,13 @@ class _Phot2conc_init:
                                  
                             }
 
-        self.img_win_1_table_col = {'name':'img_win_1_table_col',
+        self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
                             'width':int(self.image_window_ch1['width']/3)
                                  }
         self.cell_tresh_ratio_1 = {'name':'cell_tresh_ratio_1',
@@ -226,7 +260,13 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.img_win_1_table_2_col = {'name':'img_win_1_table_2_col',
+        self.img_win_1_table_2_col1 = {'name':'img_win_1_table_2_col1',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.img_win_1_table_2_col2 = {'name':'img_win_1_table_2_col2',
+                            'width':int(self.image_window_ch1['width']/3)
+                                 }
+        self.img_win_1_table_2_col3 = {'name':'img_win_1_table_2_col3',
                             'width':int(self.image_window_ch1['width']/3)
                                  }
         self.img_contrast_1 = {'name':'img_contrast_1',
@@ -241,9 +281,15 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.img_win_2_table_col = {'name':'img_win_2_table_col',
+        self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
                             'width':int(self.image_window_ch2['width']/3)
                                  }
+        self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
+                            'width':int(self.image_window_ch2['width']/3)
+                                 }
+        self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
+                            'width':int(self.image_window_ch2['width']/3)
+                                    }
         self.cell_tresh_ratio_2 = {'name':'cell_tresh_ratio_2',
                             'width':-1
                                  
@@ -253,7 +299,13 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.img_win_2_table_2_col = {'name':'img_win_2_table_2_col',
+        self.img_win_2_table_2_col1 = {'name':'img_win_2_table_2_col1',
+                            'width':int(self.image_window_ch2['width']/3)
+                                 }
+        self.img_win_2_table_2_col2 = {'name':'img_win_2_table_2_col2',
+                            'width':int(self.image_window_ch2['width']/3)
+                                 }
+        self.img_win_2_table_2_col3 = {'name':'img_win_2_table_2_col3',
                             'width':int(self.image_window_ch2['width']/3)
                                  }
         self.img_contrast_2 = {'name':'img_contrast_2',
@@ -307,10 +359,10 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.FCS_win_table_col1 = {'name':'FCS_win_table_col1',
+        self.FCS_win_CH1_table_col1 = {'name':'FCS_win_CH1_table_col1',
                             'width':int(2*self.FCS_window['width']/3)
                                  }
-        self.FCS_win_table_col2 = {'name':'FCS_win_table_col2',
+        self.FCS_win_CH1_table_col2 = {'name':'FCS_win_CH1_table_col2',
                             'width':int(self.FCS_window['width']/3)
                                  }
         self.omega_input_ch_1 = {'name':'omega_input_ch_1',
@@ -347,7 +399,13 @@ class _Phot2conc_init:
                             'width':-1,
                             'default_value':100
                             }
-
+        
+        self.FCS_win_CH2_table_col1 = {'name':'FCS_win_CH2_table_col1',
+                            'width':int(2*self.FCS_window['width']/3)
+                                 }
+        self.FCS_win_CH2_table_col2 = {'name':'FCS_win_CH2_table_col2',
+                            'width':int(self.FCS_window['width']/3)
+                                 }
         self.omega_input_ch_2 = {'name':'omega_input_ch_2',
                             'width':-1
                                  
@@ -383,12 +441,13 @@ class _Phot2conc_init:
                             'default_value':100
                             }
 
-        self.RES_win_table_col1 = {'name':'RES_win_table_col1',
+        self.RES_win_CH1_table_col1 = {'name':'RES_win_CH1_table_col1',
                             'width':int(2*self.FCS_window['width']/3)
                                  }
-        self.RES_win_table_col2 = {'name':'RES_win_table_col2',
+        self.RES_win_CH1_table_col2 = {'name':'RES_win_CH1_table_col2',
                             'width':int(self.FCS_window['width']/3)
                                  }
+        
 
         self.sinle_phot_output_ch_1 = {'name':'sinle_phot_output_ch_1',
                             'width':-1
@@ -415,6 +474,12 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
+        self.RES_win_CH2_table_col1 = {'name':'RES_win_CH2_table_col1',
+                            'width':int(2*self.FCS_window['width']/3)
+                                 }
+        self.RES_win_CH2_table_col2 = {'name':'RES_win_CH2_table_col2',
+                            'width':int(self.FCS_window['width']/3)
+                                 }
         self.sinle_phot_output_ch_2 = {'name':'sinle_phot_output_ch_2',
                             'width':-1
                                  
