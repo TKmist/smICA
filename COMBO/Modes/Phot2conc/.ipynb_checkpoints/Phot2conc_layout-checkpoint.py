@@ -894,15 +894,349 @@ with dpg.window(label='',
     
     
     dpg.add_text(default_value='Channel 1',show=True,tag='FCS_pm_ch_1')
+
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False,
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   policy=dpg.mvTable_SizingFixedFit,
+                   tag='FCS_win_CH1_table',
+                   parent='FCS_window'):
+            # Add headers
+        dpg.add_table_column(label="",
+                             tag='FCS_win_CH1_table_col1',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.FCS_win_table_col1['width'] ,
+                             # width = mode_init.FCS_win_table_col1['width']
+                            )
+        dpg.add_table_column(label="",
+                             tag='FCS_win_CH1_table_col2',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.FCS_win_table_col2['width'] ,
+                             # width = mode_init.FCS_win_table_col2['width']
+                            )
+        
+        
+
+        # Add rows and columns
+        with dpg.table_row(tag='FCS_win_CH1_table_row1'):
+            dpg.add_drag_float(label='',
+                          tag='omega_input_ch_1',
+                          width = mode_init.omega_input_ch_1['width'],
+                         default_value =0.2,
+                         format = '\u03C9\u2080 = %.3f',
+                         max_value = 0.5,
+                         min_value = 0.1,
+                         speed = 0.001,
+                         # callback = callback_omega_input
+                        )
+            with dpg.tooltip('omega_input_ch_1',tag='omega_input_ch_1_tooltip'):
+                dpg.add_text("Value of the \u03C9\u2080 from the FCS callibration measurements.",tag='omega_input_ch_1_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='omega_err_input_ch_1',
+                              width = mode_init.omega_err_input_ch_1['width'],
+                             default_value =0.02,
+                             format = '\u00B1 %.3f [\u03BCm]',
+                             max_value = 0.5,
+                             min_value = 0.001,
+                             speed = 0.001,
+                             # callback = callback_omega_err_input
+                            )
+            with dpg.tooltip('omega_err_input_ch_1',tag='omega_err_input_ch_1_tooltip'):
+                dpg.add_text("Value of error for the \u03C9\u2080 from the FCS callibration measurements.",tag='omega_err_input_ch_1_tooltip_text')
+
+        with dpg.table_row(tag='FCS_win_CH1_table_row2'):
+            dpg.add_drag_float(label='',
+                              tag='kappa_input_ch_1',
+                              width = mode_init.kappa_input_ch_1['width'],
+                             default_value =5.0,
+                             format = '\u03BA = %.2f',
+                             max_value = 20.5,
+                             min_value = 2.5,
+                             speed = 0.01,
+                             # callback = callback_kappa_input
+                            )
+            with dpg.tooltip('kappa_input_ch_1',tag='kappa_input_ch_1_tooltip'):
+                dpg.add_text("Value of the \u03BA from the FCS callibration measurements.",tag='kappa_input_ch_1_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='kappa_err_input_ch_1',
+                              width = mode_init.kappa_err_input_ch_1['width'],
+                             default_value =0.5,
+                             format = '\u00B1 %.2f',
+                             max_value = 20.5,
+                             min_value = 0.01,
+                             speed = 0.01,
+                             # callback = callback_kappa_err_input
+                            )
+            with dpg.tooltip('kappa_err_input_ch_1',tag='kappa_err_input_ch_1_tooltip'):
+                dpg.add_text("Value of error for the \u03BA from the FCS callibration measurements.",tag='kappa_err_input_ch_1_tooltip_text')
+        with dpg.table_row(tag='FCS_win_CH1_table_row3'):
+            dpg.add_drag_float(label='',
+                              tag='focal_vol_input_ch_1',
+                              width = mode_init.focal_vol_input_ch_1['width'],
+                             default_value =method_cmn.VEFF(dpg.get_value('omega_input_ch_1'),dpg.get_value('kappa_input_ch_1'),dpg.get_value('omega_err_input_ch_1'),dpg.get_value('kappa_err_input_ch_1'))[0],
+                             format = 'V\u2080 = %.3f',
+                             max_value = 2.5,
+                             min_value = 0.05,
+                             speed = 0.001,
+                             enabled=False
+                             
+                            )
+            with dpg.tooltip('focal_vol_input_ch_1',tag='focal_vol_input_ch_1_tooltip'):
+                dpg.add_text("Value of the V\u2080 calculated using \u03C9\u2080 and \u03BA. This field is read-only.",tag='focal_vol_input_ch_1_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='focal_vol_err_input_ch_1',
+                              width = mode_init.focal_vol_err_input_ch_1['width'],
+                             default_value =method_cmn.VEFF(dpg.get_value('omega_input_ch_1'),dpg.get_value('kappa_input_ch_1'),dpg.get_value('omega_err_input_ch_1'),dpg.get_value('kappa_err_input_ch_1'))[1],
+                             format = '\u00B1 %.3f [fL]',
+                             max_value = 2.5,
+                             min_value = 0.05,
+                             speed = 0.001,
+                            enabled=False
+                             
+                            )
+            with dpg.tooltip('focal_vol_err_input_ch_1',tag='focal_vol_err_input_ch_1_tooltip'):
+                dpg.add_text("Value of error for the V\u2080 calculated using \u03C9\u2080 and \u03BA. This field is read-only.",tag='focal_vol_err_input_ch_1_tooltip_text')
+        with dpg.table_row(tag='FCS_win_CH1_table_row4'):
+            dpg.add_drag_int(label='',
+                              tag='Brightness_input_ch_1',
+                              width = mode_init.Brightness_input_ch_1['width'],
+                             default_value =mode_init.Brightness_input_ch_1['default_value'],
+                             
+                             format = '<Mol. brightness> = %.d',
+                             max_value = 1e5,
+                             # callback = callback_Brightness_input
+                            )
+            with dpg.tooltip('Brightness_input_ch_1',tag='Brightness_input_ch_1_tooltip'):
+                dpg.add_text("Mean value of the molecular brightness. Optionally input your own known value.",tag='Brightness_input_ch_1_tooltip_text')
+            
+            dpg.add_drag_int(label='',
+                              tag='Brightness_err_input_ch_1',
+                              width = mode_init.Brightness_err_input_ch_1['width'],
+                             default_value =mode_init.Brightness_err_input_ch_1['default_value'],
+                             format = '\u00B1 %.d',
+                             max_value = 1e5,
+                             # callback = callback_Brightness_err_input
+                            )
+            with dpg.tooltip('Brightness_err_input_ch_1',tag='Brightness_err_input_ch_1_tooltip'):
+                dpg.add_text("Standard deviation value of the molecular brightness. Optionally input your own known value.",tag='Brightness_err_input_ch_1_tooltip_text')
+    dpg.add_separator(tag ='FCS_mid_sep_2',show=True)
+    
+    dpg.add_text(default_value='Channel 2',show=True,tag='FCS_pm_ch_2')
+
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False,
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   policy=dpg.mvTable_SizingFixedFit,
+                   tag='FCS_win_CH2_table',
+                   parent='FCS_window'):
+            # Add headers
+        dpg.add_table_column(label="",
+                             tag='FCS_win_CH2_table_col1',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.FCS_win_table_col1['width'] ,
+                             # width = mode_init.FCS_win_table_col1['width']
+                            )
+        dpg.add_table_column(label="",
+                             tag='FCS_win_CH2_table_col2',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.FCS_win_table_col2['width'] ,
+                             # width = mode_init.FCS_win_table_col2['width']
+                            )
+        
+        
+
+        # Add rows and columns
+        with dpg.table_row(tag='FCS_win_CH2_table_row1'):
+            dpg.add_drag_float(label='',
+                          tag='omega_input_ch_2',
+                          width = mode_init.omega_input_ch_2['width'],
+                         default_value =0.2,
+                         format = '\u03C9\u2080 = %.3f',
+                         max_value = 0.5,
+                         min_value = 0.1,
+                         speed = 0.001,
+                         # callback = callback_omega_input
+                        )
+            with dpg.tooltip('omega_input_ch_2',tag='omega_input_ch_2_tooltip'):
+                dpg.add_text("Value of the \u03C9\u2080 from the FCS callibration measurements.",tag='omega_input_ch_2_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='omega_err_input_ch_2',
+                              width = mode_init.omega_err_input_ch_2['width'],
+                             default_value =0.02,
+                             format = '\u00B1 %.3f [\u03BCm]',
+                             max_value = 0.5,
+                             min_value = 0.001,
+                             speed = 0.001,
+                             # callback = callback_omega_err_input
+                            )
+            with dpg.tooltip('omega_err_input_ch_2',tag='omega_err_input_ch_2_tooltip'):
+                dpg.add_text("Value of error for the \u03C9\u2080 from the FCS callibration measurements.",tag='omega_err_input_ch_2_tooltip_text')
+
+        with dpg.table_row(tag='FCS_win_CH2_table_row2'):
+            dpg.add_drag_float(label='',
+                              tag='kappa_input_ch_2',
+                              width = mode_init.kappa_input_ch_2['width'],
+                             default_value =5.0,
+                             format = '\u03BA = %.2f',
+                             max_value = 20.5,
+                             min_value = 2.5,
+                             speed = 0.01,
+                             # callback = callback_kappa_input
+                            )
+            with dpg.tooltip('kappa_input_ch_2',tag='kappa_input_ch_2_tooltip'):
+                dpg.add_text("Value of the \u03BA from the FCS callibration measurements.",tag='kappa_input_ch_2_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='kappa_err_input_ch_2',
+                              width = mode_init.kappa_err_input_ch_2['width'],
+                             default_value =0.5,
+                             format = '\u00B1 %.2f',
+                             max_value = 20.5,
+                             min_value = 0.01,
+                             speed = 0.01,
+                             # callback = callback_kappa_err_input
+                            )
+            with dpg.tooltip('kappa_err_input_ch_2',tag='kappa_err_input_ch_2_tooltip'):
+                dpg.add_text("Value of error for the \u03BA from the FCS callibration measurements.",tag='kappa_err_input_ch_2_tooltip_text')
+        with dpg.table_row(tag='FCS_win_CH2_table_row3'):
+            dpg.add_drag_float(label='',
+                              tag='focal_vol_input_ch_2',
+                              width = mode_init.focal_vol_input_ch_2['width'],
+                             default_value =method_cmn.VEFF(dpg.get_value('omega_input_ch_2'),dpg.get_value('kappa_input_ch_2'),dpg.get_value('omega_err_input_ch_2'),dpg.get_value('kappa_err_input_ch_2'))[0],
+                             format = 'V\u2080 = %.3f',
+                             max_value = 2.5,
+                             min_value = 0.05,
+                             speed = 0.001,
+                             enabled=False
+                             
+                            )
+            with dpg.tooltip('focal_vol_input_ch_2',tag='focal_vol_input_ch_2_tooltip'):
+                dpg.add_text("Value of the V\u2080 calculated using \u03C9\u2080 and \u03BA. This field is read-only.",tag='focal_vol_input_ch_2_tooltip_text')
+            
+            dpg.add_drag_float(label='',
+                              tag='focal_vol_err_input_ch_2',
+                              width = mode_init.focal_vol_err_input_ch_2['width'],
+                             default_value =method_cmn.VEFF(dpg.get_value('omega_input_ch_2'),dpg.get_value('kappa_input_ch_2'),dpg.get_value('omega_err_input_ch_2'),dpg.get_value('kappa_err_input_ch_2'))[1],
+                             format = '\u00B1 %.3f [fL]',
+                             max_value = 2.5,
+                             min_value = 0.05,
+                             speed = 0.001,
+                            enabled=False
+                             
+                            )
+            with dpg.tooltip('focal_vol_err_input_ch_2',tag='focal_vol_err_input_ch_2_tooltip'):
+                dpg.add_text("Value of error for the V\u2080 calculated using \u03C9\u2080 and \u03BA. This field is read-only.",tag='focal_vol_err_input_ch_2_tooltip_text')
+        with dpg.table_row(tag='FCS_win_CH2_table_row4'):
+            dpg.add_drag_int(label='',
+                              tag='Brightness_input_ch_2',
+                              width = mode_init.Brightness_input_ch_2['width'],
+                             default_value =mode_init.Brightness_input_ch_2['default_value'],
+                             format = '<Mol. brightness> = %.d',
+                             max_value = 1e5,
+                             # callback = callback_Brightness_input
+                            )
+            with dpg.tooltip('Brightness_input_ch_2',tag='Brightness_input_ch_2_tooltip'):
+                dpg.add_text("Mean value of the molecular brightness. Optionally input your own known value.",tag='Brightness_input_ch_2_tooltip_text')
+            
+            dpg.add_drag_int(label='',
+                              tag='Brightness_err_input_ch_2',
+                              width = mode_init.Brightness_err_input_ch_2['width'],
+                             default_value =mode_init.Brightness_err_input_ch_2['default_value'],
+                             format = '\u00B1 %.d',
+                             max_value = 1e5,
+                             # callback = callback_Brightness_err_input
+                            )
+            with dpg.tooltip('Brightness_err_input_ch_2',tag='Brightness_err_input_ch_2_tooltip'):
+                dpg.add_text("Standard deviation value of the molecular brightness. Optionally input your own known value.",tag='Brightness_err_input_ch_2_tooltip_text')
+
 globalITEMS.windows.extend(['FCS_window',
                             'FCS_CALLIB',
                             'FCS_top_sep',
                             'Load_calib_button',
                             'Save_calib_button',
-                            'FCS_mid_sep_1'
+                            'FCS_mid_sep_1',
+                            'FCS_win_CH1_table',
+                            'FCS_win_CH1_table_col1',
+                            'FCS_win_CH1_table_col2',
+                            'FCS_win_CH1_table_row1',
+                            'omega_input_ch_1',
+                            'omega_input_ch_1_tooltip',
+                            'omega_input_ch_1_tooltip_text'
+                            'omega_err_input_ch_1',
+                            'omega_err_input_ch_1_tooltip',
+                            'omega_err_input_ch_1_tooltip_text',
+                            'FCS_win_CH1_table_row2',
+                            'kappa_input_ch_1',
+                            'kappa_input_ch_1_tooltip',
+                            'kappa_input_ch_1_tooltip_text',
+                            'kappa_err_input_ch_1',
+                            'kappa_err_input_ch_1_tooltip',
+                            'kappa_err_input_ch_1_tooltip_text',
+                            'FCS_win_CH1_table_row3',
+                            'focal_vol_input_ch_1',
+                            'focal_vol_input_ch_1_tooltip',
+                            'focal_vol_input_ch_1_tooltip_text',
+                            'focal_vol_err_input_ch_1',
+                            'focal_vol_err_input_ch_1_tooltip',
+                            'focal_vol_err_input_ch_1_tooltip_text',
+                            'FCS_win_CH1_table_row4',
+                            'Brightness_input_ch_1',
+                            'Brightness_input_ch_1_tooltip',
+                            'Brightness_err_input_ch_1_tooltip_text',
+                            'FCS_mid_sep_2',
+                            'FCS_pm_ch_2',
+                            'FCS_win_CH2_table',
+                            'FCS_win_CH2_table_col1',
+                            'FCS_win_CH2_table_col2',
+                            'FCS_win_CH2_table_row1',
+                            'omega_input_ch_2',
+                            'omega_input_ch_2_tooltip',
+                            'omega_input_ch_2_tooltip_text'
+                            'omega_err_input_ch_2',
+                            'omega_err_input_ch_2_tooltip',
+                            'omega_err_input_ch_2_tooltip_text',
+                            'FCS_win_CH2_table_row2',
+                            'kappa_input_ch_2',
+                            'kappa_input_ch_2_tooltip',
+                            'kappa_input_ch_2_tooltip_text',
+                            'kappa_err_input_ch_2',
+                            'kappa_err_input_ch_2_tooltip',
+                            'kappa_err_input_ch_2_tooltip_text',
+                            'FCS_win_CH2_table_row3',
+                            'focal_vol_input_ch_2',
+                            'focal_vol_input_ch_2_tooltip',
+                            'focal_vol_input_ch_2_tooltip_text',
+                            'focal_vol_err_input_ch_2',
+                            'focal_vol_err_input_ch_2_tooltip',
+                            'focal_vol_err_input_ch_2_tooltip_text',
+                            'FCS_win_CH2_table_row4',
+                            'Brightness_input_ch_2',
+                            'Brightness_input_ch_2_tooltip',
+                            'Brightness_err_input_ch_2_tooltip_text',
+                            
                             
                            ]
                           )
+
+'''Results window items'''
 with dpg.window(label='',
                 pos=mode_init.results_window['pos'],
                 width=mode_init.results_window['width'],
@@ -914,8 +1248,263 @@ with dpg.window(label='',
                 tag='results_window',
                 show=True
                ):
-    pass
+    dpg.add_text(default_value='RESULTS',show=True,tag='RES_pm')
+    
+    dpg.add_separator(tag ='RESULTS_top_sep',show=True)
 
+    dpg.add_text(default_value='Channel 1',show=True,tag='RES_pm_ch_1')
+
+
+
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False,
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   policy=dpg.mvTable_SizingFixedFit,
+                   tag='RES_win_CH1_table',
+                   parent='results_window'):
+            # Add headers
+        dpg.add_table_column(label="",
+                             tag='RES_win_CH1_table_col1',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.RES_win_table_col1['width'] ,
+                             # width = mode_init.FCS_win_table_col1['width']
+                            )
+        dpg.add_table_column(label="",
+                             tag='RES_win_CH1_table_col2',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.RES_win_table_col2['width'] ,
+                             # width = mode_init.RES_win_table_col2['width']
+                            )
+        
+        
+
+        # Add rows and columns
+        with dpg.table_row(tag='RES_win_CH1_table_row1'):
+            dpg.add_drag_float(label='',
+                              tag='sinle_phot_output_ch_1',
+                              width = mode_init.sinle_phot_output_ch_1['width'],
+                             default_value = 0,
+                             format = 'Photons per pixel = %.1f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_phot_output_ch_1',tag='sinle_phot_output_ch_1_tooltip'):
+                dpg.add_text("Mean number of photons per pixel.",tag='sinle_phot_output_ch_1_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='sinle_phot_err_output_ch_1',
+                              width = mode_init.sinle_phot_err_output_ch_1['width'],
+                             default_value = 0,
+                             format = '\u00B1 %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_phot_err_output_ch_1',tag='sinle_phot_err_output_ch_1_tooltip'):
+                dpg.add_text("SD of number of photons per pixel.",tag='sinle_phot_err_output_ch_1_tooltip_text')
+                
+        with dpg.table_row(tag='RES_win_CH1_table_row2'):
+            dpg.add_drag_float(label='',
+                              tag='sinle_mols_output_ch_1',
+                              width = mode_init.sinle_mols_output_ch_1['width'],
+                             default_value = 0,
+                             format = '<N_p> per pixel = %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_mols_output_ch_1',tag='sinle_mols_output_ch_1_tooltip'):
+                dpg.add_text("Mean number of molecules per pixel.",tag='sinle_mols_output_ch_1_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='sinle_mols_err_output_ch_1',
+                              width = mode_init.sinle_mols_err_output_ch_1['width'],
+                             default_value = 0,
+                             format = '\u00B1 %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_mols_err_output_ch_1',tag='sinle_mols_err_output_ch_1_tooltip'):
+                dpg.add_text("SD of number of molecules per pixel.",tag='sinle_mols_err_output_ch_1_tooltip_text')
+                
+        with dpg.table_row(tag='RES_win_CH1_table_row3'):
+            dpg.add_drag_float(label='',
+                              tag='single_conc_output_ch_1',
+                              width = mode_init.single_conc_output_ch_1['width'],
+                             default_value =0,
+                             format = '<C> = %.3f',
+                            enabled=False
+                            )
+            with dpg.tooltip('single_conc_output_ch_1',tag='single_conc_output_ch_1_tooltip'):
+                dpg.add_text("Mean concentration. Average over entire image/ROI.",tag='single_conc_output_ch_1_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='single_conc_err_output_ch_1',
+                              width = mode_init.single_conc_err_output_ch_1['width'],
+                             default_value =0,
+                             format = '\u00B1 %.3f [nM]',
+                            enabled=False
+                            )
+            with dpg.tooltip('single_conc_err_output_ch_1',tag='single_conc_err_output_ch_1_tooltip'):
+                dpg.add_text("SD of concentration. Average over entire image/ROI.",tag='single_conc_err_output_ch_1_tooltip_text')
+
+    dpg.add_separator(tag ='RESULTS_mid_sep_1',show=True)
+    
+    
+    dpg.add_text(default_value='Channel 2',show=True,tag='Bright_pm_ch_2')
+
+
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False,
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   policy=dpg.mvTable_SizingFixedFit,
+                   tag='RES_win_CH2_table',
+                   parent='results_window'):
+            # Add headers
+        dpg.add_table_column(label="",
+                             tag='RES_win_CH2_table_col1',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.RES_win_table_col1['width'] ,
+                             # width = mode_init.FCS_win_table_col1['width']
+                            )
+        dpg.add_table_column(label="",
+                             tag='RES_win_CH2_table_col2',
+                             width_stretch=True,
+                             init_width_or_weight=mode_init.RES_win_table_col2['width'] ,
+                             # width = mode_init.RES_win_table_col2['width']
+                            )
+        
+        
+
+        # Add rows and columns
+        with dpg.table_row(tag='RES_win_CH2_table_row1'):
+            dpg.add_drag_float(label='',
+                              tag='sinle_phot_output_ch_2',
+                              width = mode_init.sinle_phot_output_ch_2['width'],
+                             default_value = 0,
+                             format = 'Photons per pixel = %.1f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_phot_output_ch_2',tag='sinle_phot_output_ch_2_tooltip'):
+                dpg.add_text("Mean number of photons per pixel.",tag='sinle_phot_output_ch_2_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='sinle_phot_err_output_ch_2',
+                              width = mode_init.sinle_phot_err_output_ch_2['width'],
+                             default_value = 0,
+                             format = '\u00B1 %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_phot_err_output_ch_2',tag='sinle_phot_err_output_ch_2_tooltip'):
+                dpg.add_text("SD of number of photons per pixel.",tag='sinle_phot_err_output_ch_2_tooltip_text')
+                
+        with dpg.table_row(tag='RES_win_CH2_table_row2'):
+            dpg.add_drag_float(label='',
+                              tag='sinle_mols_output_ch_2',
+                              width = mode_init.sinle_mols_output_ch_2['width'],
+                             default_value = 0,
+                             format = '<N_p> per pixel = %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_mols_output_ch_2',tag='sinle_mols_output_ch_2_tooltip'):
+                dpg.add_text("Mean number of molecules per pixel.",tag='sinle_mols_output_ch_2_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='sinle_mols_err_output_ch_2',
+                              width = mode_init.sinle_mols_err_output_ch_2['width'],
+                             default_value = 0,
+                             format = '\u00B1 %.3f',
+                             enabled=False
+                            )
+            with dpg.tooltip('sinle_mols_err_output_ch_2',tag='sinle_mols_err_output_ch_2_tooltip'):
+                dpg.add_text("SD of number of molecules per pixel.",tag='sinle_mols_err_output_ch_2_tooltip_text')
+                
+        with dpg.table_row(tag='RES_win_CH2_table_row3'):
+            dpg.add_drag_float(label='',
+                              tag='single_conc_output_ch_2',
+                              width = mode_init.single_conc_output_ch_2['width'],
+                             default_value =0,
+                             format = '<C> = %.3f',
+                            enabled=False
+                            )
+            with dpg.tooltip('single_conc_output_ch_2',tag='single_conc_output_ch_2_tooltip'):
+                dpg.add_text("Mean concentration. Average over entire image/ROI.",tag='single_conc_output_ch_2_tooltip_text')
+            dpg.add_drag_float(label='',
+                              tag='single_conc_err_output_ch_2',
+                              width = mode_init.single_conc_err_output_ch_2['width'],
+                             default_value =0,
+                             format = '\u00B1 %.3f [nM]',
+                            enabled=False
+                            )
+            with dpg.tooltip('single_conc_err_output_ch_2',tag='single_conc_err_output_ch_2_tooltip'):
+                dpg.add_text("SD of concentration. Average over entire image/ROI.",tag='single_conc_err_output_ch_2_tooltip_text')
+    dpg.add_separator(tag ='RESULTS_bott2_sep',show=True)
+    dpg.add_checkbox(label='Errors as SD',
+                     tag='Error_type_checkbox',
+                     default_value = False,
+                     # callback=callback_calculate
+                    )
+            
+globalITEMS.windows.extend(['results_window',
+                            'RES_pm',
+                            'RESULTS_top_sep',
+                            'RES_pm_ch_1',
+                            'RES_win_CH1_table',
+                            'RES_win_CH1_table_col1',
+                            'RES_win_CH1_table_col2',
+                            'RES_win_CH1_table_row1',
+                            'sinle_phot_output_ch_1',
+                            'sinle_phot_output_ch_1_tooltip',
+                            'sinle_phot_output_ch_1_tooltip_text',
+                            'sinle_phot_err_output_ch_1',
+                            'sinle_phot_err_output_ch_1_tooltip',
+                            'sinle_phot_err_output_ch_1_tooltip_text',
+                            'sinle_mols_output_ch_1',
+                            'sinle_mols_output_ch_1_tooltip',
+                            'sinle_mols_output_ch_1_tooltip_text',
+                            'sinle_mols_err_output_ch_1',
+                            'sinle_mols_err_output_ch_1_tooltip',
+                            'sinle_mols_err_output_ch_1_tooltip_text',
+                            'single_conc_output_ch_1',
+                            'single_conc_output_ch_1_tooltip',
+                            'single_conc_output_ch_1_tooltip_text',
+                            'single_conc_err_output_ch_1',
+                            'single_conc_err_output_ch_1_tooltip',
+                            'single_conc_err_output_ch_1_tooltip_text',
+
+                            'RESULTS_mid_sep_1',
+                            'Bright_pm_ch_2',
+
+                            'RES_win_CH2_table',
+                            'RES_win_CH2_table_col1',
+                            'RES_win_CH2_table_col2',
+                            'RES_win_CH2_table_row1',
+                            'sinle_phot_output_ch_2',
+                            'sinle_phot_output_ch_2_tooltip',
+                            'sinle_phot_output_ch_2_tooltip_text',
+                            'sinle_phot_err_output_ch_2',
+                            'sinle_phot_err_output_ch_2_tooltip',
+                            'sinle_phot_err_output_ch_2_tooltip_text',
+                            'sinle_mols_output_ch_2',
+                            'sinle_mols_output_ch_2_tooltip',
+                            'sinle_mols_output_ch_2_tooltip_text',
+                            'sinle_mols_err_output_ch_2',
+                            'sinle_mols_err_output_ch_2_tooltip',
+                            'sinle_mols_err_output_ch_2_tooltip_text',
+                            'single_conc_output_ch_2',
+                            'single_conc_output_ch_2_tooltip',
+                            'single_conc_output_ch_2_tooltip_text',
+                            'single_conc_err_output_ch_2',
+                            'single_conc_err_output_ch_2_tooltip',
+                            'single_conc_err_output_ch_2_tooltip_text',
+                            'RESULTS_bott2_sep',
+                            'Error_type_checkbox'
+                            
+                           ]
+                          )
 
 
 

@@ -151,9 +151,11 @@ class _Phot2conc_init:
                             'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
                                    2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
                             }
+
+        
         self.FCS_window = {'name':'FCS_window',
                             'width':int(380*self.size_ratio['width']),
-                            'height':int(390*self.size_ratio['height']),
+                            'height':int(400*self.size_ratio['height']),
                             'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(2.5*self.internal_indent)+self.image_window_ch2['width']+int(2.5*self.internal_indent),
                                    self.top_indent)
                             }
@@ -305,6 +307,140 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
+        self.FCS_win_table_col1 = {'name':'FCS_win_table_col1',
+                            'width':int(2*self.FCS_window['width']/3)
+                                 }
+        self.FCS_win_table_col2 = {'name':'FCS_win_table_col2',
+                            'width':int(self.FCS_window['width']/3)
+                                 }
+        self.omega_input_ch_1 = {'name':'omega_input_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.omega_err_input_ch_1 = {'name':'omega_err_input_ch_1',
+                            'width':-1
+                                 
+                            }
+
+        self.kappa_input_ch_1 = {'name':'kappa_input_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.kappa_err_input_ch_1 = {'name':'kappa_err_input_ch_1',
+                            'width':-1
+                                 
+                            }
+
+        self.focal_vol_input_ch_1 = {'name':'focal_vol_input_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.focal_vol_err_input_ch_1 = {'name':'focal_vol_err_input_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.Brightness_input_ch_1 = {'name':'Brightness_input_ch_1',
+                            'width':-1,
+                            'default_value':1000                                
+                            }
+        self.Brightness_err_input_ch_1 = {'name':'Brightness_err_input_ch_1',
+                            'width':-1,
+                            'default_value':100
+                            }
+
+        self.omega_input_ch_2 = {'name':'omega_input_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.omega_err_input_ch_2 = {'name':'omega_err_input_ch_2',
+                            'width':-1
+                                 
+                            }
+
+        self.kappa_input_ch_2 = {'name':'kappa_input_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.kappa_err_input_ch_2 = {'name':'kappa_err_input_ch_2',
+                            'width':-1
+                                 
+                            }
+
+        self.focal_vol_input_ch_2 = {'name':'focal_vol_input_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.focal_vol_err_input_ch_2 = {'name':'focal_vol_err_input_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.Brightness_input_ch_2 = {'name':'Brightness_input_ch_2',
+                            'width':-1,
+                            'default_value':1000
+                            }
+        self.Brightness_err_input_ch_2 = {'name':'Brightness_err_input_ch_2',
+                            'width':-1,
+                            'default_value':100
+                            }
+
+        self.RES_win_table_col1 = {'name':'RES_win_table_col1',
+                            'width':int(2*self.FCS_window['width']/3)
+                                 }
+        self.RES_win_table_col2 = {'name':'RES_win_table_col2',
+                            'width':int(self.FCS_window['width']/3)
+                                 }
+
+        self.sinle_phot_output_ch_1 = {'name':'sinle_phot_output_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.sinle_phot_err_output_ch_1 = {'name':'sinle_phot_err_output_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.sinle_mols_output_ch_1 = {'name':'sinle_mols_output_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.sinle_mols_err_output_ch_1 = {'name':'sinle_mols_err_output_ch_1',
+                            'width':-1
+                                 
+                            }
+
+        self.single_conc_output_ch_1 = {'name':'single_conc_output_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.single_conc_err_output_ch_1 = {'name':'single_conc_err_output_ch_1',
+                            'width':-1
+                                 
+                            }
+        self.sinle_phot_output_ch_2 = {'name':'sinle_phot_output_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.sinle_phot_err_output_ch_2 = {'name':'sinle_phot_err_output_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.sinle_mols_output_ch_2 = {'name':'sinle_mols_output_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.sinle_mols_err_output_ch_2 = {'name':'sinle_mols_err_output_ch_2',
+                            'width':-1
+                                 
+                            }
+
+        self.single_conc_output_ch_2 = {'name':'single_conc_output_ch_2',
+                            'width':-1
+                                 
+                            }
+        self.single_conc_err_output_ch_2 = {'name':'single_conc_err_output_ch_2',
+                            'width':-1
+                                 
+                            }
+        
     
     def im_to_rgbim(self,im):
         '''Converts grayscale image into rgba(float) image.'''
@@ -484,6 +620,14 @@ class _Phot2conc_vars_funct:
         pass
     def callback_exportsettings(self):
         pass
+    def VEFF(self,w,k,w_err,k_err):
+        
+        
+        V = (pi**(3/2))*(w**3)*k
+        V_err = sqrt(9*(k**2)*(pi**3)*(w**4)*(w_err**2)+(k_err**2)*(pi**3)*(w**6))
+        return V, V_err
+
+    
     
 #         self.basf=basf
 #         self.size_ratio = size_ratio 
