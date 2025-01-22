@@ -858,6 +858,8 @@ globalITEMS.windows.extend(['hist_window_ch2',
                             'phot_mean_ser_ch_2',
                             'phot_med_ser_ch_2'
                             ])
+
+'''FCS window items'''
 with dpg.window(label='',
                 pos=mode_init.FCS_window['pos'],
                 width=mode_init.FCS_window['width'],
@@ -870,8 +872,37 @@ with dpg.window(label='',
                 tag='FCS_window',
                 show=True
                ):
-    pass
-
+    dpg.add_text(default_value='FCS CALLIBRATION DATA',show=True,tag='FCS_CALLIB')
+    
+    dpg.add_separator(tag ='FCS_top_sep',show=True)
+    
+    dpg.add_button(label="Load callibration data",
+                   # callback=lambda: dpg.configure_item("Calib_file_dialog_id",show=True,user_data = 'Load_calib_button'),
+                   width = mode_init.Load_calib_button['width'],
+                   tag='Load_calib_button',
+                   show=True,enabled=True
+                  )
+    dpg.bind_item_theme('Load_calib_button', 'fit_button_theme')
+    dpg.add_button(label="Save callibration data",
+                   # callback=lambda: dpg.configure_item("Calib_file_dialog_id",show=True,user_data = 'Save_calib_button'),
+                   width = mode_init.Save_calib_button['width'],
+                   tag='Save_calib_button',
+                   show=True,enabled=True
+                  )
+    dpg.bind_item_theme('Save_calib_button', 'fit_button_theme')
+    dpg.add_separator(tag ='FCS_mid_sep_1',show=True)
+    
+    
+    dpg.add_text(default_value='Channel 1',show=True,tag='FCS_pm_ch_1')
+globalITEMS.windows.extend(['FCS_window',
+                            'FCS_CALLIB',
+                            'FCS_top_sep',
+                            'Load_calib_button',
+                            'Save_calib_button',
+                            'FCS_mid_sep_1'
+                            
+                           ]
+                          )
 with dpg.window(label='',
                 pos=mode_init.results_window['pos'],
                 width=mode_init.results_window['width'],

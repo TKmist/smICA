@@ -296,6 +296,15 @@ class _Phot2conc_init:
                             'height':-1
                                  
                             }
+        self.Load_calib_button = {'name':'Load_calib_button',
+                            'width':-1
+                                 
+                            }
+
+        self.Save_calib_button = {'name':'Save_calib_button',
+                            'width':-1
+                                 
+                            }
     
     def im_to_rgbim(self,im):
         '''Converts grayscale image into rgba(float) image.'''
