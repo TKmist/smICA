@@ -38,6 +38,12 @@ class _basicF:
                 default_font = font_18
             dpg.bind_font(default_font)
         
+
+    def remove_font_from_registry(self):
+        font = 'DejaVu'
+        dpg.delete_item(font)
+        dpg.delete_item('Font_registry')
+        
     def _hsv_to_rgb(self,h, s, v):
         '''Funtion converts HSV color notation to the RGB values'''
         if s == 0.0: return (v, v, v)

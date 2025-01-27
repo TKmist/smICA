@@ -8,7 +8,7 @@ from numpy import log10, sqrt, exp, log, pi
 import time
 import pickle
 import cv2
-from Required.automated_roi import ImageROIProcessor
+# from Required.automated_roi import ImageROIProcessor
 
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
@@ -29,7 +29,6 @@ import Required.INIT as inits
 bf = inits._basicF()
 # inV=inits._init_varaibles()
 lprint = bf.lnprint
-globalITEMS = inits._common_VARIABLES()
 ###############################################################################
 ###############################################################################
 ''' Inits'''
@@ -38,7 +37,7 @@ globalITEMS = inits._common_VARIABLES()
 
 
 
-class _Phot2conc_init:
+class _PhotExtr_init:
     
     
     def __init__(self,
@@ -50,11 +49,13 @@ class _Phot2conc_init:
                  top_indent,
                  group_spacer,
                  font_size,
-                 last_directory,GI):
+                 last_directory,
+                 GI
+                ):
         '''General variables'''
         self.last_directory = last_directory
    
-        self.GI = GI        
+        
         
         
         
@@ -68,456 +69,457 @@ class _Phot2conc_init:
         self.group_spacer = int(group_spacer*self.size_ratio['width'])
         self.fnt_ratio = (self.size_ratio['width']+self.size_ratio['height'])/2
         self.font_size = int(np.round(font_size*self.fnt_ratio,0))
-        self.im_scaller =int(32)#1.1
+        # self.im_scaller =int(32)#1.1
         self.files =[]
-        self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
+        self.GI=GI
+        # self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
         
         
-        bf.remove_font_from_registry()
-        bf.add_font_to_registry(self.font_size)
         
         
         
-        self.PTU_DATA_window = {'name':'PTU_DATA_window',
-                            'width':int(380*self.size_ratio['width']),
-                            'height':int(175*self.size_ratio['height']),
+        
+        
+        self.plot_window_ch1 = {'name':'plot_window_ch1',
+                            'width':int(500*self.size_ratio['width']),
+                            'height':int(870*self.size_ratio['height']),
                             'pos':(self.left_indent,self.top_indent)
                             }
 
-        self.file_window = {'name':'file_window',
-                            'width':int(380*self.size_ratio['width']),
-                            'height':dpg.get_viewport_height()-(self.top_indent+self.PTU_DATA_window['height']+self.internal_indent+self.bottom_indent),
-                            'pos':(self.left_indent,self.top_indent+self.PTU_DATA_window['height']+self.internal_indent)
-                            }
-        self.image_window_ch1 = {'name':'image_window_ch1',
-                            'width':int(386*self.size_ratio['width']),
-                            'height':int((392*self.size_ratio['width']+(2*40))),
-                            'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent,
-                                   self.top_indent)
-                            }
-        self.image_window_ch2 = {'name':'image_window_ch2',
-                            'width':int(386*self.size_ratio['width']),
-                            'height':int(392*self.size_ratio['width']+2*40),
-                            'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
-                                   self.top_indent)
-                            }
-        self.tex_1_name = 'texture_tag_chan_1'
-        self.tex_2_name = 'texture_tag_chan_2'
+        # self.file_window = {'name':'file_window',
+        #                     'width':int(380*self.size_ratio['width']),
+        #                     'height':dpg.get_viewport_height()-(self.top_indent+self.PTU_DATA_window['height']+self.internal_indent+self.bottom_indent),
+        #                     'pos':(self.left_indent,self.top_indent+self.PTU_DATA_window['height']+self.internal_indent)
+        #                     }
+        # self.image_window_ch1 = {'name':'image_window_ch1',
+        #                     'width':int(386*self.size_ratio['width']),
+        #                     'height':int((386*self.size_ratio['width']+(2*40))),
+        #                     'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent,
+        #                            self.top_indent)
+        #                     }
+        # self.image_window_ch2 = {'name':'image_window_ch2',
+        #                     'width':int(386*self.size_ratio['width']),
+        #                     'height':int(386*self.size_ratio['width']+2*40),
+        #                     'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
+        #                            self.top_indent)
+        #                     }
+        # self.tex_1_name = 'texture_tag_chan_1'
+        # self.tex_2_name = 'texture_tag_chan_2'
         
-        if 'texture_reg' in dpg.get_aliases():
-            pass
-        else:
-            dpg.add_texture_registry(show=False,tag='texture_reg')
-            
-            self.GI.extend(['texture_reg'])
-            
-            self.processor_1 = ImageROIProcessor()
-            self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-            self.processor_2 = ImageROIProcessor()
-            self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-    
-            self.rgba_image_1 = self.im_to_rgbim(self.processor_1.image)
-            self.rgba_image_2 = self.im_to_rgbim(self.processor_2.image)
-    
-            self.rgba_image_1  =cv2.resize(self.rgba_image_1,
-                                      (int(self.image_window_ch1['width']-self.im_scaller),
-                                       int(self.image_window_ch1['width']-self.im_scaller)),
-                                      interpolation=cv2.INTER_LINEAR)
-            self.rgba_image_2  =cv2.resize(self.rgba_image_2,
-                                      (int(self.image_window_ch2['width']-self.im_scaller), 
-                                       int(self.image_window_ch2['width']-self.im_scaller)),
-                                      interpolation=cv2.INTER_LINEAR)
-    
-    
-            dpg_image_1=(self.rgba_image_1.astype(np.float64) /np.max(self.rgba_image_1)).flatten().tolist()
-            dpg_image_2=(self.rgba_image_2.astype(np.float64) /np.max(self.rgba_image_2)).flatten().tolist()
-    
-            dpg.add_dynamic_texture(width=int(self.image_window_ch1['width']-self.im_scaller),
-                                    height=int(self.image_window_ch1['width']-self.im_scaller),
-                                    default_value=dpg_image_1,
-                                    tag=self.tex_1_name,
-                                    parent = 'texture_reg')
-            dpg.add_dynamic_texture(width=int(self.image_window_ch2['width']-self.im_scaller),
-                                    height=int(self.image_window_ch2['width']-self.im_scaller),
-                                    default_value=dpg_image_2,
-                                    tag=self.tex_2_name,
-                                    parent = 'texture_reg')
-        
-        # if self.size_ratio['width']>=1:
-        #     self.shift=int((self.image_window_ch1['width']/self.size_ratio['width']-dpg.get_item_width(self.tex_1_name))/4)
+        # if 'texture_reg' in dpg.get_aliases():
+        #     pass
         # else:
-        #     self.shift=int((self.image_window_ch1['width']-dpg.get_item_width(self.tex_1_name))/4)
-        self.shift = 8
+        #     dpg.add_texture_registry(show=False,tag='texture_reg')
+            
+    
+    
+        #     self.processor_1 = ImageROIProcessor()
+        #     self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+        #     self.processor_2 = ImageROIProcessor()
+        #     self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+    
+        #     self.rgba_image_1 = self.im_to_rgbim(self.processor_1.image)
+        #     self.rgba_image_2 = self.im_to_rgbim(self.processor_2.image)
+    
+        #     self.rgba_image_1  =cv2.resize(self.rgba_image_1,
+        #                               (int(self.image_window_ch1['width']-self.im_scaller),
+        #                                int(self.image_window_ch1['width']-self.im_scaller)),
+        #                               interpolation=cv2.INTER_LINEAR)
+        #     self.rgba_image_2  =cv2.resize(self.rgba_image_2,
+        #                               (int(self.image_window_ch2['width']-self.im_scaller), 
+        #                                int(self.image_window_ch2['width']-self.im_scaller)),
+        #                               interpolation=cv2.INTER_LINEAR)
+    
+    
+        #     dpg_image_1=(self.rgba_image_1.astype(np.float64) /np.max(self.rgba_image_1)).flatten().tolist()
+        #     dpg_image_2=(self.rgba_image_2.astype(np.float64) /np.max(self.rgba_image_2)).flatten().tolist()
+    
+        #     dpg.add_dynamic_texture(width=int(self.image_window_ch1['width']-self.im_scaller),
+        #                             height=int(self.image_window_ch1['width']-self.im_scaller),
+        #                             default_value=dpg_image_1,
+        #                             tag=self.tex_1_name,
+        #                             parent = 'texture_reg')
+        #     dpg.add_dynamic_texture(width=int(self.image_window_ch2['width']-self.im_scaller),
+        #                             height=int(self.image_window_ch2['width']-self.im_scaller),
+        #                             default_value=dpg_image_2,
+        #                             tag=self.tex_2_name,
+        #                             parent = 'texture_reg')
+        
+        # # if self.size_ratio['width']>=1:
+        # #     self.shift=int((self.image_window_ch1['width']/self.size_ratio['width']-dpg.get_item_width(self.tex_1_name))/4)
+        # # else:
+        # #     self.shift=int((self.image_window_ch1['width']-dpg.get_item_width(self.tex_1_name))/4)
+        # self.shift = 8
         # lprint(self.size_ratio['width'],self.shift)
-        self.hist_window_ch1 = {'name':'hist_window_ch1',
-                            # 'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
-                            'width':self.image_window_ch1['width'],
-                            # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
-                            'height':dpg.get_viewport_height()-(self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent+self.bottom_indent),
-                            # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
-                            #        2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
-                            'pos': (self.image_window_ch1['pos'][0],self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent)
-                            }
+        # self.hist_window_ch1 = {'name':'hist_window_ch1',
+        #                     # 'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
+        #                     'width':self.image_window_ch1['width'],
+        #                     # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
+        #                     'height':dpg.get_viewport_height()-(self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent+self.bottom_indent),
+        #                     # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
+        #                     #        2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
+        #                     'pos': (self.image_window_ch1['pos'][0],self.image_window_ch1['pos'][1]+self.image_window_ch1['height']+self.internal_indent)
+        #                     }
 
-        self.hist_window_ch2 = {'name':'hist_window_ch2',
-                            # 'width':dpg.get_item_width(self.tex_2_name)+int(1.5*self.internal_indent),
-                                'width':self.image_window_ch2['width'],
-                            # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
-                            # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
-                            #        2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
-                             'height':dpg.get_viewport_height()-(self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent+self.bottom_indent),
+        # self.hist_window_ch2 = {'name':'hist_window_ch2',
+        #                     # 'width':dpg.get_item_width(self.tex_2_name)+int(1.5*self.internal_indent),
+        #                         'width':self.image_window_ch2['width'],
+        #                     # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
+        #                     # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
+        #                     #        2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
+        #                      'height':dpg.get_viewport_height()-(self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent+self.bottom_indent),
 
-                            'pos': (self.image_window_ch2['pos'][0],self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent)   
-                            }
+        #                     'pos': (self.image_window_ch2['pos'][0],self.image_window_ch2['pos'][1]+self.image_window_ch2['height']+self.internal_indent)   
+        #                     }
 
         
-        self.FCS_window = {'name':'FCS_window',
-                            # 'width':int(380*self.size_ratio['width']),
-                           'width':dpg.get_viewport_width()-(self.image_window_ch2['pos'][0]+self.image_window_ch2['width']+self.internal_indent+self.right_indent),
+        # self.FCS_window = {'name':'FCS_window',
+        #                     # 'width':int(380*self.size_ratio['width']),
+        #                    'width':dpg.get_viewport_width()-(self.image_window_ch2['pos'][0]+self.image_window_ch2['width']+self.internal_indent+self.right_indent),
                            
-                            'height':int(406*self.size_ratio['height']),
-                            'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(self.internal_indent)+self.image_window_ch2['width']+int(self.internal_indent),
-                                   self.top_indent)
-                            }
+        #                     'height':int(400*self.size_ratio['height']),
+        #                     'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(self.internal_indent)+self.image_window_ch2['width']+int(self.internal_indent),
+        #                            self.top_indent)
+        #                     }
 
-        self.results_window = {'name':'results_window',
-                            'width':self.FCS_window['width'],
-                            'height':int(360*self.size_ratio['height']),
-                            'pos':(self.FCS_window['pos'][0],self.top_indent+self.FCS_window['height']+self.internal_indent)
-                            }
+        # self.results_window = {'name':'results_window',
+        #                     'width':self.FCS_window['width'],
+        #                     'height':int(360*self.size_ratio['height']),
+        #                     'pos':(self.FCS_window['pos'][0],self.top_indent+self.FCS_window['height']+self.internal_indent)
+        #                     }
 
         
-        self.Resolution_output = {'name':'Resolution_output',
-                            'width':-1
-                                 }
+        # self.Resolution_output = {'name':'Resolution_output',
+        #                     'width':-1
+        #                          }
         
-        self.Pixel_size_output = {'name':'Pixel_size_output',
-                            'width':-1
-                                 }
-        self.Nframes_output = {'name':'Nframes_output',
-                            'width':-1
-                                 }
-        self.Pixel_dwell_output = {'name':'Pixel_dwell_output',
-                            'width':-1
-                                 }
-        self.Resol_Pix_size_table_col1 = {'name':'Resol_Pix_size_table_col1',
-                            'width':int(self.PTU_DATA_window['width']/2)
-                                 }
-        self.Resol_Pix_size_table_col2 = {'name':'Resol_Pix_size_table_col2',
-                            'width':int(self.PTU_DATA_window['width']/2)
-                                 }
-        self.ROI_table_col1 = {'name':'ROI_table_col1',
-                            'width':int(self.PTU_DATA_window['width']/2)
-                                 }
-        self.ROI_table_col2 = {'name':'ROI_table_col2',
-                            'width':int(self.PTU_DATA_window['width']/2)
-                                 }
+        # self.Pixel_size_output = {'name':'Pixel_size_output',
+        #                     'width':-1
+        #                          }
+        # self.Nframes_output = {'name':'Nframes_output',
+        #                     'width':-1
+        #                          }
+        # self.Pixel_dwell_output = {'name':'Pixel_dwell_output',
+        #                     'width':-1
+        #                          }
+        # self.Resol_Pix_size_table_col1 = {'name':'Resol_Pix_size_table_col1',
+        #                     'width':int(self.PTU_DATA_window['width']/2)
+        #                          }
+        # self.Resol_Pix_size_table_col2 = {'name':'Resol_Pix_size_table_col2',
+        #                     'width':int(self.PTU_DATA_window['width']/2)
+        #                          }
+        # self.ROI_table_col1 = {'name':'ROI_table_col1',
+        #                     'width':int(self.PTU_DATA_window['width']/2)
+        #                          }
+        # self.ROI_table_col2 = {'name':'ROI_table_col2',
+        #                     'width':int(self.PTU_DATA_window['width']/2)
+        #                          }
 
-        self.file_box = {'name':'file_box',
-                            'width':-1,
-                            'num_items':11,
-                             'items':self.files
+        # self.file_box = {'name':'file_box',
+        #                     'width':-1,
+        #                     'num_items':11,
+        #                      'items':self.files
                             
-                            }
-        self.Calculate_button = {'name':'Calculate_button',
-                            'width':-1
+        #                     }
+        # self.Calculate_button = {'name':'Calculate_button',
+        #                     'width':-1
                                  
-                            }
-        self.add_to_res_single_button = {'name':'add_to_res_single_button',
-                            'width':-1
+        #                     }
+        # self.add_to_res_single_button = {'name':'add_to_res_single_button',
+        #                     'width':-1
                                  
-                            }
-        self.Calculate_all_button = {'name':'Calculate_all_button',
-                            'width':-1
+        #                     }
+        # self.Calculate_all_button = {'name':'Calculate_all_button',
+        #                     'width':-1
                                  
-                            }
-        self.EXPORT_ops_table_col1 = {'name':'EXPORT_ops_table_col1',
-                            'width':int(self.file_window['width']/2)
-                                    }
-        self.EXPORT_ops_table_col2 = {'name':'EXPORT_ops_table_col2',
-                            'width':int(self.file_window['width']/2)
-                                    }
+        #                     }
+        # self.EXPORT_ops_table_col1 = {'name':'EXPORT_ops_table_col1',
+        #                     'width':int(self.file_window['width']/2)
+        #                             }
+        # self.EXPORT_ops_table_col2 = {'name':'EXPORT_ops_table_col2',
+        #                     'width':int(self.file_window['width']/2)
+        #                             }
     
-        self.Export_all_button = {'name':'Export_all_button',
-                            'width':-1
+        # self.Export_all_button = {'name':'Export_all_button',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.cell_tresh_ratio_1 = {'name':'cell_tresh_ratio_1',
-                            'width':-1
+        # self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.cell_tresh_ratio_1 = {'name':'cell_tresh_ratio_1',
+        #                     'width':-1
                                  
-                            }
+        #                     }
         
-        self.nucl_tresh_ratio_1 = {'name':'nucl_tresh_ratio_1',
-                            'width':-1
+        # self.nucl_tresh_ratio_1 = {'name':'nucl_tresh_ratio_1',
+        #                     'width':-1
                                  
-                            }
-        self.img_win_1_table_2_col1 = {'name':'img_win_1_table_2_col1',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_2_col2 = {'name':'img_win_1_table_2_col2',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_2_col3 = {'name':'img_win_1_table_2_col3',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_contrast_1 = {'name':'img_contrast_1',
-                            'width':-1
+        #                     }
+        # self.img_win_1_table_2_col1 = {'name':'img_win_1_table_2_col1',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.img_win_1_table_2_col2 = {'name':'img_win_1_table_2_col2',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.img_win_1_table_2_col3 = {'name':'img_win_1_table_2_col3',
+        #                     'width':int(self.image_window_ch1['width']/3)
+        #                          }
+        # self.img_contrast_1 = {'name':'img_contrast_1',
+        #                     'width':-1
                                  
-                            }
-        self.img_Brightness_1 = {'name':'img_Brightness_1',
-                            'width':-1
+        #                     }
+        # self.img_Brightness_1 = {'name':'img_Brightness_1',
+        #                     'width':-1
                                  
-                            }
-        self.img_roi_alpha_1 = {'name':'img_roi_alpha_1',
-                            'width':-1
+        #                     }
+        # self.img_roi_alpha_1 = {'name':'img_roi_alpha_1',
+        #                     'width':-1
                                  
-                            }
-        self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
-                            'width':int(self.image_window_ch2['width']/3)
-                                    }
-        self.cell_tresh_ratio_2 = {'name':'cell_tresh_ratio_2',
-                            'width':-1
+        #                     }
+        # self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                          }
+        # self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                          }
+        # self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                             }
+        # self.cell_tresh_ratio_2 = {'name':'cell_tresh_ratio_2',
+        #                     'width':-1
                                  
-                            }
+        #                     }
         
-        self.nucl_tresh_ratio_2 = {'name':'nucl_tresh_ratio_2',
-                            'width':-1
+        # self.nucl_tresh_ratio_2 = {'name':'nucl_tresh_ratio_2',
+        #                     'width':-1
                                  
-                            }
-        self.img_win_2_table_2_col1 = {'name':'img_win_2_table_2_col1',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_2_col2 = {'name':'img_win_2_table_2_col2',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_2_col3 = {'name':'img_win_2_table_2_col3',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_contrast_2 = {'name':'img_contrast_2',
-                            'width':-1
+        #                     }
+        # self.img_win_2_table_2_col1 = {'name':'img_win_2_table_2_col1',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                          }
+        # self.img_win_2_table_2_col2 = {'name':'img_win_2_table_2_col2',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                          }
+        # self.img_win_2_table_2_col3 = {'name':'img_win_2_table_2_col3',
+        #                     'width':int(self.image_window_ch2['width']/3)
+        #                          }
+        # self.img_contrast_2 = {'name':'img_contrast_2',
+        #                     'width':-1
                                  
-                            }
-        self.img_Brightness_2 = {'name':'img_Brightness_2',
-                            'width':-1
+        #                     }
+        # self.img_Brightness_2 = {'name':'img_Brightness_2',
+        #                     'width':-1
                                  
-                            }
-        self.img_roi_alpha_2 = {'name':'img_roi_alpha_2',
-                            'width':-1
+        #                     }
+        # self.img_roi_alpha_2 = {'name':'img_roi_alpha_2',
+        #                     'width':-1
                                  
-                            }
-        self.hist_conc_plot_ch1 = {'name':'hist_conc_plot_ch1',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_conc_plot_ch1 = {'name':'hist_conc_plot_ch1',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.hist_np_plot_ch1 = {'name':'hist_np_plot_ch1',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_np_plot_ch1 = {'name':'hist_np_plot_ch1',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.hist_phot_plot_ch1 = {'name':'hist_phot_plot_ch1',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_phot_plot_ch1 = {'name':'hist_phot_plot_ch1',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.hist_conc_plot_ch2 = {'name':'hist_conc_plot_ch2',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_conc_plot_ch2 = {'name':'hist_conc_plot_ch2',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.hist_np_plot_ch2 = {'name':'hist_np_plot_ch2',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_np_plot_ch2 = {'name':'hist_np_plot_ch2',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.hist_phot_plot_ch2 = {'name':'hist_phot_plot_ch2',
-                            'width':-1,
-                            'height':-1
+        #                     }
+        # self.hist_phot_plot_ch2 = {'name':'hist_phot_plot_ch2',
+        #                     'width':-1,
+        #                     'height':-1
                                  
-                            }
-        self.Load_calib_button = {'name':'Load_calib_button',
-                            'width':-1
+        #                     }
+        # self.Load_calib_button = {'name':'Load_calib_button',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.Save_calib_button = {'name':'Save_calib_button',
-                            'width':-1
+        # self.Save_calib_button = {'name':'Save_calib_button',
+        #                     'width':-1
                                  
-                            }
-        self.FCS_win_CH1_table_col1 = {'name':'FCS_win_CH1_table_col1',
-                            'width':int(2*self.FCS_window['width']/3)
-                                 }
-        self.FCS_win_CH1_table_col2 = {'name':'FCS_win_CH1_table_col2',
-                            'width':int(self.FCS_window['width']/3)
-                                 }
-        self.omega_input_ch_1 = {'name':'omega_input_ch_1',
-                            'width':-1
+        #                     }
+        # self.FCS_win_CH1_table_col1 = {'name':'FCS_win_CH1_table_col1',
+        #                     'width':int(2*self.FCS_window['width']/3)
+        #                          }
+        # self.FCS_win_CH1_table_col2 = {'name':'FCS_win_CH1_table_col2',
+        #                     'width':int(self.FCS_window['width']/3)
+        #                          }
+        # self.omega_input_ch_1 = {'name':'omega_input_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.omega_err_input_ch_1 = {'name':'omega_err_input_ch_1',
-                            'width':-1
+        #                     }
+        # self.omega_err_input_ch_1 = {'name':'omega_err_input_ch_1',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.kappa_input_ch_1 = {'name':'kappa_input_ch_1',
-                            'width':-1
+        # self.kappa_input_ch_1 = {'name':'kappa_input_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.kappa_err_input_ch_1 = {'name':'kappa_err_input_ch_1',
-                            'width':-1
+        #                     }
+        # self.kappa_err_input_ch_1 = {'name':'kappa_err_input_ch_1',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.focal_vol_input_ch_1 = {'name':'focal_vol_input_ch_1',
-                            'width':-1
+        # self.focal_vol_input_ch_1 = {'name':'focal_vol_input_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.focal_vol_err_input_ch_1 = {'name':'focal_vol_err_input_ch_1',
-                            'width':-1
+        #                     }
+        # self.focal_vol_err_input_ch_1 = {'name':'focal_vol_err_input_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.Brightness_input_ch_1 = {'name':'Brightness_input_ch_1',
-                            'width':-1,
-                            'default_value':1000                                
-                            }
-        self.Brightness_err_input_ch_1 = {'name':'Brightness_err_input_ch_1',
-                            'width':-1,
-                            'default_value':100
-                            }
+        #                     }
+        # self.Brightness_input_ch_1 = {'name':'Brightness_input_ch_1',
+        #                     'width':-1,
+        #                     'default_value':1000                                
+        #                     }
+        # self.Brightness_err_input_ch_1 = {'name':'Brightness_err_input_ch_1',
+        #                     'width':-1,
+        #                     'default_value':100
+        #                     }
         
-        self.FCS_win_CH2_table_col1 = {'name':'FCS_win_CH2_table_col1',
-                            'width':int(2*self.FCS_window['width']/3)
-                                 }
-        self.FCS_win_CH2_table_col2 = {'name':'FCS_win_CH2_table_col2',
-                            'width':int(self.FCS_window['width']/3)
-                                 }
-        self.omega_input_ch_2 = {'name':'omega_input_ch_2',
-                            'width':-1
+        # self.FCS_win_CH2_table_col1 = {'name':'FCS_win_CH2_table_col1',
+        #                     'width':int(2*self.FCS_window['width']/3)
+        #                          }
+        # self.FCS_win_CH2_table_col2 = {'name':'FCS_win_CH2_table_col2',
+        #                     'width':int(self.FCS_window['width']/3)
+        #                          }
+        # self.omega_input_ch_2 = {'name':'omega_input_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.omega_err_input_ch_2 = {'name':'omega_err_input_ch_2',
-                            'width':-1
+        #                     }
+        # self.omega_err_input_ch_2 = {'name':'omega_err_input_ch_2',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.kappa_input_ch_2 = {'name':'kappa_input_ch_2',
-                            'width':-1
+        # self.kappa_input_ch_2 = {'name':'kappa_input_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.kappa_err_input_ch_2 = {'name':'kappa_err_input_ch_2',
-                            'width':-1
+        #                     }
+        # self.kappa_err_input_ch_2 = {'name':'kappa_err_input_ch_2',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.focal_vol_input_ch_2 = {'name':'focal_vol_input_ch_2',
-                            'width':-1
+        # self.focal_vol_input_ch_2 = {'name':'focal_vol_input_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.focal_vol_err_input_ch_2 = {'name':'focal_vol_err_input_ch_2',
-                            'width':-1
+        #                     }
+        # self.focal_vol_err_input_ch_2 = {'name':'focal_vol_err_input_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.Brightness_input_ch_2 = {'name':'Brightness_input_ch_2',
-                            'width':-1,
-                            'default_value':1000
-                            }
-        self.Brightness_err_input_ch_2 = {'name':'Brightness_err_input_ch_2',
-                            'width':-1,
-                            'default_value':100
-                            }
+        #                     }
+        # self.Brightness_input_ch_2 = {'name':'Brightness_input_ch_2',
+        #                     'width':-1,
+        #                     'default_value':1000
+        #                     }
+        # self.Brightness_err_input_ch_2 = {'name':'Brightness_err_input_ch_2',
+        #                     'width':-1,
+        #                     'default_value':100
+        #                     }
 
-        self.RES_win_CH1_table_col1 = {'name':'RES_win_CH1_table_col1',
-                            'width':int(2*self.FCS_window['width']/3)
-                                 }
-        self.RES_win_CH1_table_col2 = {'name':'RES_win_CH1_table_col2',
-                            'width':int(self.FCS_window['width']/3)
-                                 }
+        # self.RES_win_CH1_table_col1 = {'name':'RES_win_CH1_table_col1',
+        #                     'width':int(2*self.FCS_window['width']/3)
+        #                          }
+        # self.RES_win_CH1_table_col2 = {'name':'RES_win_CH1_table_col2',
+        #                     'width':int(self.FCS_window['width']/3)
+        #                          }
         
 
-        self.sinle_phot_output_ch_1 = {'name':'sinle_phot_output_ch_1',
-                            'width':-1
+        # self.sinle_phot_output_ch_1 = {'name':'sinle_phot_output_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_phot_err_output_ch_1 = {'name':'sinle_phot_err_output_ch_1',
-                            'width':-1
+        #                     }
+        # self.sinle_phot_err_output_ch_1 = {'name':'sinle_phot_err_output_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_mols_output_ch_1 = {'name':'sinle_mols_output_ch_1',
-                            'width':-1
+        #                     }
+        # self.sinle_mols_output_ch_1 = {'name':'sinle_mols_output_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_mols_err_output_ch_1 = {'name':'sinle_mols_err_output_ch_1',
-                            'width':-1
+        #                     }
+        # self.sinle_mols_err_output_ch_1 = {'name':'sinle_mols_err_output_ch_1',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.single_conc_output_ch_1 = {'name':'single_conc_output_ch_1',
-                            'width':-1
+        # self.single_conc_output_ch_1 = {'name':'single_conc_output_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.single_conc_err_output_ch_1 = {'name':'single_conc_err_output_ch_1',
-                            'width':-1
+        #                     }
+        # self.single_conc_err_output_ch_1 = {'name':'single_conc_err_output_ch_1',
+        #                     'width':-1
                                  
-                            }
-        self.RES_win_CH2_table_col1 = {'name':'RES_win_CH2_table_col1',
-                            'width':int(2*self.FCS_window['width']/3)
-                                 }
-        self.RES_win_CH2_table_col2 = {'name':'RES_win_CH2_table_col2',
-                            'width':int(self.FCS_window['width']/3)
-                                 }
-        self.sinle_phot_output_ch_2 = {'name':'sinle_phot_output_ch_2',
-                            'width':-1
+        #                     }
+        # self.RES_win_CH2_table_col1 = {'name':'RES_win_CH2_table_col1',
+        #                     'width':int(2*self.FCS_window['width']/3)
+        #                          }
+        # self.RES_win_CH2_table_col2 = {'name':'RES_win_CH2_table_col2',
+        #                     'width':int(self.FCS_window['width']/3)
+        #                          }
+        # self.sinle_phot_output_ch_2 = {'name':'sinle_phot_output_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_phot_err_output_ch_2 = {'name':'sinle_phot_err_output_ch_2',
-                            'width':-1
+        #                     }
+        # self.sinle_phot_err_output_ch_2 = {'name':'sinle_phot_err_output_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_mols_output_ch_2 = {'name':'sinle_mols_output_ch_2',
-                            'width':-1
+        #                     }
+        # self.sinle_mols_output_ch_2 = {'name':'sinle_mols_output_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.sinle_mols_err_output_ch_2 = {'name':'sinle_mols_err_output_ch_2',
-                            'width':-1
+        #                     }
+        # self.sinle_mols_err_output_ch_2 = {'name':'sinle_mols_err_output_ch_2',
+        #                     'width':-1
                                  
-                            }
+        #                     }
 
-        self.single_conc_output_ch_2 = {'name':'single_conc_output_ch_2',
-                            'width':-1
+        # self.single_conc_output_ch_2 = {'name':'single_conc_output_ch_2',
+        #                     'width':-1
                                  
-                            }
-        self.single_conc_err_output_ch_2 = {'name':'single_conc_err_output_ch_2',
-                            'width':-1
+        #                     }
+        # self.single_conc_err_output_ch_2 = {'name':'single_conc_err_output_ch_2',
+        #                     'width':-1
                                  
-                            }
+        #                     }
         
     
-    def im_to_rgbim(self,im):
-        '''Converts grayscale image into rgba(float) image.'''
-        rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
-        rgba_image[..., 0] = im
-        rgba_image[..., 1] = im
-        rgba_image[..., 2] = im
-        rgba_image[..., 3] = 1
+    # def im_to_rgbim(self,im):
+    #     '''Converts grayscale image into rgba(float) image.'''
+    #     rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
+    #     rgba_image[..., 0] = im
+    #     rgba_image[..., 1] = im
+    #     rgba_image[..., 2] = im
+    #     rgba_image[..., 3] = 1
         
-        return rgba_image
+    #     return rgba_image
 
         
         
@@ -664,35 +666,35 @@ class _Phot2conc_init:
 ###############################################################################
 ###############################################################################
 
-class _Phot2conc_vars_funct:
+class _PhotExtr_vars_funct:
     def __init__(self,
                  INIT,
                 last_directory,
                  basf):
-        self.method_init=INIT
+        self.mode_init=INIT
         self.basf=basf
         self.last_directory = last_directory
-        self.size_ratio = self.method_init.size_ratio 
+        self.size_ratio = self.mode_init.size_ratio 
         
         
 
     def define_file_menu_callbacks(self):
-    
-        dpg.configure_item('Open_PTU_menu_item',callback=lambda: dpg.show_item("PTU_file_dialog_id"))
-        dpg.configure_item('Open_ROI_menu_item',callback=lambda: dpg.show_item("ROI_folder_dialog_id"))
-        dpg.configure_item('Reset results',callback=self.callback_reset_results_DF)
-        dpg.configure_item('Export settings',callback=self.callback_exportsettings)
+        pass
+        # dpg.configure_item('Open_PTU_menu_item',callback=lambda: dpg.show_item("PTU_file_dialog_id"))
+        # dpg.configure_item('Open_ROI_menu_item',callback=lambda: dpg.show_item("ROI_folder_dialog_id"))
+        # dpg.configure_item('Reset results',callback=self.callback_reset_results_DF)
+        # dpg.configure_item('Export settings',callback=self.callback_exportsettings)
 
-    def callback_reset_results_DF(self):
-        pass
-    def callback_exportsettings(self):
-        pass
-    def VEFF(self,w,k,w_err,k_err):
+    # def callback_reset_results_DF(self):
+    #     pass
+    # def callback_exportsettings(self):
+    #     pass
+    # def VEFF(self,w,k,w_err,k_err):
         
         
-        V = (pi**(3/2))*(w**3)*k
-        V_err = sqrt(9*(k**2)*(pi**3)*(w**4)*(w_err**2)+(k_err**2)*(pi**3)*(w**6))
-        return V, V_err
+    #     V = (pi**(3/2))*(w**3)*k
+    #     V_err = sqrt(9*(k**2)*(pi**3)*(w**4)*(w_err**2)+(k_err**2)*(pi**3)*(w**6))
+    #     return V, V_err
 
     
     

@@ -7,6 +7,7 @@ class _PHOT2CONC_mounting_functions:
         
         for item in reversed(fcs_items):
             dpg.delete_item(item)
+        dpg.delete_item('texture_reg')
         # dpg.delete_item('keyword_handler_Phot2conc')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
@@ -42,6 +43,7 @@ class _PHOT2CONC_mounting_functions:
             
         globalITEMS.windows.extend(['Open_PTU_menu_item',
                                     'Open_ROI_menu_item',
+                                    'File_menu_sep_1',
                                     'Reset_results_menu_item',
                                     'Export_settings_menu_item'])
         
@@ -55,6 +57,7 @@ class _PHOT2CONC_menu_functions:
     
     def unmnt_evthn(self,items,MTHD_conf):
         for item in reversed(items):
+            # print(item)
             dpg.delete_item(item)
         
         # dpg.delete_item(MTHD_conf['keyword_handler_tag'])
@@ -69,6 +72,7 @@ class _PHOT2CONC_menu_functions:
         if self.is_mounted:
             self.mnt.unmount_me(globalITEMS.windows)
             globalITEMS.windows=[]
+            print(dpg.get_aliases())
         else:
             if inV.mounted_method != None:
                 
@@ -80,13 +84,13 @@ class _PHOT2CONC_menu_functions:
         self.mnt.mount_me()
         
         self.is_mounted = True
-        inV.mounted_method = 'Modes/FCS_fitting'
+        inV.mounted_method = 'Modes/Phot2conc'
         # print('SIZE_RATIO:',method_init.size_ratio)
     
         
         path_to_layout = os.path.join('Modes/Phot2conc',basf.path_to_method_anal_layout('Modes/Phot2conc'))
         execfile(path_to_layout)
-        # method_cmn.load_json()
+        # mode_cmn.load_json()
         # method_cmn.define_file_menu_callbacks()
         
     
@@ -108,4 +112,4 @@ dpg.add_menu_item(label="Phot2Conc",
 
 
 
-P2C_manu_F.callback_PHOT2CONC_menu()
+# P2C_manu_F.callback_PHOT2CONC_menu()

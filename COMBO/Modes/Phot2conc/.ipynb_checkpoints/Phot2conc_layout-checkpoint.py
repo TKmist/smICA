@@ -65,7 +65,8 @@ def Phot2conc_resizer(sender,app_data):
                          inV.init_top_indent,
                          inV.init_group_spacer,
                          inV.init_font_size,
-                         globalITEMS.last_directory)
+                         globalITEMS.last_directory,
+                             globalITEMS.windows)
     # lprint('2',mode_init.image_window_ch1['width'])
     mode_init.processor_1.image = current_image_1
     mode_init.processor_2.image = current_image_2
@@ -125,7 +126,7 @@ def Phot2conc_resizer(sender,app_data):
     dpg.add_image(mode_init.tex_2_name,parent = 'image_window_ch2'
                           ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',indent=mode_init.shift)
     
-    lprint(dpg.get_item_width('image_window_ch1'),dpg.get_item_width(mode_init.tex_1_name))
+    # lprint(dpg.get_item_width('image_window_ch1'),dpg.get_item_width(mode_init.tex_1_name))
     for item in init_resizable_items:
         # lprint(item)
         props =eval('mode_init.'+item) 
@@ -146,6 +147,7 @@ def Phot2conc_resizer(sender,app_data):
 
 dpg.set_viewport_resize_callback(Phot2conc_resizer)
 
+# lprint(globalITEMS.windows)
 
 mode_init = _Phot2conc_init(inV.init_size_ratio,
                              inV.init_left_indent,
@@ -156,6 +158,7 @@ mode_init = _Phot2conc_init(inV.init_size_ratio,
                              inV.init_group_spacer,
                              inV.init_font_size,
                              globalITEMS.last_directory,
+                             globalITEMS.windows
                             )
 
 
@@ -288,6 +291,7 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             
                             
                            ])
+# lprint(globalITEMS.windows)
 
 '''Files window items'''
 with dpg.window(label='',

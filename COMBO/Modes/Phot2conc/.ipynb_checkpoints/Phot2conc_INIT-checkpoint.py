@@ -29,6 +29,7 @@ import Required.INIT as inits
 bf = inits._basicF()
 # inV=inits._init_varaibles()
 lprint = bf.lnprint
+globalITEMS = inits._common_VARIABLES()
 ###############################################################################
 ###############################################################################
 ''' Inits'''
@@ -49,11 +50,11 @@ class _Phot2conc_init:
                  top_indent,
                  group_spacer,
                  font_size,
-                 last_directory):
+                 last_directory,GI):
         '''General variables'''
         self.last_directory = last_directory
    
-        
+        self.GI = GI        
         
         
         
@@ -73,14 +74,14 @@ class _Phot2conc_init:
         
         
         
-        
-        
+        bf.remove_font_from_registry()
+        bf.add_font_to_registry(self.font_size)
         
         
         
         self.PTU_DATA_window = {'name':'PTU_DATA_window',
                             'width':int(380*self.size_ratio['width']),
-                            'height':int(170*self.size_ratio['height']),
+                            'height':int(175*self.size_ratio['height']),
                             'pos':(self.left_indent,self.top_indent)
                             }
 
@@ -91,25 +92,26 @@ class _Phot2conc_init:
                             }
         self.image_window_ch1 = {'name':'image_window_ch1',
                             'width':int(386*self.size_ratio['width']),
-                            'height':int((386*self.size_ratio['width']+(2*40))),
+                            'height':int((392*self.size_ratio['width']+(2*40))),
                             'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
         self.image_window_ch2 = {'name':'image_window_ch2',
                             'width':int(386*self.size_ratio['width']),
-                            'height':int(386*self.size_ratio['width']+2*40),
+                            'height':int(392*self.size_ratio['width']+2*40),
                             'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
                                    self.top_indent)
                             }
-
+        self.tex_1_name = 'texture_tag_chan_1'
+        self.tex_2_name = 'texture_tag_chan_2'
+        
         if 'texture_reg' in dpg.get_aliases():
             pass
         else:
             dpg.add_texture_registry(show=False,tag='texture_reg')
-            self.tex_1_name = 'texture_tag_chan_1'
-            self.tex_2_name = 'texture_tag_chan_2'
-    
-    
+            
+            self.GI.extend(['texture_reg'])
+            
             self.processor_1 = ImageROIProcessor()
             self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
             self.processor_2 = ImageROIProcessor()
@@ -147,7 +149,7 @@ class _Phot2conc_init:
         # else:
         #     self.shift=int((self.image_window_ch1['width']-dpg.get_item_width(self.tex_1_name))/4)
         self.shift = 8
-        lprint(self.size_ratio['width'],self.shift)
+        # lprint(self.size_ratio['width'],self.shift)
         self.hist_window_ch1 = {'name':'hist_window_ch1',
                             # 'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
                             'width':self.image_window_ch1['width'],
@@ -174,7 +176,7 @@ class _Phot2conc_init:
                             # 'width':int(380*self.size_ratio['width']),
                            'width':dpg.get_viewport_width()-(self.image_window_ch2['pos'][0]+self.image_window_ch2['width']+self.internal_indent+self.right_indent),
                            
-                            'height':int(400*self.size_ratio['height']),
+                            'height':int(406*self.size_ratio['height']),
                             'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent+self.image_window_ch1['width']+int(self.internal_indent)+self.image_window_ch2['width']+int(self.internal_indent),
                                    self.top_indent)
                             }

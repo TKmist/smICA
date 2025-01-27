@@ -1,13 +1,13 @@
 
 import dearpygui.dearpygui as dpg
     
-class _PHOT2CONC_mounting_functions:
+class _PHOTEXTR_mounting_functions:
     
-    def unmount_me(self,fcs_items):
+    def unmount_me(self,mounted_items):
         
-        for item in reversed(fcs_items):
+        for item in reversed(mounted_items):
             dpg.delete_item(item)
-        dpg.delete_item('texture_reg')
+        # dpg.delete_item('texture_reg')
         # dpg.delete_item('keyword_handler_Phot2conc')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
@@ -18,46 +18,23 @@ class _PHOT2CONC_mounting_functions:
                   parent = 'menu_file_dropout',
                   before = 'menu_item_exit',
                          )
-        dpg.add_menu_item(label="Open ROI directory",
-                  tag='Open_ROI_menu_item',
-                  parent = 'menu_file_dropout',
-                  before = 'menu_item_exit',
-                         )
-        dpg.add_separator(tag ='File_menu_sep_1',show=True,
-                  parent = 'menu_file_dropout',
-                  before = 'menu_item_exit')
-        dpg.add_menu_item(label="Reset results",
-                  tag='Reset_results_menu_item',
-                  parent = 'menu_file_dropout',
-                  before = 'menu_item_exit',
-                         )
-
-        dpg.add_menu_item(label="Export settings",
-                  tag='Export_settings_menu_item',
-                  parent = 'menu_file_dropout',
-                  before = 'menu_item_exit',
-                         )
+        
     
 
 
             
-        globalITEMS.windows.extend(['Open_PTU_menu_item',
-                                    'Open_ROI_menu_item',
-                                    'File_menu_sep_1',
-                                    'Reset_results_menu_item',
-                                    'Export_settings_menu_item'])
+        globalITEMS.windows.extend(['Open_PTU_menu_item'])
         
         
-class _PHOT2CONC_menu_functions:
+class _PHOTEXTR_menu_functions:
     
     def __init__(self):
         self.is_mounted = False
-        self.mnt = _PHOT2CONC_mounting_functions()
+        self.mnt = _PHOTEXTR_mounting_functions()
         
     
     def unmnt_evthn(self,items,MTHD_conf):
         for item in reversed(items):
-            # print(item)
             dpg.delete_item(item)
         
         # dpg.delete_item(MTHD_conf['keyword_handler_tag'])
@@ -67,7 +44,7 @@ class _PHOT2CONC_menu_functions:
         inV.mounted_method = None
         globalITEMS.windows=[]
         
-    def callback_PHOT2CONC_menu(self):
+    def callback_PHOTEXTR_menu(self):
 
         if self.is_mounted:
             self.mnt.unmount_me(globalITEMS.windows)
@@ -84,11 +61,11 @@ class _PHOT2CONC_menu_functions:
         self.mnt.mount_me()
         
         self.is_mounted = True
-        inV.mounted_method = 'Modes/Phot2conc'
+        inV.mounted_method = 'Modes/Extract_from_PTU'
         # print('SIZE_RATIO:',method_init.size_ratio)
     
         
-        path_to_layout = os.path.join('Modes/Phot2conc',basf.path_to_method_anal_layout('Modes/Phot2conc'))
+        path_to_layout = os.path.join('Modes/Extract_from_PTU',basf.path_to_method_anal_layout('Modes/Extract_from_PTU'))
         execfile(path_to_layout)
         # mode_cmn.load_json()
         # method_cmn.define_file_menu_callbacks()
@@ -102,14 +79,14 @@ class _PHOT2CONC_menu_functions:
         
         
         
-P2C_manu_F = _PHOT2CONC_menu_functions()
+PE_manu_F = _PHOTEXTR_menu_functions()
 
-dpg.add_menu_item(label="Phot2Conc",
+dpg.add_menu_item(label="Extract from PTU",
                           parent ='menu_analysis_method_dropout' ,
-                          tag='Analysis_submenu_item_Phot2conc',
-                          callback=P2C_manu_F.callback_PHOT2CONC_menu)
+                          tag='Analysis_submenu_item_PhotExtract',
+                          callback=PE_manu_F.callback_PHOTEXTR_menu)
 
 
 
 
-# P2C_manu_F.callback_PHOT2CONC_menu()
+PE_manu_F.callback_PHOTEXTR_menu()

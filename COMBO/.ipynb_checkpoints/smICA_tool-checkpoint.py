@@ -75,9 +75,9 @@ inV.METHODS = basf.search_for_methods()
 
 
 for method in inV.METHODS:
-    lprint(method)
+    # lprint(method)
     path =os.path.join(method,basf.path_to_method_anal_menu_item(method))
-    lprint(path)
+    # lprint(path)
     execfile(path)
 
 # print(vars(menu))

@@ -1,4 +1,4 @@
-STARTED on 2025-01-20 16:14:17.758034
+STARTED on 2025-01-23 14:10:40.694861
 Modules loaded
 Functions loaded
 Init parameters loaded
@@ -8,19 +8,8 @@ Menu bar created
 Dialogs created
 Executing function: load_ptu
 	File
-		 /home/tomekk/Projekty/CODING/github/smICA/prezentacje/samples/cell-201-01200.ptu
+		 /home/tomekk/Projekty/CODING/github/smICA/BRANCHES/UPDATE_12_24/EXTRACT_AND_FILTER_PTU/samples/cell11-1317.ptu
 	loaded.
 Using statistical filters
 Using statistical filters
-Executing function: callback_apply_to_all_ptus
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-Executing function: extract_from_ptu
-FINISHED on 2025-01-20 16:18:25.231456
+FINISHED on 2025-01-27 11:20:39.553772
