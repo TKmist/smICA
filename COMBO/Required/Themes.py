@@ -53,7 +53,7 @@ with dpg.theme(tag="plot_theme"):
         
     with dpg.theme_component(dpg.mvLineSeries):
         '''Theme for solid lines.'''        
-        dpg.add_theme_color(dpg.mvPlotCol_Line, (229, 80, 48), category=dpg.mvThemeCat_Plots)
+        dpg.add_theme_color(dpg.mvPlotCol_Line, (31, 255, 0), category=dpg.mvThemeCat_Plots)
         dpg.add_theme_style(dpg.mvPlotStyleVar_LineWeight, 4, category=dpg.mvThemeCat_Plots)
         
     with dpg.theme_component(dpg.mvShadeSeries):
@@ -61,7 +61,15 @@ with dpg.theme(tag="plot_theme"):
         dpg.add_theme_color(dpg.mvPlotCol_Fill, (62, 122, 56, 64), category=dpg.mvThemeCat_Plots)
         dpg.add_theme_color(dpg.mvPlotCol_Line, (62, 122, 56, 90), category=dpg.mvThemeCat_Plots)
         dpg.add_theme_style(dpg.mvPlotStyleVar_LineWeight, 4, category=dpg.mvThemeCat_Plots)
-        
+
+
+with dpg.theme(tag="plot_bg_filter_theme"):
+    '''Themes for plot.'''
+    with dpg.theme_component(dpg.mvScatterSeries):
+        '''Theme for scattered points.'''
+        dpg.add_theme_color(dpg.mvPlotCol_Line, (237, 255, 0), category=dpg.mvThemeCat_Plots)
+        dpg.add_theme_style(dpg.mvPlotStyleVar_MarkerSize, 5, category=dpg.mvThemeCat_Plots)
+
         
 with dpg.theme(tag="Error_window_theme"):
     '''Theme for Error windows'''

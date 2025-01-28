@@ -183,6 +183,7 @@ class _init_Menu:
     def __init__(self,VERSION):
         self.VERSION = VERSION
 
+    
     def callback_license(self,sender,app_data):
         if not 'License_title' in dpg.get_aliases():
             with dpg.window(tag='License_win',width=dpg.get_viewport_width()/2,
@@ -234,6 +235,7 @@ class _init_Menu:
                              default_value = License,
                              wrap = int(0.95*(dpg.get_viewport_width()/2)))
 
+    
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
@@ -257,5 +259,5 @@ class _common_VARIABLES:
     def __init__(self):
         self.windows = []
         self.items = []
-        self.last_directory = '..'
+        self.last_directory = 'samples'
         self.directory = ''

@@ -257,5 +257,5 @@ class _common_VARIABLES:
     def __init__(self):
         self.windows = []
         self.items = []
-        self.last_directory = '..'
+        self.last_directory = 'samples'
         self.directory = ''

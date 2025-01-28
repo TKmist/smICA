@@ -68,7 +68,7 @@ class _PHOTEXTR_menu_functions:
         path_to_layout = os.path.join('Modes/Extract_from_PTU',basf.path_to_method_anal_layout('Modes/Extract_from_PTU'))
         execfile(path_to_layout)
         # mode_cmn.load_json()
-        # method_cmn.define_file_menu_callbacks()
+        mode_cmn.define_file_menu_callbacks()
         
     
             
