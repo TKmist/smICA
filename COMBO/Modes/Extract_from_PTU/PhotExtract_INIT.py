@@ -338,8 +338,18 @@ class _PhotExtr_init:
         self.loading_butt = {'name':'loading_butt',
                             'width':self.load_ind_win['width']
                                  }
+        self.loading_status = {'name':'loading_status',
+                            'width':self.load_ind_win['width']
+                                 }
+        self.loading_cnt_butt = {'name':'loading_cnt_butt',
+                            'width':self.load_ind_win['width']
+                                 }
+        self.loading_status_text = {'name':'loading_status_text',
+                            'width':self.load_ind_win['width']
+                                 }
         
-        
+
+
                                  
 ###############################################################################
 ###############################################################################
@@ -353,6 +363,7 @@ class _PhotExtr_vars_funct:
                 last_directory,
                  basf):
         self.mode_init=INIT
+        self.GI = self.mode_init.GI
         self.files=self.mode_init.files
         self.basf=basf
         self.last_directory = last_directory
@@ -389,6 +400,7 @@ class _PhotExtr_vars_funct:
         self.Btch_limit_ch_2 = None
         self.Utch_limit_ch_2 = None
         self.curve_list = []
+        
         
         
     def callback_empty(self,sender,app_data):
@@ -456,11 +468,23 @@ class _PhotExtr_vars_funct:
         try:
             dpg.delete_item('loading_butt')
             dpg.delete_item('loading_title')
-            dpg.delete_item('load_ind_win')
             
             
         except:
             pass
+
+        try: 
+            dpg.delete_item('loading_cnt_butt')
+            dpg.delete_item('loading_status')
+            dpg.delete_item('loading_status_text')
+        except:
+            pass
+        try:
+
+            dpg.delete_item('load_ind_win')
+        except:
+            pass
+    
 
     def load_ptu(self,file_path):
         '''Reads the .PTU file'''
@@ -2345,97 +2369,97 @@ class _PhotExtr_vars_funct:
 
     def callback_proceed_submission(self,sender,app_data):
         wavelength = dpg.get_value('get_wavelength')
-    if wavelength == '' or wavelength == 'ERROR!!!':
-
-        dpg.set_value('get_wavelength','ERROR!!!')
-    else:
-
-
-        channel_name = dpg.get_value('get_channel')
-        TCSPC_resolution = dpg.get_value('get_tcspc_resolution')
-
-
-
-
-
-
-
-        channel = None
-        if self.bg_channel_marker == None:
-            pass
-        elif self.bg_channel_marker == 1:
-            channel = 1
-            xs = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchanx'+str(channel)]
-            ys = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchany'+str(channel)]
-
-        elif self.bg_channel_marker == 2:
-            channel = 2
-            xs = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchanx'+str(channel)]
-            ys = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchany'+str(channel)]
+        if wavelength == '' or wavelength == 'ERROR!!!':
+    
+            dpg.set_value('get_wavelength','ERROR!!!')
         else:
-            pass
-
-        data_array = np.concatenate([xs,ys]).reshape((len([xs,ys]),len([xs,ys][-1])))
-        if dpg.get_value('get_name') == '' or dpg.get_value('get_name') == 'Name (optional)':
-            name = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['name']
-        else:
-            name = dpg.get_value('get_name')
-
-
-        if dpg.get_value('get_decay_description') == '' or dpg.get_value('get_decay_description') == 'Type descrption here (opitonal)':
-            describe = ''
-        else:
-            describe = dpg.get_value('get_decay_description')
-
-        jsn_file = 'TCSPC_decay_library.json'
-        jsn_path = os.path.join('res','Lib','json',jsn_file)
-        npy_file = name+'.npy'
-        npy_path = os.path.join('res','Lib','npy',npy_file)
-        if os.path.exists(jsn_path):
-
-            with open(jsn_path) as json_library:
-                jsn_dict = json.load(json_library)
-
-            jsn_dict[channel_name][name]={
-                    'EXC-wavelength':wavelength,
-                    'TCSPC_resolution':TCSPC_resolution,
-                    'TCSPC_channels':self.ntchannels,
-                    'Description':describe,
-                    'npy_path':npy_path
+    
+    
+            channel_name = dpg.get_value('get_channel')
+            TCSPC_resolution = dpg.get_value('get_tcspc_resolution')
+    
+    
+    
+    
+    
+    
+    
+            channel = None
+            if self.bg_channel_marker == None:
+                pass
+            elif self.bg_channel_marker == 1:
+                channel = 1
+                xs = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchanx'+str(channel)]
+                ys = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchany'+str(channel)]
+    
+            elif self.bg_channel_marker == 2:
+                channel = 2
+                xs = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchanx'+str(channel)]
+                ys = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchany'+str(channel)]
+            else:
+                pass
+    
+            data_array = np.concatenate([xs,ys]).reshape((len([xs,ys]),len([xs,ys][-1])))
+            if dpg.get_value('get_name') == '' or dpg.get_value('get_name') == 'Name (optional)':
+                name = self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['name']
+            else:
+                name = dpg.get_value('get_name')
+    
+    
+            if dpg.get_value('get_decay_description') == '' or dpg.get_value('get_decay_description') == 'Type descrption here (opitonal)':
+                describe = ''
+            else:
+                describe = dpg.get_value('get_decay_description')
+    
+            jsn_file = 'TCSPC_decay_library.json'
+            jsn_path = os.path.join('res','Lib','json',jsn_file)
+            npy_file = name+'.npy'
+            npy_path = os.path.join('res','Lib','npy',npy_file)
+            if os.path.exists(jsn_path):
+    
+                with open(jsn_path) as json_library:
+                    jsn_dict = json.load(json_library)
+    
+                jsn_dict[channel_name][name]={
+                        'EXC-wavelength':wavelength,
+                        'TCSPC_resolution':TCSPC_resolution,
+                        'TCSPC_channels':self.ntchannels,
+                        'Description':describe,
+                        'npy_path':npy_path
+                        }
+    
+    
+            else:
+    
+                jsn_dict = {
+                    channel_name:{
+                        name:{
+                        'EXC-wavelength':wavelength,
+                        'TCSPC_resolution':TCSPC_resolution,
+                        'TCSPC_channels':self.ntchannels,
+                        'Description':describe,
+                        'npy_path':npy_path
+                        }
+    
                     }
-
-
-        else:
-
-            jsn_dict = {
-                channel_name:{
-                    name:{
-                    'EXC-wavelength':wavelength,
-                    'TCSPC_resolution':TCSPC_resolution,
-                    'TCSPC_channels':self.ntchannels,
-                    'Description':describe,
-                    'npy_path':npy_path
-                    }
-
+    
                 }
-
-            }
-
-        np.save(npy_path,data_array)
-        with open(jsn_path, 'w') as f:
-            json.dump(jsn_dict, f, indent=4, sort_keys=False)
-            f.close()
-
-        dpg.hide_item('fl_bg_win_group_2')
-        dpg.hide_item('fl_decay_params_group')
-        dpg.hide_item('get_wavelength')
-        dpg.hide_item('get_channel')
-        dpg.hide_item('get_tcspc_resolution')
-        dpg.hide_item('get_name')
-        dpg.hide_item('fl_bg_win_submit_decay')
-        dpg.hide_item('Cancel_decay_submission')
-        dpg.hide_item('Proceed_decay_submission')
-        dpg.hide_item('get_decay_description')
+    
+            np.save(npy_path,data_array)
+            with open(jsn_path, 'w') as f:
+                json.dump(jsn_dict, f, indent=4, sort_keys=False)
+                f.close()
+    
+            dpg.hide_item('fl_bg_win_group_2')
+            dpg.hide_item('fl_decay_params_group')
+            dpg.hide_item('get_wavelength')
+            dpg.hide_item('get_channel')
+            dpg.hide_item('get_tcspc_resolution')
+            dpg.hide_item('get_name')
+            dpg.hide_item('fl_bg_win_submit_decay')
+            dpg.hide_item('Cancel_decay_submission')
+            dpg.hide_item('Proceed_decay_submission')
+            dpg.hide_item('get_decay_description')
 
 
     def callback_select_filter_for_batch(self,sender,app_data):
@@ -2774,4 +2798,392 @@ class _PhotExtr_vars_funct:
     
         with open(os.path.join(folder,file+'.pkl'), 'wb') as pklf:
             pickle.dump(json_pickle_all, pklf)
+    
+    def make_smooth(self,xs,substracted_tchany):
+        subtr = pd.DataFrame(xs,columns=['xs'])
+        subtr['ys']= substracted_tchany
+        subtr['ys'] = subtr['ys'].where(subtr['ys']>=0,0)
+        rol_win = len(substracted_tchany)//50
+    
+        subtr['smth'] = subtr.ys.rolling(rol_win,center=True).median().fillna(0)
+    
+        return subtr
+
+    def make_weight_from_filters(self,filters_dict,channel):
+
+        available_filters = dpg.get_aliases()
+        available_filters = [af for af in available_filters if af.startswith('filters_ch_'+str(channel)+'_tab_list_row_')]
+        available_filters = [af for af in available_filters if af.endswith('_cell b_chk')]
+        available_filters.sort()
+        filter_name = None
+        for i,af in enumerate(available_filters):
+    
+            if dpg.get_value(af):
+                filter_name = dpg.get_value('filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell a_text')
+    
+                break
+    
+        if filter_name == None:
+            log_it('No filters selected - ignoring','a')
+    
+        else:
+            F = filters_dict[filter_name]
+    
+            weight = F/max(F)
+            weight = np.where(weight>0,weight,0)
+    
+        return weight
+    def mount_LIB_decay_table(self,decay_list,_dict):
+
+        for i,decay in enumerate(decay_list):
+            EXC_wavelength = _dict[decay]['EXC-wavelength']
+            TCSPC_resolution = _dict[decay]['TCSPC_resolution']
+            TCSPC_channels = _dict[decay]['TCSPC_channels']
+            Description = _dict[decay]['Description']
+            with dpg.table_row(tag ='decays_lib_tab_row_'+str(i),parent='decays_tab_lib_list_tag'):
+                self.GI.extend(['decays_lib_tab_row_'+str(i)])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell null'):
+                    dpg.add_text(i+1,tag = 'decays_lib_tab_row_'+str(i)+'_cell null_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell null',
+                                            'decays_lib_tab_row_'+str(i)+'_cell null_text'])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell a'):
+                    dpg.add_text(decay,tag = 'decays_lib_tab_row_'+str(i)+'_cell a_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell a',
+                                           'decays_lib_tab_row_'+str(i)+'_cell a_text'])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell b'):
+                    dpg.add_text(EXC_wavelength,tag = 'decays_lib_tab_row_'+str(i)+'_cell b_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell b',
+                                            'decays_lib_tab_row_'+str(i)+'_cell b_text'
+                                           ])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell c'):
+                    dpg.add_text(Description,tag = 'decays_lib_tab_row_'+str(i)+'_cell c_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell c',
+                                           'decays_lib_tab_row_'+str(i)+'_cell c_text'])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell d'):
+                    dpg.add_text(TCSPC_resolution,tag = 'decays_lib_tab_row_'+str(i)+'_cell d_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell d',
+                                           'decays_lib_tab_row_'+str(i)+'_cell d_text'])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell f'):
+                    dpg.add_text(TCSPC_channels,tag = 'decays_lib_tab_row_'+str(i)+'_cell f_text')
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell f',
+                                           'decays_lib_tab_row_'+str(i)+'_cell f_text'])
+                with dpg.table_cell(tag = 'decays_lib_tab_row_'+str(i)+'_cell e'):
+                    dpg.add_checkbox(
+                             default_value=False,
+                        enabled=True,
+                        tag = 'decays_lib_tab_row_'+str(i)+'_cell e_chk',
+    
+                                )
+                    self.GI.extend(['decays_lib_tab_row_'+str(i)+'_cell e','decays_lib_tab_row_'+str(i)+'_cell e_chk'])
+    
+    
+    def mount_decay_table(self,decay_list):
+        
+        channel = None
+        if self.bg_channel_marker == None:
+                pass
+        elif self.bg_channel_marker == 1:
+            channel = 'Channel 1'
+            if_substracted = len(self.fl_bg_curves_dict[channel][self.anal_file]['subtract_bg']['tchanx1'])>0
+    
+        elif self.bg_channel_marker == 2:
+            channel = 'Channel 2'
+            if_substracted = len(self.fl_bg_curves_dict[channel][self.anal_file]['subtract_bg']['tchanx2'])>0
+    
+        else:
+            pass
+    
+    
+    
+        for i,decay in enumerate(decay_list):
+            self.GI.extend(['decays_tab_row_'+str(i),
+                               'decays_tab_row_'+str(i)+'_cell #',
+                              'decays_tab_row_'+str(i)+'_cell #_text',
+                              'decays_tab_row_'+str(i)+'_cell a',
+                              'decays_tab_row_'+str(i)+'_cell a_text',
+                              'decays_tab_row_'+str(i)+'_cell b'])
+            with dpg.table_row(tag ='decays_tab_row_'+str(i),parent='decays_tab_list_tag'):
+                with dpg.table_cell(tag = 'decays_tab_row_'+str(i)+'_cell #'):
+                    dpg.add_text(str(i+1),tag = 'decays_tab_row_'+str(i)+'_cell #_text')
+                with dpg.table_cell(tag = 'decays_tab_row_'+str(i)+'_cell a'):
+                    dpg.add_text(decay,tag = 'decays_tab_row_'+str(i)+'_cell a_text')
+                with dpg.table_cell(tag = 'decays_tab_row_'+str(i)+'_cell b'):
+                    
+                    
+                    if i!=0:
+    
+    
+                        dpg.add_checkbox(
+                             default_value=True,
+                             enabled=True,
+                             tag = 'decays_tab_row_'+str(i)+'_cell b_chk',
+                             callback=self.callback_chkbox_decay_table_mark
+                                )
+                        self.GI.extend(['decays_tab_row_'+str(i)+'_cell b_chk'])
+                        
+    
+                    else:
+    
+                        if if_substracted:
+                            dpg.add_checkbox(
+                                 default_value=True,
+                                enabled=False,
+                                tag = 'decays_tab_row_'+str(i)+'_cell b_chk',
+                                callback=self.callback_chkbox_decay_table_mark
+                                    )
+                            self.GI.extend(['decays_tab_row_'+str(i)+'_cell b_chk'])
+                        else:
+                            dpg.add_checkbox(
+                                 default_value=False,
+                                enabled=False,
+                                tag = 'decays_tab_row_'+str(i)+'_cell b_chk',
+                                callback=self.callback_chkbox_decay_table_mark
+                                    )
+                            self.GI.extend(['decays_tab_row_'+str(i)+'_cell b_chk'])
+        
+    def mount_filter_list_table(self,channel):
+        
+        for i,F in enumerate(self.Filters.keys()):
+    
+            log_it('\t- '+F,'a')
+    
+            with dpg.table_row(tag ='filters_ch_'+str(channel)+'_tab_list_row_'+str(i),
+                               parent='filters_ch_'+str(channel)+'_tab_list_tag'):
+                self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)])
+                with dpg.table_cell(tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell #'):
+                    dpg.add_text(str(i+1),tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell #_text')
+                    self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell #',
+                                            'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell #_text'
+                                           ])
+                with dpg.table_cell(tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell a'):
+                    dpg.add_text(F,tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell a_text')
+                    self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell a',
+                                            'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell a_text'])
+                with dpg.table_cell(tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b'):
+                    if F == 'Current decay; CH '+str(channel):
+                        self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b'])
+                        dpg.add_checkbox(
+                                     default_value=True,
+                            enabled=True,
+                            tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b_chk',
+                            callback=self.callback_select_filter_for_batch
+                                        )
+                        self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b_chk'])
+                    else:
+                        dpg.add_checkbox(
+                                     default_value=False,
+                            enabled=True,
+                            tag = 'filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b_chk',
+                            callback=self.callback_select_filter_for_batch
+                                        )
+                        self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b_chk'])
+    def mount_status_modal(self):
+        self.mount_loading_status_window()
+        # with dpg.window(tag='load_ind_win',width=ww,height=250,
+        #                         menubar=False,
+        #                         autosize=False,
+        #                         no_title_bar=True,
+        #                         no_move=True,
+        #                         no_background=True,
+        #                         modal=True,
+    
+        #                    show=True):
+        dpg.configure_item('loading_title',label='Processing file:')
+            # dpg.add_button(tag='loading_title',width=ww,label='Processing file:')
+    
+            # dpg.bind_item_theme('loading_title', 'transparent_theme')
+        dpg.configure_item('loading_butt',label='')
+            # dpg.add_button(tag='loading_butt',width=ww,label='')
+            # dpg.bind_item_theme('loading_butt', 'transparent_theme')
+        
+        dpg.add_button(tag='loading_status_text',
+                       width=self.mode_init.loading_status_text['width'],
+                       label='Status:',parent='load_ind_win')
+        dpg.bind_item_theme('loading_status_text', 'transparent_theme')
+        
+        dpg.add_button(tag='loading_status',
+                       width=self.mode_init.loading_status['width'],
+                       label='Extracting',parent='load_ind_win')
+        dpg.bind_item_theme('loading_status', 'transparent_theme')
+        
+        dpg.add_button(tag='loading_cnt_butt',
+                       width=self.mode_init.loading_cnt_butt['width'],
+                       label='',parent='load_ind_win')
+        dpg.bind_item_theme('loading_cnt_butt', 'transparent_theme')
+        
+
+        
+    def prepare_input_to_calculate_filters_from_routine(self,XS,YS,TCSPC_SIZE,TCSPC_RESOLUTION,routine,channel):
+        
+        XS = XS*self.tau_resolution-(XS*self.tau_resolution)[0]
+        curve_names = routine['Channel '+str(channel)].keys()
+        curve_names = [c for c in curve_names if c!='BG']
+        curve_names = [c for c in curve_names if c!='BG_rng']
+        cname = 'Current decay; CH '+str(channel)
+        jsn_file = 'TCSPC_decay_library.json'
+        jsn_path = os.path.join('res','Lib','json',jsn_file)
+        with open(jsn_path) as json_library:
+            jsn_dict = json.load(json_library)
+    
+        CURVES={}
+        if_BG = routine['Channel '+str(channel)]['BG']
+    
+        if_afterpulse = dpg.get_value('remove_afterpulsing_chkbx')
+        
+        if not if_BG and len(curve_names)==0:
+            print('Failure: no filters selected')
+            # log_it('\tFailure: no filters selected.','a')
+        elif not if_BG and len(curve_names)>0:
+            for curv in curve_names:
+                curve = np.load(routine['Channel '+str(channel)][curv])
+    
+                df = pd.DataFrame(curve.T,columns=['time','ydata'])
+                df.ydata = df.ydata/df.ydata.sum()
+    
+                adjusted = self.adjust_curves(df, pd.Series(XS).to_frame())
+                curve=adjusted.ydata.values
+                CURVES[curv]=curve
+                
+            if if_afterpulse:
+    
+                afterpulse = 1/np.unique(XS).size
+                afterpulse = np.array([afterpulse for i in CURVES[curve_names[0]]])
+                CURVES['Afterpulsing and background']=afterpulse
+    
+            else:
+                pass
+    
+    
+    
+        elif if_BG and len(curve_names)==0:
+            bg_range = routine['Channel '+str(channel)]['BG_rng']
+    
+            xs = XS
+            ys = YS
+            noise_LVL = np.mean((ys)[np.where((xs>=bg_range[0]) & (xs<=bg_range[1]))[0]])
+    
+            ys = ys - noise_LVL
+            norma = np.sum(ys)
+            CURVES[cname] = ys/norma
+            if if_afterpulse:
+                afterpulse = 1/np.unique(xs).size
+    
+                afterpulse = np.array([afterpulse for i in CURVES[cname]])
+    
+                CURVES['Afterpulsing and background']=afterpulse
+            else:
+                pass
+    
+        else:
+    
+    
+            bg_range = routine['Channel '+str(channel)]['BG_rng']
+            xs = XS
+            ys = YS
+            noise_LVL = np.mean((ys)[np.where((xs>=bg_range[0]) & (xs<=bg_range[1]))[0]])
+            ys = ys - noise_LVL
+            norma = np.sum(ys)
+    
+            CURVES[cname] = ys/norma
+            for curv in curve_names:
+    
+    
+                FILTER_TCSPC_RESOLUTION = jsn_dict['Channel '+str(channel)][curv]['TCSPC_resolution']
+                FILTER_TCSPC_SIZE = jsn_dict['Channel '+str(channel)][curv]['TCSPC_channels']
+    
+                curve = np.load(routine['Channel '+str(channel)][curv])
+    
+                df = pd.DataFrame(curve.T,columns=['time','ydata'])
+                df.ydata = df.ydata/df.ydata.sum()
+    
+                adjusted = self.adjust_curves(df, pd.Series(XS).to_frame())
+                curve=adjusted.ydata.values
+                CURVES[curv]=curve
+                
+            if if_afterpulse:
+                afterpulse = 1/np.unique(xs).size
+                afterpulse = np.array([afterpulse for i in CURVES[cname]])
+                CURVES['Afterpulsing and background']=afterpulse
+            else:
+                pass
+    
+        return CURVES
+
+    def print_val(self,sender):
+        pass
+
+    def remove_existing_filter_plots(self):
+        existing_filter_plots = dpg.get_aliases()
+        existing_filter_plots = [p for p in existing_filter_plots if p.startswith('tag_series_F_')]
+        for p in existing_filter_plots:
+            dpg.delete_item(p)
+    
+    
+    
+    def remove_imported_curves_from_plot(self):
+        cur = dpg.get_aliases()
+        cur = [c for c in cur if 'tag_series_fltr_imported_' in c]
+    
+        for c in cur:
+            dpg.delete_item(c)
+
+    def show_error(self,TEXT):
+        try:
+            dpg.add_window(pos=(400,150),
+                           label='Error!',
+                               tag='ERROR',
+                               autosize=True,
+                               no_move=True,
+                                no_close=True,
+                                no_title_bar=False,
+                                no_resize=True,
+                               show=True,
+                               modal=False
+                              )
+            dpg.add_text(TEXT,tag='ERROR_text',
+                     parent='ERROR')
+            dpg.add_button(label='Close',
+                           parent='ERROR',
+                           tag='ERROR_butt',
+                           callback=self.callback_ERROR_dialog_close
+                          )
+            dpg.bind_item_theme('No_data_files', 'Error_window_theme')
+        except:
+            dpg.show_item('ERROR')
+    
+
+    def unmount_LIB_decay_table(self):
+        rows = dpg.get_aliases()
+    
+        rows = [r for r in rows if r.startswith('decays_lib_tab_row_')]
+    
+    
+        for r in rows:
+            dpg.delete_item(r)
+        dpg.hide_item('decays_tab_lib_list_tag')
+
+
+    def unmount_decay_table(self):
+    
+        rows = dpg.get_aliases()
+    
+        rows = [r for r in rows if r.startswith('decays_tab_row_')]
+    
+        for r in rows:
+            dpg.delete_item(r)
+
+    def unmount_status_modal(self):
+        dpg.configure_item('load_ind_win',show=False)
+        try:
+            dpg.delete_item('loading_butt')
+            dpg.delete_item('loading_status_text')
+            dpg.delete_item('loading_status')
+    
+            dpg.delete_item('loading_cnt_butt')
+            dpg.delete_item('loading_title')
+            dpg.delete_item('load_ind_win')
+    
+    
+        except:
+            pass
     

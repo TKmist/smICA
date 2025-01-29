@@ -1,0 +1,11 @@
+{
+    "Channel 1": {
+        "c_11317": {
+            "EXC-wavelength": "485",
+            "TCSPC_resolution": "16",
+            "TCSPC_channels": 3126,
+            "Description": "Some optional text",
+            "npy_path": "res/Lib/npy/c_11317.npy"
+        }
+    }
+}
