@@ -193,7 +193,7 @@ with dpg.window(label="Lifetime Channel 1",
     dpg.add_button(label='Calculate filters',
                    tag='Remove_bgd_butt_ch_1',
                    width = mode_init.Remove_bgd_butt_ch_1['width'],
-                   # callback = mode_cmn.show_brmode_cmn._fltr_wndw,
+                   callback = mode_cmn.show_br_fltr_wndw,
                    enabled = False,
                    show=False
                    # show=True
@@ -599,10 +599,10 @@ with dpg.window(label="Lifetime background filtering",
                 dpg.add_plot_axis(dpg.mvXAxis, label="Time [ns]", tag="xaxis_tltr",log_scale=False)
                 dpg.add_plot_axis(dpg.mvYAxis, label="Intensity", tag="yaxis_tltr",log_scale=True)
                 dpg.add_scatter_series([], [], parent='yaxis_tltr',tag="tag_series_fltr")
-                dpg.bind_item_theme("tag_series_fltr", "plot_theme")
+                # dpg.bind_item_theme("tag_series_fltr", "plot_theme")
                 dpg.add_scatter_series([], [],
                                     parent='yaxis_tltr',tag="tag_series_fltr_subtr")
-                dpg.bind_item_theme("tag_series_fltr_subtr", "plotplot_bg_filter_theme_theme")
+                # dpg.bind_item_theme("tag_series_fltr_subtr", "plot_bg_filter_theme")
                 dpg.add_drag_line(label="Background level",
                               tag='Background_level_line' ,
                               parent = 'fltr_plot',

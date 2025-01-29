@@ -9,6 +9,7 @@ import time
 import pickle
 import cv2
 from Required.readPTU_FLIM import PTUreader
+from numpy.linalg import inv, det,cond,pinv
 # from Required.automated_roi import ImageROIProcessor
 
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -1217,7 +1218,7 @@ class _PhotExtr_vars_funct:
             the_channel = 'Channel 1'
             self.fl_bg_curves_dict[the_channel] = {self.anal_file:{
                                                  'name':'(Ch1) '+self.anal_file.split('/')[-1],
-                                                 'file_path':aself.nal_file,
+                                                 'file_path':self.anal_file,
                                                 'TCSPC_resolution':int(np.round(self.tau_resolution*1e-9*1e12)),
                                                 'TCSPC_channels':self.ntchannels,
                                                  'Tchanx1' : self.Tchanx1,
@@ -1578,11 +1579,13 @@ class _PhotExtr_vars_funct:
         minlist=[]
         self.remove_existing_filter_plots()
         for F_name in self.Filters.keys():
+            
             F = self.Filters[F_name]
             F = F/np.max(F)
     
-    
-            dpg.add_scatter_series(rawdatax_t, F, parent='yaxis_tltr_fltr',tag="tag_series_F_"+F_name,label=F_name)
+            fcurve_tag="tag_series_F_"+F_name
+            dpg.add_scatter_series(rawdatax_t, F, parent='yaxis_tltr_fltr',tag=fcurve_tag,label=F_name)
+            # dpg.bind_item_theme(fcurve_tag, "plot_theme")
             minlist.append(min(abs(F[np.where(F!=0)[0]]))/2)
         minimum = min(minlist)
         maximum =2
@@ -1781,12 +1784,12 @@ class _PhotExtr_vars_funct:
     
             decay_npy_data = np.load(jsn_dict[channel][name]['npy_path'] )
     
-            if not name in curve_list:
+            if not name in self.curve_list:
                 self.curve_list.append(name)
             else:
                 pass
         self.unmount_decay_table()
-        self.mount_decay_table(curve_list)
+        self.mount_decay_table(self.curve_list)
         for marked_decay in to_import_list:
             dpg.set_value(marked_decay,False)
         tmp_series = dpg.get_aliases()
@@ -1804,7 +1807,7 @@ class _PhotExtr_vars_funct:
         for i, d in enumerate(checked_decays):
             if i!=0:
     
-                self.allback_chkbox_decay_table_mark(d)
+                self.callback_chkbox_decay_table_mark(d)
             else:
                 pass
         self.callback_Cancel_library_import('Cancel_library_import',None)
@@ -2115,7 +2118,7 @@ class _PhotExtr_vars_funct:
                                         parent='yaxis_tltr',
                                     tag="tag_series_fltr_temp_import"+str(i),
                                     label='To be imported (#'+str(i+1)+')')
-    
+                dpg.bind_item_theme("tag_series_fltr_temp_import"+str(i), "plot_bg_filter_theme")
                 minimum = min(abs(tmp_ys[np.where(tmp_ys!=0)[0]]))/2
                 dpg.set_axis_limits("yaxis_tltr", minimum ,max(tmp_ys)*2)
         else:
@@ -2229,7 +2232,7 @@ class _PhotExtr_vars_funct:
     
                 dpg.add_scatter_series(npdata_X, npdata_Y,
                                             parent='yaxis_tltr',tag="tag_series_fltr_imported_"+decay_name,label=decay_name[:5])
-    
+                dpg.bind_item_theme("tag_series_fltr_imported_"+decay_name, "plot_bg_filter_theme")
                 dpg.set_axis_limits("yaxis_tltr", minimum ,maximum)
     
 
@@ -2945,7 +2948,7 @@ class _PhotExtr_vars_funct:
         
         for i,F in enumerate(self.Filters.keys()):
     
-            log_it('\t- '+F,'a')
+            
     
             with dpg.table_row(tag ='filters_ch_'+str(channel)+'_tab_list_row_'+str(i),
                                parent='filters_ch_'+str(channel)+'_tab_list_tag'):

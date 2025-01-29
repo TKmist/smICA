@@ -67,7 +67,7 @@ with dpg.theme(tag="plot_bg_filter_theme"):
     '''Themes for plot.'''
     with dpg.theme_component(dpg.mvScatterSeries):
         '''Theme for scattered points.'''
-        dpg.add_theme_color(dpg.mvPlotCol_Line, (237, 255, 0), category=dpg.mvThemeCat_Plots)
+        dpg.add_theme_color(dpg.mvPlotCol_Line, (12, 172, 182), category=dpg.mvThemeCat_Plots)
         dpg.add_theme_style(dpg.mvPlotStyleVar_MarkerSize, 5, category=dpg.mvThemeCat_Plots)
 
         
