@@ -117,12 +117,12 @@ class _PhotExtr_init:
         self.Open_file_dialog = {'name':'Open_file_dialog',
                             'width':int(1000*self.size_ratio['width']),
                             'height':int(800*self.size_ratio['height']),
-                            'pos':(self.left_indent,self.top_indent)
+                            # 'pos':(self.left_indent,self.top_indent)
                             }
         self.PTU_dir_dialog = {'name':'PTU_dir_dialog',
                             'width':int(1000*self.size_ratio['width']),
                             'height':int(800*self.size_ratio['height']),
-                            'pos':(self.left_indent,self.top_indent)
+                            # 'pos':(self.left_indent,self.top_indent)
                             }
 
         self.BG_removal_window = {'name':'BG_removal_window',
@@ -1194,8 +1194,9 @@ class _PhotExtr_vars_funct:
     def show_br_fltr_wndw(self,sender):
         
         # global fl_bg_curadd_line_serieses_dict
+        # lprint(sender)
+        # self.callback_Set_background_range(self,sender,app_data)
         
-    
         dpg.set_value('tag_series_fltr', [[], []])
         dpg.set_value('tag_series_fltr_subtr', [[], []])
         dpg.configure_item("tag_series_fltr", label = '')
@@ -1214,8 +1215,10 @@ class _PhotExtr_vars_funct:
         dpg.set_value('add_bg_range', False)
         dpg.set_axis_limits("xaxis_tltr", 0 ,1)
         if sender == 'Remove_bgd_butt_ch_1':
+            
             self.bg_channel_marker = 1
             the_channel = 'Channel 1'
+            self.filtering_routine[the_channel] = {}
             self.fl_bg_curves_dict[the_channel] = {self.anal_file:{
                                                  'name':'(Ch1) '+self.anal_file.split('/')[-1],
                                                  'file_path':self.anal_file,
@@ -1275,6 +1278,7 @@ class _PhotExtr_vars_funct:
         elif sender == 'Remove_bgd_butt_ch_2':
             self.bg_channel_marker = 2
             the_channel = 'Channel 2'
+            self.filtering_routine[the_channel] = {}
             self.fl_bg_curves_dict[the_channel] = {self.anal_file:{
                                              'name':'(Ch2) '+self.anal_file.split('/')[-1],
                                              'file_path':self.anal_file,
@@ -1321,7 +1325,7 @@ class _PhotExtr_vars_funct:
                     
                     self.curve_list.append(name)
             self.mount_decay_table(self.curve_list)
-            
+        self.callback_Set_background_range('add_bg_range',False)     
         self.unmount_filter_list_table(self.bg_channel_marker)
         dpg.configure_item("tag_series_fltr", label = 'Decay')
         dpg.show_item('BG_removal_window')
@@ -1329,7 +1333,8 @@ class _PhotExtr_vars_funct:
     
     def calllback_use_stat_filters_chbx(self,sender,app_data):
     
-        
+        # lprint(self.Filters)
+        # lprint('routine\n',self.filtering_routine)
         if_value=app_data 
         if if_value:
             if sender == 'use_as_statistical_filters_chkbx_ch_1':
@@ -1350,6 +1355,7 @@ class _PhotExtr_vars_funct:
                 self.callback_reset_range('reset_button_ch1',None)
                 dpg.show_item('L_dline_ch1')
                 dpg.show_item('U_dline_ch1')
+                self.unmount_filter_list_table(1)
                 
                 
             if sender == 'use_as_statistical_filters_chkbx_ch_2':
@@ -1357,12 +1363,20 @@ class _PhotExtr_vars_funct:
                 self.callback_reset_range('reset_button_ch2',None)
                 dpg.show_item('L_dline_ch2')
                 dpg.show_item('U_dline_ch2')
+                self.unmount_filter_list_table(2)
 
     def unmount_filter_list_table(self,channel):
         rows = dpg.get_aliases()
         rows = [r for r in rows if r.startswith('filters_ch_'+str(channel)+'_tab_list_row_')]
         for r in rows:
             dpg.delete_item(r)
+        if channel == 1:
+            dpg.hide_item('filters_ch_1_tab_list_tag')
+        elif channel == 2:
+            dpg.hide_item('filters_ch_2_tab_list_tag')
+        else:
+            pass
+        
 
     
     def callback_reset_range(self,sender,app_data):
@@ -1482,7 +1496,7 @@ class _PhotExtr_vars_funct:
     
     
     
-        
+        # lprint('routine',routine)
         curve_names = routine['Channel '+str(channel)].keys()
         curve_names = [c for c in curve_names if c!='BG']
         curve_names = [c for c in curve_names if c!='BG_rng']
@@ -1570,17 +1584,19 @@ class _PhotExtr_vars_funct:
     
         
     
-    
+        # lprint('channel',channel)
+        # lprint('CURVES',CURVES)
     
         
-        self.Filters = self.calculate_stat_filter(CURVES,rawy)
+        self.Filters['Channel '+str(channel)] = self.calculate_stat_filter(CURVES,rawy)
     
         
         minlist=[]
         self.remove_existing_filter_plots()
-        for F_name in self.Filters.keys():
+        # lprint(self.Filters)
+        for F_name in self.Filters['Channel '+str(channel)].keys():
             
-            F = self.Filters[F_name]
+            F = self.Filters['Channel '+str(channel)][F_name]
             F = F/np.max(F)
     
             fcurve_tag="tag_series_F_"+F_name
@@ -1651,10 +1667,11 @@ class _PhotExtr_vars_funct:
         dpg.set_value('use_as_statistical_filters_chkbx_ch_'+str(channel),True)
         dpg.show_item('filters_ch_'+str(channel)+'_tab_list_tag')
         self.mount_filter_list_table(channel)
+        self.Filters ['Channel '+str(channel)] = {}
 
-
+        # lprint(self.Filters)
     def callback_Calculate_filters(self,sender,app_data):
-    
+        # lprint('filtering_routine',self.filtering_routine)
         jsn_file = 'TCSPC_decay_library.json'
         jsn_path = os.path.join('res','Lib','json',jsn_file)
         with open(jsn_path) as json_library:
@@ -1672,6 +1689,7 @@ class _PhotExtr_vars_funct:
             Btch_limit= self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['Btch_limit_ch_1']*self.tau_resolution-(self.tchanx1*self.tau_resolution)[0]
             Utch_limit= self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['Utch_limit_ch_1']*self.tau_resolution-(self.tchanx1*self.tau_resolution)[0]
             
+            
         elif self.bg_channel_marker == 2:
             channel = 2
             rawx = self.tchanx2*self.tau_resolution-(self.tchanx2*self.tau_resolution)[0]
@@ -1683,7 +1701,7 @@ class _PhotExtr_vars_funct:
         else:
             pass
     
-        
+       
         curves = dpg.get_aliases()
         curves = [c for c in curves if c.startswith('decays_tab_row_')]
         curves = [c for c in curves if c.endswith('_cell b_chk')]
@@ -1733,13 +1751,22 @@ class _PhotExtr_vars_funct:
             dpg.set_value(marked_decay,False)
 
     def callback_Decline_filters(self):
-        
+        channel = None
+        if self.bg_channel_marker == None:
+            pass
+        elif self.bg_channel_marker == 1:
+            channel = 1
+            
+        elif self.bg_channel_marker == 2:
+            channel = 2
+        else:
+            pass
         self.remove_existing_filter_plots()
         dpg.hide_item('fltr_filters_plot')
         dpg.hide_item('Decline_filters')
         dpg.hide_item('fl_accpet_filters_group')
         dpg.hide_item('Accept_filters')
-        self.Filters = None
+        self.Filters ['Channel '+str(channel)] = {}
 
     def callback_ERROR_dialog_close(self,sender,app_data):
         dpg.configure_item('ERROR',show=False)
@@ -2379,6 +2406,7 @@ class _PhotExtr_vars_funct:
     
     
             channel_name = dpg.get_value('get_channel')
+            # lprint(channel_name)
             TCSPC_resolution = dpg.get_value('get_tcspc_resolution')
     
     
@@ -2946,7 +2974,7 @@ class _PhotExtr_vars_funct:
         
     def mount_filter_list_table(self,channel):
         
-        for i,F in enumerate(self.Filters.keys()):
+        for i,F in enumerate(self.Filters['Channel '+str(channel)].keys()):
     
             
     

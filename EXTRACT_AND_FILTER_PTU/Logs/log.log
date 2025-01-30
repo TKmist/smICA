@@ -1,4 +1,4 @@
-STARTED on 2025-01-29 16:49:07.036895
+STARTED on 2025-01-30 15:56:00.922248
 Modules loaded
 Functions loaded
 Init parameters loaded
@@ -6,12 +6,4 @@ Themes loaded
 Fonts loaded
 Menu bar created
 Dialogs created
-Executing function: load_ptu
-	File
-		 /home/tomekk/Projekty/CODING/github/smICA/BRANCHES/UPDATE_12_24/EXTRACT_AND_FILTER_PTU/samples/cell11-1317.ptu
-	loaded.
-Using statistical filters
-Using statistical filters
-Using statistical filters
-Using statistical filters
-FINISHED on 2025-01-29 16:49:56.567632
+FINISHED on 2025-01-30 15:56:04.805250

@@ -6,6 +6,22 @@
             "TCSPC_channels": 3126,
             "Description": "Some optional text",
             "npy_path": "res/Lib/npy/c_11317.npy"
+        },
+        "(Ch1) cell-201-01200.ptu": {
+            "EXC-wavelength": "234",
+            "TCSPC_resolution": "16",
+            "TCSPC_channels": 3126,
+            "Description": "",
+            "npy_path": "res/Lib/npy/(Ch1) cell-201-01200.ptu.npy"
+        }
+    },
+    "Channel 2": {
+        "(Ch2) cell-201-01200.ptu": {
+            "EXC-wavelength": "234",
+            "TCSPC_resolution": "16",
+            "TCSPC_channels": 3126,
+            "Description": "",
+            "npy_path": "res/Lib/npy/(Ch2) cell-201-01200.ptu.npy"
         }
     }
 }

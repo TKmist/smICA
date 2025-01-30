@@ -3,14 +3,18 @@ import numpy as np
 import cv2
 
 def PhotExtr_resizer(sender,app_data):
-    
+
+    hidden_items = ['load_ind_win','loading_title','loading_butt','loading_status','loading_cnt_butt','loading_status_text']
     init_resizable_items = []
     cmn_resizable_items = []
     obj_var = [eval('mode_init.'+str(m)) for m in vars(mode_init)]
     for m in obj_var:
         if type(m) == dict:
             if 'name' in m.keys():
-                init_resizable_items.append(m['name'])
+                if m['name'] not in hidden_items:
+                    init_resizable_items.append(m['name'])
+                else:
+                    pass
         else:
             pass
     obj_var = [eval('mode_cmn.'+str(m)) for m in vars(mode_cmn)]
@@ -31,6 +35,7 @@ def PhotExtr_resizer(sender,app_data):
                      'size_ratio',
                      'font_size',
                      'last_directory'
+                     
                     ]
     temp_inits = mode_init.__init__.__code__.co_varnames
 
@@ -55,7 +60,7 @@ def PhotExtr_resizer(sender,app_data):
     for item in init_resizable_items:
         
         props =eval('mode_init.'+item) 
-        
+        # print(item)
             
         if 'width' in props.keys():
             dpg.configure_item(item,width=props['width'])
