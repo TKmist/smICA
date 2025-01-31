@@ -91,7 +91,7 @@ class _PHOT2CONC_menu_functions:
         path_to_layout = os.path.join('Modes/Phot2conc',basf.path_to_method_anal_layout('Modes/Phot2conc'))
         execfile(path_to_layout)
         # mode_cmn.load_json()
-        # method_cmn.define_file_menu_callbacks()
+        mode_cmn.define_file_menu_callbacks()
         
     
             
@@ -112,4 +112,4 @@ dpg.add_menu_item(label="Phot2Conc",
 
 
 
-# P2C_manu_F.callback_PHOT2CONC_menu()
+P2C_manu_F.callback_PHOT2CONC_menu()

@@ -89,4 +89,4 @@ dpg.add_menu_item(label="Extract from PTU",
 
 
 
-PE_manu_F.callback_PHOTEXTR_menu()
+# PE_manu_F.callback_PHOTEXTR_menu()

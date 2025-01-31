@@ -9,7 +9,8 @@ import time
 import pickle
 import cv2
 from Required.automated_roi import ImageROIProcessor
-
+from scipy.stats import median_abs_deviation
+import pickle
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
 # import matplotlib.gridspec as gridspec
@@ -507,7 +508,36 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        
+        self.ROI_folder_dialog_id = {'name':'ROI_folder_dialog_id',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
+        self.file_dialog_id = {'name':'file_dialog_id',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
+        self.PTU_file_dialog_id = {'name':'PTU_file_dialog_id',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
+        self.Select_ROI_dialog = {'name':'Select_ROI_dialog',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
+        self.file_dialog_export = {'name':'file_dialog_export',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
+        self.Calib_file_dialog_id = {'name':'Calib_file_dialog_id',
+                            'width':int(900*self.size_ratio['width']),
+                            'height':int(600*self.size_ratio['width'])
+                                 
+                            }
     
     def im_to_rgbim(self,im):
         '''Converts grayscale image into rgba(float) image.'''
@@ -519,144 +549,6 @@ class _Phot2conc_init:
         
         return rgba_image
 
-        
-        
-        
-        
-        
-        # self.internal_width_left_panel = int(self.file_window['width']-self.internal_indent-self.group_spacer*3)
-        
-        # self.internal_width_middle_panel = int(self.Model_selection_panel['width']-self.internal_indent-self.group_spacer*3)
-        
-        # self.internal_width_right_panel = int(self.plot_win['width']-2*self.internal_indent+3*self.group_spacer)
-        
-        # self.internal_height_right_panel = int(self.plot_win['height']-2*self.internal_indent-self.group_spacer)
-
-        # self.file_box = {'name':'file_box',
-        #                  'width':-1,
-        #                  'num_items':10
-        #                 }
-        # self.Add_model_button = {'name':'Add_model_button',
-        #                  'width':int(107*self.size_ratio['width'])
-        #                 }
-        # self.model_choose = {'name':'model_choose',
-        #                  'width':int(self.internal_width_middle_panel-self.Add_model_button['width'])
-        #                 }
-        
-        # self.CNTR ={'name':'CNTR',
-        #     'width':-1}
-        # self.BRIGHT ={'name':'BRIGHT',
-        #     'width':-1}
-        # self.Xunits = {'name':'Xunits',
-        #                  'width':int(165*self.size_ratio['width'])
-        #                 }
-        # self.Yunits = {'name':'Yunits',
-        #                  'width':int(165*self.size_ratio['width'])
-        #                 }
-        # self.df_min = {'name':'df_min',
-        #                  'width':int(165*self.size_ratio['width'])
-        #                 }
-        # self.df_max = {'name':'df_max',
-        #                  'width':int(165*self.size_ratio['width'])
-        #                 }
-        # self.Reset_range = {'name':'Reset_range',
-        #                  'width':int(165*self.size_ratio['width'])
-        #                 }
-        
-        # self.subplots = {'name':'subplots',
-        #                  'width': self.internal_width_right_panel,
-        #                  'height': self.internal_height_right_panel-4*self.internal_indent-self.group_spacer*2}
-        
-        # self.Add_model_window = {'name':'Add_model_window',
-        #                  'width':int(1230*self.size_ratio['width']),
-        #                           'height': int(900*self.size_ratio['height']),
-        #                           'pos': (int(100*self.size_ratio['width']),
-        #                                   int(20*self.size_ratio['height']))}
-        
-        # self.Close_Add_model_button = {'name':'Close_Add_model_button',
-        #                  'width':int(150*self.size_ratio['width'])}
-        # self.Save_model_button = {'name':'Save_model_button',
-        #                  'width':int(150*self.size_ratio['width'])}
-        
-        
-        # self.image_1 = {
-        #                  'width':int(1224*self.size_ratio['width']),
-        #                      'height':int(200*self.size_ratio['height'])}
-        # self.model_input_name = {'name':'model_input_name',
-        #                  'width':self.image_1['width']}
-        # self.model_input_describe = {'name':'model_input_describe',
-        #                  'width':self.image_1['width']}
-        # self.model_input_text1 = {'name':'model_input_text1',
-        #                  'width':self.image_1['width']}
-        # self.drawlist1 = {'name':'drawlist1',
-        #                  'width':self.image_1['width'],
-        #                  'height':self.image_1['height']}
-        # self.model_input_variables = {'name':'model_input_variables',
-        #                  'width':self.image_1['width']}
-        
-        
-        # self.is_there_csv = False
-    
-    
-    
-    
-    
-#     def load_default_settings(self):
-#         path = os.path.join('Methods','FCS_fitting','res','JSON_files','Default_settings.json')
-
-#         with open(path) as json_settings:
-#             OPTIONS = json.load(json_settings)
-
-#         for item in OPTIONS.keys():
-#             dpg.set_value(item,OPTIONS[item])
-#     def callback_save_as_def(self,sender,app_data):
-#         items = ['Sett_export_each',
-#                  'Sett_export_to_excel',
-#                  'Sett_export_plot_as_png',
-#                  'Sett_export_to_csv',
-#                  'Sett_export_plot_as_csv',
-#                  'Sett_export_to_pickle',
-#                  'Sett_export_plot_as_pickle',
-#                  'Sett_export_stats',
-#                  'Sett_export_plot_loglog',
-#                  'Sett_export_stats_to_csv',
-#                  'Sett_export_stats_to_xlsx',
-#                  'Sett_export_stats_to_pickle',
-#                  'Sett_preserve_time',
-#                  'Sett_preserve_units',
-#                  'default_quick_export_filename',
-#                  'default_quick_stst_filename']
-
-#         options = {}
-#         for item in items:
-            
-#             options[item]=dpg.get_value(item)
-#             print(item,options[item])
-        
-#         path = os.path.join('Methods','FCS_fitting','res','JSON_files','Default_settings.json')
-#         with open(path, 'w') as f:
-#             json.dump(options, f, indent=4, sort_keys=False)
-#         dpg.configure_item(sender,enabled=False)   
-#     def callback_settings_data_stats(self,sender,app_data):   
-#         items = ['Sett_export_stats_to_csv','Sett_export_stats_to_xlsx',]
-#         dpg.configure_item('Setts_save_defaults',enabled=True)
-#         if app_data:
-#             for item in items:
-#                 dpg.configure_item(item, enabled = True)
-#         else:
-#             for item in items:
-
-#                 dpg.configure_item(item, enabled = False)
-#     def callback_settings_data_export_each(self,sender,app_data): 
-#         items = ['Sett_export_to_excel','Sett_export_to_csv','Sett_export_to_pickle']
-#         dpg.configure_item('Setts_save_defaults',enabled=True)
-#         if app_data:
-#             for item in items:
-#                 dpg.configure_item(item, enabled = True)
-#         else:
-#             for item in items:
-#                 dpg.configure_item(item, enabled = False)
-    
                                  
 ###############################################################################
 ###############################################################################
@@ -669,24 +561,101 @@ class _Phot2conc_vars_funct:
                  INIT,
                 last_directory,
                  basf):
-        self.method_init=INIT
-        self.basf=basf
+        self.mode_init = INIT
+        self.basf = basf
         self.last_directory = last_directory
-        self.size_ratio = self.method_init.size_ratio 
+        self.size_ratio = self.mode_init.size_ratio 
+        self.Sing_Results_DF = pd.DataFrame()
+        self.anal_file = ''
+        self.tex_1_name = self.mode_init.tex_1_name
+        self.tex_2_name = self.mode_init.tex_2_name
+
+        self.pck_list = []
+        self.Channels = ''
+        self.mean_Molecules_ch_1 = None
+        self.std_Molecules_ch_1 = None
+        self.mean_Concentration_ch_1 = None
+        self.std_Concentration_ch_1 = None
+        self.std_err_Concentration_ch_1 = None
+        self.median_C_ch_1 = None
+        self.median_err_C_ch_1 = None
+        self.mean_Molecules_err_ch_1 = None
+        self.mean_Concentration_err_ch_1 = None
+        self.mean_Photons_ch_1 = None
+        self.mean_Photons_err_ch_1 = None   
+        self.mean_Molecules_ch_2 = None
+        self.std_Molecules_ch_2 = None
+        self.mean_Concentration_ch_2 = None
+        self.std_Concentration_ch_2 = None
+        self.std_err_Concentration_ch_2 = None
+        self.median_C_ch_2 = None
+        self.median_err_C_ch_2 = None
+        self.mean_Molecules_err_ch_2 = None
+        self.mean_Concentration_err_ch_2 = None
+        self.mean_Photons_ch_2 = None
+        self.mean_Photons_err_ch_2 = None
+
+        self.FCS_results_ch_1 = pd.DataFrame()
+        self.FCS_results_ch_2 = pd.DataFrame()
         
+        self.mean_brightness_err_ch_1 = 1
+        self.mean_brightness_err_ch_2 = 1
+        self.mean_brightness_ch_1 = 1
+        self.mean_brightness_ch_2  = 1
+
+        self.files = []
+        self.pck_files = []
+        self.PTU_directory = ''
+        self.ROI_directory = ''
+        self.calib_directory = ''
+        self.sync_rate = None
+        self.pixel_dwell = None
+        self.number_of_frames = None
+
+        self.DF = pd.DataFrame()
+        self.DF2 = pd.DataFrame()
+
+
         
+        self.PTU_N_frames = None
+        self.PTU_Px_dwell = None
+        self.PTU_Resolution = None
+        self.PTU_Px_size = None
+        self.image_1_times_roi = None
+        self.image_2_times_roi = None
+        
+        self.pkl = None
+
+        self.roi_1 = None
+        self.roi_2 = None
+
+        self.Current_image_1 = None
+        self.Current_image_2 = None
+
+    
+        
+        self.image_1_times_roi = None
+        self.image_2_times_roi = None
+        
+        self.NO_IMAGE_INTENSITY = self.mode_init.NO_IMAGE_INTENSITY
+        self.processor_1 = self.mode_init.processor_1
+        self.processor_2 = self.mode_init.processor_2
+        self.pkl_data = None
+
+        self.im_to_rgbim = self.mode_init.im_to_rgbim
+    
 
     def define_file_menu_callbacks(self):
     
         dpg.configure_item('Open_PTU_menu_item',callback=lambda: dpg.show_item("PTU_file_dialog_id"))
         dpg.configure_item('Open_ROI_menu_item',callback=lambda: dpg.show_item("ROI_folder_dialog_id"))
-        dpg.configure_item('Reset results',callback=self.callback_reset_results_DF)
-        dpg.configure_item('Export settings',callback=self.callback_exportsettings)
+        dpg.configure_item('Reset_results_menu_item',callback=self.callback_reset_results_DF)
+        dpg.configure_item('Export_settings_menu_item',callback=self.callback_exportsettings)
 
-    def callback_reset_results_DF(self):
-        pass
-    def callback_exportsettings(self):
-        pass
+    # def callback_reset_results_DF(self):
+    #     pass
+    # def callback_exportsettings(self):
+    #     pass
     def VEFF(self,w,k,w_err,k_err):
         
         
@@ -694,2733 +663,3005 @@ class _Phot2conc_vars_funct:
         V_err = sqrt(9*(k**2)*(pi**3)*(w**4)*(w_err**2)+(k_err**2)*(pi**3)*(w**6))
         return V, V_err
 
+    def CONC(self,N,V,N_err,V_err):
+        
+        Na = 6.022e23
+        C = N/(Na*V)
+        C_err = sqrt(((N**2)*(V_err**2))/((Na**2)*(V**4))+(N_err**2)/((Na**2)*(V**2)))
+        return C, C_err
+
+    def Export_result_dataframe_to_file(self, sender,app_data):
+        # global directory, new_directory,last_directory
+    
+        self.directory = app_data['current_path']
+        self.new_directory=self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        
+        # global Sing_Results_DF
+        
+        filtr = app_data['current_filter']
+        
+        if filtr == '':
+            fnam = app_data['file_name']
+            filtr = '.'+fnam.split('.')[1]
+        
+        if filtr == '.xlsx' :
+            path = app_data['file_path_name']
+            self.Sing_Results_DF.to_excel(path,index=False)
+            
+        elif filtr == '.dat' :
+            path = app_data['file_path_name']
+            self.Sing_Results_DF.to_csv(path,sep='\t',index=False)
+            
+        elif filtr == '.csv' :
+            path = app_data['file_path_name']
+            self.Sing_Results_DF.to_csv(path,index=False)
+            
+        else:
+            path = app_data['file_path_name']
+            self.Sing_Results_DF.to_pickle(path)
+
+    def Exception(self,tried):
+        function_name = sys._getframe(0).f_code.co_name
+        print('Exception in function '+str(function_name)+ ' while trying: '+tried)
+    
+    def Load_Save_Calib_file(self,sender,app_data,user_data):
+        # global directory, new_directory,last_directory,calib_directory
+    
+        self.directory = app_data['current_path']
+        self.new_directory=self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        
+        if user_data == 'Load_calib_button':
+            path_to_json_file = app_data['file_path_name']
+            calib_directory = path_to_json_file
+    
+            with open(path_to_json_file) as json_file:
+                data = json.load(json_file)
+            json_file.close()
     
     
-#         self.basf=basf
-#         self.size_ratio = size_ratio 
-        
-#         self.group_spacer = group_spacer
-        
-#         self.image_width1 = image_width1
-#         self.image_height1 = image_height1
-#         self.internal_width_left_panel = internal_width_left_panel
-#         self.internal_width_middle_panel = internal_width_middle_panel
-#         self.last_directory = last_directory
-#         self.dpg_image1 = []
-        
-#         self.variable_drag_float ={'name':'variable_drag_float',
-#             'width':-1}
-#         self.variable_slider_float = {'name':'variable_slider_float',
-#             'width':-1}
-#         self.Fit_button = {'name':'Fit_button',
-#             'width':-1}
-#         self.Fit_all_button = {'name':'Fit_all_button',
-#             'width':-1}
-        
-#         self.vars_input_float = {'name':'vars_input_float',
-#             'width':220* self.size_ratio['width']}
-        
-        
-#         self.keep_results_butt = {'name':'keep_results_butt',
-#                          'width':-1
-#                                  }
-#         self.show_res_win = {'name':'show_res_win',
-#                          'width':int(1500*self.size_ratio['width']),
-#                              'height': int(200*self.size_ratio['height']),
-#                              'pos':(8,150)
-#                             }
-#         self.show_results_butt = {'name':'show_results_butt',
-#                          'width':-1
-#                                  }
-#         self.save_single_butt = {'name':'save_single_butt',
-#                          'width':int(320*self.size_ratio['width'])}
-#         self.save_results_butt = {'name':'save_results_butt',
-#                          'width':-1       
-#                                  }
-#         self.plot_all_results_butt = {'name':'plot_all_results_butt',
-#                          'width':-1             
-#                                      }
-#         self.close_button_results = {'name':'close_button_results',
-#                          'width':int(100*self.size_ratio['width'])}
-#         self.remove_button_results = {'name':'remove_button_results',
-#                          'width':int(100*self.size_ratio['width'])}
-        
-        
-        
-        
-        
-        
-        
-        
-#         self.directory = ''
-#         self.new_directory = ''
-#         self.files = ()
-#         self.anal_file =''
-#         self.time_range = (None,None)
-#         self.math_expr = ['arccos','arccosh','arcsin','arcsinh','arctan','arctan2',
-#             'arctanh','cos','cosh','exp','exp2','expm1','log','log10','log1p',
-#             'log2','mod','sign','sin','sinh','sqrt','square','tan','tanh',
-#             'pi','isfinite']
-#         self.pre_defined_FCS_models = os.path.join('Methods','FCS_fitting','res',
-#                                                    'JSON_files',
-#                                                    'Pre-defined_FCS_functions.json')
-#         self.user_defined_FCS_models = os.path.join('Methods','FCS_fitting','res',
-#                                                     'JSON_files',
-#                                                     'User_functions.json')
-        
-#         self.VAR_RELATED_GROUPS=[]
-#         self.VAR_RELATED_ITEMS=[]
-#         self.VARIABLES_RANGE={}    # define variable range 
-#         self.FIXED_VARIABLES={}
-#         self.JSONDATA = {}
-#         self.EXPRESSION = ''
-#         self.VARIABLES = {}
-#         self.DESCRIPTION = ''
-#         self.UJSONDATA = {}
-#         self.RESTAB_RELATED_ITEMS=[]
-        
-#         self.RES_DF = None
-        
-#         '''Model variables'''
-#         self.variable_range_delimiter=100
-#         self.Models =[]
-#         self.init_model = ''
-        
-#         self.res_dict= {}
-#         self.reserr_dict = {}
-#         self.workspace_iso = {}
-#         self.workspace_iso_path = ''
-#         self.FCS_data_type = '3C'
-        
-#         self.df = pd.DataFrame()
-#         self.df_copy = self.df.copy()
-#         self.chisqr = None
-#         self.redchi = None
-        
-#         self.row_number_count = 0
-#         self.res_add = []
-        
-        
-#         '''Handler variables'''
-#         self.all_items = None
-#         self.file_box_items = []
-#         self.up_key = dpg.mvKey_Up
-#         self.down_key = dpg.mvKey_Down
-#         self.w_key = dpg.mvKey_W
-#         self.s_key = dpg.mvKey_S
-#         self.d_key = dpg.mvKey_D
-#         self.return_key = dpg.mvKey_Return
-#         self.ctrl_key = dpg.mvKey_Control
-#         self.LAlt_key = dpg.mvKey_Alt
-#         self.Del = dpg.mvKey_Delete
-#         self.x_key = dpg.mvKey_X
-#         self.active_keys = [dpg.mvKey_Up,
-#                             dpg.mvKey_Down,
-#                             dpg.mvKey_W,
-#                             dpg.mvKey_S,
-#                             dpg.mvKey_D,
-#                             dpg.mvKey_Return,
-#                             dpg.mvKey_Control,
-#                             dpg.mvKey_Alt,
-#                             dpg.mvKey_Delete,
-#                             dpg.mvKey_X]
-        
-
-
-#     # ###############################################################################
-#     # ###############################################################################
-#     ''' Functions'''
-#     # ###############################################################################
-#     # ###############################################################################
-
-
-#     def load_json(self):
+            for k0 in data.keys():
+                try:
+                    len_kappa = len(data[k0]['kappa'])
+                except:
+                    self.Exception("len_kappa = len(data[k0]['kappa'])")
+                    
+                try:
+                    len_omega = len(data[k0]['omega'])
+                except:
+                    self.Exception("len_omega = len(data[k0]['omega'])")
     
-#         '''Function that loads JSON file containing fitting function details '''
-
-#         '''Define global variables'''
-
-#         '''Check selected technique. TECHNIQE0 corresponds to the default technique (FCS).'''
-#         with open(self.pre_defined_FCS_models) as json_FCS_functions_file:
-#             self.JSONDATA = json.load(json_FCS_functions_file)['Functions']
-#         try:
-#             with open(self.user_defined_FCS_models) as json_user_functions_file:
-#                     self.UJSONDATA = json.load(json_user_functions_file)['Functions'] 
-#                     self.JSONDATA.update(self.UJSONDATA)
-#         except:
-#             pass
-
-
-#         self.Models=list(self.JSONDATA.keys())  # define list of models
-#         self.init_model=self.Models[0]          # define default model
-
-#         '''load expression variables and description for models stored in a given JSON file'''
-#         self.EXPRESSION = self.JSONDATA[self.init_model]['Function_expression']
-#         self.VARIABLES = self.JSONDATA[self.init_model]['Variables']
-#         self.DESCRIPTION = self.JSONDATA[self.init_model]['Function_description'] 
-#         self.VARIABLES_RANGE = self.JSONDATA[self.init_model]['Initial-range']    
-#         self.FIXED_VARIABLES = self.JSONDATA[self.init_model]['Fixed Variables']
-#         dpg.configure_item('model_choose', items=self.Models)
-#         dpg.set_value('model_choose',self.init_model)
+                try:
+                    len_V0= len(data[k0]['V0'])
+                except:
+                    self.Exception("len_V0= len(data[k0]['V0'])")
     
-#     def define_RES_DF(self):
-#         res_columns=['file']
-#         res_columns.extend([v for v in self.VARIABLES.keys()])
-#         res_columns.extend(['B','B_err'])
-#         res_columns.extend(['chi_sqr','Red.chi_sqr'])
-#         self.RES_DF = pd.DataFrame(columns=res_columns)
-        
-        
-#     def auto_fit_fontsize(self,text, width, height, fig=None, ax=None):
-#         '''Auto-decrease the fontsize of a text object.
-
-#         Args:
-#             text (matplotlib.text.Text)
-#             width (float): allowed width in data coordinates
-#             height (float): allowed height in data coordinates
-#         '''
-#         fig = fig or plt.gcf()
-#         ax = ax or plt.gca()
-
-#         renderer = FigureCanvas(fig).get_renderer()
-#         bbox_text = text.get_window_extent(renderer=renderer)
-#         bbox_text = Bbox(ax.transData.inverted().transform(bbox_text))
-#         fits_width = bbox_text.width*0.85 < width if width else True
-#         fits_height = bbox_text.height < height if height else True
-#         if not all((fits_width, fits_height)):
-
-#             text.set_fontsize(text.get_fontsize()-2)
-
-#             auto_fit_fontsize(text, width, height, fig, ax)
-
+                try:
+                    len_Bright= len(data[k0]['Mol.Brightness'])
+                except:
+                    self.Exception("len_Bright= len(data[k0]['Mol.Brightness'])")
+    
+    
+                if (len_kappa==2) and (len_omega==2) and (len_V0 == 2) and (len_Bright ==2):
+    
+                    if k0 == 'Channel_1':
+                        dpg.set_value('omega_input_ch_1',data[k0]['omega'][0])
+                        dpg.set_value('omega_err_input_ch_1',data[k0]['omega'][1])
+    
+                        dpg.set_value('kappa_input_ch_1',data[k0]['kappa'][0])
+                        dpg.set_value('kappa_err_input_ch_1',data[k0]['kappa'][1])
+    
+                        dpg.set_value('focal_vol_input_ch_1',data[k0]['V0'][0])
+                        dpg.set_value('focal_vol_err_input_ch_1',data[k0]['V0'][1])
+    
+                        dpg.set_value('Brightness_input_ch_1',data[k0]['Mol.Brightness'][0])
+                        dpg.set_value('Brightness_err_input_ch_1',data[k0]['Mol.Brightness'][1])
+    
+                    elif k0 == 'Channel_2':
+    
+                        dpg.set_value('omega_input_ch_2',data[k0]['omega'][0])
+                        dpg.set_value('omega_err_input_ch_2',data[k0]['omega'][1])
+    
+                        dpg.set_value('kappa_input_ch_2',data[k0]['kappa'][0])
+                        dpg.set_value('kappa_err_input_ch_2',data[k0]['kappa'][1])
+    
+                        dpg.set_value('focal_vol_input_ch_2',data[k0]['V0'][0])
+                        dpg.set_value('focal_vol_err_input_ch_2',data[k0]['V0'][1])
+    
+                        dpg.set_value('Brightness_input_ch_2',data[k0]['Mol.Brightness'][0])
+                        dpg.set_value('Brightness_err_input_ch_2',data[k0]['Mol.Brightness'][1])
+    
+                    else:
+                        pass
+                elif (len_kappa==0) and (len_omega==0) and (len_V0 == 0) and (len_Bright ==0):
+                    pass
+    
+                else:
+                    pass
+            
+        elif user_data == 'Save_calib_button':  
+            path_to_json_file = app_data['file_path_name']
+            calib_directory = path_to_json_file
+            omega_1 = [dpg.get_value('omega_input_ch_1'),dpg.get_value('omega_err_input_ch_1')]
+            kappa_1 = [dpg.get_value('kappa_input_ch_1'),dpg.get_value('kappa_err_input_ch_1')]
+            V0_1 = [dpg.get_value('focal_vol_input_ch_1'),dpg.get_value('focal_vol_err_input_ch_1')]
+            bright_1 = [dpg.get_value('Brightness_input_ch_1'),dpg.get_value('Brightness_err_input_ch_1')]
+            
+            omega_2 = [dpg.get_value('omega_input_ch_2'),dpg.get_value('omega_err_input_ch_2')]
+            kappa_2 = [dpg.get_value('kappa_input_ch_2'),dpg.get_value('kappa_err_input_ch_2')]
+            V0_2 = [dpg.get_value('focal_vol_input_ch_2'),dpg.get_value('focal_vol_err_input_ch_2')]
+            bright_2 = [dpg.get_value('Brightness_input_ch_2'),dpg.get_value('Brightness_err_input_ch_2')]
             
             
-#     def count_curves(self,f):
-#         '''Function counts the number of data curves included in the input file. Output depends on the user declared number of columns per data curve (2 columns for X,Y data and 3 columns for X,Y,Y_err data).'''
+            output_dict = {'Channel_1':{'omega':omega_1,
+                                        'kappa':kappa_1,
+                                        'V0':V0_1,
+                                        'Mol.Brightness':bright_1
+                                       },
+                           'Channel_2':{'omega':omega_2,
+                                        'kappa':kappa_2,
+                                        'V0':V0_2,
+                                        'Mol.Brightness':bright_2
+                                       }
+                          }
+            
+            with open(path_to_json_file, 'w') as f:
+                json.dump(output_dict, f, indent=4, sort_keys=False)
 
-#         cnt,DF = self.count_skiprows(f)
-#         if (len(DF.columns))%3==0:
-#             cols = 3
-#             # cols = 2
-#             COLS = len(DF.columns)
 
-#             return int(COLS/cols)
-#         else:
-#             return -1
+    def add_single_result_to_DF(self,sender,app_data):
         
         
-#     def diff_coeff(self,omega,tau):
-#         ''' Calclulates diffusion coefficient based on the omega and diffusion time.'''
-
-#         D = omega**2/(4*pi*1e-3*tau)
-#         return D
+        
+        stored_results = self.Sing_Results_DF.File.values
+        if self.anal_file in stored_results:
+            self.Sing_Results_DF.File=self.Sing_Results_DF.File.where(self.Sing_Results_DF.File!=self.anal_file)
+            self.Sing_Results_DF.dropna(inplace=True)
+        else:
+            pass
+        if len(self.Channels) == 1:
+        
+            
+            if '1' in self.Channels[0]:
+                self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                          1,
+                                                          self.mean_Photons_ch_1,
+                                                          self.mean_Photons_err_ch_1,
+                                                          self.mean_Molecules_ch_1,
+                                                          self.mean_Molecules_err_ch_1,
+                                                          self.mean_Concentration_ch_1,
+                                                          self.mean_Concentration_err_ch_1,
+                                                          self.median_C_ch_1,
+                                                          self.median_err_C_ch_1
+                                                         ]],
+                                                        columns=self.Sing_Results_DF.columns)
+            elif '2' in self.Channels[0]:
+                self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                          2,
+                                                          self.mean_Photons_ch_2,
+                                                          self.mean_Photons_err_ch_2,
+                                                          self.mean_Molecules_ch_2,
+                                                          self.mean_Molecules_err_ch_2,
+                                                          self.mean_Concentration_ch_2,
+                                                          self.mean_Concentration_err_ch_2,
+                                                          self.median_C_ch_2,self.median_err_C_ch_2
+                                                         ]],
+                                                        columns=self.Sing_Results_DF.columns)
+            else:
+                pass
+        if len(self.Channels) == 2:
+            self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                      1,
+                                                      self.mean_Photons_ch_1,
+                                                      self.mean_Photons_err_ch_1,
+                                                      self.mean_Molecules_ch_1,
+                                                      self.mean_Molecules_err_ch_1,
+                                                      self.mean_Concentration_ch_1,
+                                                      self.mean_Concentration_err_ch_1,
+                                                      self.median_C_ch_1,
+                                                      self.median_err_C_ch_1],
+                                                   [self.anal_file,
+                                                    2,
+                                                    self.mean_Photons_ch_2,
+                                                    self.mean_Photons_err_ch_2,
+                                                    self.mean_Molecules_ch_2,
+                                                    self.mean_Molecules_err_ch_2,
+                                                    self.mean_Concentration_ch_2,
+                                                    self.mean_Concentration_err_ch_2,
+                                                    self.median_C_ch_2,self.median_err_C_ch_2
+                                                   ]],columns=self.Sing_Results_DF.columns)
+        
+        
+        self.Sing_Results_DF=pd.concat([self.Sing_Results_DF,
+                                        self.Sing_Results_DF_tmp]).reset_index(drop=True)
     
-#     def evaluate(self,expression,names):
-
-#         """Evaluate a math expression."""
-#         code = compile(expression, "<string>", "eval")
-#         for name in code.co_names:
-#             if name not in names.keys():
-
-#                 raise NameError(f"The use of '{name}' is not allowed")
-
-#         VArs={"__builtins__": {}}
+        self._pkl_file()
 
 
-#         return eval(code,VArs , names)
+    def calc_molecules(self,DF,PTU_Px_dwell,PTU_N_frames,brightness,brightness_err):
     
-#     def fit_function(self,DF,pars):
-#         '''Fit the model function'''
-#         lprint(pars)
-#         my_model = Model(self.my_universal_function)   #create expression based on the selected model.
+        PTU_Px_dwell = PTU_Px_dwell*1e-6
+        MOL = ( DF*(1/(PTU_Px_dwell*PTU_N_frames)))/brightness
+        part_BR = -DF/(PTU_N_frames*PTU_Px_dwell*(brightness**2))
+        MOL_err = sqrt((part_BR**2)*(brightness_err**2))
+        return MOL,MOL_err
 
-#         xdata=DF.X.values
-#         ydata=DF.Y.values
-
-#         xdata=[n for n in DF.X.values]
-#         ydata=[n for n in DF.Y.values]
-#         if self.FCS_data_type=='bin':
-#             if dpg.get_value('FITing_checkbox'):
-#                 ydata_err=[ 1/n for n in DF.Y_err.values]
-#                 # print('fit with weights')
-#                 results = my_model.fit(ydata, pars, x=xdata, weights=ydata_err)
-#             else:
-#                 # print('fit without weights')
-#                 results = my_model.fit(ydata, pars, x=xdata)
-#         if self.FCS_data_type=='3C':
-#             if dpg.get_value('FITing_checkbox'):
-#                 ydata_err=[ 1/n for n in DF.Y_err.values]
-#                 # print('fit with weights')
-#                 results = my_model.fit(ydata, pars, x=xdata, weights=ydata_err)
-#             else:
-#                 # print('fit without weights')
-#                 results = my_model.fit(ydata, pars, x=xdata)
-#         elif self.FCS_data_type == '2C':
-#             # print('fit without weights')
-#             results = my_model.fit(ydata, pars, x=xdata)
-#         else:
-#             pass
-#         return results
+        
+        
+        
+    def callback_Brightness_err_input(self,sender,app_data):
+        
+        if sender == 'Brightness_err_input_ch_1':
+            self.mean_brightness_err_ch_1  = app_data
+            self.FCS_results_ch_1 = pd.DataFrame()
+            
     
-#     def my_universal_function(self,x,**kwargs):
-
-#         '''universal function returning the python readable expression used for fitting and plotting.'''
-
-#         x=np.array(x)                 #array containing the X values
-
-#         '''Define allowed names for evaluate function.'''
-#         allowed_names = {
-#                 k: v for k, v in np.__dict__.items() if k in self.math_expr
-#             }
-#         variables=kwargs.keys()
-
-#         '''Add model variables to varaibles allowed for evaulation of the expression.'''
-
-#         allowed_names['x']= x 
-
-#         for vr in variables:
-
-#             allowed_names[vr]= kwargs[vr] 
-
-#         return self.evaluate(self.EXPRESSION,allowed_names) # return expression 
     
-#     def count_skiprows(self,f):
     
-#         '''Count how many rows need to be skiped during loading the data file. The rows that do not contain numerical values (headers and other strings) will be omited.'''
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_1_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+    
+            try:
+                dpg.delete_item('column_results_show_del_ch_1')
+                dpg.delete_item('column_results_show_Brightness_ch_1')
+                dpg.delete_item('column_results_show_N_p_ch_1')
+                dpg.delete_item('column_results_show_file_ch_1')
+                dpg.delete_item('table_results_show_ch_1')
+                dpg.delete_item('remove_button_results_ch_1')
+                dpg.delete_item('close_button_results_ch_1')
+                dpg.delete_item('group_close_results_table_ch_1')
+                dpg.delete_item('show_TT_res_win_ch_1')
+            except:
+                pass
+        elif sender == 'Brightness_err_input_ch_2':
+            mean_brightness_err_ch_2  = app_data
+            FCS_results_ch_2 = pd.DataFrame()
+            
+    
+    
+    
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_2_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+    
+            try:
+                dpg.delete_item('column_results_show_del_ch_2')
+                dpg.delete_item('column_results_show_Brightness_ch_2')
+                dpg.delete_item('column_results_show_N_p_ch_2')
+                dpg.delete_item('column_results_show_file_ch_2')
+                dpg.delete_item('table_results_show_ch_2')
+                dpg.delete_item('remove_button_results_ch_2')
+                dpg.delete_item('close_button_results_ch_2')
+                dpg.delete_item('group_close_results_table_ch_2')
+                dpg.delete_item('show_TT_res_win_ch_2')
+            except:
+                pass
+        else:
+            pass
+        
+        
+        
+        
+        
+    def callback_Brightness_input(self,sender,app_data):
+        
+        if sender == 'Brightness_input_ch_1':
+            self.mean_brightness_ch_1  = app_data
+            self.FCS_results_ch_1 = pd.DataFrame()
+            
+    
+    
+    
+    
+    
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_1_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            try:
+                dpg.delete_item('column_results_show_del_ch_1')
+                dpg.delete_item('column_results_show_Brightness_ch_1')
+                dpg.delete_item('column_results_show_N_p_ch_1')
+                dpg.delete_item('column_results_show_file_ch_1')
+                dpg.delete_item('table_results_show_ch_1')
+                dpg.delete_item('remove_button_results_ch_1')
+                dpg.delete_item('close_button_results_ch_1')
+                dpg.delete_item('group_close_results_tabl_ch_1')
+                dpg.delete_item('show_TT_res_win_ch_1')
+            except:
+                pass
+        elif sender == 'Brightness_input_ch_2':
+            self.mean_brightness_ch_2  = app_data
+            self.FCS_results_ch_2 = pd.DataFrame()
+    
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_2_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            try:
+                dpg.delete_item('column_results_show_del_ch_2')
+                dpg.delete_item('column_results_show_Brightness_ch_2')
+                dpg.delete_item('column_results_show_N_p_ch_2')
+                dpg.delete_item('column_results_show_file_ch_2')
+                dpg.delete_item('table_results_show_ch_2')
+                dpg.delete_item('remove_button_results_ch_2')
+                dpg.delete_item('close_button_results_ch_2')
+                dpg.delete_item('group_close_results_tabl_ch_2')
+                dpg.delete_item('show_TT_res_win_ch_2')
+            except:
+                pass
+        
+        else:
+            pass
+        
+        
+    def callback_Keyword_key(self,sender,app_data):
+        files = dpg.get_item_configuration('file_box')['items']
+        up_key = dpg.mvKey_Up
+        down_key = dpg.mvKey_Down
+        
+        if len(files)!=0:
+            def_val = dpg.get_value('file_box')
+            index = files.index(def_val)
+        
+            if app_data == up_key:
+                if index!=0:
+                    index=index-1
+                    dpg.set_value('file_box',files[index])
+                    self.callback_listbox('file_box',files[index])
+                else:
+                    pass
+            if app_data == down_key:
+                if index!=len(files)-1:
+                    index=index+1
+                    dpg.set_value('file_box',files[index])
+                    self.callback_listbox('file_box',files[index])
+                else:
+                    pass
+        
+        
+        
+        
+        
+    def callback_PTU_directory_select(self,sender,app_data):
+        
+        self.Sing_Results_DF = pd.DataFrame(columns=['File', 'Channel','<Counts>','Counts_std','<N_p>','N_p_err','<C>', 'C_err','C_median', 'C_median_abs_err'])
+        files=()
+        dpg.set_value('FILE_ROI_checkbox',False)
+        self.directory = app_data['file_path_name']
+        self.new_directory=self.directory
+        self.PTU_directory = self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
+        self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
+        dpg.configure_item('FILE_ROI_checkbox', enabled=True)
+        dpg.configure_item('Auto_ROI_checkbox', enabled=True)
+        
+        try:
+            self.hide_histograms()
+        except:
+            pass
+        
+        filenames = [f.replace('.ptu','') for f in files]
+        
+        if len(files)==0:
+            self.show_error_no_files('No PTU files found.')
+        else:
+            stop=False
+            for file in filenames:
+                ptufile = file+'.ptu'
+                for f in self.pck_files:
+                    if file in f:
+                        stop = True
+                        ffile = file
+                        break
+                    else:
+                        stop = False
+                 
+                if stop:
+                    pass
+                else:
+                    self.show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again. Mising file: '+ffile)
+                    try:
+                        pass
+                        
+                    except:
+                        pass
+                    
+                    
+        if len(self.pck_files)!=0:
+            self.update_flist(filenames)
+            self.anal_file=filenames[0]
+            dpg.configure_item('file_box', default_value=self.anal_file)
+            self.callback_listbox('file_box',self.anal_file)
+            # load_PTU_images(anal_file)
+            
+        else:
+            self.show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again.')    
+        
+        
+        
+    def callback_ROI_directory_select(self,sender,app_data):
+        self.ROI_directory = app_data['file_path_name']
+        self.last_directory =self.ROI_directory
+        self.update_dialogs_default_directory(self.last_directory)
+        # dpg.set_value('FILE_ROI_checkbox',True)
+        # callback_select_roi('FILE_ROI_checkbox',True)
+        dpg.hide_item('ROI_folder_dialog_id')
+        self.load_PTU_images(self.anal_file)
+        
 
-#         stop = False
-#         cnt=0
 
-#         while stop == False:
-#             testdf = pd.read_csv(f,
-#                          sep='[:,|\t]',
-#                          skiprows=cnt,
-#                          header=0,
-#                  encoding = 'latin1',
-#                          engine='python')
-#             # print(f,testdf.head(1))
-#             # cond_1 = not(np.any(testdf.head(1).applymap(lambda x: isinstance(x, (int, float))).values))
-#             cond_1 = not(np.any(testdf.head(1).apply(lambda col: col.map(lambda x: isinstance(x, (int, float)))).values))
-#             if cond_1:
-#                 cnt=cnt+1
+    def callback_add_ROI(self,sender,app_data):
+    
+        
+        dpg.configure_item("Select_ROI_dialog",user_data = sender)
+        dpg.show_item("Select_ROI_dialog")
+        
 
-#             else:
-#                 # print('stop at cnt = ',cnt)
-#                 stop=True
+    # def callback_auto_adjust(self,sender,app_data):
+        
+    #     self.callback_windows_size(sender,app_data)
+    #     self.callback_font_size(sender,app_data)
 
-#         return cnt,testdf
+    
+
+
+
+
+    def callback_calculate(self,sender,app_data):
+        cmap = 'afmhot'
+        rect = 0.1, 0.1, 0.85, 0.9
+        norm = None
+        if len(self.Channels) == 1:
+            if '1' in self.Channels[0]:
+                brightness_ch_1 = dpg.get_value('Brightness_input_ch_1')
+                brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
+                Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
+                Veff_err_ch_1 = 1e-15*dpg.get_value('focal_vol_err_input_ch_1')
+                # DF = Current_image_1
+                
+                self.DF = self.image_1_times_roi
+                Photons_1 = pd.DataFrame(self.DF)
+                
+                n_pixels_1 =  Photons_1.stack().reset_index(drop=True).dropna().count()
+                
+                Molecules_ch_1 = self.calc_molecules(self.DF,
+                                                     self.PTU_Px_dwell,
+                                                     self.PTU_N_frames,
+                                                     brightness_ch_1,
+                                                     brightness_err_ch_1)[0]
+                Molecules_err_ch_1 = self.calc_molecules(self.DF,
+                                                         self.PTU_Px_dwell,
+                                                         self.PTU_N_frames,
+                                                         brightness_ch_1,
+                                                         brightness_err_ch_1)[1]
+                Concentration_ch_1 = 1e9*self.CONC(Molecules_ch_1,Veff_ch_1,Molecules_err_ch_1,Veff_err_ch_1)[0]
+                Concentration_err_ch_1 = 1e9*self.CONC(Molecules_ch_1,Veff_ch_1,Molecules_err_ch_1,Veff_err_ch_1)[1]
+                self.mean_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().mean()
+                self.mean_Photons_err_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+                self.mean_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().mean()
+                if not dpg.get_value('Error_type_checkbox'):
+                    self.mean_Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1).stack().reset_index(drop=True).dropna().mean()
+                else:
+                    self.mean_Molecules_err_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+                
+                self.mean_Concentration_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().mean()
+                if not dpg.get_value('Error_type_checkbox'):
+                    self.mean_Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1).stack().reset_index(drop=True).dropna().mean()
+                else:
+                    self.mean_Concentration_err_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+                
+                self.median_C_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().median()
+                self.median_err_C_ch_1 = median_abs_deviation(pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna())
+                
+                dpg.set_value('sinle_phot_output_ch_1',self.mean_Photons_ch_1)
+            
+                dpg.set_value('sinle_phot_err_output_ch_1',self.mean_Photons_err_ch_1)
+                dpg.set_value('sinle_mols_output_ch_1',self.mean_Molecules_ch_1)
+                
+                dpg.set_value('sinle_mols_err_output_ch_1',self.mean_Molecules_err_ch_1)
+                dpg.set_value('single_conc_output_ch_1',self.mean_Concentration_ch_1)
+                
+                dpg.set_value('single_conc_err_output_ch_1',self.mean_Concentration_err_ch_1)
+                Molecules_ch_1 = pd.DataFrame(Molecules_ch_1)
+                Concentration_ch_1 = pd.DataFrame(Concentration_ch_1)
+                
+                Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1)
+                Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1)
+                Phot_hist_ch_1,Phot_bins_ch_1 =np.histogram(Photons_1.stack().reset_index(drop=True).dropna().values,
+                                                            density=True,bins='auto')
+                Phot_bins_ch_1=Phot_bins_ch_1[:-1]
+                median_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().median()
+                
+                Mols_hist_ch_1,Mols_bins_ch_1 =np.histogram(pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().values
+                                                            ,density=True,bins='auto')
+                Mols_bins_ch_1=Mols_bins_ch_1[:-1]
+                median_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().median()
+                
+                Conc_hist_ch_1,Conc_bins_ch_1 =np.histogram(pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().values
+                                                            ,density=True,bins='auto')
+                Conc_bins_ch_1=Conc_bins_ch_1[:-1]
+                
+                ind=np.where(Conc_hist_ch_1!=0)[0]
+                
+                Conc_hist_ch_1=Conc_hist_ch_1[ind]
+                Conc_bins_ch_1=Conc_bins_ch_1[ind]
+                
+                ind=np.where(Mols_hist_ch_1!=0)[0]
+                
+                Mols_hist_ch_1=Mols_hist_ch_1[ind]
+                Mols_bins_ch_1=Mols_bins_ch_1[ind]
+                
+                ind=np.where(Phot_hist_ch_1!=0)[0]
+                
+                Phot_hist_ch_1=Phot_hist_ch_1[ind]
+                Phot_bins_ch_1=Phot_bins_ch_1[ind]
+                
+                dpg.set_value('c_dist_ser_ch_1',(Conc_bins_ch_1,Conc_hist_ch_1))
+                dpg.set_value('c_mean_ser_ch_1',(np.array([self.mean_Concentration_ch_1]),np.array([max(Conc_hist_ch_1)])))
+                dpg.set_value('c_med_ser_ch_1',(np.array([self.median_C_ch_1]),np.array([max(Conc_hist_ch_1)])))
+                dpg.set_axis_limits('hist_xc_axis_ch1', min(Conc_bins_ch_1), max(Conc_bins_ch_1))
+                dpg.set_axis_limits('hist_yc_axis_ch1', 0, max(Conc_hist_ch_1))
+                
+                dpg.set_value('np_dist_ser_ch_1',(Mols_bins_ch_1,Mols_hist_ch_1))
+                dpg.set_value('np_mean_ser_ch_1',(np.array([self.mean_Molecules_ch_1]),np.array([max(Mols_hist_ch_1)])))
+                dpg.set_value('np_med_ser_ch_1',(np.array([median_Molecules_ch_1]),np.array([max(Mols_hist_ch_1)])))
+                dpg.set_axis_limits('hist_xnp_axis_ch1', min(Mols_bins_ch_1), max(Mols_bins_ch_1))
+                dpg.set_axis_limits('hist_ynp_axis_ch1', 0, max(Mols_hist_ch_1))
+                
+                dpg.set_value('phot_dist_ser_ch_1',(Phot_bins_ch_1,Phot_hist_ch_1))
+                dpg.set_value('phot_mean_ser_ch_1',(np.array([self.mean_Photons_ch_1]),np.array([max(Phot_hist_ch_1)])))
+                dpg.set_value('phot_med_ser_ch_1',(np.array([median_Photons_ch_1]),np.array([max(Phot_hist_ch_1)])))
+                dpg.set_axis_limits('hist_xphot_axis_ch1', min(Phot_bins_ch_1), max(Phot_bins_ch_1))
+                dpg.set_axis_limits('hist_yphot_axis_ch1', 0, max(Phot_hist_ch_1))
+                
+                dpg.configure_item('c_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Concentration_ch_1,4)))
+                dpg.configure_item('c_med_ser_ch_1',label='Median = '+str(np.round(self.median_C_ch_1,4)))
+                
+                dpg.configure_item('np_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Molecules_ch_1,2)))
+                dpg.configure_item('np_med_ser_ch_1',label='Median = '+str(np.round(self.median_Molecules_ch_1,2)))
+                
+                dpg.configure_item('phot_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Photons_ch_1,1)))
+                dpg.configure_item('phot_med_ser_ch_1',label='Median = '+str(np.round(median_Photons_ch_1,1)))
+                
+                
+                try:
+                    dpg.show_item('hist_conc_plot_ch1')
+                except:
+                    pass
+                
+                try:
+                    dpg.show_item('hist_np_plot_ch1')
+                except:
+                    pass
+                
+                try:
+                    dpg.show_item('hist_phot_plot_ch1')
+                except:
+                    pass
+                
+                
+                
+                if dpg.get_value('Photons_array_checkbox'):
+                    phot_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_ch_1.csv')
+                    
+                    Photons_1.to_csv(phot_array_path_ch_1,index=False,sep=',', header=None)
+                else:
+                    pass
+                
+                if dpg.get_value('Np_array_checkbox'):
+                    Np_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_ch_1.csv')
+                    
+                    
+                    Molecules_ch_1.to_csv(Np_array_path_ch_1,index=False,sep=',', header=None)
+                    
+                    Np_err_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_err_ch_1.csv')
+                    Molecules_err_ch_1.to_csv(Np_err_array_path_ch_1,index=False,sep=',', header=None)
+                    
+                else:
+                    pass
+                if dpg.get_value('C_array_checkbox'):
+                    Conc_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_ch_1.csv')
+                    
+                    Concentration_ch_1.to_csv(Conc_array_path_ch_1,index=False,sep=',', header=None)
+                    
+                    Conc_err_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_err_ch_1.csv')
+                    Concentration_err_ch_1.to_csv(Conc_err_array_path_ch_1,index=False,sep=',', header=None)
+                    
+                else:
+                    pass
+                
+                if dpg.get_value('Photons_Hmaps_checkbox'):
+                    phot_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_HM_ch_1.png')
+    
+                    fig = Figure(facecolor='white')
+    
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Photons_1.min().min(), vmax=Photons_1.max().max())
+                    ax.imshow(Photons_1,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(phot_hmap_path_ch_1)
+                    
+                else:
+                    pass
+                
+                if dpg.get_value('Np_Hmaps_checkbox'):
+                    Np_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_HM_ch_1.png')
+    
+                    fig = Figure(facecolor='white')
+    
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Molecules_ch_1.min().min(), vmax=Molecules_ch_1.max().max())
+                    ax.imshow(Molecules_ch_1,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(Np_hmap_path_ch_1)
+                    
+                else:
+                    pass
+    
+                if dpg.get_value('C_Hmaps_checkbox'):
+                    C_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_HM_ch_1.png')
+                    fig = Figure(facecolor='white')
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Concentration_ch_1.min().min(), vmax=Concentration_ch_1.max().max())
+                    ax.imshow(Concentration_ch_1,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(C_hmap_path_ch_1)
+                    
+                else:
+                    pass
+            
+            elif '2' in Channels[0]:
+                brightness_ch_2 = dpg.get_value('Brightness_input_ch_2')
+                brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2') 
+                Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
+                Veff_err_ch_2 = 1e-15*dpg.get_value('focal_vol_err_input_ch_2')
+                # DF2 = Current_image_2
+    
+                self.DF2 = self.image_2_times_roi
+                Photons_2 = pd.DataFrame(self.DF2)
+                n_pixels_2 =  Photons_2.stack().reset_index(drop=True).dropna().count()
+    
+                self.mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
+                self.mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+                Molecules_ch_2 = self.calc_molecules(self.DF2,
+                                                     self.PTU_Px_dwell,
+                                                     self.PTU_N_frames,
+                                                     brightness_ch_2,
+                                                     brightness_err_ch_2)[0]
+                Molecules_err_ch_2 = self.calc_molecules(self.DF2,
+                                                         self.PTU_Px_dwell,
+                                                         self.PTU_N_frames,
+                                                         brightness_ch_2,
+                                                         brightness_err_ch_2)[1]
+                
+                
+                Concentration_ch_2 = 1e9*self.CONC(Molecules_ch_2,Veff_ch_2,Molecules_err_ch_2,Veff_err_ch_2)[0]
+                Concentration_err_ch_2 = 1e9*self.CONC(Molecules_ch_2,Veff_ch_2,Molecules_err_ch_2,Veff_err_ch_2)[1]
+                
+                self.mean_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().mean()
+                if not dpg.get_value('Error_type_checkbox'):
+                    self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2).stack().reset_index(drop=True).dropna().mean()
+                else:
+                    self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+                
+                
+                
+                self.mean_Concentration_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().mean()
+                if not dpg.get_value('Error_type_checkbox'):
+                    self.mean_Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2).stack().reset_index(drop=True).dropna().mean()
+                else:
+                    self.mean_Concentration_err_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+                
+                self.median_C_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().median()
+                self.median_err_C_ch_2 = median_abs_deviation(pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna())
+                dpg.set_value('sinle_phot_output_ch_2',self.mean_Photons_ch_2)
+            
+                dpg.set_value('sinle_phot_err_output_ch_2',self.mean_Photons_err_ch_2)
+                dpg.set_value('sinle_mols_output_ch_2',self.mean_Molecules_ch_2)
+                
+                dpg.set_value('sinle_mols_err_output_ch_2',self.mean_Molecules_err_ch_2)
+                dpg.set_value('single_conc_output_ch_2',self.mean_Concentration_ch_2)
+                
+                dpg.set_value('single_conc_err_output_ch_2',self.mean_Concentration_err_ch_2)
+                Molecules_ch_2 = pd.DataFrame(Molecules_ch_2)
+                Concentration_ch_2 = pd.DataFrame(Concentration_ch_2)
+                
+                Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2)
+                Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2)
+                Phot_hist_ch_2,Phot_bins_ch_2 =np.histogram(Photons_2.stack().reset_index(drop=True).dropna().values,
+                                                            density=True,bins='auto')
+                Phot_bins_ch_2=Phot_bins_ch_2[:-1]
+                median_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().median()
+                
+                Mols_hist_ch_2,Mols_bins_ch_2 =np.histogram(pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().values
+                                                            ,density=True,bins='auto')
+                Mols_bins_ch_2=Mols_bins_ch_2[:-1]
+                median_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().median()
+                
+                Conc_hist_ch_2,Conc_bins_ch_2 =np.histogram(pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().values
+                                                            ,density=True,bins='auto')
+                Conc_bins_ch_2=Conc_bins_ch_2[:-1]
+                
+                ind=np.where(Conc_hist_ch_2!=0)[0]
+                
+                Conc_hist_ch_2=Conc_hist_ch_2[ind]
+                Conc_bins_ch_2=Conc_bins_ch_2[ind]
+                
+                ind=np.where(Mols_hist_ch_2!=0)[0]
+                
+                Mols_hist_ch_2=Mols_hist_ch_2[ind]
+                Mols_bins_ch_2=Mols_bins_ch_2[ind]
+                
+                ind=np.where(Phot_hist_ch_2!=0)[0]
+                
+                Phot_hist_ch_2=Phot_hist_ch_2[ind]
+                Phot_bins_ch_2=Phot_bins_ch_2[ind]
+                
+                dpg.set_value('c_dist_ser_ch_2',(Conc_bins_ch_2,Conc_hist_ch_2))
+                dpg.set_value('c_mean_ser_ch_2',(np.array([self.mean_Concentration_ch_2]),np.array([max(Conc_hist_ch_2)])))
+                dpg.set_value('c_med_ser_ch_2',(np.array([self.median_C_ch_2]),np.array([max(Conc_hist_ch_2)])))
+                dpg.set_axis_limits('hist_xc_axis_ch2', min(Conc_bins_ch_2), max(Conc_bins_ch_2))
+                dpg.set_axis_limits('hist_yc_axis_ch2', 0, max(Conc_hist_ch_2))
+                
+                dpg.set_value('np_dist_ser_ch_2',(Mols_bins_ch_2,Mols_hist_ch_2))
+                dpg.set_value('np_mean_ser_ch_2',(np.array([self.mean_Molecules_ch_2]),np.array([max(Mols_hist_ch_2)])))
+                dpg.set_value('np_med_ser_ch_2',(np.array([median_Molecules_ch_2]),np.array([max(Mols_hist_ch_2)])))
+                dpg.set_axis_limits('hist_xnp_axis_ch2', min(Mols_bins_ch_2), max(Mols_bins_ch_2))
+                dpg.set_axis_limits('hist_ynp_axis_ch2', 0, max(Mols_hist_ch_2))
+                
+                dpg.set_value('phot_dist_ser_ch_2',(Phot_bins_ch_2,Phot_hist_ch_2))
+                dpg.set_value('phot_mean_ser_ch_2',(np.array([self.mean_Photons_ch_2]),np.array([max(Phot_hist_ch_2)])))
+                dpg.set_value('phot_med_ser_ch_2',(np.array([median_Photons_ch_2]),np.array([max(Phot_hist_ch_2)])))
+                dpg.set_axis_limits('hist_xphot_axis_ch2', min(Phot_bins_ch_2), max(Phot_bins_ch_2))
+                dpg.set_axis_limits('hist_yphot_axis_ch2', 0, max(Phot_hist_ch_2))
+                
+                dpg.configure_item('c_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Concentration_ch_2,4)))
+                dpg.configure_item('c_med_ser_ch_2',label='Median = '+str(np.round(self.median_C_ch_2,4)))
+                
+                dpg.configure_item('np_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Molecules_ch_2,2)))
+                dpg.configure_item('np_med_ser_ch_2',label='Median = '+str(np.round(median_Molecules_ch_2,2)))
+                
+                dpg.configure_item('phot_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Photons_ch_2,1)))
+                dpg.configure_item('phot_med_ser_ch_2',label='Median = '+str(np.round(median_Photons_ch_2,1)))
+                
+                
+                try:
+                    dpg.show_item('hist_conc_plot_ch2')
+                except:
+                    pass
+                
+                try:
+                    dpg.show_item('hist_np_plot_ch2')
+                except:
+                    pass
+                
+                try:
+                    dpg.show_item('hist_phot_plot_ch2')
+                except:
+                    pass
+                
+                
+                
+                
+                if dpg.get_value('Photons_array_checkbox'):
+                    phot_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_ch_2.csv')
+                    
+                    Photons_2.to_csv(phot_array_path_ch_2,index=False,sep=',', header=None)
+                else:
+                    pass
+                
+                
+                if dpg.get_value('Np_array_checkbox'):
+                    Np_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_ch_2.csv')
+                    
+                    Molecules_ch_2.to_csv(Np_array_path_ch_2,index=False,sep=',', header=None)
+                    
+                    Np_err_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_err_ch_2.csv')
+                    Molecules_err_ch_2.to_csv(Np_err_array_path_ch_2,index=False,sep=',', header=None)
+                else:
+                    pass
+                if dpg.get_value('C_array_checkbox'):
+                    Conc_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_ch_2.csv')
+                    
+                    Concentration_ch_2.to_csv(Conc_array_path_ch_2,index=False,sep=',', header=None)
+                    
+                    Conc_err_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_err_ch_2.csv')
+                    Concentration_err_ch_2.to_csv(Conc_err_array_path_ch_2,index=False,sep=',', header=None)
+                    
+                    
+                else:
+                    pass
+                
+                if dpg.get_value('Photons_Hmaps_checkbox'):
+                    phot_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_HM_ch_2.png')
+    
+                    fig = Figure(facecolor='white')
+    
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Photons_2.min().min(), vmax=Photons_2.max().max())
+                    ax.imshow(Photons_2,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(phot_hmap_path_ch_2)
+                    
+                else:
+                    pass
+                
+                if dpg.get_value('Np_Hmaps_checkbox'):
+                    Np_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_HM_ch_2.png')
+    
+                    fig = Figure(facecolor='white')
+    
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Molecules_ch_2.min().min(), vmax=Molecules_ch_2.max().max())
+                    ax.imshow(Molecules_ch_2,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(Np_hmap_path_ch_2)
+                    
+                else:
+                    pass
+    
+                if dpg.get_value('C_Hmaps_checkbox'):
+                    C_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_HM_ch_2.png')
+                    fig = Figure(facecolor='white')
+                    ax = fig.add_axes(rect)
+                    norm = mpl.colors.Normalize(vmin=Concentration_ch_2.min().min(), vmax=Concentration_ch_2.max().max())
+                    ax.imshow(Concentration_ch_2,cmap =cmap)
+    
+                    ax.axis('off')
+                    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                    FigureCanvas(fig).print_png(C_hmap_path_ch_2)
+                    
+                else:
+                    pass
+            else:
+                pass
+        
+        
+        elif len(Channels) == 2:
+            brightness_ch_1 = dpg.get_value('Brightness_input_ch_1')
+            brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
+            Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
+            Veff_err_ch_1 = 1e-15*dpg.get_value('focal_vol_err_input_ch_1')
+            # DF = Current_image_1
+            self.DF = self.image_1_times_roi
+            Photons_1 = pd.DataFrame(self.DF)
+            n_pixels_1 =  Photons_1.stack().reset_index(drop=True).dropna().count()
+    
+            # Photons_1t = pd.DataFrame(np.nan_to_num(image_1_times_roi, nan=0))
+            # n_pixels_1test =  Photons_1t.stack().reset_index(drop=True).dropna().count()
+            
+            # lnprint('N pixel test', n_pixels_1,n_pixels_1test)
+    
+            
+            Molecules_ch_1 = self.calc_molecules(self.DF,
+                                                 self.PTU_Px_dwell,
+                                                 self.PTU_N_frames,
+                                                 brightness_ch_1,
+                                                 brightness_err_ch_1)[0]
+            Molecules_err_ch_1 = self.calc_molecules(self.DF,
+                                                     self.PTU_Px_dwell,
+                                                     self.PTU_N_frames,
+                                                     brightness_ch_1,
+                                                     brightness_err_ch_1)[1]
+            Concentration_ch_1 = 1e9*self.CONC(Molecules_ch_1,Veff_ch_1,Molecules_err_ch_1,Veff_err_ch_1)[0]
+            Concentration_err_ch_1 = 1e9*self.CONC(Molecules_ch_1,Veff_ch_1,Molecules_err_ch_1,Veff_err_ch_1)[1]
+    
+            
+            
+            self.mean_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().mean()
+            self.mean_Photons_err_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+            self.mean_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().mean()
+            if not dpg.get_value('Error_type_checkbox'):
+                self.mean_Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1).stack().reset_index(drop=True).dropna().mean()
+            else:
+                self.mean_Molecules_err_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+            
+            
+            self.mean_Concentration_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().mean()
+            if not dpg.get_value('Error_type_checkbox'):
+                self.mean_Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1).stack().reset_index(drop=True).dropna().mean()
+            else:
+                self.mean_Concentration_err_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_1)
+            
+            
+            self.median_C_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().median()
+            self.median_err_C_ch_1 = median_abs_deviation(pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna())
+            dpg.set_value('sinle_phot_output_ch_1',self.mean_Photons_ch_1)
+            
+            dpg.set_value('sinle_phot_err_output_ch_1',self.mean_Photons_err_ch_1)
+            dpg.set_value('sinle_mols_output_ch_1',self.mean_Molecules_ch_1)
+            
+            dpg.set_value('sinle_mols_err_output_ch_1',self.mean_Molecules_err_ch_1)
+            dpg.set_value('single_conc_output_ch_1',self.mean_Concentration_ch_1)
+            
+            dpg.set_value('single_conc_err_output_ch_1',self.mean_Concentration_err_ch_1)
+            Molecules_ch_1 = pd.DataFrame(Molecules_ch_1)
+            Concentration_ch_1 = pd.DataFrame(Concentration_ch_1)
+            
+            Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1)
+            Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1)
+            
+            
+            
+    
+            Phot_hist_ch_1,Phot_bins_ch_1 =np.histogram(Photons_1.stack().reset_index(drop=True).dropna().values,
+                                                        density=True,bins='auto')
+            Phot_bins_ch_1=Phot_bins_ch_1[:-1]
+            median_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().median()
+    
+            Mols_hist_ch_1,Mols_bins_ch_1 =np.histogram(pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().values
+                                                        ,density=True,bins='auto')
+            Mols_bins_ch_1=Mols_bins_ch_1[:-1]
+            median_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().median()
+    
+            Conc_hist_ch_1,Conc_bins_ch_1 =np.histogram(pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().values
+                                                        ,density=True,bins='auto')
+            Conc_bins_ch_1=Conc_bins_ch_1[:-1]
+    
+            ind=np.where(Conc_hist_ch_1!=0)[0]
+    
+            Conc_hist_ch_1=Conc_hist_ch_1[ind]
+            Conc_bins_ch_1=Conc_bins_ch_1[ind]
+    
+            ind=np.where(Mols_hist_ch_1!=0)[0]
+    
+            Mols_hist_ch_1=Mols_hist_ch_1[ind]
+            Mols_bins_ch_1=Mols_bins_ch_1[ind]
+    
+            ind=np.where(Phot_hist_ch_1!=0)[0]
+    
+            Phot_hist_ch_1=Phot_hist_ch_1[ind]
+            Phot_bins_ch_1=Phot_bins_ch_1[ind]
+    
+            dpg.set_value('c_dist_ser_ch_1',(Conc_bins_ch_1,Conc_hist_ch_1))
+            dpg.set_value('c_mean_ser_ch_1',(np.array([self.mean_Concentration_ch_1]),np.array([max(Conc_hist_ch_1)])))
+            dpg.set_value('c_med_ser_ch_1',(np.array([self.median_C_ch_1]),np.array([max(Conc_hist_ch_1)])))
+            dpg.set_axis_limits('hist_xc_axis_ch1', min(Conc_bins_ch_1), max(Conc_bins_ch_1))
+            dpg.set_axis_limits('hist_yc_axis_ch1', 0, max(Conc_hist_ch_1))
+    
+            dpg.set_value('np_dist_ser_ch_1',(Mols_bins_ch_1,Mols_hist_ch_1))
+            dpg.set_value('np_mean_ser_ch_1',(np.array([self.mean_Molecules_ch_1]),np.array([max(Mols_hist_ch_1)])))
+            dpg.set_value('np_med_ser_ch_1',(np.array([median_Molecules_ch_1]),np.array([max(Mols_hist_ch_1)])))
+            dpg.set_axis_limits('hist_xnp_axis_ch1', min(Mols_bins_ch_1), max(Mols_bins_ch_1))
+            dpg.set_axis_limits('hist_ynp_axis_ch1', 0, max(Mols_hist_ch_1))
+    
+            dpg.set_value('phot_dist_ser_ch_1',(Phot_bins_ch_1,Phot_hist_ch_1))
+            dpg.set_value('phot_mean_ser_ch_1',(np.array([self.mean_Photons_ch_1]),np.array([max(Phot_hist_ch_1)])))
+            dpg.set_value('phot_med_ser_ch_1',(np.array([median_Photons_ch_1]),np.array([max(Phot_hist_ch_1)])))
+            dpg.set_axis_limits('hist_xphot_axis_ch1', min(Phot_bins_ch_1), max(Phot_bins_ch_1))
+            dpg.set_axis_limits('hist_yphot_axis_ch1', 0, max(Phot_hist_ch_1))
+    
+            dpg.configure_item('c_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Concentration_ch_1,4)))
+            dpg.configure_item('c_med_ser_ch_1',label='Median = '+str(np.round(self.median_C_ch_1,4)))
+    
+            dpg.configure_item('np_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Molecules_ch_1,2)))
+            dpg.configure_item('np_med_ser_ch_1',label='Median = '+str(np.round(median_Molecules_ch_1,2)))
+    
+            dpg.configure_item('phot_mean_ser_ch_1',label='Mean = '+str(np.round(self.mean_Photons_ch_1,1)))
+            dpg.configure_item('phot_med_ser_ch_1',label='Median = '+str(np.round(median_Photons_ch_1,1)))
+    
+    
+            try:
+                dpg.show_item('hist_conc_plot_ch1')
+            except:
+                pass
+    
+            try:
+                dpg.show_item('hist_np_plot_ch1')
+            except:
+                pass
+    
+            try:
+                dpg.show_item('hist_phot_plot_ch1')
+            except:
+                pass
+    
+    
+            
+    
+            if dpg.get_value('Photons_array_checkbox'):
+                phot_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_ch_1.csv')
+                
+                Photons_1.to_csv(phot_array_path_ch_1,index=False,sep=',', header=None)
+            else:
+                pass
+            
+            if dpg.get_value('Np_array_checkbox'):
+                Np_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_ch_1.csv')
+                
+                Molecules_ch_1.to_csv(Np_array_path_ch_1,index=False,sep=',', header=None)
+                
+                Np_err_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_err_ch_1.csv')
+                Molecules_err_ch_1.to_csv(Np_err_array_path_ch_1,index=False,sep=',', header=None)
+                
+            else:
+                pass
+            if dpg.get_value('C_array_checkbox'):
+                Conc_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_ch_1.csv')
+                
+                Concentration_ch_1.to_csv(Conc_array_path_ch_1,index=False,sep=',', header=None)
+                
+                Conc_err_array_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_err_ch_1.csv')
+                Concentration_err_ch_1.to_csv(Conc_err_array_path_ch_1,index=False,sep=',', header=None)
+                
+            else:
+                pass
+    
+            
+            if dpg.get_value('Photons_Hmaps_checkbox'):
+                phot_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_HM_ch_1.png')
+    
+                fig = Figure(facecolor='white')
+    
+                ax = fig.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Photons_1.min().min(), vmax=Photons_1.max().max())
+                ax.imshow(Photons_1,cmap =cmap)
+    
+                ax.axis('off')
+                fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig).print_png(phot_hmap_path_ch_1)
+                
+            else:
+                pass        
+    
+            if dpg.get_value('Np_Hmaps_checkbox'):
+                Np_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_Np_HM_ch_1.png')
+    
+                fig1 = Figure(facecolor='white')
+    
+                ax = fig1.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Molecules_ch_1.min().min(), vmax=Molecules_ch_1.max().max())
+                ax.imshow(Molecules_ch_1,cmap =cmap)
+    
+                ax.axis('off')
+                fig1.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig1).print_png(Np_hmap_path_ch_1)
+                
+            else:
+                pass
+    
+            if dpg.get_value('C_Hmaps_checkbox'):
+                C_hmap_path_ch_1 = os.path.join(self.PTU_directory,self.anal_file+'_conc_HM_ch_1.png')
+                fig1 = Figure(facecolor='white')
+                ax = fig1.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Concentration_ch_1.min().min(), vmax=Concentration_ch_1.max().max())
+                ax.imshow(Concentration_ch_1,cmap =cmap)
+    
+                ax.axis('off')
+                fig1.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig1).print_png(C_hmap_path_ch_1)
+                
+            else:
+                pass
+            
+            brightness_ch_2 = dpg.get_value('Brightness_input_ch_2')
+            brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2') 
+            Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
+            Veff_err_ch_2 = 1e-15*dpg.get_value('focal_vol_err_input_ch_2')
+            # DF2 = Current_image_2
+            self.DF2 = self.image_2_times_roi
+            Photons_2 = pd.DataFrame(self.DF2)
+            n_pixels_2 =  Photons_2.stack().reset_index(drop=True).dropna().count()
+            
+            self.mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
+            self.mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+            Molecules_ch_2 = self.calc_molecules(self.DF2,
+                                                 self.PTU_Px_dwell,
+                                                 self.PTU_N_frames,
+                                                 brightness_ch_2,
+                                                 brightness_err_ch_2)[0]
+            Molecules_err_ch_2 = self.calc_molecules(self.DF2,
+                                                     self.PTU_Px_dwell,
+                                                     self.PTU_N_frames,
+                                                     brightness_ch_2,
+                                                     brightness_err_ch_2)[1]
+            
+            
+            Concentration_ch_2 = 1e9*self.CONC(Molecules_ch_2,Veff_ch_2,Molecules_err_ch_2,Veff_err_ch_2)[0]
+            Concentration_err_ch_2 = 1e9*self.CONC(Molecules_ch_2,Veff_ch_2,Molecules_err_ch_2,Veff_err_ch_2)[1]
+            
+            self.mean_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().mean()
+            if not dpg.get_value('Error_type_checkbox'):
+                self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2).stack().reset_index(drop=True).dropna().mean()
+            else:
+                self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+            
+            
+            
+            self.mean_Concentration_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().mean()
+            if not dpg.get_value('Error_type_checkbox'):
+                self.mean_Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2).stack().reset_index(drop=True).dropna().mean()
+            else:
+                self.mean_Concentration_err_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().std()/sqrt(n_pixels_2)
+            
+            self.median_C_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().median()
+            self.median_err_C_ch_2 = median_abs_deviation(pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna())
+            dpg.set_value('sinle_phot_output_ch_2',self.mean_Photons_ch_2)
+            
+            dpg.set_value('sinle_phot_err_output_ch_2',self.mean_Photons_err_ch_2)
+            dpg.set_value('sinle_mols_output_ch_2',self.mean_Molecules_ch_2)
+            
+            dpg.set_value('sinle_mols_err_output_ch_2',self.mean_Molecules_err_ch_2)
+            dpg.set_value('single_conc_output_ch_2',self.mean_Concentration_ch_2)
+            
+            dpg.set_value('single_conc_err_output_ch_2',self.mean_Concentration_err_ch_2)
+            Molecules_ch_2 = pd.DataFrame(Molecules_ch_2)
+            Concentration_ch_2 = pd.DataFrame(Concentration_ch_2)
+            
+            Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2)
+            Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2)
+            Phot_hist_ch_2,Phot_bins_ch_2 =np.histogram(Photons_2.stack().reset_index(drop=True).dropna().values,
+                                                        density=True,bins='auto')
+            Phot_bins_ch_2=Phot_bins_ch_2[:-1]
+            median_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().median()
+    
+            Mols_hist_ch_2,Mols_bins_ch_2 =np.histogram(pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().values
+                                                        ,density=True,bins='auto')
+            Mols_bins_ch_2=Mols_bins_ch_2[:-1]
+            median_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().median()
+    
+            Conc_hist_ch_2,Conc_bins_ch_2 =np.histogram(pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().values
+                                                        ,density=True,bins='auto')
+            Conc_bins_ch_2=Conc_bins_ch_2[:-1]
+    
+            ind=np.where(Conc_hist_ch_2!=0)[0]
+    
+            Conc_hist_ch_2=Conc_hist_ch_2[ind]
+            Conc_bins_ch_2=Conc_bins_ch_2[ind]
+    
+            ind=np.where(Mols_hist_ch_2!=0)[0]
+    
+            Mols_hist_ch_2=Mols_hist_ch_2[ind]
+            Mols_bins_ch_2=Mols_bins_ch_2[ind]
+    
+            ind=np.where(Phot_hist_ch_2!=0)[0]
+    
+            Phot_hist_ch_2=Phot_hist_ch_2[ind]
+            Phot_bins_ch_2=Phot_bins_ch_2[ind]
+    
+            dpg.set_value('c_dist_ser_ch_2',(Conc_bins_ch_2,Conc_hist_ch_2))
+            dpg.set_value('c_mean_ser_ch_2',(np.array([self.mean_Concentration_ch_2]),np.array([max(Conc_hist_ch_2)])))
+            dpg.set_value('c_med_ser_ch_2',(np.array([self.median_C_ch_2]),np.array([max(Conc_hist_ch_2)])))
+            dpg.set_axis_limits('hist_xc_axis_ch2', min(Conc_bins_ch_2), max(Conc_bins_ch_2))
+            dpg.set_axis_limits('hist_yc_axis_ch2', 0, max(Conc_hist_ch_2))
+    
+            dpg.set_value('np_dist_ser_ch_2',(Mols_bins_ch_2,Mols_hist_ch_2))
+            dpg.set_value('np_mean_ser_ch_2',(np.array([self.mean_Molecules_ch_2]),np.array([max(Mols_hist_ch_2)])))
+            dpg.set_value('np_med_ser_ch_2',(np.array([median_Molecules_ch_2]),np.array([max(Mols_hist_ch_2)])))
+            dpg.set_axis_limits('hist_xnp_axis_ch2', min(Mols_bins_ch_2), max(Mols_bins_ch_2))
+            dpg.set_axis_limits('hist_ynp_axis_ch2', 0, max(Mols_hist_ch_2))
+    
+            dpg.set_value('phot_dist_ser_ch_2',(Phot_bins_ch_2,Phot_hist_ch_2))
+            dpg.set_value('phot_mean_ser_ch_2',(np.array([self.mean_Photons_ch_2]),np.array([max(Phot_hist_ch_2)])))
+            dpg.set_value('phot_med_ser_ch_2',(np.array([median_Photons_ch_2]),np.array([max(Phot_hist_ch_2)])))
+            dpg.set_axis_limits('hist_xphot_axis_ch2', min(Phot_bins_ch_2), max(Phot_bins_ch_2))
+            dpg.set_axis_limits('hist_yphot_axis_ch2', 0, max(Phot_hist_ch_2))
+    
+            dpg.configure_item('c_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Concentration_ch_2,4)))
+            dpg.configure_item('c_med_ser_ch_2',label='Median = '+str(np.round(self.median_C_ch_2,4)))
+    
+            dpg.configure_item('np_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Molecules_ch_2,2)))
+            dpg.configure_item('np_med_ser_ch_2',label='Median = '+str(np.round(median_Molecules_ch_2,2)))
+    
+            dpg.configure_item('phot_mean_ser_ch_2',label='Mean = '+str(np.round(self.mean_Photons_ch_2,1)))
+            dpg.configure_item('phot_med_ser_ch_2',label='Median = '+str(np.round(median_Photons_ch_2,1)))
+    
+    
+            try:
+                dpg.show_item('hist_conc_plot_ch2')
+            except:
+                pass
+    
+            try:
+                dpg.show_item('hist_np_plot_ch2')
+            except:
+                pass
+    
+            try:
+                dpg.show_item('hist_phot_plot_ch2')
+            except:
+                pass
+    
+    
+            
+            
+    
+            if dpg.get_value('Photons_array_checkbox'):
+                phot_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_ch_2.csv')
+                
+                Photons_2.to_csv(phot_array_path_ch_2,index=False,sep=',', header=None)
+            else:
+                pass        
+    
+            if dpg.get_value('Np_array_checkbox'):
+                Np_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_ch_2.csv')
+                
+                Molecules_ch_2.to_csv(Np_array_path_ch_2,index=False,sep=',', header=None)
+                
+                Np_err_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_err_ch_2.csv')
+                Molecules_err_ch_2.to_csv(Np_err_array_path_ch_2,index=False,sep=',', header=None)
+            else:
+                pass
+            if dpg.get_value('C_array_checkbox'):
+                Conc_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_ch_2.csv')
+                
+                Concentration_ch_2.to_csv(Conc_array_path_ch_2,index=False,sep=',', header=None)
+                
+                
+                Conc_err_array_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_err_ch_2.csv')
+                Concentration_err_ch_2.to_csv(Conc_err_array_path_ch_2,index=False,sep=',', header=None)
+            else:
+                pass
+    
+            if dpg.get_value('Photons_Hmaps_checkbox'):
+                phot_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Phot_HM_ch_2.png')
+    
+                fig = Figure(facecolor='white')
+    
+                ax = fig.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Photons_2.min().min(), vmax=Photons_2.max().max())
+                ax.imshow(Photons_2,cmap =cmap)
+    
+                ax.axis('off')
+                fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig).print_png(phot_hmap_path_ch_2)
+                
+            else:
+                pass       
+    
+            if dpg.get_value('Np_Hmaps_checkbox'):
+                Np_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_Np_HM_ch_2.png')
+    
+                fig2 = Figure(facecolor='white')
+    
+                ax = fig2.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Molecules_ch_2.min().min(), vmax=Molecules_ch_2.max().max())
+                ax.imshow(Molecules_ch_2,cmap =cmap)
+    
+                ax.axis('off')
+                fig2.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig2).print_png(Np_hmap_path_ch_2)
+                
+            else:
+                pass
+    
+            if dpg.get_value('C_Hmaps_checkbox'):
+                C_hmap_path_ch_2 = os.path.join(self.PTU_directory,self.anal_file+'_conc_HM_ch_2.png')
+                fig2 = Figure(facecolor='white')
+                ax = fig2.add_axes(rect)
+                norm = mpl.colors.Normalize(vmin=Concentration_ch_2.min().min(), vmax=Concentration_ch_2.max().max())
+                ax.imshow(Concentration_ch_2,cmap =cmap)
+    
+                ax.axis('off')
+                fig2.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax)
+                FigureCanvas(fig2).print_png(C_hmap_path_ch_2)
+                
+            else:
+                pass
+        
+        else:
+            pass
+        
+
+
+
+    def callback_calculate_all(self,sender,app_data):
+        
+        filenames = [f.replace('.ptu','') for f in self.files]
+        
+        
+        for cnt, an_file in enumerate(filenames):
+            self.anal_file=an_file
+            
+            dpg.configure_item('file_box', default_value=an_file)
+            self.callback_listbox('file_box',self.anal_file)
+            # load_PTU_images(an_file)
+            # callback_calculate(sender,app_data)
+            
+            
+            
+            
+            
+            
+            
+            if len(Channels) == 1:
+                if '1' in Channels[0]:
+            
+            
+                    Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                         1,
+                                                         self.mean_Photons_ch_1,
+                                                         self.mean_Photons_err_ch_1,
+                                                         self.mean_Molecules_ch_1,
+                                                         self.mean_Molecules_err_ch_1,
+                                                         self.mean_Concentration_ch_1,
+                                                         self.mean_Concentration_err_ch_1,
+                                                         self.median_C_ch_1,
+                                                         self.median_err_C_ch_1]],
+                                                       columns=self.Sing_Results_DF.columns)
+                
+                elif '2' in Channels[0]:
+                    Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                         2,
+                                                         self.mean_Photons_ch_2,
+                                                         self.mean_Photons_err_ch_2,
+                                                         self.mean_Molecules_ch_2,
+                                                         self.mean_Molecules_err_ch_2,
+                                                         self.mean_Concentration_ch_2,
+                                                         self.mean_Concentration_err_ch_2,
+                                                         self.median_C_ch_2,
+                                                         self.median_err_C_ch_2]],
+                                                       columns=self.Sing_Results_DF.columns)
+                else:
+                    pass
+            
+            if len(Channels) == 2:
+                Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                     1,
+                                                     self.mean_Photons_ch_1,
+                                                     self.mean_Photons_err_ch_1,
+                                                     self.mean_Molecules_ch_1,
+                                                     self.mean_Molecules_err_ch_1,
+                                                     self.mean_Concentration_ch_1,
+                                                     self.mean_Concentration_err_ch_1,
+                                                     self.median_C_ch_1,
+                                                     self.median_err_C_ch_1],
+                                                    [self.anal_file,
+                                                     2,
+                                                     self.mean_Photons_ch_2,
+                                                     self.mean_Photons_err_ch_2,
+                                                     self.mean_Molecules_ch_2,
+                                                     self.mean_Molecules_err_ch_2,
+                                                     self.mean_Concentration_ch_2,
+                                                     self.mean_Concentration_err_ch_2,
+                                                     self.median_C_ch_2,
+                                                     self.median_err_C_ch_2]],
+                                                   columns=self.Sing_Results_DF.columns)
+    
+    
+    
+            self.Sing_Results_DF=pd.concat([self.Sing_Results_DF,Sing_Results_DF_tmp]).reset_index(drop=True)
+            
+    
+    def callback_directory_select(self,sender,app_data):
+        self.files=()
+        self.directory = app_data['file_path_name']
+        self.PTU_directory = self.directory
+        self.new_directory=self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        self.files = tuple(np.sort([f for f in os.listdir(self.directory) if f.endswith('.ptu')]))
+        
+        if len(files)==0:
+            show_error_no_files('No PTU files found.')
+        else:
+            self.update_flist(self.files)
+        
+        self.anal_file=files[0]
+        dpg.configure_item('file_box', default_value=self.anal_file)   
+
+    def callback_empty(self,sender,app_data):
+        '''Empty function. Do nothing.'''
+        pass
+
+
+    # def callback_font_size(self,sender,app_data):
+    #     global current_font_size,ratio_w,ratio_h,dif_vp0_width
+    #     global inf_w
+    #     font = 'DejaVu'
+        
+    #     inf_w = dpg.get_viewport_width()-dif_vp0_width
+    #     inf_h = dpg.get_viewport_height()
+    #     ratio_w = inf_w/(init_widths['VIEWPORT']-dif_vp0_width)
+    #     ratio_h = inf_h/init_heights['VIEWPORT']
+    #     ratio = 1
+    #     if ratio_w < ratio_h:
+    #         ratio = ratio_w
+    #     else:
+    #         ratio = ratio_h
+    
+    #     new_font_size = int(init_font_size*ratio)
+    #     current_font_size = new_font_size
+        
+    #     dpg.delete_item(font)
+    #     dpg.delete_item('Font_registry')
+    #     add_font_to_registry(current_font_size)
+        
+    def callback_kappa_err_input(self,sender,app_data):
+        
+        if sender == 'kappa_err_input_ch_1':
+            omega = dpg.get_value('omega_input_ch_1')
+            omega_err = dpg.get_value('omega_err_input_ch_1')
+            kappa = dpg.get_value('kappa_input_ch_1')
+            kappa_err =  app_data
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_1',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_1',default_value = foc_vol[1] )
+        else:
+            omega = dpg.get_value('omega_input_ch_2')
+            omega_err = dpg.get_value('omega_err_input_ch_2')
+            kappa = dpg.get_value('kappa_input_ch_2')
+            kappa_err =  app_data
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_2',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_2',default_value = foc_vol[1] )
+
+
+
+    def callback_kappa_input(self,sender,app_data):
+        
+        if sender == 'kappa_input_ch_1':
+            omega = dpg.get_value('omega_input_ch_1')
+            omega_err = dpg.get_value('omega_err_input_ch_1')
+            kappa = app_data
+            kappa_err =  dpg.get_value('kappa_err_input_ch_1')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_1',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_1',default_value = foc_vol[1] )
+        else:
+            omega = dpg.get_value('omega_input_ch_2')
+            omega_err = dpg.get_value('omega_err_input_ch_2')
+            kappa = app_data
+            kappa_err =  dpg.get_value('kappa_err_input_ch_2')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_2',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_2',default_value = foc_vol[1] )
+
+
+    def callback_listbox(self,sender,app_data):
+        self.anal_file = app_data
+    
+        pkl_file = self.anal_file+'.rpk'
+        pkl_path = os.path.join(self.last_directory,pkl_file)
+        # lnprint(pkl_file)
+        if os.path.exists(pkl_path):
+            # lnprint('loading_pkl')
+            self.pkl = self._load_pkl_file(pkl_path)
+            
+        else:
+             self.pkl = {}
+        
+        self.load_PTU_images(self.anal_file)
+        self.hide_histograms()
+        self.callback_calculate(sender,app_data)
+
+    def callback_no_files_dialog_close_only(self,sender,app_data):
+        dpg.configure_item('No_data_files',show=False)
+        dpg.delete_item('no_files_error_text')
+        dpg.delete_item('no_files_error_butt')
+        dpg.delete_item('No_data_files')
+
+    def callback_omega_err_input(self,sender,app_data):
+    
+        if sender == 'omega_err_input_ch_1':
+            omega = dpg.get_value('omega_input_ch_1')
+            omega_err = app_data
+            kappa = dpg.get_value('kappa_input_ch_1')
+            kappa_err =  dpg.get_value('kappa_err_input_ch_1')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_1',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_1',default_value = foc_vol[1] )
+        else:
+            omega = dpg.get_value('omega_input_ch_2')
+            omega_err = app_data
+            kappa = dpg.get_value('kappa_input_ch_2')
+            kappa_err =  dpg.get_value('kappa_err_input_ch_2')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_2',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_2',default_value = foc_vol[1] )
+
+
+    def callback_omega_input(self,sender,app_data):
+        
+        if sender == 'omega_input_ch_1':
+            omega = app_data
+            omega_err = dpg.get_value('omega_err_input_ch_1')
+            kappa = dpg.get_value('kappa_input_ch_1')
+            kappa_err =  dpg.get_value('kappa_err_input_ch_1')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_1',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_1',default_value = foc_vol[1] )
+        else:
+            omega = app_data
+            omega_err = dpg.get_value('omega_err_input_ch_2')
+            kappa = dpg.get_value('kappa_input_ch_2')
+            kappa_err =  dpg.get_value('kappa_err_input_ch_2')
+            foc_vol = self.VEFF(omega,kappa,omega_err,kappa_err)
+            dpg.configure_item('focal_vol_input_ch_2',default_value = foc_vol[0] )
+            dpg.configure_item('focal_vol_err_input_ch_2',default_value = foc_vol[1] )
+
+
+    def callback_remove_result_button(self,sender,app_data):
+        if sender == 'remove_button_results_ch_1':
+            ind_result_to_remove =[]
+            for i in self.FCS_results_ch_1.index:
+                if dpg.get_value('ch_1_results_delete_'+str(i)+'_check_ch_1'):
+                    ind_result_to_remove.append(i)
+            
+            self.FCS_results_ch_1.drop(self.FCS_results_ch_1.index[ind_result_to_remove],inplace=True)
+            self.FCS_results_ch_1.reset_index(drop=True,inplace=True)
+    
+            self.mean_bright_input_ch_1()
+    
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_1_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_1_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for i in self.FCS_results_ch_1.index:
+    
+                with dpg.table_row(tag='ch_1_row_results_show_ch_1'+str(i),
+                                   parent='table_results_show_ch_1'):
+    
+                    dpg.add_text(self.FCS_results_ch_1.at[i,'file'],
+                                 tag='ch_1_results_show_'+str(i)+'_name_ch_1')
+                    dpg.add_text(np.round(self.FCS_results_ch_1.at[i,'N_p'],2),
+                                 tag='ch_1_results_show_'+str(i)+'_N_p_value_ch_1')
+                    dpg.add_text(self.FCS_results_ch_1.at[i,'Brightness'],
+                                 tag='ch_1_results_show_'+str(i)+'_Brightness_value_ch_1')
+                    dpg.add_checkbox(label='',
+                                     tag='ch_1_results_delete_'+str(i)+'_check_ch_1')
+        else:
+            ind_result_to_remove =[]
+            for i in self.FCS_results_ch_2.index:
+                if dpg.get_value('ch_2_results_delete_'+str(i)+'_check_ch_2'):
+                    ind_result_to_remove.append(i)
+            self.FCS_results_ch_2.drop(self.FCS_results_ch_2.index[ind_result_to_remove],inplace=True)
+            self.FCS_results_ch_2.reset_index(drop=True,inplace=True)
+    
+            self.mean_bright_input_ch_2()
+    
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_results_show_'):
+                    try:
+    
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+                if alias.startswith('ch_2_results_delete_'):
+                    try: 
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for alias in dpg.get_aliases():
+                if alias.startswith('ch_2_row_results_show'):
+                    try:
+                        dpg.delete_item(alias)
+                    except:
+                        pass
+            for i in self.FCS_results_ch_2.index:
+    
+                with dpg.table_row(tag='ch_2_row_results_show_ch_2'+str(i),
+                                   parent='table_results_show_ch_2'):
+    
+                    dpg.add_text(self.FCS_results_ch_2.at[i,'file'],
+                                 tag='ch_2_results_show_'+str(i)+'_name_ch_2')
+                    dpg.add_text(np.round(self.FCS_results_ch_2.at[i,'N_p'],2),
+                                 tag='ch_2_results_show_'+str(i)+'_N_p_value_ch_2')
+                    dpg.add_text(self.FCS_results_ch_2.at[i,'Brightness'],
+                                 tag='ch_2_results_show_'+str(i)+'_Brightness_value_ch_2')
+                    dpg.add_checkbox(label='',
+                                     tag='ch_2_results_delete_'+str(i)+'_check_ch_2')
+
+
+    
+    def callback_reset_results_DF(self):
+        self.Sing_Results_DF = pd.DataFrame(columns=['File',
+                                                     'Channel',
+                                                     '<Counts>',
+                                                     'Counts_std',
+                                                     '<N_p>',
+                                                     'N_p_err',
+                                                     '<C>',
+                                                     'C_err',
+                                                     'C_median',
+                                                     'C_median_abs_err'])
+
+    def callback_select_lt_to_roi(self,sender,app_data):
+        self.load_PTU_images(self.anal_file)
+
+
+    def callback_select_roi(self,sender,app_data):
+        if dpg.get_value(sender):
+            dpg.set_value('Auto_ROI_checkbox',False)
+            dpg.configure_item('cell_tresh_ratio_1',enabled=False)
+            dpg.configure_item('nucleus_search_1',enabled=False)
+            dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
+            dpg.configure_item('cell_tresh_ratio_2',enabled=False)
+            dpg.configure_item('nucleus_search_2',enabled=False)
+            dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
+        else:
+            pass
+        if self.ROI_directory!=None:
+            self.load_PTU_images(self.anal_file)
+            
+        else:
+            dpg.show_item('ROI_folder_dialog_id')
+
+    def callback_select_autoroi(self,sender,app_data):
+        if dpg.get_value(sender):
+            dpg.set_value('FILE_ROI_checkbox',False)
+            dpg.configure_item('cell_tresh_ratio_1',enabled=True)
+            dpg.configure_item('nucleus_search_1',enabled=True)
+            dpg.configure_item('nucl_tresh_ratio_1',enabled=True)
+            dpg.configure_item('cell_tresh_ratio_2',enabled=True)
+            dpg.configure_item('nucleus_search_2',enabled=True)
+            dpg.configure_item('nucl_tresh_ratio_2',enabled=True)
+            
+        else:
+            dpg.configure_item('cell_tresh_ratio_1',enabled=False)
+            dpg.configure_item('nucleus_search_1',enabled=False)
+            dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
+            dpg.configure_item('cell_tresh_ratio_2',enabled=False)
+            dpg.configure_item('nucleus_search_2',enabled=False)
+            dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
+        self.load_PTU_images(selfanal_file)
+    
+    # def callback_show_int(self,sender,app_data):
+    #     self.load_PTU_images(self.anal_file)
+
+    # def callback_show_lt(self,sender,app_data):
+    #     self.load_PTU_images(self.anal_file)
+
+    # def callback_test(self,sender,app_data):
+    #     items = dpg.get_aliases()
+    #     if 'texture_tag_chan_1' in items:
+    #         dpg.delete_item('texture_tag_chan_1')
+            
+        
+        
+    #     else:
+    #         pass
+
+
+
+
+    # def callback_windows_size(sender,app_data):
+    #     global image_width1,image_height1,dpg_image1
+    #     global ratio_w ,ratio_h ,top_indent,bottom_indent,left_indent,right_indent,internal_indent
+    #     global group_spacer,var_def_group_1_spacer
+    #     global init_widths, init_heights,init_position
+    #     global DF,DF2
+    #     global Current_image_1,Current_image_2
+    #     global tex_1_name,tex_2_name,dif_vp0_width
+    #     global inf_w
+    #     # lnprint('RUNNING: callback_windows_size')
+    #     inf_w = dpg.get_viewport_width()-dif_vp0_width
+        
+    #     inf_h = dpg.get_viewport_height()
+        
+    #     items = dpg.get_aliases()
+        
+    #     # lnprint('reseize',inf_w,inf_h)
+    
+    #     item_types = []
+    #     for item in items:
+    #         item_types.append(dpg.get_item_type(item))
+    #     item_types=set(item_types)
+    #     item_types_dict = {}
+    #     for item_type in item_types:
+    #         its = []
+    #         for item in items:
+    #             if dpg.get_item_type(item) == item_type:
+    #                 its.append(item)
+    #         item_types_dict[item_type]=its
+        
+    #     items = [item for item in items if dpg.get_item_type(item) in resizable_items ]
+    #     ratio_w = inf_w/(init_widths['VIEWPORT']-dif_vp0_width)
+    #     ratio_h = inf_h/init_heights['VIEWPORT']
+    #     # lnprint('line 2577',ratio_w,ratio_h)
+    
+        
+    #     top_indent = int(init_top_indent*ratio_h)
+    #     bottom_indent = int(init_bottom_indent*ratio_h)
+    #     left_indent = int(init_left_indent*ratio_w)
+    #     right_indent = int(init_right_indent*ratio_w)
+    #     internal_indent = int(init_internal_indent*ratio_w)
+    #     group_spacer = int(np.round(init_group_spacer*ratio_w))
+    #     image_width1 = int(init_image_width1*ratio_w)
+    #     image_height1 = int(init_image_height1*ratio_h)
+    #     var_def_group_1_spacer = int(init_var_def_group_1_spacer*ratio_w)
+        
+    #     item = 'PTU_DATA_window'
+    #     # lnprint('line 2591',item)
+    #     new_width = int(init_widths[item]*ratio_w)
+    #     new_height = int(init_heights[item]*ratio_h)
+    #     new_pos = (left_indent,top_indent)
+        
+    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
+        
+    #     item = 'file_window'
+    #     # lnprint('line 2599',item)
+    #     new_width = dpg.get_item_width('PTU_DATA_window')
+        
+    #     #int(init_heights[item]*ratio_h)
+        
+    #     new_pos = (dpg.get_item_pos('PTU_DATA_window')[0],
+    #                top_indent+dpg.get_item_height('PTU_DATA_window')+internal_indent)
+    
+    #     new_height = dpg.get_viewport_height() -(new_pos[1]+bottom_indent)
+    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
+        
+        
+    #     item1 = 'image_window_ch1'
+    #     # lnprint('line 2610',item1)
+    #     item2 = 'image_window_ch2'
+    #     # lnprint('line 2612',item2)
+    #     mult = ((init_widths['VIEWPORT']-dif_vp0_width)*ratio_w -left_indent-2*internal_indent-init_widths['PTU_DATA_window']-internal_indent- right_indent-5)/2/init_widths[item1]
+    #     # lnprint('line 2614',mult)
+        
+        
+        
+        
+    #     new_width = int((dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2)
+    #     new_height = new_width
+    
+    #     image_position_1 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
+    #                   top_indent)
+        
+    #     img = processor_1.image#.astype(np.uint8)
+    #     # lnprint(np.max(img))
+    #     rgba_image = im_to_rgbim(img)
+                
+    #     # lnprint(img.shape,rgba_image.shape,(new_width, new_height))
+    #     rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+    #     # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
+        
+    #     dpg_image_1 = rgba_image.flatten().tolist()
+        
+    #     # rgba_to_dpgtex(rgba_image,np.max(disp),tex_1_name)
+    
+        
+    
+    #     # dpg_image_1 = update_texture(Current_image_1)
+    
+        
+        
+    #     # lnprint('_update_textures_both_roi 1 in')
+    #     # _update_textures_both_roi('ch1',None)
+    #     # lnprint('_update_textures_both_roi 1 out')
+    #     dpg.set_item_pos('image_window_ch1',image_position_1)
+    
+        
+    #     if tex_1_name in dpg.get_aliases():
+    #         dpg.delete_item(tex_1_name)
+            
+    #         dpg.remove_alias(tex_1_name)
+    #         dpg.delete_item('texture_CH_1')
+            
+    #         dpg.add_dynamic_texture(width=new_width,
+    #                         height=new_height,
+    #                         default_value=dpg_image_1,
+    #                         tag=tex_1_name,
+    #                         parent = 'texture_reg')
+            
+    #         dpg.add_image(tex_1_name,parent = 'image_window_ch1'
+    #                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',before='img_win_1_table')
+    
+    #     _update_textures_both_roi('ch1',None)  
+        
+        
+    
+    #     image_position_2 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
+    #                   top_indent)
+        
+        
+    #     # dpg_image_2 = update_texture(Current_image_2)
+    #     img = processor_2.image#.astype(np.uint8)
+    #     rgba_image = im_to_rgbim(img)
+                
+        
+    #     rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+    #     # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
+        
+    #     dpg_image_2 = rgba_image.flatten().tolist() 
+       
+    #     dpg.set_item_pos('image_window_ch2',image_position_2)
+    #     if tex_2_name in dpg.get_aliases():
+    #         dpg.delete_item(tex_2_name)
+    #         dpg.remove_alias(tex_2_name)
+    #         dpg.delete_item('texture_CH_2')
+    #         dpg.add_dynamic_texture(width=new_width,
+    #                         height=new_height,
+    #                         default_value=dpg_image_2,
+    #                         tag=tex_2_name,
+    #                         parent = 'texture_reg')
+            
+    #         dpg.add_image(tex_2_name,parent = 'image_window_ch2'
+    #                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',before='img_win_2_table')
+        
+    #     _update_textures_both_roi('ch2',None)
+    #     item = 'FCS_window'
+    #     new_weight = int(init_widths[item]*ratio_w)
+    #     new_height = int(init_heights[item]*ratio_h)
+    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent+dpg.get_item_width(tex_2_name)+2*internal_indent
+                   
+    #                ,top_indent)
+    #     wdt_hgt_pos(item,new_weight,new_height,new_pos)
+        
+    #     item = 'results_window'
+    #     new_weight = int(init_widths[item]*ratio_w)
+    #     new_height = int(init_heights[item]*ratio_h)
+    #     new_pos = (dpg.get_item_pos('FCS_window')[0],dpg.get_item_pos('FCS_window')[1]+dpg.get_item_height('FCS_window')+internal_indent)
+    #     wdt_hgt_pos(item,new_weight,new_height,new_pos)
+        
+        
+        
+    
+        
+        
+        
+    #     item = 'hist_window_ch1'
+    #     # print('line 2719',item)
+    #     new_width = dpg.get_item_width(tex_1_name)+int(1.5*init_internal_indent)
+    #     new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
+    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
+    #                2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent))
+        
+    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
+        
+        
+    #     item = 'hist_window_ch2'
+    #     # print('line 2729',item)
+    #     new_width = dpg.get_item_width(tex_2_name)+int(1.5*init_internal_indent)
+    #     new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
+    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
+    #                2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent))
+        
+    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
+        
+        
+        
+        
+        
+    
+        
+    
+        
+        
+    #     for item in file_panel_items:
+    #         # lnprint(item)
+    #         new_weight = int(init_widths[item]*ratio_w)
+    #         wdt_hgt_pos(item,new_weight,None,None)
+            
+    
+    
+    
+    
+        
+    #     for item in dialogs:
+    #         # lnprint(item)
+    #         new_weight = int(init_widths[item]*ratio_w)
+    #         new_height = int(init_heights[item]*ratio_h)
+    
+    #         wdt_hgt_pos(item,new_weight,new_height,None)
+        
+        
+    
+        
+        
+        
+    #     '''Group spacer resizing'''
+    #     for item in item_types_dict['mvAppItemType::mvGroup']:
+    #         # lnprint(item)
+    #         if dpg.get_item_configuration(item)['horizontal']:
+                
+    #             dpg.configure_item(item,horizontal_spacing = group_spacer)
+    #         else:
+    #             pass
+            
+    #     # if platform.system().upper() == "LINUX":
+            
+    #     #     dpg.set_viewport_resizable(False)
+    
+    
+    #     # lnprint(dpg.get_item_width('img_win_2_table_2_2'))
+
+    
+    
+    
+    def display_images(self,dframes,channel):
+        
+        if channel == 'both':
+            df = dframes[0]
+            df2 = dframes[1]
+            
+        elif channel == 1:
+            df = dframes[0]
+            
+        elif channel == 2:
+            df2 = dframes[0]
+            
+        else:
+            pass
+    
+        if channel == 1:
+            self._update_textures_both_roi('ch1',None)
+            
+        elif channel == 2:
+            self._update_textures_both_roi('ch2',None)
+            
+        elif channel =='both':
+            self._update_textures_both_roi('ch1',None)
+            self._update_textures_both_roi('ch2',None)
+
+    # def extract_PTU(self,Directory,ptu_file,):
+    #     jsn={}
+    #     ptu_path = os.path.join(self.directory,ptu_file)
+    #     ptu_image  = PTUreader(ptu_path, print_header_data = False)
+    #     flim_data_stack, intensity_image_all_channels = ptu_image.get_flim_data_stack()
+    #     if flim_data_stack.ndim == 4:
+    #         number_of_channels = flim_data_stack.shape[2]
+            
+    #         Resolution = str(flim_data_stack.shape[0])+'x'+str(flim_data_stack.shape[1])
+    
+            
+    #     if flim_data_stack.ndim == 3:
+    #         number_of_channels = flim_data_stack.shape[2]
+            
+    #         Resolution = str(flim_data_stack.shape[0])+'x'+str(flim_data_stack.shape[1])
+    #     ccnt =0
+    #     for channel in range(number_of_channels):
+    #         channel_data = np.sum(flim_data_stack[:,:,channel,:],axis=2)
+    #         data_sum = channel_data.sum()
+    #         if data_sum!=0:
+    #             ccnt +=1
+                
+    #     number_of_channels = ccnt
+    #     dpg.configure_item("N_channels", default_value='Number of chanels: '+str(number_of_channels))
+    #     dpg.configure_item("resolution", default_value='Resolution: '+Resolution)
+        
+    
+            
+    #     for channel in range(number_of_channels):
+    #         pickle_name = ptu_file.replace('.ptu', '_in_ch_'+str(channel+1)+'.pck')
+    #         jsn['channel_'+str(channel+1)]=pickle_name
+    
+    
+    #         channel_data = np.sum(flim_data_stack[:,:,channel,:],axis=2)
+            
+            
+    
+    
+    #     return jsn
+    
+    def hide_histograms(self):
+        dpg.set_value('c_dist_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('c_mean_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('c_med_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_dist_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_mean_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_med_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_dist_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_mean_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_med_ser_ch_1',(np.empty(2),np.empty(2)))
+        dpg.configure_item('c_mean_ser_ch_1',label='Mean = ')
+        dpg.configure_item('c_med_ser_ch_1',label='Median = ')
+        dpg.configure_item('np_mean_ser_ch_1',label='Mean = ')
+        dpg.configure_item('np_med_ser_ch_1',label='Median = ')
+        dpg.configure_item('phot_mean_ser_ch_1',label='Mean = ')
+        dpg.configure_item('phot_med_ser_ch_1',label='Median = ')
+        dpg.hide_item('hist_conc_plot_ch1')
+        dpg.hide_item('hist_np_plot_ch1')
+        dpg.hide_item('hist_phot_plot_ch1')
+        
+        dpg.set_value('c_dist_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('c_mean_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('c_med_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_dist_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_mean_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('np_med_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_dist_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_mean_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.set_value('phot_med_ser_ch_2',(np.empty(2),np.empty(2)))
+        dpg.configure_item('c_mean_ser_ch_2',label='Mean = ')
+        dpg.configure_item('c_med_ser_ch_2',label='Median = ')
+        dpg.configure_item('np_mean_ser_ch_2',label='Mean = ')
+        dpg.configure_item('np_med_ser_ch_2',label='Median = ')
+        dpg.configure_item('phot_mean_ser_ch_2',label='Mean = ')
+        dpg.configure_item('phot_med_ser_ch_2',label='Median = ')
+        dpg.hide_item('hist_conc_plot_ch2')
+        dpg.hide_item('hist_np_plot_ch2')
+        dpg.hide_item('hist_phot_plot_ch2')
+
+
+    # def plot_IMAGE(self,img,width,height):
+    #     width = int(width)
+    #     height = int(height)
+    #     # lnprint(time.strftime("%H:%M:%S"),type(img),img.shape,np.max(img))
+    #     if img.shape != (height, width):  # Resize if necessary
+    #         resized_img = cv2.resize(img, (width, height))  # Resize to (width, height)
+    #     else:
+    #         resized_img = img
+
+    #     # Check if grayscale (2D) or already RGB (3D)
+    #     if len(resized_img.shape) == 2:  # Grayscale image (H, W)
+    #         rgb_img = np.stack([resized_img] * 3, axis=2)  # Convert (H, W) to (H, W, 3)
+    #     else:
+    #         rgb_img = resized_img  # Already RGB (H, W, 3)
+        
+    #     # Ensure pixel values are in range [0, 255]
+    #     if rgb_img.max() <= 1.0:  # If the image is in range [0, 1]
+    #         rgb_img = (rgb_img * 255).astype(np.uint8)  # Convert to [0, 255]
+    #     else:
+    #         rgb_img = rgb_img.astype(np.uint8)  # Ensure dtype is uint8
+
+    #     return rgb_img
+
+
+    # def image_INT_LT(self,img,width,height):
+    #     dct = locals()
+        
+    
+    #     if isinstance(img[0],np.ndarray) and isinstance(img[1],np.ndarray):
+    #         fg_color = 'white'
+    #         px = 1/plt.rcParams['figure.dpi']
+    
+    
+            
+            
+    #         fig,ax = plt.subplots(figsize=(np.round(width*px,3),np.round(height*px,3)),facecolor='black')
+            
+            
+    #         fig.subplots_adjust(top=1, bottom=-0.15, right=1, left=0, hspace=0, wspace=0)
+    #         ax.margins(0, 0,)
+    #         ax.axis('off')
+    
+    #         pa = ax.imshow(img[0],cmap='gray')
+            
+    #         plt.axis('tight')
+    #         b =BytesIO()
+    #         FigureCanvas(fig).print_png(b)
+    #         plt.close()
+    #         b.seek(0)
+    #         image=Image.open(b)
+    
+    #         return image
+    #     elif isinstance(img[0],np.ndarray) and not isinstance(img[1],np.ndarray):
+    #         fg_color = 'white'
+    #         px = 1/plt.rcParams['figure.dpi']
+    
+            
+            
+    #         fig,ax = plt.subplots(figsize=((width*px),(height*px)),facecolor='black')
+            
+            
+    #         fig.subplots_adjust(top=0.9, bottom=0.1, right=1, left=0, hspace=0, wspace=0)
+    #         ax.margins(0, 0,)
+    #         ax.axis('off')
+    
+    #         pa = ax.imshow(img[0],cmap='gray')
+    #         # cba = plt.colorbar(pa,shrink=1,location = 'right',anchor=(-0.3,1))
+            
+            
+    #         cba.ax.yaxis.set_tick_params(color=fg_color)
+    #         cba.set_label('Intensity', color=fg_color)
+    
+    #         cba.outline.set_edgecolor(fg_color)
+    
+    
+        
+    
+        
+    
+        
+            
+    #         plt.setp(plt.getp(cba.ax.axes, 'yticklabels'), color=fg_color)
+    #         plt.axis('tight')
+    #         b =BytesIO()
+    #         FigureCanvas(fig).print_png(b)
+    #         plt.close()
+    #         b.seek(0)
+    #         image=Image.open(b)
+    #         return image
+    #     elif not isinstance(img[0],np.ndarray) and isinstance(img[1],np.ndarray):
+    #         fg_color = 'white'
+    #         px = 1/plt.rcParams['figure.dpi']
+    
+            
+            
+    #         fig,ax = plt.subplots(figsize=((width*px),(height*px)),facecolor='black')
+            
+            
+    #         fig.subplots_adjust(top=1, bottom=-0.15, right=0.90, left=0.1, hspace=0, wspace=0)
+    #         ax.margins(0, 0,)
+    #         ax.axis('off')
+    
+            
+            
+    #         pb = ax.imshow(img[1],cmap='rainbow',alpha=1)
+    #         for spine in pb.axes.spines.values():
+    #             spine.set_edgecolor(fg_color) 
+    #         cbb = plt.colorbar(pb,location = 'bottom',shrink=1,anchor=(0.5,2.2))
+        
+        
+    
+        
+    
+    
+    #         cbb.ax.xaxis.set_tick_params(color=fg_color, rotation=90)
+    
+    #         cbb.set_label('Lifetime', color=fg_color)
+    
+    #         cbb.outline.set_edgecolor(fg_color)
+    #         plt.setp(plt.getp(cbb.ax.axes, 'xticklabels'), color=fg_color)
+            
+    #         plt.axis('tight')
+    #         b =BytesIO()
+    #         FigureCanvas(fig).print_png(b)
+    #         plt.close()
+    #         b.seek(0)
+    #         image=Image.open(b)
+            
+    #         return image
+    #     else:
+    #         pass
+
+    def import_ROI(self,sender,app_data,user_data):
+    
+        # global DF, DF2,pck_list,roi_1,roi_2
+        
+        # global directory, new_directory,last_directory
+        self.directory = app_data['file_path_name']
+        self.new_directory=self.directory
+        self.last_directory=self.directory
+        self.update_dialogs_default_directory(self.last_directory)
+        
+        # # lnprint('import_ROI')
+        roi = self.load_ROI(app_data['file_path_name'])
+    
+        
+        if user_data == 'Add_ROI_1_button':
+            try:
+                self.roi_1 = roi.to_numpy()
+                
+                self.DF = self.DF*self.roi_1
+                chan = 1
+                
+            except:
+                self.show_error_no_files('PTU file loaded. Try again.')
+        if user_data == 'Add_ROI_2_button':
+            try:
+                self.roi_2 = roi.to_numpy()
+                self.DF2 = self.DF2*self.roi_2
+                chan = 2
+            except:
+                self.show_error_no_files('PTU file loaded. Try again.')
+    
+    
+        if len(self.pck_list)==2:
+            chan = 'both'
+            self.display_images([self.DF,self.DF2],chan)
+        else:
+            self.display_images([self.DF],chan)
+
+    # def join_dicts(self,dict1,dict2):
+    #     output = {**dict1, **dict2}
+    #     return output
+
+    def load_PTU_images(self,an_file):
+        self.pkl_data = {}
+       
+        pickle_file = os.path.join(self.PTU_directory,an_file+'.pkl')
+    
+        with open(pickle_file, 'rb') as pcklf:
+            pklf = pickle.load(pcklf)
+        
+        ptu_meta = pklf['File info']#json.load(f)    
+        try:
+            self.DF=self.DF2=[]
+        except:
+            pass
+        
+        self.PTU_Resolution = str(ptu_meta['Pixels per line'])+'x'+str(ptu_meta['Number of lines'])
+        self.PTU_Px_size = ptu_meta['Pixels size']
+        self.PTU_N_frames = ptu_meta['Number of frames']
+        self.PTU_Px_dwell = ptu_meta['Pixel dwell']
+        # tau_resolution = ptu_meta['Lifetime resolution']
+        
+        dpg.set_value('Resolution_output','Resolution: '+self.PTU_Resolution)
+        dpg.set_value('Pixel_size_output',self.PTU_Px_size)
+        dpg.set_value('Nframes_output',self.PTU_N_frames)
+        dpg.set_value('Pixel_dwell_output',self.PTU_Px_dwell)
+        
+        dpg.set_value('sinle_phot_output_ch_1',0)
+        dpg.set_value('sinle_phot_err_output_ch_1',0)
+        dpg.set_value('sinle_mols_output_ch_1',0)
+        dpg.set_value('sinle_mols_err_output_ch_1',0)
+        dpg.set_value('single_conc_output_ch_1',0)
+        dpg.set_value('single_conc_err_output_ch_1',0)
+        dpg.set_value('sinle_phot_output_ch_2',0)
+        dpg.set_value('sinle_phot_err_output_ch_2',0)
+        dpg.set_value('sinle_mols_output_ch_2',0)
+        dpg.set_value('sinle_mols_err_output_ch_2',0)
+        dpg.set_value('single_conc_output_ch_2',0)
+        dpg.set_value('single_conc_err_output_ch_2',0)
+        if self.PTU_N_frames>1:
+            self.PTU_N_frames = self.PTU_N_frames-1
+        else:
+            pass
+        ptu_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
+        
+
+        self.Channels = list(pklf.keys())
+        self.Channels = [f for f in self.Channels if f.startswith('export_df')]
+        self.Channels = [ch[-1] for ch in self.Channels]
+    
+                
+        if dpg.get_value('FILE_ROI_checkbox'):
+            
+        
+            if len(self.Channels)==1:
+                if '1' in self.Channels[0]:
+                    Intensity_1 = pklf['intensity_1'] 
+                    
+                    Intensity_1 = Intensity_1
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=Intensity_1.astype(np.uint16)
+    
+    
+    
+                    roi_1_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_1.dat')
+                    self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
+                    self.processor_1.roi_img = self.roi_1
+                    Intensity_1 = Intensity_1
+                    channel = 'both'
+    
+                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                    self.image_1_times_roi = self.Current_image_1
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+                elif '2' in self.Channels[0]:
+                    Intensity_2 = pklf['intensity_2']
+                    Intensity_2 = Intensity_2
+                    
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=Intensity_2.astype(np.uint16)
+    
+    
+                    roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
+                    self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
+                    self.processor_2.roi_img = self.roi_2
+                    channel = 'both'
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
+                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                    self.image_2_times_roi = self.Current_image_2
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                else:
+                    pass
+    
+            elif len(self.Channels)==2:
+                
+                Intensity_1 = pklf['intensity_1']
+                Intensity_2 = pklf['intensity_2']
+                
+                self.processor_1 = ImageROIProcessor()
+                self.processor_1.image=Intensity_1.astype(np.uint16)
+                self.processor_2 = ImageROIProcessor()
+                self.processor_2.image=Intensity_2.astype(np.uint16)
+                roi_1_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_1.dat')
+                self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
+                roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
+                self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
+                self.processor_1.roi_img = self.roi_1
+                self.processor_2.roi_img = self.roi_2
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.image_1_times_roi = self.Current_image_1
+                self.image_2_times_roi = self.Current_image_2
+                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+        elif dpg.get_value('Auto_ROI_checkbox'):
+            
+            if len(self.Channels)==1:
+                if '1' in self.Channels[0]:
+                    Intensity_1 = pklf['intensity_1'] 
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=Intensity_1.astype(np.uint16)
+                    channel = 'both'
+                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                    self.image_1_times_roi = self.Current_image_1
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+                elif '2' in self.Channels[0]:
+                    Intensity_2 = pklf['intensity_2']
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=Intensity_2.astype(np.uint16)
+                    channel = 'both'
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
+                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                    self.image_2_times_roi = self.Current_image_2
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+                else:
+                    pass
+    
+            elif len(self.Channels)==2:
+                
+                Intensity_1 = pklf['intensity_1'] 
+                Intensity_2 = pklf['intensity_2']
+                self.processor_1 = ImageROIProcessor()
+                self.processor_1.image=Intensity_1.astype(np.uint16)
+                self.processor_2 = ImageROIProcessor()
+                self.processor_2.image=Intensity_2.astype(np.uint16)
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.image_1_times_roi = self.Current_image_1
+                self.image_2_times_roi = self.Current_image_2
+                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+    
+        else:
+    
+            if len(self.Channels)==1:
+                if '1' in self.Channels[0]:
+                    Intensity_1 = pklf['intensity_1']
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=Intensity_1.astype(np.uint16)
+                    self.roi_1 = np.zeros(self.Current_image_1.shape)
+                    channel = 'both'
+                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                    self.image_1_times_roi = self.Current_image_1
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+                elif '2' in self.Channels[0]:
+                    Intensity_2 = pklf['intensity_2']
+                    self.processor_2 = ImageROIProcessor()
+                    self.processor_2.image=Intensity_2.astype(np.uint16)
+                    self.roi_2 = np.zeros(self.Current_image_2.shape)
+                    self.image_2_times_roi = self.Current_image_2
+                    channel = 'both'
+                    self.processor_1 = ImageROIProcessor()
+                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
+                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
+                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    
+                else:
+                    pass
+
+            elif len(self.Channels)==2:
+                
+                Intensity_1 = pklf['intensity_1']
+                Intensity_2 = pklf['intensity_2']
+                self.roi_1 = np.zeros(self.Current_image_1.shape)
+                self.roi_2 = np.zeros(self.Current_image_2.shape)
+                self.processor_1 = ImageROIProcessor()
+                self.processor_1.image=Intensity_1.astype(np.uint16)
+                self.processor_2 = ImageROIProcessor()
+                self.processor_2.image=Intensity_2.astype(np.uint16)
+                channel = 'both'
+                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
+                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
+                self.image_1_times_roi = self.Current_image_1
+                self.image_2_times_roi = self.Current_image_2
+                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+
+
+    def overlayrgba(self,im,rgba_image,mask_image,full_mask,ovrl):
+        overlay_alpha = ovrl  
+        alpha_normalized = np.clip(overlay_alpha / 100.0,0.,1.).astype(np.float64)
+        if alpha_normalized == 1:
+            mask_image[full_mask > 0, 0] = 1  
+        else:
+            mask_image[full_mask > 0, 0] = (
+                im[full_mask > 0] * (1 - alpha_normalized) + 1 * alpha_normalized            
+        ).astype(np.float64)  
+    
+        mask_image[full_mask > 0, 1] = im[full_mask > 0].astype(np.float64)  
+        mask_image[full_mask > 0, 2] = im[full_mask > 0].astype(np.float64)  
+        mask_image[full_mask > 0, 3] = (alpha_normalized).astype(np.float64)
+
+        for i in range(3):  
+            rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) +mask_image[..., i] * alpha_normalized)
     
    
+        rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
+        
+        rgba_image = np.clip(rgba_image, 0, 1)
+        
+        
+        return rgba_image
+
+    def rgba_to_dpgtex(self,rgba_image,gs_im_max,tex_name):
+
+        w = dpg.get_item_width(tex_name)
+        h = dpg.get_item_height(tex_name)
+        rgba_image =cv2.resize(rgba_image, (w, h), interpolation=cv2.INTER_LINEAR)
+        rgba_image=rgba_image.astype(np.float64) /gs_im_max
+        new_texture_data = rgba_image.flatten().tolist()
+        dpg.set_value(tex_name, new_texture_data)
 
 
+    def _update_textures_both_roi(self,sender,app_data):
+        # global pkl_data#,_fin_im_size
+        # global processor_1,processor_2
+        # global tex_1_name,tex_2_name
+        # global Current_image_1,Current_image_2
+        # global image_1_times_roi, image_2_times_roi
+        # # global anal_file, PTU_directory, ROI_directory,roi_1,roi_2,last_directory
+        # # lnprint('static',time.time())
+        # ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
+        #      'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
+        # ratio_w = ratio['width']
+    
+        
+        
+        # w = (dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2
+        # h = w
+        # w = dpg.get_item_width(tex_1_name)
+        # h = dpg.get_item_height(tex_1_name)
+        # lnprint(w,h)
+        # _fin_im_size = (w,h)
+        # w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
+        # h = _fin_im_size[1]
+        # ovrl = 15
+    
+        auto_roi = dpg.get_value('Auto_ROI_checkbox')
+        file_roi = dpg.get_value('FILE_ROI_checkbox')
+        no_roi = dpg.get_value('Auto_ROI_checkbox') == False and dpg.get_value('FILE_ROI_checkbox') == False
+    
+        # lnprint(auto_roi,file_roi,no_roi)
+        # lnprint(roi)
+        
+        if sender[-1]=='1':
+    
+            contrast = dpg.get_value("img_contrast_1")
+            brightness = dpg.get_value("img_Brightness_1")/255
+            ovrl = dpg.get_value("img_roi_alpha_1")
+            # dpg.set_value("img_roi_alpha_2",ovrl)
+            # find_nucleus = dpg.get_value('nucleus_search_1')
+            # cell_rat = dpg.get_value('cell_tresh_ratio_1')
+            # nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
+            img = self.processor_1.image#.astype(np.uint16)
+            # disp = processor_1.image
+            disp = np.clip(self.processor_1.image/np.max(self.processor_1.image),0,1).astype(np.float64)
+            froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+    
+            if no_roi:
+                # lnprint('im_to_rgbim')
+                rgba_image = self.im_to_rgbim(disp)
+                
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                self.image_1_times_roi = img
+                # lnprint('rgba_to_dpgtex in')
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+                # lnprint('rgba_to_dpgtex in')
+                
+            elif auto_roi:
+                
+                find_nucleus = dpg.get_value('nucleus_search_1')
+                cell_rat = dpg.get_value('cell_tresh_ratio_1')
+                nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
+                # lnprint('disp',disp.dtype)
+                cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
+                # lnprint(cell_rat,nucl_rat)
+                if not find_nucleus:    
+                    full_mask = cell_roi_image
+                else:
+                    nucleus_roi = self.processor_1.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    full_mask = self.processor_1.make_full_roi(cell_roi_image, nucleus_roi)
+    
+                roi = np.where(full_mask==0,np.nan,1)
+    
+                self.image_1_times_roi = img*roi
+                
+                self.pkl_data['channel_1']={
+                    'image':self.processor_1.image,
+                    'ROI':full_mask,
+                    'cell_treshold':cell_rat,
+                    'nucl_chk':find_nucleus,
+                    'nucl_treshold':nucl_rat,
+                }
+                rgba_image = self.im_to_rgbim(disp)
+                mask_image=rgba_image.copy()
+    
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                # lnprint(np.max(disp))
+                
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+            elif file_roi:
+                roi = self.processor_1.roi_img
+                
+                full_mask = np.nan_to_num(roi*255, nan=0)
+                
+                
+                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
+                # lnprint(np.max(full_mask))
+                self.image_1_times_roi = img*roi
+    
+                
+    
+                
+                rgba_image = self.im_to_rgbim(disp)
+                mask_image=rgba_image.copy()
+    
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                # lnprint(np.max(disp))
+                
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+                
+                
+        elif sender[-1]=='2': 
+            contrast = dpg.get_value("img_contrast_2")
+            brightness = dpg.get_value("img_Brightness_2")/255
+            ovrl = dpg.get_value("img_roi_alpha_2")
+            # dpg.set_value("img_roi_alpha_1",ovrl)
+            img = self.processor_2.image#.astype(np.uint8)
+            # disp = processor_2.image
+            disp = np.clip(self.processor_2.image/np.max(self.processor_2.image),0,1).astype(np.float64)
+            froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+    
+            if no_roi:
+                # lnprint('im_to_rgbim')
+                rgba_image = self.im_to_rgbim(disp)
+    
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                self.image_2_times_roi = img
+                # lnprint('rgba_to_dpgtex in')
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+                # lnprint('rgba_to_dpgtex out')
+            elif auto_roi:
+                # lnprint('auto_roi',auto_roi)
+                find_nucleus = dpg.get_value('nucleus_search_2')
+                cell_rat = dpg.get_value('cell_tresh_ratio_2')
+                nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
+    
+                cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                # lnprint(cell_rat,nucl_rat)
+                if not find_nucleus:    
+                    full_mask = cell_roi_image.astype(np.uint8)
+                else:
+                    nucleus_roi = self.processor_2.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    full_mask = self.processor_2.make_full_roi(cell_roi_image, nucleus_roi).astype(np.uint8)
+                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
+                roi = np.where(full_mask==0,np.nan,1)
+                # lnprint(pd.DataFrame(roi)[[1,128]].describe())
+                # lnprint('roi\n',roi)
+                
+                # roi=full_mask/np.max(full_mask)
+    
+                self.image_2_times_roi = img*roi
+                # df=pd.DataFrame(image_2_times_roi)
+                # lnprint(df[[1,128]].info(),df[[1,128]].describe())
+    
+                
+                
+                self.pkl_data['channel_2']={
+                    'image':self.processor_2.image,
+                    'ROI':full_mask,
+                    'cell_treshold':cell_rat,
+                    'nucl_chk':find_nucleus,
+                    'nucl_treshold':nucl_rat,
+                }
+                rgba_image = self.im_to_rgbim(disp)
+                mask_image=rgba_image.copy()
+    
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                # lnprint(np.max(disp))
+                
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+            elif file_roi:
+                roi = self.processor_2.roi_img
+                # lnprint(pd.DataFrame(roi)[[1,128]].describe())
+                full_mask = np.nan_to_num(roi*255, nan=0)
+                
+                
+                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
+                # lnprint(np.max(full_mask))
+                self.image_2_times_roi = img*roi
+    
+                # df=pd.DataFrame(self.image_2_times_roi)
+                # lnprint(df[[1,128]].info(),df[[1,128]].describe())
+                
+    
+                
+                rgba_image = self.im_to_rgbim(disp)
+                mask_image=rgba_image.copy()
+    
+                rgb = rgba_image[..., :3]
+                adjusted_image = rgb * contrast + brightness
+                adjusted_rgb = adjusted_image#.astype(np.uint8)
+                rgba_image[..., :3] = adjusted_rgb
+                
+                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                # lnprint(np.max(disp))
+                
+                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+        # lnprint('callback_calculate')
+        self.callback_calculate(sender,None)
+        # lnprint(dpg.get_item_width(tex_1_name),dpg.get_item_height(tex_1_name))
+
+    # def create_rgba_texture(self,image_data):
+    
+    #     if image_data.ndim != 2:
+    #         raise ValueError("Image data should be a 2D array.")
+        
+        
+    #     rgba_data = np.stack([image_data] * 3, axis=-1)
+    #     rgba_data = np.concatenate([rgba_data, np.ones((image_data.shape[0], image_data.shape[1], 1), dtype=np.uint8) * 255], axis=-1)  
+        
+        
+    #     return rgba_data.flatten().tolist()
 
 
-
-#     def unmount_variables(self):
-#         '''Unmount items (sliders and range inputs) related to the variables defined in a given model.'''
-
-
-#         for alias in self.VAR_RELATED_ITEMS:
-#             dpg.delete_item(alias)
-#         self.VAR_RELATED_ITEMS=[]
-#         VGroups_ends = ['group0','group1','group']
-#         for group in VGroups_ends: 
-#             for alias in [al for al in self.VAR_RELATED_GROUPS if al.endswith(group)]:
-#     #             print(alias)
-#                 dpg.delete_item(alias)
-#         self.VAR_RELATED_GROUPS=[]    
-
-
-#         dpg.delete_item('sep_mid_2')
-#         dpg.delete_item('Fit_button')
-#         dpg.delete_item('FIT_checkbox')
-#         dpg.delete_item('FITting_group')
-#         dpg.delete_item('Fit_all_button')
-
-
-
-#     def unmount_tables(self):
-#         '''Unmount the tables containing the fitting results.'''
-
-#         starts = ['results_','row_','column_'] 
-#         for st in starts: 
-#             for alias in [al for al in self.RESTAB_RELATED_ITEMS if al.startswith(st)]:
-#                 # print(alias)
-
-#                 dpg.delete_item(alias)
-#         self.RESTAB_RELATED_ITEMS=[]
-
-
-#         try:
-#             dpg.delete_item('table_results')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('remove_button_results')
-#         except:
-#             pass
-#         try: 
-#             dpg.delete_item('close_button_results')
-#         except:
-#             pass
-
-#         try:
-#             dpg.delete_item('group_close_results_table')
-#         except:
-#             pass
-
-#         try:
-#             dpg.delete_item('table_results_show')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('show_res_win')
-#         except:
-#             pass
-
-
-#         try:
-#             dpg.delete_item('table_results_mean')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('keep_results_butt')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('show_results_butt')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('save_results_butt')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('plot_all_results_butt')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('save_single_butt')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('group_keep_res')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('group_keep_res_tab')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('sep_left_3')
-
-#         except:
-#             pass
-
-
-
-#         try:
-#             dpg.delete_item('group_keep_res_mean')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('sep_left_4')
-#         except:
-#             pass
-#         try:
-#             dpg.delete_item('group_results')
-#         except:
-#             pass
-
-#     def mount_variables(self):
-#         '''Mount item corresponding to the variables for a given model and show the fit button.'''
-
-
-
-
-#         for v in self.VARIABLES:
-#             Vgroup1 = 'VARIABLES_'+v+'_group1'
-#             self.VAR_RELATED_GROUPS.extend([Vgroup1])
-#             with dpg.group(tag=Vgroup1,parent='Model_selection_panel'
-#                   ):
-#                 Vgroup0 = 'VARIABLES_'+v+'_group0'
-#                 col00 = 'VARIABLES_'+v+'_group0_col0'
-#                 col01 = 'VARIABLES_'+v+'_group0_col1'
-#                 row0 = 'VARIABLES_'+v+'_group0_row0'
-#                 self.VAR_RELATED_GROUPS.extend([Vgroup0,col00,col01,row0])
-#                 with dpg.table(header_row=False,tag=Vgroup0,width=-1,borders_innerH=False, 
-#                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
-#                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-#                                no_clip=True, policy=dpg.mvTable_SizingStretchSame):
-#                     dpg.add_table_column(tag=col00,width=self.internal_width_middle_panel/2)
-#                     dpg.add_table_column(tag=col01,width=self.internal_width_middle_panel/2)
-#                     with dpg.table_row(tag=row0):
-#                         var_item = 'VARIABLES_'+v+'_min'
-#                         self.VAR_RELATED_ITEMS.extend([var_item])
-#                         dpg.add_drag_float(label='',
-#                                            width= self.variable_drag_float['width'],
-#                                            tag=var_item,
-#                                            show=True,
-#                                            default_value=self.VARIABLES_RANGE[v][0],
-#                                            speed=self.VARIABLES_RANGE[v][0]/self.variable_range_delimiter,
-#                                            callback=self.callback_range_min,
-#                                            no_input=False,
-#                                            format=v+' (min) = %g'
-#                                           )
-#                         with dpg.tooltip(var_item):
-#                                 dpg.add_text("Define lowest value of "+v+", also bottom constrain while fiting. Drag to change. Double click or Ctrl + Click to inout teh vaolue directly.")
-#                         var_item = 'VARIABLES_'+v+'_max'
-#                         self.VAR_RELATED_ITEMS.extend([var_item])
-#                         dpg.add_drag_float(label='',
-#                                            width=self.variable_drag_float['width'],
-#                                            tag=var_item,
-#                                            show=True,
-#                                            default_value=self.VARIABLES_RANGE[v][1],
-#                                            speed=self.VARIABLES_RANGE[v][1]/self.variable_range_delimiter,
-#                                            callback=self.callback_range_max,
-#                                            no_input=False,
-#                                            format=v+' (max) = %g'
-#                                           )
-#                         with dpg.tooltip(var_item):
-#                                 dpg.add_text("Define highest value of "+v+", also top constrain while fiting. Drag to change. Double click or Ctrl + Click to inout the value directly.")
+    
+    def load_ROI(self,path):
+        df=pd.read_csv(path, sep='\t',header=None,skiprows=3,encoding ='latin1')
+        df=df.replace('-',-1.)
+        try:
+            df=df.astype(float)
+        except:
+            for i in df.index:
+                try:
+                    df.at[i,0]=float(df.at[i,0])
                     
-#                 Vgroup = 'VARIABLES_'+v+'_group'
-#                 self.VAR_RELATED_GROUPS.extend([Vgroup])
-#                 with dpg.group(tag=Vgroup,parent='Model_selection_panel',horizontal=True,
-#                            horizontal_spacing=self.group_spacer*4
-#                       ):
-#                     var_item = 'VARIABLES_'+v+'_check'
-#                     self.VAR_RELATED_ITEMS.extend([var_item])
-#                     dpg.add_checkbox(label="", tag=var_item,default_value = ast.literal_eval(self.FIXED_VARIABLES[v]))
-#                     with dpg.tooltip(var_item):
-#                         dpg.add_text("Check for fixing durig fit.")
-
-
-#                     var_item = 'VARIABLES_'+v+'_slider'
-#                     self.VAR_RELATED_ITEMS.extend([var_item])
-#                     dpg.add_slider_float(label='',
-#                                          width = self.variable_slider_float['width'],
-#                                          tag = var_item,
-#                                          show=True,
-#                                          no_input=False,
-#                                          default_value=self.VARIABLES[v],
-#                                          min_value=dpg.get_value('VARIABLES_'+v+'_min'),
-#                                          max_value=dpg.get_value('VARIABLES_'+v+'_max'),
-#                                          callback=self.callback_slider,
-#                                          format=v+' = %g'
-#                                         )
-
-#                     with dpg.tooltip(var_item):
-#                         dpg.add_text("Slide to change the initial value of "+v+" for fitting. Double click or Ctrl + Click to input the value directly.")
-                        
-#     # # 
-#         dpg.add_separator(tag ='sep_mid_2',parent='Model_selection_panel',show=True)
-#         with dpg.group(tag='FITting_group',
-#                        parent='Model_selection_panel',
-#                            horizontal=True,
-#                            horizontal_spacing=self.group_spacer
-
-#                           ):
-#             if self.FCS_data_type == '2C':
-#                 dpg.add_checkbox(label="",
-#                                  tag='FITing_checkbox',
-#                                  default_value = False,
-#                                  enabled=False,
-#                                  show=True)
-                
-#                 with dpg.tooltip('FITing_checkbox'):
-#                         dpg.add_text("Check to include weights during fitting (not available for the two column data).")
-#             else:
-#                 dpg.add_checkbox(label="",
-#                                  tag='FITing_checkbox',
-#                                  default_value = True,
-#                                  enabled=True,
-#                                  show=True)
-#                 with dpg.tooltip('FITing_checkbox'):
-#                         dpg.add_text("Check to include weights during fitting (not available for the two column data).")
-#             dpg.add_button(label='FIT',
-#                            width =self.Fit_button['width'],
-#                           show=True,
-#                           tag='Fit_button',
-#                            parent='FITting_group',
-
-#                            callback=self.callback_fit_button
-#                           )
-#             with dpg.tooltip('Fit_button'):
-#                             dpg.add_text("Press to fit the data. (Ctrl+Enter)")
-#             dpg.bind_item_theme('Fit_button', 'fit_button_theme')
-#         dpg.add_button(label='FIT and keep ALL',
-#                            width =self.Fit_all_button['width'],
-#                           show=True,
-#                           tag='Fit_all_button',
-#                            parent='Model_selection_panel',
-
-#                            callback=self.callback_fit_all_button
-#                           )
-#         with dpg.tooltip('Fit_all_button'):
-#             dpg.add_text("Press to fit ALL data.")
-#         dpg.bind_item_theme('Fit_all_button', 'fit_button_theme')  
-#         Variable_groups = [item for item in dpg.get_aliases() if item.startswith('VARIABLES_') and item.endswith('_group')] 
-#         Variable_groups.extend(['sep_mid_1','sep_mid_2','Fit_button','FITing_checkbox','Fit_all_button'])
-#         if len(dpg.get_item_configuration('file_box')['items'])!=0:
-
-#             for item in Variable_groups:
-#                 dpg.configure_item(item,show=True)
-#         else:
-#             for item in Variable_groups:
-#                 dpg.configure_item(item,show=False)
-
-
-#     def workspace_test(self,f):
-#         if f in self.workspace_iso['FILES']:
-
-
-
-
-#             if len(self.workspace_iso['FILES'][f]) !=0:
-#                 Current_model = dpg.get_value('model_choose')
-#                 if Current_model != self.workspace_iso['Model']:
-#                     dpg.configure_item('model_choose',default_value = self.workspace_iso['Model'])
-#                     self.callback_models('model_choose',self.workspace_iso['Model'])
-
-#                 else:
-#                     pass
-
-#                 tau_min = self.workspace_iso['FILES'][f]['tau_min']
-#                 dpg.set_value('df_min',tau_min)
-#                 self.callback_df_range('df_min',tau_min)
-
-#                 tau_max = self.workspace_iso['FILES'][f]['tau_max']
-#                 dpg.set_value('df_max',tau_max)
-#                 self.callback_df_range('df_max',tau_max)
-
-
-#                 Time_units = self.workspace_iso['FILES'][f]['Time_units']
-#                 dpg.set_value('Xunits',Time_units)
-#                 self.callback_Xunits('Xunits',Time_units)
-
-#                 G0_units = self.workspace_iso['FILES'][f]['G0_units']
-#                 dpg.set_value('Yunits',G0_units)
-#                 self.callback_Xunits('Yunits',G0_units)
-
-
-#                 Weights_checkbox = self.workspace_iso['FILES'][f]['Weights_checkbox']
-#                 dpg.set_value('FITing_checkbox',Weights_checkbox)
-#                 RES_add = self.workspace_iso['FILES'][f]['RES_ADD']
-#                 for v  in self.VARIABLES:
-#                     field = v+'_min'
-#                     var_item = 'VARIABLES_'+field
-#                     field_value = self.workspace_iso['FILES'][f][field]
-#                     dpg.set_value(var_item,field_value)
-#                     self.callback_range_min(var_item,field_value)
-#                     field = v+'_max'
-
-#                     var_item = 'VARIABLES_'+field
-#                     field_value = self.workspace_iso['FILES'][f][field]
-#                     dpg.set_value(var_item,field_value)
-#                     self.callback_range_max(var_item,field_value)
-
-#                     field = v+'_check'
-#                     var_item = 'VARIABLES_'+field
-#                     field_value = self.workspace_iso['FILES'][f][field]
-#                     dpg.set_value(var_item,field_value)
-
-#                     field = v+'_slider'
-#                     var_item = 'VARIABLES_'+field
-#                     field_value = RES_add[v]
-#                     dpg.set_value(var_item,field_value)
-#                     self.callback_slider(var_item,field_value)
-#                     dpg.set_value('results_'+v+'_name',v)
-#                     dpg.set_value('results_'+v+'_value',self.basf.zeros(field_value))
-#                     if not dpg.get_value('VARIABLES_'+v+"_check"):
-#                         dpg.set_value('results_'+v+'_error',self.basf.zeros(RES_add[v+'_err']))
-#                     else:
-#                         dpg.set_value('results_'+v+'_error','Fixed')
-
-
-
-#             else:
-#                 pass
-
-
-
-#         else:
-#             pass
-    
-    
-    
-    
-    
-#     def callback_listbox(self,sender,app_data):
-#         '''Reloads and replots the data upon selwction of the datafile.'''
-#         self.anal_file=app_data
-#         self.load_data(self.new_directory,self.anal_file)
-#         self.plot_scater(self.df,'callback_listbox')
-        
-        
-        
-#     #######################################################
-#     def callback_models(self,sender, app_data):
-#         '''Changes the variables control panel and replots upon change of the model.'''
-
-#         self.unmount_variables()
-
-#         self.unmount_tables()
-
-#         data = self.JSONDATA[app_data]
-#         self.VARIABLES_RANGE=self.JSONDATA[app_data]['Initial-range']
-#         self.FIXED_VARIABLES=self.JSONDATA[app_data]['Fixed Variables']
-#         self.EXPRESSION=data['Function_expression']
-#         variables_dict = data['Variables']
-#         self.VARIABLES=list(variables_dict.keys())
-#         '''Define variables'''
-#         self.VARIABLES = data['Variables']
-#         self.VARIABLES_RANGE=data['Initial-range']
-#         self.mount_tables()
-#         self.mount_variables()
-
-#         self.define_RES_DF()
-#         self.plot_scater(self.df,'callback_models')
-# ##########################################################
-
-#     def callback_close_new_model_window(self,sender,app_data):
-#         '''Closes the new model window.'''
-#         dpg.configure_item('Add_model_window', show=False)
-#         dpg.set_value('model_input_text1','')
-#         dpg.set_value('model_input_variables','')
-#         dpg.set_value('model_input_name','Enter the name of the model.')
-#         dpg.set_value('model_input_describe','Enter the model description.')
-# #####################################################
-
-#     def callback_save_variables_to_json(self,sender,app_data):
-#         '''Saves the newely defined model to JSON file.'''
-#         expr=parse_expr(dpg.get_value('model_input_text1')).free_symbols
-
-#         expr=sorted(set([str(v) for v in expr]))
-#         try: 
-#             expr.remove('x')
-#         except:
-#             pass
-#         model_input_variables=tt1=dpg.get_value('model_input_variables').replace(" ",'').split(',')
-#         model_input_variables=model_input_variables
-#         if expr == sorted(set(model_input_variables)):
-#             variables={}
-#             fixed_variables={}
-
-#             variables_range={}
-#             for v in model_input_variables:
-#                 variables[v]=dpg.get_value('vars_input_'+v+'_def')
-#                 fixed_variables[v]=str(dpg.get_value('New_fixed_VARIABLES_'+v+"_check"))
-#                 variables_range[v]=[dpg.get_value('vars_input_'+v+'_min'),
-#                                     dpg.get_value('vars_input_'+v+'_max')
-#                                    ]
-
-
-
-
-#             function = dpg.get_value('model_input_text1')
-#             name = 'User-defined - '+dpg.get_value('model_input_name')
-#             description = 'User-defined function: '+dpg.get_value('model_input_describe')
-#             js_entry = {name:{'Function_description':description,
-#                               'Function_expression':function,
-#                               'Variables':variables,
-#                               'Fixed Variables':fixed_variables,
-#                               'Initial-range':variables_range
-#                              }
-#                        }
-
-#             user_file=self.user_defined_FCS_models
-#             try:
-#                 with open(user_file) as f:
-#                     data = json.load(f)
-#                     data['Functions'].update(js_entry)
-#             except:
-#                 data={'Functions':js_entry}
-
-#             with open(user_file, 'w') as f:
-#                 json.dump(data, f, indent=4, sort_keys=False)
-
-#             self.load_json()    
-
-#             dpg.configure_item('model_choose',items=self.Models)
-#             dpg.configure_item('Add_model_window', show=False)
-#         else:
-#             pass
-        
-        
-# #####################################################
-
-#     def callback_stringtest1(self,sender,app_data):
-#         '''Renders the expression into the image in the add-model window.'''
-#         try: 
-#             latextexpression=latex(parse_expr(app_data))
-#             variables = parse_expr(app_data).free_symbols#.keys()
-
-#             px = 1/plt.rcParams['figure.dpi']  # pixel in inches
-#             fig=Figure(figsize=(self.image_width1*px, self.image_height1*px),facecolor='#505050')
-#             ax = fig.add_subplot()
-#             text = ax.text(0.5, 0.9, 
-#                             r'$G\left(x\right)='+latextexpression+'$', va='top', ha='center', 
-#                             fontsize=25,color='White'
-#                         )
-#             ax.axis('off')
-#             self.auto_fit_fontsize(text, 1, None, fig=fig, ax=ax)
-#             b = BytesIO()
-#             FigureCanvas(fig).print_png(b)
-#             b.seek(0)
-#             image = Image.open(b)
-#             self.dpg_image1 = []
-
-#             for i in range(0, image.height):
-#                 for j in range(0, image.width):
-#                     pixel = image.getpixel((j, i))
-#                     self.dpg_image1.append(pixel[0]/255)
-#                     self.dpg_image1.append(pixel[1]/255)
-#                     self.dpg_image1.append(pixel[2]/255)
-#                     self.dpg_image1.append(255/255)
-#             dpg.set_value("image_id1", self.dpg_image1)
-
-#             try:
-#                 dpg.configure_item('model_input_variables',enabled=True)
-
-#             except:
-#                 pass
-#             try:
-#                 for alias in dpg.get_aliases():
-#                     if alias.startswith('vars_input_'):
-#                         dpg.delete_item(alias)
-#                     if alias.startswith('New_fixed_VARIABLES_'):
-#                         dpg.delete_item(alias)
-#                 for alias in dpg.get_aliases():
-#                     if alias.startswith('vars_') & alias.endswith('_group0'):
-#                         dpg.delete_item(alias)
-#                 dpg.configure_item('Save_model_button',show=False)
-#             except:
-#                 pass
-
-#         except:
-#             pass
-#             # print('cos sie zjebalo')        
-
-        
-
-#     def callback_new_var_string(self,sender,app_data):
-#         '''Checks if the variables given by the user are in agreement with the variables extracted from the expression. enables input of the initial values and ranges of defined variables.'''
-#         expr=parse_expr(dpg.get_value('model_input_text1')).free_symbols
-#         expr=sorted(set([str(v) for v in expr]))
-#         user_defined_variables=app_data.replace(" ",'').split(',')
-#         try: 
-#             expr.remove('x')
-#         except:
-#             pass
-#         if expr==sorted(set(user_defined_variables)):
-#             dpg.configure_item(sender,enabled=False)
-
-#             dpg.configure_item('vars_group',show=True)
-#             for v in user_defined_variables:
-#                 with dpg.group(tag='vars_'+v+'_group0',parent='vars_group',horizontal=True,
-#                    horizontal_spacing=15):
-#                     dpg.add_input_float(label='',
-#                                        width=self.vars_input_float['width'],
-#                                        tag='vars_input_'+v+'_min',
-#                                         format=v+' (min) = %g'
-#                                       )
-#                     dpg.add_input_float(label='',
-#                                         width=self.vars_input_float['width'],
-#                                         tag='vars_input_'+v+'_def',
-#                                         format=v+' = %g'
-#                                        )
-#                     dpg.add_input_float(label='',
-#                                         width=self.vars_input_float['width'],
-#                                         tag='vars_input_'+v+'_max',
-#                                         format=v+' (max) = %g'
-#                                        )
-#                     dpg.add_checkbox(label="Fixed", parent='vars_'+v+'_group0', tag='New_fixed_VARIABLES_'+v+"_check")
-#                     with dpg.tooltip('New_fixed_VARIABLES_'+v+"_check"):
-#                             dpg.add_text("Check for fixing durig fit.")
-#                     dpg.configure_item('Save_model_button',show=True)
-#         else:
-#             try:
-
-
-#                 dpg.add_window(pos=(400,150),
-#                                tag='var_err',
-#                                show=True,
-#                                modal=True
-#                               )
-#                 dpg.add_text('Given variables do no match the variables provided in the equation above.',
-#                              parent='var_err')
-
-#                 dpg.add_button(label='Close',
-#                                parent='var_err',
-#                                callback=lambda:dpg.configure_item('var_err',show=False)
-#                               )
-#                 dpg.bind_item_theme('var_err', 'Error_window_theme')
-#             except:
-#                 dpg.configure_item('var_err',show=True)
+                except:
                 
                 
-
-#     def callback_range_min(self,sender,app_data):
-#         '''Changes the minimal limit for the slider related to the given variable.'''
-#         variable=sender.replace('VARIABLES_', '').replace('_min', '')
-#         self.VARIABLES_RANGE[variable][0]=app_data
-#         dpg.configure_item('VARIABLES_'+variable+'_slider', min_value=app_data)
-#         dec = self.basf.decimal_rounds_lim(app_data*10)
-#         if app_data>1e3:
-#             form = variable+' (min) = %.'+str(3)+'e'
-#         else:
-#             if dec == 0:
-#                 form = variable+' (min) = %.'+str(dec)+'f'
-#             else:
-#                 form = variable+' (min) = %.'+str(dec)+'g'
-#         dpg.configure_item(sender,speed=abs(app_data/100.))
-#         dpg.configure_item(sender,format=form)
-        
-        
-
-#     def callback_range_max(self,sender,app_data):
-#         '''Changes the maximal limit for the slider related to the given variable.'''
-#         # global VARIABLES,VARIABLES_RANGE
-#         variable=sender.replace('VARIABLES_', '').replace('_max', '')
-#         self.VARIABLES_RANGE[variable][1]=app_data
-#         dpg.configure_item('VARIABLES_'+variable+'_slider', max_value=app_data)  
-#         dec = self.basf.decimal_rounds_lim(app_data*10)
-#         if app_data>1e3:
-#             form = variable+' (max) = %.'+str(3)+'e'
-#         else:
-#             if dec == 0:
-#                 form = variable+' (max) = %.'+str(dec)+'f'
-#             else:
-#                 form = variable+' (max) = %.'+str(dec)+'g'
-#         dpg.configure_item(sender,speed=abs(app_data/100.))
-#         dpg.configure_item(sender,format=form)
-        
-
-
-#     def callback_slider(self,sender,app_data):
-#         '''Changes the value of the variable and replots.'''
-#         variable=sender.replace('VARIABLES_', '').replace('_slider', '')
-#         self.VARIABLES[variable]=app_data
-
-#         dec = self.basf.decimal_rounds_lim(app_data*10)
-#         if app_data>1e3:
-#             form = variable+' = %.'+str(3)+'e'
-#         else:
-#             if dec <= 1:
-#                 form = variable+' = %.'+str(dec)+'f'
-#             else:
-#                 form = variable+' = %.'+str(dec)+'g'
-#         dpg.configure_item(sender,format=form)
-#         self.callback_calculate_mol_bright('CNTR',dpg.get_value('CNTR'))
-#         self.plot_scater(self.df,'callback_slider')
+                
+                
+                
+                    ind =i
+                    break
+            df = df[df.index<ind]
+            df=df.astype(int)
+                
+        dfs=df[0].to_frame().applymap(np.isreal)
     
+        if len(dfs.mask(dfs).dropna()) != 0:
+            ind = int(dfs.mask(dfs).dropna().head(1).index.values) 
+            
+            df = df[df.index<ind]
+            df = df.astype(float)
+            df=df.mask(df!=-1,1)
+            df = df.where(df!=-1,np.nan)
+            
+        else:
+            df = df.astype(float)
+            df=df.mask(df!=-1,1)
+            df = df.where(df!=-1,np.nan)
+
+        
+        return df
+
     
+    def mean_bright_input_ch_1(self):
+        self.mean_brightness_ch_1  = self.FCS_results_ch_1.Brightness.mean()
+        self.mean_brightness_err_ch_1 = self.FCS_results_ch_1.Brightness.std(ddof=1)
+        dpg.configure_item('Brightness_input_ch_1',default_value = self.mean_brightness_ch_1 )
+        dpg.configure_item('Brightness_err_input_ch_1',default_value = self.mean_brightness_err_ch_1 )
+
+    def mean_bright_input_ch_2(self):
+                
+        self.mean_brightness_ch_2  = self.FCS_results_ch_2.Brightness.mean()
+        self.mean_brightness_err_ch_2 = self.FCS_results_ch_2.Brightness.std(ddof=1)
+        dpg.configure_item('Brightness_input_ch_2',default_value = self.mean_brightness_ch_2 )
+        dpg.configure_item('Brightness_err_input_ch_2',default_value = self.mean_brightness_err_ch_2 )
+
+
+    def show_error_no_files(self,error_text):
+        try:
+            with dpg.window(pos=(400,150),
+                           label='Error!',
+                               tag='No_data_files',
     
-
-#     def callback_fit_button(self,sender,app_data):
-#         '''Fits the data with the function provided by the model of choice.'''
-
-#         params = Parameters()
-#         for v in self.VARIABLES:
-#             if dpg.get_value('VARIABLES_'+v+'_min')!=dpg.get_value('VARIABLES_'+v+'_max'):
-#                 params.add(v,
-#                            value=dpg.get_value('VARIABLES_'+v+'_slider'),
-#                            vary=not dpg.get_value('VARIABLES_'+v+"_check"),
-
-#                            min=dpg.get_value('VARIABLES_'+v+'_min'),
-#                            max=dpg.get_value('VARIABLES_'+v+'_max')
-#                           )
-#             else:
-#                 params.add(v,
-#                            value=dpg.get_value('VARIABLES_'+v+'_slider'),
-#                            vary=not dpg.get_value('VARIABLES_'+v+"_check")
-#                           )
-#         fit_output = self.fit_function(self.df,params)
-#         self.res_dict={v:fit_output.best_values[v] for v in self.VARIABLES}
-#         self.reserr_dict={v+'_err':fit_output.params[v].stderr for v in self.VARIABLES}
-#         for v in self.VARIABLES:
-#             if self.reserr_dict[v+'_err'] is None:
-
-
-#                 try:
-#                     dpg.add_window(pos=(400,150),
-#                                tag='FIT_err',
-#                                show=True,
-#                                modal=True
-#                               )
-#                     dpg.add_text('Fit failed. Try to re-define input parameters.',
-#                              parent='FIT_err')
-#                     dpg.add_button(label='Close',
-#                                    parent='FIT_err',
-#                                    callback=lambda:dpg.configure_item('FIT_err',show=False)
-#                                   )
-#                     dpg.bind_item_theme('FIT_err', 'Error_window_theme')
-#                     break
-#                 except:
-#                     dpg.configure_item('FIT_err',show=True)
-#                     break
-
-
-
-#             self.VARIABLES[v]=self.res_dict[v]
-
-#             dpg.set_value('VARIABLES_'+v+'_slider',self.res_dict[v])
-#             self.callback_calculate_mol_bright('CNTR',dpg.get_value('CNTR'))
-#             dpg.set_value('results_'+v+'_name',v)
-#             dpg.set_value('results_'+v+'_value',self.basf.zeros(self.res_dict[v]))
-#             if not dpg.get_value('VARIABLES_'+v+"_check"):
-#                 dpg.set_value('results_'+v+'_error',self.basf.zeros(self.reserr_dict[v+'_err']))
-#             else:
-#                 dpg.set_value('results_'+v+'_error','Fixed')
-#         dpg.set_value('results_bright_name','B')
-#         dpg.set_value('results_bright_value',self.basf.zeros(self.BR[0]))
-#         dpg.set_value('results_bright_error',self.basf.zeros(self.BR[1]))
-#         self.chisqr = fit_output.chisqr
-#         self.redchi = fit_output.redchi
-
-#         dpg.set_value('chi_sqr','\u03C7\u00B2 = '+ str(self.basf.zeros_chi(self.chisqr))+ '   ||   Reduced \u03C7\u00B2 = '+ str(self.basf.zeros(self.redchi)))
-
-#         self.plot_scater(self.df,'callback_fit_button')
-#         dpg.configure_item('group_results', show=True)
-#         dpg.configure_item('keep_results_butt', enabled=True)
+                               no_move=True,
+                                no_close=False,
+                                no_title_bar=False,
+                                no_resize=True,
+                               show=True,
+                               modal=True
+                              ):
+                dpg.add_text(error_text,tag='no_files_error_text')
+                
+    
+                dpg.add_button(label='Close',
+                               tag='no_files_error_butt',
+                               show=True,
+                               callback=self.callback_no_files_dialog_close_only
+                              )
+                
+                dpg.bind_item_theme('No_data_files', 'Error_window_theme')
+        except:
+            dpg.show_item('No_data_files')
+    
+            
+    def update_dialogs_default_directory(self,last_directory):
+        
+        # dpg.configure_item('TT_file_dialog_id_ch_2',default_path=last_directory)
+        # dpg.configure_item('TT_file_dialog_id_ch_1',default_path=last_directory)
+        
+        dpg.configure_item('ROI_folder_dialog_id',default_path=last_directory)
+        dpg.configure_item('file_dialog_id',default_path=last_directory)
+        dpg.configure_item('PTU_file_dialog_id',default_path=last_directory)
+        dpg.configure_item('Select_ROI_dialog',default_path=last_directory)
+        dpg.configure_item('file_dialog_export',default_path=last_directory)
+        dpg.configure_item('Calib_file_dialog_id',default_path=last_directory)
+        
+   
+    def update_flist(self,fs):
+        '''Updates the filelist. '''
         
         
+        if not len(fs)==0:
+            try:
+                dpg.configure_item("file_box", items=fs)
+    
+                dpg.configure_item("file_box", default_value=fs[0])
+            except:
+                pass
+        else:
+            dpg.configure_item("file_box", items=())
+            dpg.configure_item("file_box", default_value='') 
 
-#     def callback_fit_all_button(self,sender, app_data):
-#         self.unmount_tables()
-#         self.mount_tables()
-#         self.define_RES_DF()
-#         files = dpg.get_item_configuration('file_box')['items']
-#         for file in files:
-#             dpg.set_value('file_box',file)
-#             self.callback_listbox('file_box',file)
 
-#             min_df=self.df.X.min()
-#             max_df = self.df.X.max()
-#             averaging_range = min_df*15
-#             max_averaging_range = max_df/10
-#             range_index = self.df.index[self.df['X']<=averaging_range].tolist()[-1]
-#             max_range_index = self.df.index[self.df['X']>=max_averaging_range].tolist()[0]
 
-#             pre_N = 1/(self.df.Y[:range_index].mean())
-#             pre_G_inf = self.df.Y[max_range_index:].mean()
+    # def wdt_hgt_pos(self,item,wdth,hght,pos):
+    #     dct = locals()
+        
+    #     lista = [dct[f] for f in dct.keys()]
+    #     if not dct['wdth']== None:
+    #         dpg.set_item_width(item,wdth)
+    #     if not dct['hght']== None:
+    #         dpg.set_item_height(item,hght)
+            
+    #     if not dct['pos']== None:
+    #         dpg.set_item_pos(item,pos)
 
-#             try:
-#                 dpg.set_value('VARIABLES_N_p_slider',pre_N)
-#                 self.plot_scater(self.df,'callback_fit_all_button pre N')
-#             except:
-#                 pass
-#             try:
-#                 dpg.set_value('VARIABLES_G_inf_slider',pre_G_inf)
-#                 self.plot_scater(self.df,'callback_fit_all_button pre Ginf')
-#             except:
-#                 pass
-#             self.callback_fit_button('Fit_button',app_data)
-#             self.callback_keep_res_button('keep_results_butt',app_data)
+    def callback_exportsettings(self,sender,app_data):
+        setts = {
+            'Calib_data':{
+                            'Calib_file_path': self.calib_directory,
+                            'Ch_1_omega': dpg.get_value('omega_input_ch_1'),
+                            'Ch_1_omega_err': dpg.get_value('omega_err_input_ch_1'),
+                            'Ch_1_kappa': dpg.get_value('kappa_input_ch_1'),
+                            'Ch_1_kappa_err': dpg.get_value('kappa_err_input_ch_1'),
+                            'Ch_1_V0': dpg.get_value('focal_vol_input_ch_1'),
+                            'Ch_1_V0_err': dpg.get_value('focal_vol_err_input_ch_1'),
+                            'Ch_1_B': dpg.get_value('Brightness_input_ch_1'),
+                            'Ch_1_B_err': dpg.get_value('Brightness_err_input_ch_1'),
+                            'Ch_2_omega': dpg.get_value('omega_input_ch_2'),
+                            'Ch_2_omega_err': dpg.get_value('omega_err_input_ch_2'),
+                            'Ch_2_kappa': dpg.get_value('kappa_input_ch_2'),
+                            'Ch_2_kappa_err': dpg.get_value('kappa_err_input_ch_2'),
+                            'Ch_2_V0': dpg.get_value('focal_vol_input_ch_2'),
+                            'Ch_2_V0_err': dpg.get_value('focal_vol_err_input_ch_2'),
+                            'Ch_2_B': dpg.get_value('Brightness_input_ch_2'),
+                            'Ch_2_B_err': dpg.get_value('Brightness_err_input_ch_2'),
+                
+                         },
+            'PTU_files_dir':self.PTU_directory,
+            'ROI_file_dir': self.ROI_directory,
+            'Export_opts':{
+                            'Photons to array':dpg.get_value('Photons_array_checkbox'),
+                            'Photons to heatmap':dpg.get_value('Photons_Hmaps_checkbox'),
+                            'N_p to array':dpg.get_value('Np_array_checkbox'),
+                            'N_p to heatmap':dpg.get_value('Np_Hmaps_checkbox'),
+                            'Conc. to array':dpg.get_value('C_array_checkbox'),
+                            'Conc. to heatmap':dpg.get_value('C_Hmaps_checkbox')
+                
+                
+                            },
+            'Error_notation':dpg.get_value('Error_type_checkbox')
             
             
-            
-#     def mount_tables(self):
+                }
+        
+        
+        
+        # lnprint(setts)
+        if self.PTU_directory !=None:
+            path_to_json_file = os.path.join(self.PTU_directory,'workspace_info.json')
+            with open(path_to_json_file, 'w') as f:
+                json.dump(setts, f, indent=4, sort_keys=False)
+        else:
+            pass
 
-#         '''Mount tables containing the reuslts of the fit.'''
-#         self.RESTAB_RELATED_ITEMS=['column_results_variable',
-#                                    'column_results_value',
-#                                    'column_results_err']
-#         with dpg.group(tag='group_results',show=True,parent='file_window'):
-#             with dpg.group(tag='group_keep_res_tab'):
-#                 with dpg.table(header_row=True,show=True,tag='table_results'):
-#                     dpg.add_table_column(label='Variable',
-#                                          tag=self.RESTAB_RELATED_ITEMS[0])
-#                     dpg.add_table_column(label='Value',
-#                                          tag=self.RESTAB_RELATED_ITEMS[1])
-#                     dpg.add_table_column(label='Error',
-#                                          tag=self.RESTAB_RELATED_ITEMS[2])
-#                     for v in self.VARIABLES:
-#                         row_res_item = 'row_results_'+v
-#     #                     print(row_res_item)
-#                         self.RESTAB_RELATED_ITEMS.extend([row_res_item])
-#                         with dpg.table_row(tag=row_res_item):
-#                             res_res_item = 'results_'+v+'_name'
-#                             self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                             dpg.add_text('',tag=res_res_item)
-#                             res_res_item = 'results_'+v+'_value'
-#                             self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                             dpg.add_text('',tag=res_res_item)
-#                             res_res_item = 'results_'+v+'_error'
-#                             self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                             dpg.add_text('',tag=res_res_item)
-#                     with dpg.table_row(tag='row_res_bright_item'):
-#                         res_res_item = 'results_bright_name'
-#                         self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                         dpg.add_text('',tag=res_res_item)
-#                         res_res_item = 'results_bright_value'
-#                         self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                         dpg.add_text('',tag=res_res_item)
-#                         res_res_item = 'results_bright_error'
-#                         self.RESTAB_RELATED_ITEMS.extend([res_res_item])
-#                         dpg.add_text('',tag=res_res_item)
+    def _pkl_file(self):
+           
+        pkl = {
+            'filename' : self.anal_file,
+            'ROI_mode' : (dpg.get_value('FILE_ROI_checkbox'),dpg.get_value('Auto_ROI_checkbox')),
+            'FCS_data' : {
+                            'omega_1':dpg.get_value('omega_input_ch_1'),
+                            'omega_2':dpg.get_value('omega_input_ch_2'),
+                            'omega_err_1':dpg.get_value('omega_err_input_ch_1'),
+                            'omega_err_2':dpg.get_value('omega_err_input_ch_2'),
+                            'kappa_1':dpg.get_value('kappa_input_ch_1'),
+                            'kappa_2':dpg.get_value('kappa_input_ch_2'),
+                            'kappa_err_1':dpg.get_value('kappa_err_input_ch_1'),
+                            'kappa_err_2':dpg.get_value('kappa_err_input_ch_2'),
+                            'fv_1':dpg.get_value('focal_vol_input_ch_1'),
+                            'fv_2':dpg.get_value('focal_vol_input_ch_2'),
+                            'fv_err_1':dpg.get_value('focal_vol_err_input_ch_1'),
+                            'fv_err_2':dpg.get_value('focal_vol_err_input_ch_2'),
+                            'Br_1':dpg.get_value('Brightness_input_ch_1'),
+                            'Br_2':dpg.get_value('Brightness_input_ch_2'),
+                            'Br_err_1':dpg.get_value('Brightness_err_input_ch_1'),
+                            'Br_err_2':dpg.get_value('Brightness_err_input_ch_2'),
+                            },
+            'autoroi_tresh':{
+                            'cell_1':dpg.get_value('cell_tresh_ratio_1'),
+                            'cell_2':dpg.get_value('cell_tresh_ratio_2'),
+                            'check_1':dpg.get_value('nucleus_search_1'),
+                            'check_2':dpg.get_value('nucleus_search_2'),
+                            'nucl_1':dpg.get_value('nucl_tresh_ratio_1'),
+                            'nucl_2':dpg.get_value('nucl_tresh_ratio_2')
                             
-#                 tab_tag = 'group_keep_res'
-#                 tab_col0 = 'group_keep_res_col0'
-#                 tab_col1 = 'group_keep_res_col1'
-#                 tab_row = 'group_keep_res_row'
-#                 self.VAR_RELATED_GROUPS.extend([tab_tag,tab_col0,tab_col1,tab_row])
-#                 with dpg.table(header_row=False,tag=tab_tag,width=-1,borders_innerH=False, 
-#                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
-#                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-#                                no_clip=True, policy=dpg.mvTable_SizingStretchSame):
-#                     dpg.add_table_column(tag=tab_col0,width=self.internal_width_left_panel/2)
-#                     dpg.add_table_column(tag=tab_col1,width=self.internal_width_left_panel/2)
-#                     with dpg.table_row(tag=tab_row):
-        
-        
-        
-        
-#                         dpg.add_button(label='Store results',
-#                                        tag='keep_results_butt',
-#                                        width=self.keep_results_butt['width'],
-#                                        enabled=False,
-#                                        callback=self.callback_keep_res_button
-#                                       )
-#                         dpg.bind_item_theme('keep_results_butt', 'fit_button_theme')
-#                         with dpg.tooltip('keep_results_butt'):
-#                             dpg.add_text("Press to store the fitting results in memor, export the current set of data and save the plot. (Alt+s)")
-#                         dpg.add_button(label='Show results',
-#                                        tag='show_results_butt',
-#                                        width=self.show_results_butt['width'],
-#                                        show=True,
-#                                        callback=self.callback_show_res_button
-#                                       )
-#                         dpg.bind_item_theme('show_results_butt', 'fit_button_theme')
-#                         with dpg.tooltip('show_results_butt'):
-#                             dpg.add_text("Press to show the stored fitting results.")
-#             dpg.add_separator(tag ='sep_left_3')
-#             with dpg.group(tag='group_keep_res_mean',show=True):
-#                 with dpg.table(header_row=True,show=True,tag='table_results_mean'):
-#                     dpg.add_table_column(label='Variable',tag='column_results_variable_mean')
-#                     dpg.add_table_column(label='Mean value',tag='column_results_value_mean')
-#                     dpg.add_table_column(label='SD',tag='column_results_err_mean')
-#                     for v in self.VARIABLES:
-#                         with dpg.table_row(tag='row_results_'+v+'_mean'):
-#                             try:
-#                                 if len(self.RES_DF) != 0:
-#                                     mean = self.RES_DF[v].mean()
-#                                     dpg.add_text(v,tag='results_'+v+'_name_mean') 
-#                                     dpg.add_text(self.basf.zeros(mean),
-#                                                  tag='results_'+v+'_value_mean')
-#                                     if len(self.RES_DF)<2:
-#                                         STD = '-'
-#                                         dpg.add_text(STD,tag='results_'+v+'_error_mean')
-#                                     else:
-#                                         STD = self.RES_DF[v].std(ddof=1)
-#                                         dpg.add_text(self.basf.zeros(STD),
-#                                                      tag='results_'+v+'_error_mean')
-
-#                                 else:
-#                                     dpg.add_text(v,tag='results_'+v+'_name_mean')
-
-#                                     dpg.add_text('-',tag='results_'+v+'_value_mean')
-#                                     dpg.add_text('-',tag='results_'+v+'_error_mean')
-#                             except:
-#                                 dpg.add_text(v,tag='results_'+v+'_name_mean')
-
-#                                 dpg.add_text('-',tag='results_'+v+'_value_mean')
-#                                 dpg.add_text('-',tag='results_'+v+'_error_mean')
-#                     with dpg.table_row(tag='row_results_bright_mean'):
-#                         try:
-#                             if len(self.RES_DF) != 0:
-#                                 mean = self.RES_DF['B'].mean()
-#                                 dpg.add_text('B',tag='results_bright_name_mean') 
-#                                 dpg.add_text(self.basf.zeros(mean),
-#                                              tag='results_bright_value_mean')
-#                                 if len(self.RES_DF)<2:
-#                                     STD = '-'
-#                                     dpg.add_text(STD,tag='results_bright_error_mean')
-#                                 else:
-#                                     STD = self.RES_DF['B'].std(ddof=1)
-#                                     dpg.add_text(self.basf.zeros(STD),
-#                                                  tag='results_bright_error_mean')
-
-#                             else:
-#                                 dpg.add_text('B',tag='results_bright_name_mean')
-
-#                                 dpg.add_text('-',tag='results_bright_value_mean')
-#                                 dpg.add_text('-',tag='results_bright_error_mean')
-#                         except:
-#                             dpg.add_text('B',tag='results_bright_name_mean')
-
-#                             dpg.add_text('-',tag='results_bright_value_mean')
-#                             dpg.add_text('-',tag='results_bright_error_mean')
-#                 dpg.add_button(label='Save results to file',
-#                                tag='save_results_butt',
-#                                show=True,
-#                                width = self.save_results_butt['width'],
-#                                callback=self.callback_save_res_button
-#                               )
-#                 dpg.bind_item_theme('save_results_butt', 'fit_button_theme')
-#                 with dpg.tooltip('save_results_butt'):
-#                     dpg.add_text("Export results to file.")
-
-
-
-
-#                 dpg.add_button(label='Plot all results to files',
-#                                tag='plot_all_results_butt',
-#                                show=True,
-#                                width = self.plot_all_results_butt['width'],
-#                                callback=self.callback_plot_res_button
-#                               )
-#                 dpg.bind_item_theme('plot_all_results_butt', 'fit_button_theme')
-#                 with dpg.tooltip('plot_all_results_butt'):
-#                     dpg.add_text("Plot all results to .png files.")
-#             dpg.add_separator(tag ='sep_left_4')
-#         with dpg.window(
-#                         width=self.show_res_win['width'],
-#                         pos=self.show_res_win['pos'],
-#                         tag='show_res_win',
-#                         show=False,
-#                         autosize=True,
-#                         horizontal_scrollbar=True,
-#                         modal=True
-#                           ):
-#             row_number_count = 0
-#             with dpg.table(header_row=True,
-#                            show=True,
-#                            tag='table_results_show',
-#                            policy=dpg.mvTable_SizingFixedFit,
-#                            resizable=True):
-
-#                 dpg.add_table_column(label='File',tag='column_results_show_file')
-#                 for v in self.VARIABLES:
-#                     dpg.add_table_column(label=v,tag='column_results_show_'+v)
-#                     dpg.add_table_column(label=v+'_err',tag='column_results_show_'+v+'_err')
-#                 dpg.add_table_column(label='B',tag='column_results_show_B')
-#                 dpg.add_table_column(label='B_err',tag='column_results_show_B_err')
-#                 dpg.add_table_column(label='\u03C7\u00B2',tag='column_results_show_chisqr')
-#                 dpg.add_table_column(label='Red. \u03C7\u00B2',tag='column_results_show_Redchi')
-#                 dpg.add_table_column(label='Remove?',tag='column_results_show_del') 
-#             with dpg.group(tag='group_close_results_table',
-#                            parent='show_res_win',
-#                            horizontal=True,
-#                            horizontal_spacing=self.group_spacer, show=True):
-#                 dpg.add_button(label='Close',
-#                                tag='close_button_results',
-#                                parent='group_close_results_table',
-#                                width = self.close_button_results['width'],
-#                                callback=lambda:dpg.configure_item('show_res_win',show=False)
-#                               )
-#                 dpg.add_button(label='Remove',
-#                                parent='group_close_results_table',
-#                                tag='remove_button_results',
-#                                width = self.remove_button_results['width'],
-#                                callback=self.callback_remove_result_button,
-#                                show=True
-#                               )
-
-
-#         if len(dpg.get_item_configuration('file_box')['items'])!=0:
-#             dpg.configure_item('group_results',show=True)
-#         else:
-#             dpg.configure_item('group_results',show=False)
-            
-            
-#     def callback_calculate_mol_bright(self,sender,app_data):
-
-#         # lprint(self.res_dict,self.reserr_dict)
-#         NP = dpg.get_value('VARIABLES_N_p_slider')
-        
-#         if len(self.res_dict) !=0:
-#             try:
-#                 BR_part = sqrt(((-dpg.get_value('CNTR')/NP**2)**2)*(self.reserr_dict['N_p_err'])**2)
-#             except:
-#                 BR_part =0
-#             self.BR = [dpg.get_value('CNTR')/NP,BR_part]
-#         else:
-#             BR_part = 0
-#             self.BR = [dpg.get_value('CNTR')/NP,BR_part]
-#         lprint(self.BR)
-#         lprint(self.VARIABLES)
-#         dpg.set_value('BRIGHT',self.BR[0])
-
-#     def plot_scater(self,DF,sender_function):
-#         '''Plot the current data and fiting function.'''
-#         dpg.configure_item('acf_y',label="G("+'\u03C4'+")")
-#         dpg.configure_item('acf_y_log',label="Log(G("+'\u03C4'+"))")
-#         dpg.configure_item('res_x',label="Lag time, "+'\u03C4'+" [ms]")
-#         DF=DF.astype(np.float32)
-#         xdata=[n for n in DF.loc[(DF['X'] > 0)].dropna().X.values]
-#         ydata=[n for n in DF.loc[(DF['X'] > 0)].dropna().Y.values]
-#         ygreks = ydata
-#         x_fit_data = 10**np.linspace(log10(DF.loc[(DF['X'] > 0)].dropna().X.min()),log10(DF.loc[(DF['X'] > 0)].dropna().X.max()),200)
-#         y_fit_data = self.my_universal_function(x_fit_data,**self.VARIABLES)
-#         x_res_data=xdata
-        
-#         if self.FCS_data_type=='bin':
-#             if dpg.get_value('FITing_checkbox'):
-#                 weights = [1/n for n in DF.Y_err.values]
-#             else:
-#                 weights = [1 for n in ydata]
-
-        
-
-        
-#         elif self.FCS_data_type=='3C':
-#             weights = [1/n for n in DF.Y_err.values]
-#         elif self.FCS_data_type=='2C':
-#             weights = [1 for n in ydata]
-#         y_res_data=weights*(ydata-self.my_universal_function(xdata,**self.VARIABLES))
-
-
-#         self.callback_calculate_mol_bright('CNTR',dpg.get_value('CNTR'))
-#         dpg.set_axis_limits('acf_y',min(ygreks)-min(ygreks)*0.05,max(ygreks)+max(ygreks)*0.05)
-#         dpg.set_axis_limits('acf_y_log',min(abs(DF.Y.values))/10,max(abs(DF.Y.values))*10)
-#         dpg.set_axis_limits('acf_x',min(xdata)-min(xdata)*0.05,max(xdata)+max(xdata)*0.05)
-#         dpg.set_axis_limits('acf_x_log',min(xdata)-min(xdata)*0.05,max(xdata)+max(xdata)*0.05)
-#         dpg.set_axis_limits('res_y',min(y_res_data)-min(y_res_data)*0.05,max(y_res_data)+max(y_res_data)*0.05)
-
-#         dpg.set_value('ACF_fit', [x_fit_data,y_fit_data ])
-#         dpg.set_value('RES_plot', [x_res_data,y_res_data ])
-#         dpg.set_value('ACF_plot', [xdata,ydata ])
-#         dpg.set_value('ACF_plot_log', [xdata,ydata ])
-#         dpg.set_value('ACF_fit_log', [x_fit_data,y_fit_data ])
-        
-        
-        
-
-
-
-
-#     def callback_keep_res_button(self,sender,app_data):
-#         '''Stores the fitted data into the pandas Dataframe.'''
-
-#         self.res_add = [{**self.res_dict , **self.reserr_dict}]
-#         RES_ADD = pd.DataFrame.from_dict(self.res_add)
-#         RES_ADD['file']=self.anal_file
-        
-#         lprint(self.res_add)
-#         RES_ADD['B']=self.BR[0]
-#         RES_ADD['B_err']=self.BR[1]
-#         RES_ADD['chi_sqr']=self.chisqr
-#         RES_ADD['Red.chi_sqr']=self.redchi
-
-#         if len(self.RES_DF) == 0 :
-#             for col in RES_ADD.columns:
-#                 self.RES_DF.at[0,col] = RES_ADD.at[0,col]     
-
-#         else:
-            
-#             self.RES_DF =pd.concat([self.RES_DF,RES_ADD]).reset_index(drop=True)
-
-        
-#         resdf=pd.DataFrame()
-#         self.row_number_count=int(self.RES_DF.tail(1).index.values)
-
-
-#         self.write_res_to_table()
-
-
-#         dpg.configure_item('group_keep_res_mean', show=True)
-#         if len(self.RES_DF)>1:
-#             dpg.configure_item('show_results_butt',show=True)
-#             dpg.configure_item('group_keep_res_mean', show=True)
-#             for v in self.VARIABLES:
-#                 mean = self.RES_DF[v].mean()
-#                 STD = self.RES_DF[v].std(ddof=1)
-
-#                 dpg.set_value('results_'+v+'_name_mean',v)
-#                 dpg.set_value('results_'+v+'_value_mean',self.basf.zeros(mean))
-#                 dpg.set_value('results_'+v+'_error_mean',self.basf.zeros(STD))
-
-#             mean_br = self.RES_DF['B'].mean()
-#             STD_br = self.RES_DF['B'].std(ddof=1)
-#             dpg.set_value('results_bright_name_mean','B')
-#             dpg.set_value('results_bright_value_mean',self.basf.zeros(mean_br))
-#             dpg.set_value('results_bright_error_mean',self.basf.zeros(STD_br))
-#             dpg.configure_item('table_results_mean', show=True)
-#         else:
-#             dpg.configure_item('show_results_butt',show=True)
-#             dpg.configure_item('group_keep_res_mean', show=True)
-#             for v in self.VARIABLES:
-#                 mean = self.RES_DF[v].mean()
-#                 STD = '-'
-
-#                 dpg.set_value('results_'+v+'_name_mean',v)
-#                 dpg.set_value('results_'+v+'_value_mean',self.basf.zeros(mean))
-#                 dpg.set_value('results_'+v+'_error_mean',STD)
-
-#             mean_br = self.RES_DF['B'].mean()
-#             STD_br = '-'
-
-#             dpg.set_value('results_bright_name_mean','B')
-#             dpg.set_value('results_bright_value_mean',self.basf.zeros(mean_br))
-#             dpg.set_value('results_bright_error_mean',STD_br)
-
-#         dpg.configure_item('save_results_butt', show=True)
-
-
-#         dpg.configure_item('keep_results_butt', enabled=False)
-
-
-
-
-#         Current_model = dpg.get_value('model_choose')
-#         if Current_model != self.workspace_iso['Model']:
-#             self.workspace_iso['Model'] = Current_model
-#         else:
-#             pass
-#         tau_min = dpg.get_value('df_min')
-#         tau_max = dpg.get_value('df_max')
-#         Time_units = dpg.get_value('Xunits')
-#         G0_units = dpg.get_value('Yunits')
-#         Weights_checkbox =dpg.get_value('FITing_checkbox')
-
-
-
-#         FREEZED_results = {
-#                            'tau_min':tau_min,
-#                            'tau_max': tau_max,
-#                            'Time_units': Time_units,
-#                            'G0_units': G0_units,
-#                            'Weights_checkbox': Weights_checkbox,
-#                            }
-#         for v  in self.VARIABLES:
-#             FREEZED_results[v+'_min'] = dpg.get_value('VARIABLES_'+v+'_min')
-#             FREEZED_results[v+'_max'] = dpg.get_value('VARIABLES_'+v+'_max')
-#             FREEZED_results[v+'_check'] = dpg.get_value('VARIABLES_'+v+'_check')
-#         RES_add=RES_ADD.copy().drop(columns=['file'])
-#         FREEZED_results['RES_ADD']={k:float(RES_add[k].values) for k in RES_add.columns}
-#         self.workspace_iso['FILES'][self.anal_file]=FREEZED_results
-#         self.workspace_iso['STORED RESULTS'] = {col:list(self.RES_DF[col].values) for col in self.RES_DF.columns }
-        
-        
-
-
-#     def callback_show_res_button(self,sender,app_data):
-#         '''Shows the table containing the stored fitting results.'''
-#         dpg.configure_item('show_res_win',show=True)
-
-
-    
-
-
-#     def callback_save_res_button(self,sender,app_data):
-#         '''Opend the dialog window allowing export of the fitting results to the external file.'''
-#         dpg.configure_item('file_dialog_export',default_path=self.last_directory)
-#         dpg.show_item("file_dialog_export")
-        
-  
-#     def callback_plot_res_button(self,sender,app_data):
-#         '''Opend the dialog window allowing export of the fitting results to the external PNG file.'''
-#         dpg.configure_item('file_dialog_plot_all',default_path=self.last_directory)
-#         dpg.show_item("file_dialog_plot_all")
-        
-
-
-#     def callback_remove_result_button(self,sender,app_data):
-#         ind_result_to_remove =[]
-#         for i in self.RES_DF.index:
-#             if dpg.get_value('results_delete_'+str(i)+'_check'):
-#                 ind_result_to_remove.append(i)
-#         self.RES_DF.drop(self.RES_DF.index[ind_result_to_remove],inplace=True)
-#         self.RES_DF.reset_index(drop=True,inplace=True)
-#         self.write_res_to_table()
-
-
-
-
-#     def write_res_to_table(self):
-
-
-
-#         for alias in dpg.get_aliases():
-#             if alias.startswith('results_show_'):
-#                 try:
-
-#                     dpg.delete_item(alias)
-#                 except:
-#                     pass
-#             if alias.startswith('results_delete_'):
-#                 try: 
-#                     dpg.delete_item(alias)
-#                 except:
-#                     pass
-#         for alias in dpg.get_aliases():
-#             if alias.startswith('row_results_show'):
-#                 try:
-#                     dpg.delete_item(alias)
-#                 except:
-#                     pass
-
-
-#         if dpg.get_value('Sett_export_each'):
-#             fname = dpg.get_value('default_quick_export_filename')
-#             if dpg.get_value('Sett_export_to_excel'):
-#                 pth = os.path.join(self.last_directory,fname+'.xlsx')
-#                 self.RES_DF.to_excel(os.path.join(pth),index=False)
-#             if dpg.get_value('Sett_export_to_csv'):
-#                 pth = os.path.join(self.last_directory,fname+'.csv')
-#                 self.RES_DF.to_csv(os.path.join(pth),index=False)
-#             if dpg.get_value('Sett_export_to_pickle'):
-#                 pth = os.path.join(self.last_directory,fname+'.pickle')
-#                 self.RES_DF.to_pickle(pth)             
-
-
-
-#         else:
-#             pass
-#         for i in self.RES_DF.index:
-
-#             with dpg.table_row(tag='row_results_show'+str(i),parent='table_results_show'):
-#                 dpg.add_text(self.RES_DF.at[i,'file'],tag='results_show_'+str(i)+'_name')
-#                 for v in self.VARIABLES:
-#                     dpg.add_text(self.basf.zeros(self.RES_DF.at[i,v]),
-#                                  tag='results_show_'+str(i)+'_'+v+'_value')
-#                     dpg.add_text(self.basf.zeros(self.RES_DF.at[i,v+'_err']),
-#                                  tag='results_show_'+str(i)+'_'+v+'_err')
-#                 dpg.add_text(str(self.basf.zeros_chi(self.RES_DF.at[i,'B'])),
-#                              tag='results_show_'+str(i)+'_'+'B')
-#                 dpg.add_text(str(self.basf.zeros_chi(self.RES_DF.at[i,'B_err'])),
-#                              tag='results_show_'+str(i)+'_'+'B_err')
-#                 dpg.add_text(str(self.basf.zeros_chi(self.RES_DF.at[i,'chi_sqr'])),
-#                              tag='results_show_'+str(i)+'_'+'chisqr')
-#                 dpg.add_text(str(self.basf.zeros(self.RES_DF.at[i,'Red.chi_sqr'])),
-#                              tag='results_show_'+str(i)+'_'+'Redchi')
-#                 dpg.add_checkbox(label='',tag='results_delete_'+str(i)+'_check',
-#                                  callback=self.callback_remove_result)
-    
-#     def callback_Xunits(self,sender, app_data):
-#         '''Changes the time units in the FCS mode and replots.'''
-
-
-#         self.df=self.df_copy.copy()
-#         current_range=[dpg.get_value('df_min'),dpg.get_value('df_max')]
-#         mask_min = self.df['X'] <= current_range[0]
-#         mask_max = self.df['X'] >= current_range[1]
-#         self.df.loc[mask_min,'X'] = np.nan
-#         self.df.loc[mask_max,'X'] = np.nan
-#         self.df.dropna(inplace=True)
-#         if sender == 'Xunits':
-#             self.df['X']=self.df.X*dpg.get_value('Xunits')*1e3
-#         elif sender == 'Yunits':
-#             self.df['Y']=self.df.Y*dpg.get_value('Yunits')  
-
-#             if self.FCS_data_type == "bin":
-#                 if len(self.df.columns) == 3:
-#                     self.df['Y_err']=self.df.Y_err*dpg.get_value('Yunits')
-#                 else:
-#                     pass
                 
+                            }
+        
+            }
+        # lnprint(pkl)
+        pkl_path = os.path.join(self.last_directory,self.anal_file+'.rpk')
+        with open(pkl_path, 'wb') as f:
+            pickle.dump(pkl, f)
+
+
+    def _load_pkl_file(self,path):
+        with open(path, 'rb') as file:
+            pkl = pickle.load(file)
+        # lnprint(pkl)
+        
+        dpg.set_value('omega_input_ch_1',pkl['FCS_data']['omega_1'])
+        dpg.set_value('omega_input_ch_2',pkl['FCS_data']['omega_2'])
+        dpg.set_value('omega_err_input_ch_1',pkl['FCS_data']['omega_err_1'])
+        dpg.set_value('omega_err_input_ch_2',pkl['FCS_data']['omega_err_2'])
+        dpg.set_value('kappa_input_ch_1',pkl['FCS_data']['kappa_1'])
+        dpg.set_value('kappa_input_ch_2',pkl['FCS_data']['kappa_2'])
+        dpg.set_value('kappa_err_input_ch_1',pkl['FCS_data']['kappa_err_1'])
+        dpg.set_value('kappa_err_input_ch_2',pkl['FCS_data']['kappa_err_2'])
+        dpg.set_value('focal_vol_input_ch_1',pkl['FCS_data']['fv_1'])
+        dpg.set_value('focal_vol_input_ch_2',pkl['FCS_data']['fv_2'])
+        dpg.set_value('focal_vol_err_input_ch_1',pkl['FCS_data']['fv_err_1'])
+        dpg.set_value('focal_vol_err_input_ch_2',pkl['FCS_data']['fv_err_2'])
+        dpg.set_value('Brightness_input_ch_1',pkl['FCS_data']['Br_1'])
+        dpg.set_value('Brightness_input_ch_2',pkl['FCS_data']['Br_2'])
+        dpg.set_value('Brightness_err_input_ch_1',pkl['FCS_data']['Br_err_1'])
+        dpg.set_value('Brightness_err_input_ch_2',pkl['FCS_data']['Br_err_2'])
+        dpg.set_value('cell_tresh_ratio_1',pkl['autoroi_tresh']['cell_1'])
+        dpg.set_value('cell_tresh_ratio_2',pkl['autoroi_tresh']['cell_2'])
+        dpg.set_value('nucleus_search_1',pkl['autoroi_tresh']['check_1'])
+        dpg.set_value('nucleus_search_2',pkl['autoroi_tresh']['check_2'])
+        dpg.set_value('nucl_tresh_ratio_1',pkl['autoroi_tresh']['nucl_1'])
+        dpg.set_value('nucl_tresh_ratio_2',pkl['autoroi_tresh']['nucl_2'])
+    
+        dpg.set_value('FILE_ROI_checkbox',pkl['ROI_mode'][0])
+        dpg.set_value('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+        if pkl['ROI_mode'][1]:
+            self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
             
-#             elif self.FCS_data_type == "3C":
-
-#             # try:
-#                 self.df['Y_err']=self.df.Y_err*dpg.get_value('Yunits')
-#             # except:
-#             elif self.FCS_data_type == "2C":
-#                 pass
-#         self.plot_scater(self.df,'callback_Xunits') 
-        
-        
-
-
-#     def update_flist(self,fs,multi):
-#         '''Updates the filelist. '''
-
-#         if not len(fs)==0:
-#             self.workspace_iso_path = os.path.join(self.last_directory,'workspace.dct') 
-#             Current_model = dpg.get_value('model_choose')
-
-#             if not os.path.exists(self.workspace_iso_path):
-#                 self.workspace_iso={'Model':Current_model,'FILES':{f:'' for f in fs},'STORED RESULTS':{}}
-
-
-
-
-
-#             else:
-#                 with open(self.workspace_iso_path) as json_workspace:
-#                     self.workspace_iso = json.load(json_workspace)
-#                 for k in self.workspace_iso['STORED RESULTS'].keys():
-#                     self.RES_DF[k] = self.workspace_iso['STORED RESULTS'][k]
-
-
-#             try:
-#                 dpg.configure_item("file_box", items=fs)
-
-#                 dpg.configure_item("file_box", default_value=fs[0])
-#             except:
-#                 pass
-#         else:
-#             dpg.configure_item("file_box", items=())
-#             dpg.configure_item("file_box", default_value='')
-#         dpg.configure_item('reset_workspace_menu_item',enabled=True)
-
-        
-
-
-#     def load_data(self,director,f):
-    
-#         '''The function loads the datafile into a pandas DataFrame. Also mounts the X range of the data, the number of points to skip, and the scaler for the X values depening on the defined units.'''
-
-#         f_path=os.path.join(director,f)
-
-#         # dpg.set_value('CNTR',0.0)
-#         if self.FCS_data_type == "bin":
-#             with open(f_path, 'rb') as file:
-#                 data = pickle.load(file)
-#             if not dpg.get_value('Sett_preserve_units'):
-#                 dpg.set_value('Xunits',0.001)
-#                 dpg.set_value('Yunits',1.)
-#             else:
-#                 pass
-#             lprint(data)
-#             self.df = data['Correlation']
-#             self.cntr = data['CNTR'][0]
-#             dpg.set_value('CNTR',self.cntr)
-#             if len(self.df.columns) == 3:
-#                 dpg.set_value('FITing_checkbox', True)
-#                 dpg.configure_item('FITing_checkbox', enabled=False)
-#             elif len(self.df.columns) == 2:
-#                 dpg.set_value('FITing_checkbox', False)
-#                 dpg.configure_item('FITing_checkbox', enabled=False)
-#             else:
-#                 pass
-#             # self.df.columns=['X','Y','Y_err']
-
-#             dpg.configure_item('df_min', show=True)
-#             dpg.configure_item('df_max', show=True)
-
-
-
-
-#             dpg.configure_item('df_min', default_value=self.df.X.min())
-#             dpg.configure_item('df_max', default_value=self.df.X.max())
-
-
-#             dpg.configure_item('df_min',max_value=self.df.X.max())
-#             dpg.configure_item('df_min',min_value=self.df.X.min())
-#             dpg.configure_item('df_max',max_value=self.df.X.max())
-#             dpg.configure_item('df_max',min_value=self.df.X.min())
-
-#             xunit=np.round(dpg.get_value('Xunits')*1e3,6)
-
-#             if not dpg.get_value('Sett_preserve_time'):
-#                 top_range=self.df.X.max()*xunit
-#                 bottom_range=self.df.X.min()*xunit
-#             else:
-#                 if self.time_range[0]!= None:
-
-#                     bottom_range = self.time_range[0]*xunit
-#                 else:
-#                     bottom_range=self.df.X.min()*xunit
-
-#                 if self.time_range[1]!=None:
-#                     top_range = self.time_range[1]*xunit
-#                 else:
-#                     top_range=self.df.X.max()*xunit
-#             self.df_copy=self.df.copy()
-#             if top_range != self.df.X.max():
-#                 if top_range>self.df.X.max():
-#                     top_range = self.df.X.max()
-#                 else:
-#                     mask = self.df['X'] > top_range
-#                     self.df.loc[mask,'X'] = np.nan
-#             if bottom_range != self.df.X.max():
-#                 if bottom_range < self.df.X.min():
-#                     bottom_range = self.df.X.min()
-#                 else:
-#                     mask = self.df['X'] < bottom_range # change limits of X axis
-#                     self.df.loc[mask,'X'] = np.nan
-
-#             self.df.dropna(inplace=True)
-#             dpg.configure_item('df_min', default_value=bottom_range)
-#             dpg.configure_item('df_max', default_value=top_range)
-        
-#         elif self.FCS_data_type == "3C":
-#             cnt,self.df = self.count_skiprows(f_path)
-#             if not dpg.get_value('Sett_preserve_units'):
-#                 dpg.set_value('Xunits',0.001)
-#                 dpg.set_value('Yunits',1.)
-#             else:
-#                 pass
-#             self.df.columns=['X','Y','Y_err']
-
-#             dpg.configure_item('df_min', show=True)
-#             dpg.configure_item('df_max', show=True)
-
-
-
-
-#             dpg.configure_item('df_min', default_value=self.df.X.min())
-#             dpg.configure_item('df_max', default_value=self.df.X.max())
-
-
-#             dpg.configure_item('df_min',max_value=self.df.X.max())
-#             dpg.configure_item('df_min',min_value=self.df.X.min())
-#             dpg.configure_item('df_max',max_value=self.df.X.max())
-#             dpg.configure_item('df_max',min_value=self.df.X.min())
-
-#             xunit=np.round(dpg.get_value('Xunits')*1e3,6)
-
-#             if not dpg.get_value('Sett_preserve_time'):
-#                 top_range=self.df.X.max()*xunit
-#                 bottom_range=self.df.X.min()*xunit
-#             else:
-#                 if self.time_range[0]!= None:
-
-#                     bottom_range = self.time_range[0]*xunit
-#                 else:
-#                     bottom_range=self.df.X.min()*xunit
-
-#                 if self.time_range[1]!=None:
-#                     top_range = self.time_range[1]*xunit
-#                 else:
-#                     top_range=self.df.X.max()*xunit
-#             self.df_copy=self.df.copy()
-#             if top_range != self.df.X.max():
-#                 if top_range>self.df.X.max():
-#                     top_range = self.df.X.max()
-#                 else:
-#                     mask = self.df['X'] > top_range
-#                     self.df.loc[mask,'X'] = np.nan
-#             if bottom_range != self.df.X.max():
-#                 if bottom_range < self.df.X.min():
-#                     bottom_range = self.df.X.min()
-#                 else:
-#                     mask = self.df['X'] < bottom_range # change limits of X axis
-#                     self.df.loc[mask,'X'] = np.nan
-
-#             self.df.dropna(inplace=True)
-#             dpg.configure_item('df_min', default_value=bottom_range)
-#             dpg.configure_item('df_max', default_value=top_range)
-
-
-
-
-
-#         elif self.FCS_data_type == "2C":
-#             cnt,self.df = self.count_skiprows(f_path)
-
-#             self.df.columns=['X','Y']
-
-#             dpg.configure_item('df_min', show=True)
-#             dpg.configure_item('df_max', show=True)
-#             dpg.configure_item('df_min', default_value=self.df.X.min())
-#             dpg.configure_item('df_max', default_value=self.df.X.max())
-
-
-
-#             dpg.configure_item('df_min',max_value=self.df.X.max())
-#             dpg.configure_item('df_min',min_value=self.df.X.min())
-#             dpg.configure_item('df_max',max_value=self.df.X.max())
-#             dpg.configure_item('df_max',min_value=self.df.X.min())
-
-#             dpg.configure_item('Xunits', show=True)
-#             xunit=np.round(dpg.get_value('Xunits')*1e3,6)
-#             if not dpg.get_value('Sett_preserve_time'):
-#                 top_range=self.df.X.max()*xunit
-#                 bottom_range=self.df.X.min()*xunit
-#             else:
-#                 if self.time_range[0]!= None:
-
-#                     bottom_range = self.time_range[0]*xunit
-#                 else:
-#                     bottom_range=self.df.X.min()*xunit
-
-#                 if self.time_range[1]!=None:
-#                     top_range = self.time_range[1]*xunit
-#                 else:
-#                     top_range=self.df.X.max()*xunit
-#             self.df_copy=self.df.copy()
-
-#             if top_range != self.df.X.max():
-#                 if top_range>self.df.X.max():
-#                     top_range = self.df.X.max()
-#                 else:
-#                     mask = self.df['X'] > top_range
-#                     self.df.loc[mask,'X'] = np.nan
-#             if bottom_range != self.df.X.max():
-#                 if bottom_range < self.df.X.min():
-#                     bottom_range = self.df.X.min()
-#                 else:
-#                     mask = self.df['X'] < bottom_range # change limits of X axis
-#                     self.df.loc[mask,'X'] = np.nan
-
-
-#         self.workspace_test(f)  
-
-        
-        
-
-#     def callback_df_range(self,sender, app_data):
-#         '''Response to change in the x-value's range of analysed data'''
-
-#         dmax=self.df_copy.X.max()
-#         dmin=self.df_copy.X.min()
-#         current_range=[dpg.get_value('df_min'),dpg.get_value('df_max')]
-#         if sender =='df_max':
-#             if app_data ==1:
-#                 dpg.configure_item(sender,speed=abs(app_data/10.))
-#             if app_data ==0.:
-#                 dpg.set_value(sender,dpg.get_value('df_min')*2)
-#             dpg.configure_item(sender,max_value=self.df_copy.X.max())
-#             dpg.configure_item(sender,min_value=dpg.get_value('df_min'))
-#             dpg.configure_item(sender,format='\u03C4'+' (max)  [ms] = %.'+str(self.basf.decimal_rounds_lim(app_data))+'f',)
-#         if sender =='df_min':
-#             dpg.configure_item(sender,max_value=dpg.get_value('df_max'))
-#             dpg.configure_item(sender,min_value=self.df_copy.X.min())
-#             dpg.configure_item(sender,format='\u03C4'+' (min)  [ms] = %.'+str(self.basf.decimal_rounds_lim(app_data))+'f',)
-#         self.df=self.df_copy.copy()
-
-
-#         dpg.configure_item(sender,speed=abs(app_data/10.))
-
-
-#         mask_min = self.df['X'] <= current_range[0]
-#         mask_max = self.df['X'] >= current_range[1]
-#         self.df.loc[mask_min,'X'] = np.nan
-#         self.df.loc[mask_max,'X'] = np.nan
-#         self.df.dropna(inplace=True)
-
-#         if self.df.X.max() != dmax or self.df.X.min()!=dmin:
-
-#             dpg.configure_item('Reset_range',enabled=True)
-#             dpg.bind_item_theme('Reset_range', 'fit_button_theme') 
-#         else:
-#             dpg.configure_item('Reset_range',enabled=False)
-#             dpg.bind_item_theme('Reset_range', 'fit_button_theme_inactive') 
-#         if len(self.df)!= 0:
-#             xunit = dpg.get_value('Xunits')
-#             yunit = dpg.get_value('Yunits')
-#             self.callback_Xunits('Xunits',xunit)
-#             self.callback_Xunits('Yunits',yunit)
-#             self.plot_scater(self.df,'callback_df_range')
-#         else:
-#             pass
-#         if dpg.get_value('Sett_preserve_time'):
-#             self.time_range = current_range[0],current_range[1]
-#         else:
-#             self.time_range=(None,None)
+        else:
+            self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
             
-            
-
-#     def  callback_reset_df_range(self,sender,app_data):
-#         current_range=[dpg.get_value('df_min'),dpg.get_value('df_max')]
-#         self.df=self.df_copy.copy()
-#         dpg.set_value('df_min',self.df_copy.X.min())
-#         dpg.set_value('df_max',self.df_copy.X.max())
-#         self.time_range = (None,None)
-#         self.plot_scater(self.df,'callback_reset_df_range')
-#         dpg.configure_item(sender,enabled=False)
-        
-        
-#     def callback_remove_result(self,sender,app_data):
-#         ind_result_to_remove=sender.split('_')[2]
-        
         
     
-#     def load_data_local(self,director,f):
-
-#         f_path=os.path.join(director,f)
-
-
-#         if self.FCS_data_type == "bin":
-#             with open(f_path, 'rb') as file:
-#                 data = pickle.load(file)
-#             if not dpg.get_value('Sett_preserve_units'):
-#                 dpg.set_value('Xunits',0.001)
-#                 dpg.set_value('Yunits',1.)
-#             else:
-#                 pass
-#             lprint(data)
-#             dfl = data['Correlation']
-#             cntr = data['CNTR'][0]
-            
-#             if len(dfl.columns) == 3:
-
-
-#                 dfl['X']=dfl.X*dpg.get_value('Xunits')*1e3
-#                 if not dpg.get_value('Sett_preserve_time'):
-#                     top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#                     bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
-#                 else:
-#                     if self.time_range[0]!= None:
-#                         bottom_range = self.time_range[0]*dpg.get_value('Xunits')*1e3
-#                     else:
-#                         bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
     
-#                     if self.time_range[1]!=None:
-#                         top_range = self.time_range[1]*dpg.get_value('Xunits')*1e3
-#                     else:
-#                         top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#                 dfl['Y']=dfl.Y*dpg.get_value('Yunits')    
-#                 dfl['Y_err']=dfl.Y_err*dpg.get_value('Yunits')
-    
-#                 if top_range != dfl.X.max():
-#                     if top_range>dfl.X.max():
-#                         top_range = dfl.X.max()
-#                     else:
-#                         mask = dfl['X'] >= top_range
-#                         dfl.loc[mask,'X'] = np.nan
-#                 if bottom_range != dfl.X.max():
-#                     if bottom_range < dfl.X.min():
-#                         bottom_range = dfl.X.min()
-#                     else:
-#                         mask = dfl['X'] <= bottom_range # change limits of X axis
-#                         dfl.loc[mask,'X'] = np.nan
-    
-#                 dfl.dropna(inplace=True)
-
-
-
-                
-#             elif len(dfl.columns) == 2:
-#                 dfl['X']=dfl.X*dpg.get_value('Xunits')*1e3
-#                 top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#                 bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
-#                 dfl['Y']=dfl.Y*dpg.get_value('Yunits') 
-    
-    
-#                 if top_range != dfl.X.max():
-#                     if top_range>dfl.X.max():
-#                         top_range = dfl.X.max()
-#                     else:
-#                         mask = dfl['X'] >= top_range
-#                         dfl.loc[mask,'X'] = np.nan
-#                 if bottom_range != dfl.X.min():
-#                     if bottom_range < dfl.X.min():
-#                         bottom_range = dfl.X.min()
-#                     else:
-#                         mask = dfl['X'] <= bottom_range # change limits of X axis
-#                         dfl.loc[mask,'X'] = np.nan
-    
-#                 dfl.dropna(inplace=True)
-#             else:
-#                 pass
-
-
-#         elif self.FCS_data_type == "3C":
-#             cnt,dfl = self.count_skiprows(f_path)
-
-#             dfl.columns=['X','Y','Y_err']
-
-
-#             dfl['X']=dfl.X*dpg.get_value('Xunits')*1e3
-#             if not dpg.get_value('Sett_preserve_time'):
-#                 top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#                 bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
-#             else:
-#                 if self.time_range[0]!= None:
-#                     bottom_range = self.time_range[0]*dpg.get_value('Xunits')*1e3
-#                 else:
-#                     bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
-
-#                 if self.time_range[1]!=None:
-#                     top_range = self.time_range[1]*dpg.get_value('Xunits')*1e3
-#                 else:
-#                     top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#             dfl['Y']=dfl.Y*dpg.get_value('Yunits')    
-#             dfl['Y_err']=dfl.Y_err*dpg.get_value('Yunits')
-
-#             if top_range != dfl.X.max():
-#                 if top_range>dfl.X.max():
-#                     top_range = dfl.X.max()
-#                 else:
-#                     mask = dfl['X'] >= top_range
-#                     dfl.loc[mask,'X'] = np.nan
-#             if bottom_range != dfl.X.max():
-#                 if bottom_range < dfl.X.min():
-#                     bottom_range = dfl.X.min()
-#                 else:
-#                     mask = dfl['X'] <= bottom_range # change limits of X axis
-#                     dfl.loc[mask,'X'] = np.nan
-
-#             dfl.dropna(inplace=True)
-
-
-
-
-
-
-#         elif self.FCS_data_type == "2C":
-#             cnt,dfl = self.count_skiprows(f_path)
-#             dfl.columns=['X','Y']
-
-
-#             dfl['X']=dfl.X*dpg.get_value('Xunits')*1e3
-#             top_range=dfl.X.max()*dpg.get_value('Xunits')*1e3
-#             bottom_range=dfl.X.min()*dpg.get_value('Xunits')*1e3
-#             dfl['Y']=dfl.Y*dpg.get_value('Yunits') 
-
-
-#             if top_range != dfl.X.max():
-#                 if top_range>dfl.X.max():
-#                     top_range = dfl.X.max()
-#                 else:
-#                     mask = dfl['X'] >= top_range
-#                     dfl.loc[mask,'X'] = np.nan
-#             if bottom_range != dfl.X.min():
-#                 if bottom_range < dfl.X.min():
-#                     bottom_range = dfl.X.min()
-#                 else:
-#                     mask = dfl['X'] <= bottom_range # change limits of X axis
-#                     dfl.loc[mask,'X'] = np.nan
-
-#             dfl.dropna(inplace=True)
-#         else:
-#             pass
-#         return dfl
-    
-
-#     def save_all_to_plot(self,dd,f_path,fnam,varias):
-
-
-#         checkboxes=[
-#             dpg.get_value('Sett_export_plot_as_png'),
-#             dpg.get_value('Sett_export_plot_as_csv'),
-#             dpg.get_value('Sett_export_plot_as_pickle'),
-#             dpg.get_value('Sett_export_plot_loglog')
-#                 ]
-#         ts0 = time.time()
-#         ts0a = time.time()
-
-#         dd['FIT']=self.my_universal_function(dd.X,**varias)
-#         lprint(dd)
-#         xdata = dd.X
-#         ydata =dd.Y
-#         if self.FCS_data_type == "bin":
-#             if len(dd.columns) == 4:
-#                 ydata_err = dd.Y_err
-#             else:
-#                 pass
-#         elif self.FCS_data_type == "3C":
-#             ydata_err = dd.Y_err
-#         yfit = dd.FIT
         
-#         if self.FCS_data_type == "bin":
-#             if len(dd.columns) == 4:
-#                 dd['Residues']=(1/dd.Y_err)*(dd.Y-self.my_universal_function(xdata,**varias))
-#             else:
-#                 dd['Residues']=(dd.Y-self.my_universal_function(xdata,**varias))
-#         elif self.FCS_data_type == "3C":
-#             dd['Residues']=(1/dd.Y_err)*(dd.Y-self.my_universal_function(xdata,**varias))
-#         elif self.FCS_data_type == "2C":
-
-#             dd['Residues']=(dd.Y-self.my_universal_function(xdata,**varias))
-#         res=dd['Residues']
-#         XX = 10**np.linspace(log10(min(xdata)),log10(max(xdata)),100)
-#         ts1a = time.time()
-#         ts0b = time.time()
-#         fig = Figure(figsize=(16, 10))
-#         gs = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[3, 1])
-
-#         ax2 = fig.add_subplot(gs[1])
-#         ax1 = fig.add_subplot(gs[0], sharex=ax2)
-
-
-#         ax1.set_xscale('log')
-#         ax2.set_xscale('log')
-#         ax1.plot(xdata,ydata,'o',ms=10)
-#         ax1.axhline(0,ls=':',c='k',lw=1)
-#         ax1.plot(XX,self.my_universal_function(XX,**varias),ls ='-',lw = 3,c='C1')
-#         ax2.axhline(0,c='k',ls=':',lw=1)
-#         ax2.plot(xdata,res,ls ='-',lw = 3,c='C1')
-#         ax1.tick_params('both',labelsize=19)
-#         ax2.tick_params('both',labelsize=19)
-#         ax1.set_ylabel(dpg.get_item_configuration('acf_y')['label'],
-#                        fontsize=22)
-#         ax2.set_ylabel(r'Res.', fontsize=22)
-#         ax2.set_xlabel(dpg.get_item_configuration('res_x')['label'],
-#                        fontsize=22)
-
-        
-
-#         if checkboxes[0]:
-#             export_path = os.path.join(f_path,fnam+'.png')
-#             ts0bb = time.time()
-#             FigureCanvas(fig).print_png(export_path)
-#         ts1b = time.time()
-#         ts0c = time.time()
-#         if checkboxes[1]:
-#             export_path = os.path.join(f_path,fnam+'.csv')
-#             dd.to_csv(export_path,sep='\t',index=False)
-#         if checkboxes[2]:
-#             export_path = os.path.join(f_path,fnam+'.pickle')
-#             dd.to_pickle(export_path)
-#         if checkboxes[3]:
-#             export_path = os.path.join(f_path,fnam+'_log.png')
-#             dd['FIT']=self.my_universal_function(dd.X,**varias)
-
-#             xdata = dd.X
-#             ydata =dd.Y
-#             yfit = dd.FIT
-#             if self.FCS_data_type == "3C":
-#                 if len(dd.columns) == 4:
-#                     dd['Residues']=(1/dd.Y_err)*(dd.Y-self.my_universal_function(xdata,**varias))
-#                 else:
-#                     dd['Residues']=(dd.Y-self.my_universal_function(xdata,**varias))
-#             elif self.FCS_data_type == "3C":
-#                 dd['Residues']=(1/dd.Y_err)*(dd.Y-self.my_universal_function(xdata,**varias))
-#             else:
-
-#                 dd['Residues']=(dd.Y-self.my_universal_function(xdata,**varias))
-#             res=dd['Residues']
-#             XX = 10**np.linspace(log10(min(xdata)),log10(max(xdata)),100)
-#     #         else:
-#             fig = Figure(figsize=(16, 10))
-#             gs = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[3, 1])
-
-#             ax2 = fig.add_subplot(gs[1])
-#             ax1 = fig.add_subplot(gs[0], sharex=ax2)
-
-
-#             ax1.set_xscale('log')
-#             ax2.set_xscale('log')
-
-#             ax1.set_yscale('log')
-#             ax1.plot(xdata,ydata,'o',ms=10)
-#             ax1.axhline(0,ls=':',c='k',lw=1)
-#             ax1.plot(XX,self.my_universal_function(XX,**varias),ls ='-',lw = 3,c='C1')
-#             ax2.axhline(0,c='k',ls=':',lw=1)
-#             ax2.plot(xdata,res,ls ='-',lw = 3,c='C1')
-#             ax1.tick_params('both',labelsize=19)
-#             ax2.tick_params('both',labelsize=19)
-#             print(dpg.get_item_configuration('acf_y_log')['label'])
-#             ax1.set_ylabel(dpg.get_item_configuration('acf_y_log')['label'],
-#                            fontsize=22)
-#             ax2.set_ylabel(r'Res.', fontsize=22)
-#             ax2.set_xlabel(dpg.get_item_configuration('res_x')['label'],
-#                            fontsize=22)
-#             ts0d = time.time()
-#             FigureCanvas(fig).print_png(export_path)
-#             ts1d = time.time()
-#             ts1c = time.time()
-#             ts1 = time.time()
-
-
-#     def curves(self,directory,f):
-#         '''Function extarcts single data curve from data file containing more than one data curve. Depending on the user decaler size of the data curve (2 or 3 columns) the set of new files is created in a folder named by the original filename of the multiple-curve data file. '''
-
-#         f_path=os.path.join(directory,f)
-
-#         ncurves=self.count_curves(f_path)
-#         self.new_directory=os.path.join(directory,f.replace('.dat','')+'_single_curves')
-#         try:
-#             os.stat(self.new_directory)
-#         except:
-#             os.mkdir(self.new_directory)
-#         if ncurves == -1:
-#             error_text = 'This is not a valid multicolumn file. File must contain 3xN columns, where N is the numbre of measurements.'
-#             self.show_error_no_files_close_only(error_text)
-#             return False
-#         else:
-#             cnt,self.df = self.count_skiprows(f_path)
-#             col_names_base=['X','Y','Y_err']
-
-#             col_names=[]
-#             for i in range(ncurves):
-#                 names=[s+'_'+str(i+1) for s in col_names_base]
-#                 col_names.extend(names)
-#             self.df.columns = col_names
-
-#             curve_names_base=f.replace('.dat','')+'_curve_'
-#             for i in range(ncurves):
-#                 names=[s+'_'+str(i+1) for s in col_names_base]
-#                 DF = self.df.copy()[names]
-#                 DF.columns = col_names_base
-#                 DF.to_csv(os.path.join(self.new_directory,curve_names_base+str(i+1)+'.dat'),sep='\t',index=False)
-#             self.last_directory=self.new_directory
-#             return True
-        
-    
-#     def callback_directory_export(self,sender, app_data):
-#         '''Export stored results to the external file.'''
-
-#         with open(self.workspace_iso_path, 'w') as json_workspace:
-#             json.dump(self.workspace_iso, json_workspace, indent=4, sort_keys=False)
-
-
-#         export_path = app_data['file_path_name']
-#         if app_data['current_filter']=='.xlsx':
-#             self.RES_DF.to_excel(export_path,index=False)
-#         if app_data['current_filter']=='.csv':
-#             self.RES_DF.to_csv(export_path,index=False,sep=',')
-#         if app_data['current_filter']=='.dat':
-#             self.RES_DF.to_csv(export_path,index=False,sep='\t')
-#         if app_data['current_filter']=='.pickle':
-#             self.RES_DF.to_pickle(export_path)
-#         if app_data['current_filter']=='':
-#             extension = app_data['file_name'].split('.')[1]
-#             if extension=='xlsx':
-#                 self.RES_DF.to_excel(export_path,index=False)
-#             if extension=='csv':
-#                 self.RES_DF.to_csv(export_path,index=False,sep=',')
-#             if extension=='dat':
-#                 self.RES_DF.to_csv(export_path,index=False,sep='\t')
-#             if extension=='pickle':
-#                 self.RES_DF.to_pickle(export_path)
-
-
-#         if dpg.get_value('Sett_export_stats'):
-#             fnam = dpg.get_value('default_quick_stst_filename')
-#             report_DF=self.RES_DF[[v for v in self.VARIABLES]].describe()
-#             report_f_path=os.path.join(self.new_directory,fnam)
-#             if dpg.get_value('Sett_export_stats_to_csv'):
-#                 report_DF.to_csv(report_f_path+'.csv')
-#             if dpg.get_value('Sett_export_stats_to_pickle'):
-#                 report_DF.to_pickle(report_f_path+'.pickle')
-#             if dpg.get_value('Sett_export_stats_to_xlsx'):
-#                 report_DF.to_excel(report_f_path+'.xlsx')
-#         else:
-#             pass
-
-        
-#     def callback_no_files_dialog_close(self,sender,app_data):
-#         dpg.configure_item('No_data_files',show=False)
-#         dpg.delete_item('no_files_error_text')
-#         dpg.delete_item('no_files_error_butt')
-#         dpg.delete_item('No_data_files')
-#         dpg.show_item('file_dialog_id1')
-# #     def resize_items(self):
-# #         pass
-
-
-
-#     def callback_plot_all_to_files(self,sender,app_data):
-#         # global ratio_w
-
-
-#         dpg.configure_item("file_dialog_plot_all",show=False)
-#         if self.size_ratio['width']>=1:
-#             ww = 250*self.size_ratio['width']
-#         else:
-#             ww = 250
-#         # print('ww', ww)
-#         with dpg.window(tag='load_ind_win',width=ww,height=250,
-#                                 menubar=False,
-#                                 autosize=False,
-#                                 no_title_bar=True,
-#                                 no_move=True,
-#                                 no_background=True,
-#                                 modal=True,
-
-#                            show=True):
-
-#             dpg.add_button(tag='loading_title',width=ww,label='Ploting your data to files')
-
-#             dpg.bind_item_theme('loading_title', 'transparent_theme')
-#             dpg.add_button(tag='loading_butt',width=ww,label='')
-#             dpg.bind_item_theme('loading_butt', 'transparent_theme')
-#         win_width = dpg.get_item_width('load_ind_win')
-#         win_height = dpg.get_item_height('load_ind_win')
-#         VP_w = dpg.get_viewport_width()
-#         VP_h = dpg.get_viewport_height()
-#         posit = (int(VP_w/2-win_width/2),int(VP_h/2-win_height/2))
-#         dpg.configure_item('load_ind_win',pos=posit)
-#         director = app_data['file_path_name']
-#         if len(self.RES_DF)>0:
-
-#             for cnt,i in enumerate(list(self.RES_DF.index)):
-#                 try:
-#                     dpg.configure_item('loading_butt',label=str(int(100*cnt/len(self.RES_DF)))+'%')
-#                 except:
-#                     pass
-#                 file = self.RES_DF.at[i,'file']
-#                 varias = {}
-#                 for v in self.VARIABLES:
-#                     varias[v]=self.RES_DF.at[i,v]
-#                 DATA_frame = self.load_data_local(self.last_directory,file)
-
-#                 self.save_all_to_plot(DATA_frame,director,file,varias)
-
-
-
-#         else:
-#             self.show_error_no_files_close_only('No fitted results to plot.')
-
-
-#         dpg.configure_item('load_ind_win',show=False)
-#         try:
-#             dpg.delete_item('loading_butt')
-#             dpg.delete_item('loading_title')
-#             dpg.delete_item('load_ind_win')
-
-
-#         except:
-#             pass
-        
-#     def loading_indicator_close(self):
-#         dpg.configure_item('load_ind_win',show=False)
-#         try:
-#             dpg.delete_item('loading_ind')
-#             dpg.delete_item('load_ind_win')
-
-#         except:
-#             pass
-
-
-
-#     def loading_indicator_show(self):
-#     #     try:
-#         with dpg.window(tag='load_ind_win',width=50,height=50,
-#                                 menubar=False,
-#                                 autosize=True,
-#                                 no_title_bar=True,
-#                                 no_move=True,
-#                                 no_background=True,
-#                                 modal=True,
-#                            show=True):
-#             dpg.add_button(tag='loading_title',width=-1,label='Ploting to file')
-#             dpg.bind_item_theme('loading_title', 'transparent_theme')
-#             dpg.add_loading_indicator(tag='loading_ind',
-#                                       radius=6,
-#                                       width=50,
-#                                       height=50,
-#                                       show=True,
-#                                       color=self.basf._hsv_to_rgb(2/7.0, 0.7, 0.7),
-#                                       secondary_color=(116,116,116,0),
-#                                       speed=2)
-#             dpg.add_button(tag='loading_butt',width=-1,label='')
-#             dpg.bind_item_theme('loading_butt', 'transparent_theme')
-#         win_width = dpg.get_item_width('load_ind_win')
-#         win_height = dpg.get_item_height('load_ind_win')
-#         VP_w = dpg.get_viewport_width()
-#         VP_h = dpg.get_viewport_height()
-#         posit = (int(VP_w/2-win_width/2),int(VP_h/2-win_height/2))
-#         dpg.configure_item('load_ind_win',pos=posit)
-
-#     def show_error_no_files_2c_csv(self):
-#         # try:
-#         dpg.add_window(pos=(400,150),
-#                        label='Error!',
-#                            tag='No_data_files',
-
-#                            no_move=True,
-#                             no_close=False,
-#                             no_title_bar=False,
-#                             no_resize=True,
-#                            show=True,
-#                            modal=False
-#                           )
-#         dpg.add_text('No ".dat" data files found. ".csv"  files found instead. Do you want to import ".csv" files?',tag='no_files_error_text',
-#                  parent='No_data_files')
-#         dpg.add_button(label='Yes',
-#                        parent='No_data_files',
-#                        tag='no_files_error_butt_yes',
-#                        callback=self.callback_no_files_dialog_close_yes
-#                       )
-#         dpg.add_button(label='Close',
-#                        parent='No_data_files',
-#                        tag='no_files_error_butt',
-#                        callback=self.callback_no_files_dialog_close
-#                       )
-
-#         dpg.bind_item_theme('No_data_files', 'Error_window_theme')
-#         # except:
-#         #     dpg.show_item('No_data_files')
-        
-
-
-#     def show_error_no_files(self):
-#         try:
-#             dpg.add_window(pos=(400,150),
-#                            label='Error!',
-#                                tag='No_data_files',
-
-#                                no_move=True,
-#                                 no_close=False,
-#                                 no_title_bar=False,
-#                                 no_resize=True,
-#                                show=True,
-#                                modal=False
-#                               )
-#             dpg.add_text('No data files found. Change directory.',tag='no_files_error_text',
-#                      parent='No_data_files')
-#             dpg.add_button(label='Close',
-#                            parent='No_data_files',
-#                            tag='no_files_error_butt',
-#                            callback=self.callback_no_files_dialog_close
-#                           )
-#             dpg.bind_item_theme('No_data_files', 'Error_window_theme')
-#         except:
-#             dpg.show_item('No_data_files')
-
-#     def show_delete_Curve_window(self):
-
-#         try:
-#             delete_file_name = dpg.get_value('file_box')
-#         except:
-#             self.show_error_no_files_close_only('No files loaded?')
-#         try:
-#             dpg.add_window(pos=(400,150),
-#                            label='Delete curve?',
-#                                tag='Delete_curve_win',
-
-#                                no_move=False,
-#                                 no_close=True,
-#                                 no_title_bar=False,
-#                                 no_resize=True,
-#                                show=True,
-#                                autosize=True,
-#                                modal=True
-#                               )
-#             dpg.add_text('Do you realy want to delete the file:',tag='Delete_curve_text_L1',
-#                      parent='Delete_curve_win')
-#             dpg.add_text(delete_file_name,tag='Delete_curve_text_L2',
-#                      parent='Delete_curve_win')
-
-#             with dpg.table(header_row=False,tag='del_curve_butt_table',show=True,parent='Delete_curve_win'):
-#                 dpg.add_table_column()
-#                 dpg.add_table_column()
-#                 with dpg.table_row():
-#                     with dpg.table_cell():
-#                         dpg.add_button(label='Yes',
-#                                        tag='Del_curve_yes_butt',
-#                                        callback=self.callback_delete_Curve_yes_butt
-#                                       )
-#                     with dpg.table_cell():
-#                         dpg.add_button(label='No',
-#                                        tag='Del_curve_no_butt',
-#                                        callback=self.callback_delete_Curve_no_butt
-#                                       )
-#             dpg.bind_item_theme('Delete_curve_win', 'Error_window_theme')
-#         except:
-#             dpg.show_item('Delete_curve_win')
-
-
-#     def callback_delete_Curve_yes_butt(self,sender,app_data):       
-#         files = dpg.get_item_configuration('file_box')['items']
-#         def_val = dpg.get_value('file_box')
-#         index = files.index(def_val)
-#         if index != 0:
-#             new_value = files[index-1]
-#             files.remove(def_val)
-#             self.update_flist(files,None)
-#             dpg.set_value('file_box',new_value)
-#             self.callback_listbox('file_box',new_value)
-#         else:
-#             new_value = files[index+1]
-#             files.remove(def_val)
-#             self.update_flist(files,None)
-#             dpg.set_value('file_box',new_value)
-#             self.callback_listbox('file_box',new_value)
-#         self.callback_delete_Curve_no_butt('Del_curve_no_butt',None)
-
-#     def callback_delete_Curve_no_butt(self,sender,app_data):
-
-#         dpg.configure_item('Delete_curve_win',show=False)
-#         dpg.delete_item('Delete_curve_text_L1')
-#         dpg.delete_item('Delete_curve_text_L2')
-#         dpg.delete_item('Del_curve_yes_butt')
-#         dpg.delete_item('Del_curve_no_butt')
-#         dpg.delete_item('del_curve_butt_table')
-
-#         dpg.delete_item('Delete_curve_win')
-
-
-#     def callback_no_files_dialog_close_only(self,sender,app_data):
-#         dpg.configure_item('No_data_files',show=False)
-#         dpg.delete_item('no_files_error_text')
-#         dpg.delete_item('no_files_error_butt')
-#         dpg.delete_item('No_data_files')
-#         if 'no_files_error_butt_yes' in dpg.get_aliases():
-#             dpg.delete_item('no_files_error_butt_yes')
-#         else:
-#             pass
-
-#     # def callback_no_files_dialog_close_yes(self,sender,app_data):
-#     #     self.is_there_csv = True
-#     #     dpg.configure_item('No_data_files',show=False)
-#     #     dpg.delete_item('no_files_error_text')
-#     #     dpg.delete_item('no_files_error_butt')
-#     #     dpg.delete_item('No_data_files')
-#     #     if 'no_files_error_butt_yes' in dpg.get_aliases():
-#     #         dpg.delete_item('no_files_error_butt_yes')
-#     #     else:
-#     #         pass
-        
-
-
-#     def show_error_no_files_close_only(self,error_text):
-#         try:
-#             dpg.add_window(pos=(400,150),
-#                            label='Error!',
-#                                tag='No_data_files',
-
-#                                no_move=True,
-#                                 no_close=True,
-#                                 no_title_bar=False,
-#                                 no_resize=True,
-#                                show=True,
-#                                modal=False
-#                               )
-#             dpg.add_text(error_text,tag='no_files_error_text',
-#                      parent='No_data_files')
-#             dpg.add_button(label='Close',
-#                            parent='No_data_files',
-#                            tag='no_files_error_butt',
-#                            callback=self.callback_no_files_dialog_close_only
-#                           )
-#             dpg.bind_item_theme('No_data_files', 'Error_window_theme')
-#         except:
-#             dpg.show_item('No_data_files')
-            
-            
-#     def callback_directory_select(self,sender, app_data):
-#         '''Select the directory containing datafies to analyse.'''
-
-
-
-#         def _FCSDATATYPE_initcommoncommands():
-#             self.define_RES_DF()
-#             self.unmount_tables()
-#             self.unmount_variables()
-#             self.mount_variables()
-#             self.new_directory=app_data['file_path_name']
-#             self.last_directory=self.new_directory
-
-#         def _FCSDATATYPE_dpgconfig():
-#             dpg.configure_item('file_box', callback=self.callback_listbox)
-#             dpg.configure_item('file_dialog_id1', default_path=self.last_directory)
-#             dpg.configure_item('file_dialog_export', default_path=self.last_directory)
-#             Variable_groups = [item for item in dpg.get_aliases() if item.startswith('VARIABLES_') and item.endswith('_group')] 
-#             Variable_groups.extend(['sep_mid_1','sep_mid_2','Fit_button','FITing_checkbox','Fit_all_button'])
-#             for item in Variable_groups:
-#                 dpg.configure_item(item,show=True)
-#             dpg.configure_item('model_choice_group', show=True)
-#             dpg.configure_item('model_choose', enabled=True)
-#             dpg.configure_item('log_checkbox_group', show=True)
-#             dpg.configure_item('subplots', show=True)
-#             dpg.configure_item('plot_1', show=True)
-#             dpg.configure_item('plot_2', show=True)
-#             dpg.configure_item('plot_3', show=True)
-#             dpg.configure_item('file_box', callback=self.callback_listbox)
-#             if self.FCS_data_type == 'bin':
-#                 dpg.configure_item('FITing_checkbox', enabled=True)
-                
-#             elif self.FCS_data_type == '3C':
-#                 dpg.configure_item('FITing_checkbox', enabled=True)
-#                 dpg.set_value('FITing_checkbox', True)
-#             elif self.FCS_data_type == '2C':
-#                 dpg.configure_item('FITing_checkbox', enabled=False)
-#                 dpg.set_value('FITing_checkbox', False)
-#             else:
-#                 pass
-
-#         if self.FCS_data_type == 'bin':
-#             self.files=()
-#             self.filesbin=()
-#             _FCSDATATYPE_initcommoncommands()
-#             self.files=tuple(np.sort([f for f in os.listdir(self.last_directory) if f.endswith(".corr")]))
-#             if len(self.files)==0:
-#                 self.show_error_no_files()
-#             else:
-#                 # fbin=[]
-#                 # for f in self.files:
-#                 #     f_path=os.path.join(self.new_directory,f)
-#                 #     cnt,testdf = self.count_skiprows(f_path)
-#                 #     if len(testdf.columns) == 3:
-#                 #         f3.append(f)
-#                 self.filesbin=tuple(self.files)
-#                 self.update_flist(self.filesbin,None)
-#                 self.anal_file=self.filesbin[0]
-#                 self.mount_tables()
-#                 self.load_data(self.new_directory,self.anal_file)
-#                 self.plot_scater(self.df,'callback_directory_select')
-
-#                 _FCSDATATYPE_dpgconfig()
-#         elif self.FCS_data_type == '3C':
-#             self.files=()
-#             self.files3=()
-#             _FCSDATATYPE_initcommoncommands()
-#             self.files=tuple(np.sort([f for f in os.listdir(self.last_directory) if f.endswith(".dat")]))
-#             if len(self.files)==0:
-#                 self.show_error_no_files()
-#             else:
-#                 f3=[]
-#                 for f in self.files:
-#                     f_path=os.path.join(self.new_directory,f)
-#                     cnt,testdf = self.count_skiprows(f_path)
-#                     if len(testdf.columns) == 3:
-#                         f3.append(f)
-#                 self.files3=tuple(f3)
-#                 self.update_flist(self.files3,None)
-#                 self.anal_file=self.files3[0]
-#                 self.mount_tables()
-#                 self.load_data(self.new_directory,self.anal_file)
-#                 self.plot_scater(self.df,'callback_directory_select')
-
-#                 _FCSDATATYPE_dpgconfig()
-
-#         elif self.FCS_data_type == '2C':   
-#             self.files=()
-#             self.files2=()
-#             _FCSDATATYPE_initcommoncommands()
-#             self.csv_files = tuple(np.sort([f for f in os.listdir(self.last_directory) if f.endswith(".csv")]))
-#             self.files=tuple(np.sort([f for f in os.listdir(self.last_directory) if f.endswith(".dat")]))
-            
-#             if len(self.files)==0:
-#                 if len(self.csv_files)==0:
-#                     self.show_error_no_files()
-#                 elif len(self.csv_files)!=0:
-#                     # self.show_error_no_files_2c_csv()
-#                     # print('any_csv',self.is_there_csv)
-#                     # if self.is_there_csv:
-#                     f2=[]
-#                     for f in self.csv_files:
-#                         f_path=os.path.join(self.new_directory,f)
-#                         cnt,testdf = self.count_skiprows(f_path)
-#                         if len(testdf.columns) == 2:
-#                             f2.append(f)
-#                     self.files2=tuple(f2)
-#                     self.update_flist(self.files2,None)
-#                     self.anal_file=self.files2[0]
-#                     self.mount_tables()
-#                     self.load_data(self.new_directory,self.anal_file)
-#                     self.plot_scater(self.df,'callback_directory_select')
-
-#                     try:
-#                         _FCSDATATYPE_dpgconfig()
-#                     except:
-#                         pass
-                    
-#                 else:
-#                     self.show_error_no_files()
-#             else:
-#                 f2=[]
-#                 for f in self.files:
-#                     f_path=os.path.join(self.new_directory,f)
-#                     cnt,testdf = self.count_skiprows(f_path)
-#                     if len(testdf.columns) == 2:
-#                         f2.append(f)
-#                 self.files2=tuple(f2)
-#                 self.update_flist(self.files2,None)
-#                 self.anal_file=self.files2[0]
-#                 self.mount_tables()
-#                 self.load_data(self.new_directory,self.anal_file)
-#                 self.plot_scater(self.df,'callback_directory_select')
-
-#                 try:
-#                     _FCSDATATYPE_dpgconfig()
-#                 except:
-#                     pass
-#         elif self.FCS_data_type == 'MC':
-#             dat_file_path = app_data['file_path_name']
-#             filename = app_data['file_name'] 
-#             directory = app_data['current_path']
-#             if self.curves(directory,filename):
-#                 self.FCS_data_type = '3C'
-#                 self.callback_directory_select('file_dialog_id1', {'file_path_name':self.new_directory})
-#             else:
-#                 pass
-            
-            
-#     def callback_Open_FCS_data(self,sender,app_data):
-#         if sender == 'bin_menu_item':
-#             self.FCS_data_type = 'bin'
-#             dpg.show_item("file_dialog_id1")
-#         elif sender == '3C_menu_item':
-#             self.FCS_data_type = '3C'
-#             dpg.show_item("file_dialog_id1")
-#         elif sender == '2C_menu_item':
-#             self.FCS_data_type = '2C'
-#             dpg.show_item("file_dialog_id1")
-#         elif sender == 'MC_menu_item':
-#             self.FCS_data_type = 'MC'
-#             dpg.show_item("multi_file_dialog_id")
-#         elif sender == 'PTU_menu_item':
-#             pass
-#         else:
-#             pass
-    
-
-        
-        
-        
-        
-#     def callback_reset_workspace(self,sender,app_data):
-#         self.workspace_iso['FILES']={k:'' for k in self.workspace_iso['FILES'].keys()}
-#         file_box_items = dpg.get_item_configuration('file_box')['items'][0]
-#         try:
-#             self.callback_listbox('file_box',file_box_items)
-#             dpg.configure_item('model_choose',default_value = self.init_model)
-#             self.callback_models('model_choose',self.init_model)
-#             self.callback_reset_df_range('Reset_range',None)
-#             self.unmount_tables()
-#             self.mount_tables()
-#             dpg.set_value('Xunits',0.00100000000)
-#             dpg.set_value('Yunits',1)
-#         except:
-#             pass
-#     def callback_reset_workspace_results(self,sender,app_data):
-#         self.define_RES_DF()
-#         self.unmount_tables()
-#         self.mount_tables()
-#         dpg.set_value('Xunits',0.00100000000)
-#         dpg.set_value('Yunits',1)
-        
-        
-        
-
-        
-        
-#     def mount_fcs_handlers(self):
-#         dpg.add_key_press_handler(tag ='keyword_handler_fcs',callback=self.callback_fcs_Keyword_key,parent = 'handlers_registry')
-    
-    
-    
-#     def callback_fcs_Keyword_key(self,sender, app_data):
-        
-#         if app_data in self.active_keys:
-#             self.all_items = dpg.get_aliases()
-#             if 'file_box' in self.all_items:
-#                 self.file_box_items = dpg.get_item_configuration('file_box')['items']
-#                 if len(self.file_box_items)!=0:
-#                     def_val = dpg.get_value('file_box')
-#                     index = self.file_box_items.index(def_val)
-#                     if app_data == self.up_key:
-#                         if index!=0:
-#                             index=index-1
-#                             dpg.set_value('file_box',self.file_box_items[index])
-#                             self.callback_listbox('file_box',self.file_box_items[index])
-#                         else:
-#                             pass
-#                     if app_data == self.down_key:
-#                         if index!=len(self.file_box_items)-1:
-#                             index=index+1
-#                             dpg.set_value('file_box',self.file_box_items[index])
-#                             self.callback_listbox('file_box',self.file_box_items[index])
-#                         else:
-#                             pass
-#                     if app_data == self.s_key:
-#                         check = dpg.is_key_down(self.LAlt_key)
-#                         if check:
-#                             self.callback_keep_res_button('keep_results_butt',None)
-#                         else:
-#                             pass
-#                     if app_data == self.d_key:
-#                         check = dpg.is_key_down(self.LAlt_key)
-#                         if check:
-#                             if dpg.get_item_configuration('reset_workspace_menu_item')['enabled']:
-#                                 self.callback_reset_workspace('reset_workspace_menu_item',None)
-#                             else:
-#                                 pass
-#                         else:
-#                             pass
-#                     if app_data == self.return_key:
-#                         check = dpg.is_key_down(self.ctrl_key)
-#                         if check:
-#                             self.callback_fit_button('Fit_button',None)
-#                         else:
-#                             pass
-#                     if app_data == self.Del:
-#                         self.show_delete_Curve_window()
-#                 if app_data == self.w_key:
-#                     check = dpg.is_key_down(self.LAlt_key)
-#                     if check:
-#                         self.callback_Open_FCS_data('3C_menu_item',None)
-#                     else:
-#                         pass
-                    
-    
+        return pkl

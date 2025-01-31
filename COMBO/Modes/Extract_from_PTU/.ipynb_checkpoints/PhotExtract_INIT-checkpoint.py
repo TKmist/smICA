@@ -10,26 +10,12 @@ import pickle
 import cv2
 from Required.readPTU_FLIM import PTUreader
 from numpy.linalg import inv, det,cond,pinv
-# from Required.automated_roi import ImageROIProcessor
 
-# from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-# from matplotlib.figure import Figure
-# import matplotlib.gridspec as gridspec
-# from matplotlib.transforms import Bbox
-# import matplotlib.pyplot as plt
-
-# from sympy.parsing.sympy_parser import parse_expr
-# from sympy import latex
-# from io import BytesIO
-# from PIL import Image
-
-# from lmfit import Model, Parameters
-# import ast
 
 import Required.INIT as inits
 
 bf = inits._basicF()
-# inV=inits._init_varaibles()
+
 lprint = bf.lnprint
 ###############################################################################
 ###############################################################################
@@ -75,7 +61,7 @@ class _PhotExtr_init:
         # self.im_scaller =int(32)#1.1
         self.files =[]
         self.GI=GI
-        # self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
+
         
         
         bf.remove_font_from_registry()
@@ -97,8 +83,7 @@ class _PhotExtr_init:
                             'pos':(self.plot_window_ch1['pos'][0]+self.plot_window_ch1['width']+self.internal_indent,self.top_indent)
                             }
         self.Options = {'name':'Options',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'width':dpg.get_viewport_width()-(self.plot_window_ch2['pos'][0]+self.plot_window_ch2['width']+self.internal_indent+self.right_indent),
+                        'width':dpg.get_viewport_width()-(self.plot_window_ch2['pos'][0]+self.plot_window_ch2['width']+self.internal_indent+self.right_indent),
                         
                             'height':int(120*self.size_ratio['height']),
                             'pos':(self.plot_window_ch2['pos'][0]+self.plot_window_ch2['width']+self.internal_indent,self.top_indent)
@@ -132,26 +117,22 @@ class _PhotExtr_init:
                             }
 
         self.plt_1_ch_1 = {'name':'plt_1_ch_1',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'width':-1,
+                           'width':-1,
                             'height':int(300*self.size_ratio['width']),
                             }
         
         self.L_dline_ch1 = {'name':'L_dline_ch1',
-                            # 'width':int(500*self.size_ratio['width']),
                             'thickness':self.drag_line_thickness,
                             'color':[255, 100, 0, 255],
                             'default_value': 0.0,
                             }
         self.U_dline_ch1 = {'name':'U_dline_ch1',
-                            # 'width':int(500*self.size_ratio['width']),
                             'thickness':self.drag_line_thickness,
                             'color':[255, 0, 100, 255],
                             'default_value': 1.0,
                             }
         self.plt_2_ch_1 = {'name':'plt_2_ch_1',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'width':-1,
+                           'width':-1,
                             'height':int(300*self.size_ratio['width']),
                             }
         self.LIMITS_ch_1_table_col1 = {'name':'LIMITS_ch_1_table_col1',
@@ -182,26 +163,22 @@ class _PhotExtr_init:
                                  }
 
         self.plt_1_ch_2 = {'name':'plt_1_ch_2',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'width':-1,
+                           'width':-1,
                             'height':int(300*self.size_ratio['width']),
                             }
         
         self.L_dline_ch2 = {'name':'L_dline_ch2',
-                            # 'width':int(500*self.size_ratio['width']),
                             'thickness':self.drag_line_thickness,
                             'color':[255, 100, 0, 255],
                             'default_value': 0.0,
                             }
         self.U_dline_ch2 = {'name':'U_dline_ch2',
-                            # 'width':int(500*self.size_ratio['width']),
                             'thickness':self.drag_line_thickness,
                             'color':[255, 0, 100, 255],
                             'default_value': 1.0,
                             }
         self.plt_2_ch_2 = {'name':'plt_2_ch_2',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'width':-1,
+                           'width':-1,
                             'height':int(300*self.size_ratio['width']),
                             }
         self.LIMITS_ch_2_table_col1 = {'name':'LIMITS_ch_2_table_col1',
@@ -269,20 +246,17 @@ class _PhotExtr_init:
                                  }
         
         self.Background_level_line = {'name':'Background_level_line',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'thickness':self.drag_line_thickness,
+                                      'thickness':self.drag_line_thickness,
                             'color':[100, 255, 100, 255],
                             'default_value': 0.0,
                             }
         self.Background_RLL_line = {'name':'Background_RLL_line',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'thickness':self.drag_line_thickness,
+                                    'thickness':self.drag_line_thickness,
                             'color':[100, 255, 100, 255],
                             'default_value': 0.0,
                             }
         self.Background_RUL_line = {'name':'Background_RUL_line',
-                            # 'width':int(500*self.size_ratio['width']),
-                            'thickness':self.drag_line_thickness,
+                                    'thickness':self.drag_line_thickness,
                             'color':[100, 190, 100, 255],
                             'default_value': 0.0,
                             }
@@ -457,12 +431,7 @@ class _PhotExtr_vars_funct:
                            label='LOADING...'
                           )
             dpg.bind_item_theme('loading_butt', 'transparent_theme')
-        # win_width = dpg.get_item_configuration('load_ind_win')['width']
-        # win_height = dpg.get_item_configuration('load_ind_win')['height']
-        # VP_w = dpg.get_viewport_width()
-        # VP_h = dpg.get_viewport_height()
-        # posit = (int(VP_w/2-win_width/2),int(VP_h/2-win_height/2))
-        # dpg.configure_item('load_ind_win',pos=posit)
+            
         
     def unmount_loading_status_window(self):
         dpg.configure_item('load_ind_win',show=False)
@@ -1193,10 +1162,6 @@ class _PhotExtr_vars_funct:
 
     def show_br_fltr_wndw(self,sender):
         
-        # global fl_bg_curadd_line_serieses_dict
-        # lprint(sender)
-        # self.callback_Set_background_range(self,sender,app_data)
-        
         dpg.set_value('tag_series_fltr', [[], []])
         dpg.set_value('tag_series_fltr_subtr', [[], []])
         dpg.configure_item("tag_series_fltr", label = '')
@@ -1333,8 +1298,6 @@ class _PhotExtr_vars_funct:
     
     def calllback_use_stat_filters_chbx(self,sender,app_data):
     
-        # lprint(self.Filters)
-        # lprint('routine\n',self.filtering_routine)
         if_value=app_data 
         if if_value:
             if sender == 'use_as_statistical_filters_chkbx_ch_1':
@@ -1492,11 +1455,6 @@ class _PhotExtr_vars_funct:
         with open(jsn_path) as json_library:
             jsn_dict = json.load(json_library)
         
-    
-    
-    
-    
-        # lprint('routine',routine)
         curve_names = routine['Channel '+str(channel)].keys()
         curve_names = [c for c in curve_names if c!='BG']
         curve_names = [c for c in curve_names if c!='BG_rng']
@@ -1583,17 +1541,12 @@ class _PhotExtr_vars_funct:
                 pass
     
         
-    
-        # lprint('channel',channel)
-        # lprint('CURVES',CURVES)
-    
         
         self.Filters['Channel '+str(channel)] = self.calculate_stat_filter(CURVES,rawy)
     
         
         minlist=[]
         self.remove_existing_filter_plots()
-        # lprint(self.Filters)
         for F_name in self.Filters['Channel '+str(channel)].keys():
             
             F = self.Filters['Channel '+str(channel)][F_name]
@@ -1601,7 +1554,7 @@ class _PhotExtr_vars_funct:
     
             fcurve_tag="tag_series_F_"+F_name
             dpg.add_scatter_series(rawdatax_t, F, parent='yaxis_tltr_fltr',tag=fcurve_tag,label=F_name)
-            # dpg.bind_item_theme(fcurve_tag, "plot_theme")
+            
             minlist.append(min(abs(F[np.where(F!=0)[0]]))/2)
         minimum = min(minlist)
         maximum =2
@@ -1669,9 +1622,9 @@ class _PhotExtr_vars_funct:
         self.mount_filter_list_table(channel)
         self.Filters ['Channel '+str(channel)] = {}
 
-        # lprint(self.Filters)
+        
     def callback_Calculate_filters(self,sender,app_data):
-        # lprint('filtering_routine',self.filtering_routine)
+        
         jsn_file = 'TCSPC_decay_library.json'
         jsn_path = os.path.join('res','Lib','json',jsn_file)
         with open(jsn_path) as json_library:
@@ -2601,12 +2554,6 @@ class _PhotExtr_vars_funct:
                           }
     
     
-        # with open(os.path.join(folder,infoname), "w") as outL_file:
-        #     json.dump(info_dict, outL_file, indent=4, sort_keys=False)
-    
-    
-    
-    
         for channel in range(number_of_channels):
     
     
@@ -2806,7 +2753,7 @@ class _PhotExtr_vars_funct:
     
     
             to_png = (channel_data / np.max(channel_data) * 255).astype(np.uint8)
-            # to_png_8bit = cv2.normalize(to_png, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+           
     
             colormap = cv2.COLORMAP_JET
     
@@ -3010,22 +2957,11 @@ class _PhotExtr_vars_funct:
                         self.GI.extend(['filters_ch_'+str(channel)+'_tab_list_row_'+str(i)+'_cell b_chk'])
     def mount_status_modal(self):
         self.mount_loading_status_window()
-        # with dpg.window(tag='load_ind_win',width=ww,height=250,
-        #                         menubar=False,
-        #                         autosize=False,
-        #                         no_title_bar=True,
-        #                         no_move=True,
-        #                         no_background=True,
-        #                         modal=True,
-    
-        #                    show=True):
+        
         dpg.configure_item('loading_title',label='Processing file:')
-            # dpg.add_button(tag='loading_title',width=ww,label='Processing file:')
-    
-            # dpg.bind_item_theme('loading_title', 'transparent_theme')
+            
         dpg.configure_item('loading_butt',label='')
-            # dpg.add_button(tag='loading_butt',width=ww,label='')
-            # dpg.bind_item_theme('loading_butt', 'transparent_theme')
+            
         
         dpg.add_button(tag='loading_status_text',
                        width=self.mode_init.loading_status_text['width'],
@@ -3063,7 +2999,7 @@ class _PhotExtr_vars_funct:
         
         if not if_BG and len(curve_names)==0:
             print('Failure: no filters selected')
-            # log_it('\tFailure: no filters selected.','a')
+            
         elif not if_BG and len(curve_names)>0:
             for curv in curve_names:
                 curve = np.load(routine['Channel '+str(channel)][curv])
