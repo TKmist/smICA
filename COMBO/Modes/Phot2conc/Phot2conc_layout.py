@@ -892,7 +892,7 @@ with dpg.window(label='',
                   )
     dpg.bind_item_theme('Load_calib_button', 'fit_button_theme')
     dpg.add_button(label="Save callibration data",
-                   # callback=lambda: dpg.configure_item("Calib_file_dialog_id",show=True,user_data = 'Save_calib_button'),
+                   callback=lambda: dpg.configure_item("Calib_file_dialog_id",show=True,user_data = 'Save_calib_button'),
                    width = mode_init.Save_calib_button['width'],
                    tag='Save_calib_button',
                    show=True,enabled=True

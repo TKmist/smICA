@@ -68,7 +68,7 @@ globalITEMS = inits._common_VARIABLES()
 
 VP_w = dpg.get_viewport_width()            # get initial width of the viewport
 VP_h = dpg.get_viewport_height()           # get initial height of the viewport
-# dpg.maximize_viewport() 
+dpg.maximize_viewport() 
 menu.mount_main_Menu_bar()
 
 inV.METHODS = basf.search_for_methods()

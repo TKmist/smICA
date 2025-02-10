@@ -3046,7 +3046,7 @@ def load_PTU_images(an_file):
                 roi_1_path = os.path.join(ROI_directory,an_file + '_roi_ch_1.dat')
                 # lnprint('load_PTU_images single channel 1')
                 roi_1 = load_ROI(roi_1_path).to_numpy()
-                processor_1.roi_img = roi_1
+                processor_1.roi_image = roi_1
                 # lnprint(roi_1_path)
                 # lnprint(roi_1)
                 Intensity_1 = Intensity_1
@@ -3075,7 +3075,7 @@ def load_PTU_images(an_file):
                 roi_2_path = os.path.join(ROI_directory,an_file + '_roi_ch_2.dat')
                 # lnprint('load_PTU_images single channel 2')
                 roi_2 = load_ROI(roi_2_path).to_numpy()
-                processor_2.roi_img = roi_2
+                processor_2.roi_image = roi_2
                 # lnprint(roi_2_path)
                 # lnprint(roi_2)
                 # lnprint('roi2',roi_2)
@@ -3127,8 +3127,8 @@ def load_PTU_images(an_file):
             # lnprint('load_PTU_images two channel 2')
             roi_2 = load_ROI(roi_2_path).to_numpy()
             Intensity_2 = Intensity_2#*roi_2
-            processor_1.roi_img = roi_1
-            processor_2.roi_img = roi_2
+            processor_1.roi_image = roi_1
+            processor_2.roi_image = roi_2
             # Lifetime_2 = Lifetime_2*roi_2
             # lnprint(roi_1_path)
             # lnprint(roi_1)
@@ -3545,7 +3545,7 @@ def _update_textures_both_roi(sender,app_data):
             
             rgba_to_dpgtex(rgba_image,np.max(disp),tex_1_name)
         elif file_roi:
-            roi = processor_1.roi_img
+            roi = processor_1.roi_image
             
             full_mask = np.nan_to_num(roi*255, nan=0)
             
@@ -3640,7 +3640,7 @@ def _update_textures_both_roi(sender,app_data):
             
             rgba_to_dpgtex(rgba_image,np.max(disp),tex_2_name)
         elif file_roi:
-            roi = processor_2.roi_img
+            roi = processor_2.roi_image
             # lnprint(pd.DataFrame(roi)[[1,128]].describe())
             full_mask = np.nan_to_num(roi*255, nan=0)
             

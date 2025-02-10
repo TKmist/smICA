@@ -629,17 +629,15 @@ class _Phot2conc_vars_funct:
         self.roi_1 = None
         self.roi_2 = None
 
-        self.Current_image_1 = None
-        self.Current_image_2 = None
+        
 
     
-        
-        self.image_1_times_roi = None
-        self.image_2_times_roi = None
         
         self.NO_IMAGE_INTENSITY = self.mode_init.NO_IMAGE_INTENSITY
         self.processor_1 = self.mode_init.processor_1
         self.processor_2 = self.mode_init.processor_2
+        self.Current_image_1 = self.processor_1.image
+        self.Current_image_2 = self.processor_2.image
         self.pkl_data = None
 
         self.im_to_rgbim = self.mode_init.im_to_rgbim
@@ -1088,14 +1086,14 @@ class _Phot2conc_vars_funct:
     def callback_PTU_directory_select(self,sender,app_data):
         
         self.Sing_Results_DF = pd.DataFrame(columns=['File', 'Channel','<Counts>','Counts_std','<N_p>','N_p_err','<C>', 'C_err','C_median', 'C_median_abs_err'])
-        files=()
+        self.files=()
         dpg.set_value('FILE_ROI_checkbox',False)
         self.directory = app_data['file_path_name']
         self.new_directory=self.directory
         self.PTU_directory = self.directory
         self.last_directory=self.directory
         self.update_dialogs_default_directory(self.last_directory)
-        files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
+        self.files = tuple(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
         self.pck_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.pkl')]))
         dpg.configure_item('FILE_ROI_checkbox', enabled=True)
         dpg.configure_item('Auto_ROI_checkbox', enabled=True)
@@ -1105,9 +1103,9 @@ class _Phot2conc_vars_funct:
         except:
             pass
         
-        filenames = [f.replace('.ptu','') for f in files]
+        filenames = [f.replace('.ptu','') for f in self.files]
         
-        if len(files)==0:
+        if len(self.files)==0:
             self.show_error_no_files('No PTU files found.')
         else:
             stop=False
@@ -1148,8 +1146,8 @@ class _Phot2conc_vars_funct:
         self.ROI_directory = app_data['file_path_name']
         self.last_directory =self.ROI_directory
         self.update_dialogs_default_directory(self.last_directory)
-        # dpg.set_value('FILE_ROI_checkbox',True)
-        # callback_select_roi('FILE_ROI_checkbox',True)
+        dpg.set_value('FILE_ROI_checkbox',True)
+        self.callback_select_roi('FILE_ROI_checkbox',True)
         dpg.hide_item('ROI_folder_dialog_id')
         self.load_PTU_images(self.anal_file)
         
@@ -1381,7 +1379,7 @@ class _Phot2conc_vars_funct:
                 else:
                     pass
             
-            elif '2' in Channels[0]:
+            elif '2' in self.Channels[0]:
                 brightness_ch_2 = dpg.get_value('Brightness_input_ch_2')
                 brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2') 
                 Veff_ch_2 = 1e-15*dpg.get_value('focal_vol_input_ch_2')
@@ -1592,7 +1590,7 @@ class _Phot2conc_vars_funct:
                 pass
         
         
-        elif len(Channels) == 2:
+        elif len(self.Channels) == 2:
             brightness_ch_1 = dpg.get_value('Brightness_input_ch_1')
             brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1') 
             Veff_ch_1 = 1e-15*dpg.get_value('focal_vol_input_ch_1')
@@ -2021,17 +2019,19 @@ class _Phot2conc_vars_funct:
 
 
     def callback_calculate_all(self,sender,app_data):
-        
+
+        # print(self.files)
         filenames = [f.replace('.ptu','') for f in self.files]
-        
+        # print(filenames)
         
         for cnt, an_file in enumerate(filenames):
+            # print(cnt,an_file)
             self.anal_file=an_file
             
             dpg.configure_item('file_box', default_value=an_file)
             self.callback_listbox('file_box',self.anal_file)
-            # load_PTU_images(an_file)
-            # callback_calculate(sender,app_data)
+            self.load_PTU_images(an_file)
+            self.callback_calculate(sender,app_data)
             
             
             
@@ -2039,8 +2039,8 @@ class _Phot2conc_vars_funct:
             
             
             
-            if len(Channels) == 1:
-                if '1' in Channels[0]:
+            if len(self.Channels) == 1:
+                if '1' in self.Channels[0]:
             
             
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
@@ -2055,7 +2055,7 @@ class _Phot2conc_vars_funct:
                                                          self.median_err_C_ch_1]],
                                                        columns=self.Sing_Results_DF.columns)
                 
-                elif '2' in Channels[0]:
+                elif '2' in self.Channels[0]:
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                          2,
                                                          self.mean_Photons_ch_2,
@@ -2070,7 +2070,7 @@ class _Phot2conc_vars_funct:
                 else:
                     pass
             
-            if len(Channels) == 2:
+            if len(self.Channels) == 2:
                 Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                      1,
                                                      self.mean_Photons_ch_1,
@@ -2383,7 +2383,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('cell_tresh_ratio_2',enabled=False)
             dpg.configure_item('nucleus_search_2',enabled=False)
             dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
-        self.load_PTU_images(selfanal_file)
+        self.load_PTU_images(self.anal_file)
     
     # def callback_show_int(self,sender,app_data):
     #     self.load_PTU_images(self.anal_file)
@@ -2991,7 +2991,7 @@ class _Phot2conc_vars_funct:
     
                     roi_1_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_1.dat')
                     self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
-                    self.processor_1.roi_img = self.roi_1
+                    self.processor_1.roi_image = self.roi_1
                     Intensity_1 = Intensity_1
                     channel = 'both'
     
@@ -3012,7 +3012,7 @@ class _Phot2conc_vars_funct:
     
                     roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
-                    self.processor_2.roi_img = self.roi_2
+                    self.processor_2.roi_image = self.roi_2
                     channel = 'both'
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
@@ -3036,8 +3036,8 @@ class _Phot2conc_vars_funct:
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
-                self.processor_1.roi_img = self.roi_1
-                self.processor_2.roi_img = self.roi_2
+                self.processor_1.roi_image = self.roi_1
+                self.processor_2.roi_image = self.roi_2
                 channel = 'both'
                 self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
@@ -3272,9 +3272,9 @@ class _Phot2conc_vars_funct:
                 
                 self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
             elif file_roi:
-                roi = self.processor_1.roi_img
+                roi = self.processor_1.roi_image
                 
-                full_mask = np.nan_to_num(roi*255, nan=0)
+                full_mask = np.nan_to_num(roi, nan=0)*255
                 
                 
                 # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
@@ -3367,9 +3367,9 @@ class _Phot2conc_vars_funct:
                 
                 self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
             elif file_roi:
-                roi = self.processor_2.roi_img
+                roi = self.processor_2.roi_image
                 # lnprint(pd.DataFrame(roi)[[1,128]].describe())
-                full_mask = np.nan_to_num(roi*255, nan=0)
+                full_mask = np.nan_to_num(roi, nan=0)*255
                 
                 
                 # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))

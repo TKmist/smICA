@@ -460,7 +460,10 @@ class _PhotExtr_vars_funct:
         '''Reads the .PTU file'''
         
         self.mount_loading_status_window()
-        
+        self.sindatax1 = np.empty(10)
+        self.sindatay1 = np.empty(10)
+        self.sindatax2 = np.empty(10)
+        self.sindatay2 = np.empty(10)
         dpg.set_value('tag_series_ch_1', [self.sindatax1, self.sindatay1])
         dpg.fit_axis_data("xaxis_chan1")
         dpg.fit_axis_data("yaxis_chan1")
@@ -503,7 +506,9 @@ class _PhotExtr_vars_funct:
         dpg.configure_item('U_dline_ch2',show=False)
         dpg.hide_item('use_as_statistical_filters_chkbx_ch_1')
         dpg.hide_item('use_as_statistical_filters_chkbx_ch_2')
-                        
+
+        
+        
         ptu_image  = PTUreader(file_path, print_header_data = False)
         
         self.tau_resolution = ptu_image.head["MeasDesc_Resolution"]*1e9  
