@@ -73,16 +73,18 @@ class _Phot2conc_init:
         self.files =[]
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
-        
+        self.ROI_mode_items = ['Detect cell',
+                               'Detect nucleus']
         
         bf.remove_font_from_registry()
         bf.add_font_to_registry(self.font_size)
         
-        
+        self.img_border = 60
         
         self.PTU_DATA_window = {'name':'PTU_DATA_window',
                             'width':int(380*self.size_ratio['width']),
                             'height':int(175*self.size_ratio['height']),
+                            # 'height':int(315*self.size_ratio['height']),
                             'pos':(self.left_indent,self.top_indent)
                             }
 
@@ -93,13 +95,13 @@ class _Phot2conc_init:
                             }
         self.image_window_ch1 = {'name':'image_window_ch1',
                             'width':int(386*self.size_ratio['width']),
-                            'height':int((392*self.size_ratio['width']+(2*40))),
+                            'height':int((392*self.size_ratio['width']+(self.img_border))),
                             'pos':(self.left_indent+self.PTU_DATA_window['width']+self.internal_indent,
                                    self.top_indent)
                             }
         self.image_window_ch2 = {'name':'image_window_ch2',
                             'width':int(386*self.size_ratio['width']),
-                            'height':int(392*self.size_ratio['width']+2*40),
+                            'height':int(392*self.size_ratio['width']+self.img_border),
                             'pos':(self.image_window_ch1['pos'][0]+self.image_window_ch1['width']+self.internal_indent,
                                    self.top_indent)
                             }
@@ -214,10 +216,29 @@ class _Phot2conc_init:
         self.ROI_table_col2 = {'name':'ROI_table_col2',
                             'width':int(self.PTU_DATA_window['width']/2)
                                  }
-
+        
+        self.auto_ROI_ch_table_col1 = {'name':'auto_ROI_ch_table_col1',
+                            'width':int(self.PTU_DATA_window['width']/5)
+                                 }
+        self.auto_ROI_ch_table_col2 = {'name':'auto_ROI_ch_table_col2',
+                            'width':int(2*self.PTU_DATA_window['width']/5)
+                                 }
+        self.auto_ROI_ch_table_col3 = {'name':'auto_ROI_ch_table_col3',
+                            'width':int(2*self.PTU_DATA_window['width']/5)
+                                 }
+        self.ROI_mode_1 = {'name':'ROI_mode_1',
+                            'width':-1,
+                             'items':self.ROI_mode_items
+                            
+                            }
+        self.ROI_mode_2 = {'name':'ROI_mode_2',
+                            'width':-1,
+                             'items':self.ROI_mode_items
+                            
+                            }
         self.file_box = {'name':'file_box',
                             'width':-1,
-                            'num_items':11,
+                            'num_items':17,
                              'items':self.files
                             
                             }
@@ -245,21 +266,24 @@ class _Phot2conc_init:
                                  
                             }
 
-        self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
-                            'width':int(self.image_window_ch1['width']/3)
-                                 }
-        self.cell_tresh_ratio_1 = {'name':'cell_tresh_ratio_1',
+        # self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
+        #                     'width':int(self.image_window_ch1['width']/4)
+        #                          }
+        # self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
+        #                     'width':int(self.image_window_ch1['width']/4)
+        #                          }
+        # self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
+        #                     'width':int(self.image_window_ch1['width']/4)
+        #                          }
+        # self.img_win_1_table_col4 = {'name':'img_win_1_table_col4',
+        #                     'width':int(self.image_window_ch1['width']/4)
+        #                          }
+        self.cell_thres_ratio_1 = {'name':'cell_thres_ratio_1',
                             'width':-1
                                  
                             }
         
-        self.nucl_tresh_ratio_1 = {'name':'nucl_tresh_ratio_1',
+        self.nucl_thres_ratio_1 = {'name':'nucl_thres_ratio_1',
                             'width':-1
                                  
                             }
@@ -284,21 +308,24 @@ class _Phot2conc_init:
                             'width':-1
                                  
                             }
-        self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
-                            'width':int(self.image_window_ch2['width']/3)
-                                 }
-        self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
-                            'width':int(self.image_window_ch2['width']/3)
-                                    }
-        self.cell_tresh_ratio_2 = {'name':'cell_tresh_ratio_2',
+        # self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
+        #                     'width':int(self.image_window_ch2['width']/4)
+        #                          }
+        # self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
+        #                     'width':int(self.image_window_ch2['width']/4)
+        #                          }
+        # self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
+        #                     'width':int(self.image_window_ch2['width']/4)
+        #                             }
+        # self.img_win_2_table_col4 = {'name':'img_win_2_table_col4',
+        #                     'width':int(self.image_window_ch2['width']/4)
+        #                             }
+        self.cell_thres_ratio_2 = {'name':'cell_thres_ratio_2',
                             'width':-1
                                  
                             }
         
-        self.nucl_tresh_ratio_2 = {'name':'nucl_tresh_ratio_2',
+        self.nucl_thres_ratio_2 = {'name':'nucl_thres_ratio_2',
                             'width':-1
                                  
                             }
@@ -2352,12 +2379,12 @@ class _Phot2conc_vars_funct:
     def callback_select_roi(self,sender,app_data):
         if dpg.get_value(sender):
             dpg.set_value('Auto_ROI_checkbox',False)
-            dpg.configure_item('cell_tresh_ratio_1',enabled=False)
+            dpg.configure_item('cell_thres_ratio_1',enabled=False)
             dpg.configure_item('nucleus_search_1',enabled=False)
-            dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
-            dpg.configure_item('cell_tresh_ratio_2',enabled=False)
+            dpg.configure_item('nucl_thres_ratio_1',enabled=False)
+            dpg.configure_item('cell_thres_ratio_2',enabled=False)
             dpg.configure_item('nucleus_search_2',enabled=False)
-            dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
+            dpg.configure_item('nucl_thres_ratio_2',enabled=False)
         else:
             pass
         if self.ROI_directory!=None:
@@ -2369,20 +2396,49 @@ class _Phot2conc_vars_funct:
     def callback_select_autoroi(self,sender,app_data):
         if dpg.get_value(sender):
             dpg.set_value('FILE_ROI_checkbox',False)
-            dpg.configure_item('cell_tresh_ratio_1',enabled=True)
-            dpg.configure_item('nucleus_search_1',enabled=True)
-            dpg.configure_item('nucl_tresh_ratio_1',enabled=True)
-            dpg.configure_item('cell_tresh_ratio_2',enabled=True)
-            dpg.configure_item('nucleus_search_2',enabled=True)
-            dpg.configure_item('nucl_tresh_ratio_2',enabled=True)
+            dpg.show_item('auto_ROI_ch_table')
+            dpg.configure_item('cell_thres_ratio_1',enabled=True)
+            dpg.configure_item('nucl_thres_ratio_1',enabled=True)
+            dpg.configure_item('ROI_mode_1',enabled=True)
+            dpg.configure_item('cp_roi_1',enabled=True)
+            
+            dpg.configure_item('cell_thres_ratio_2',enabled=True)
+            dpg.configure_item('nucl_thres_ratio_2',enabled=True)
+            dpg.configure_item('ROI_mode_2',enabled=True)
+            dpg.configure_item('cp_roi_2',enabled=True)
+            self.mode_init.file_box['num_items'] = 11
+            self.mode_init.PTU_DATA_window['height'] = int(315*self.mode_init.size_ratio['height'])
+
+            self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
+                            
+            
+            
+            dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
+            dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
+            dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
+
+            
+
+        
             
         else:
-            dpg.configure_item('cell_tresh_ratio_1',enabled=False)
-            dpg.configure_item('nucleus_search_1',enabled=False)
-            dpg.configure_item('nucl_tresh_ratio_1',enabled=False)
-            dpg.configure_item('cell_tresh_ratio_2',enabled=False)
-            dpg.configure_item('nucleus_search_2',enabled=False)
-            dpg.configure_item('nucl_tresh_ratio_2',enabled=False)
+            dpg.hide_item('auto_ROI_ch_table')
+            dpg.configure_item('cell_thres_ratio_1',enabled=False)
+            dpg.configure_item('nucl_thres_ratio_1',enabled=False)
+            dpg.configure_item('ROI_mode_1',enabled=False)
+            dpg.configure_item('cp_roi_1',enabled=False)
+            
+            dpg.configure_item('cell_thres_ratio_2',enabled=False)
+            dpg.configure_item('nucl_thres_ratio_2',enabled=False)
+            dpg.configure_item('ROI_mode_2',enabled=False)
+            dpg.configure_item('cp_roi_1',enabled=False)
+            self.mode_init.file_box['num_items'] = 17
+            self.mode_init.PTU_DATA_window['height'] = int(175*self.mode_init.size_ratio['height'])
+            self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
+            dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
+            dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
+            dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
+            
         self.load_PTU_images(self.anal_file)
     
     # def callback_show_int(self,sender,app_data):
@@ -2648,20 +2704,21 @@ class _Phot2conc_vars_funct:
     
     
     
-    def display_images(self,dframes,channel):
+    # def display_images(self,dframes,channel):
+    def display_images(self,channel):
         
-        if channel == 'both':
-            df = dframes[0]
-            df2 = dframes[1]
+        # if channel == 'both':
+        #     df = dframes[0]
+        #     df2 = dframes[1]
             
-        elif channel == 1:
-            df = dframes[0]
+        # elif channel == 1:
+        #     df = dframes[0]
             
-        elif channel == 2:
-            df2 = dframes[0]
+        # elif channel == 2:
+        #     df2 = dframes[0]
             
-        else:
-            pass
+        # else:
+        #     pass
     
         if channel == 1:
             self._update_textures_both_roi('ch1',None)
@@ -2919,9 +2976,11 @@ class _Phot2conc_vars_funct:
     
         if len(self.pck_list)==2:
             chan = 'both'
-            self.display_images([self.DF,self.DF2],chan)
+            # self.display_images([self.DF,self.DF2],chan)
+            self.display_images(chan)
         else:
-            self.display_images([self.DF],chan)
+            # self.display_images([self.DF],chan)
+            self.display_images(chan)
 
     # def join_dicts(self,dict1,dict2):
     #     output = {**dict1, **dict2}
@@ -2994,13 +3053,15 @@ class _Phot2conc_vars_funct:
                     self.processor_1.roi_image = self.roi_1
                     Intensity_1 = Intensity_1
                     channel = 'both'
+                    # channel = 1
     
                     self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                     
                 elif '2' in self.Channels[0]:
                     Intensity_2 = pklf['intensity_2']
@@ -3014,12 +3075,14 @@ class _Phot2conc_vars_funct:
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                     self.processor_2.roi_image = self.roi_2
                     channel = 'both'
+                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                     self.image_2_times_roi = self.Current_image_2
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                 else:
                     pass
     
@@ -3043,40 +3106,50 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                self.display_images(channel)
                     
         elif dpg.get_value('Auto_ROI_checkbox'):
             
             if len(self.Channels)==1:
+                dpg.configure_item('cp_roi_1',enabled = False)
+                dpg.configure_item('cp_roi_2',enabled = False)
+                dpg.set_value('cp_roi_1',False)
+                dpg.set_value('cp_roi_2',False)
                 if '1' in self.Channels[0]:
                     Intensity_1 = pklf['intensity_1'] 
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image=Intensity_1.astype(np.uint16)
                     channel = 'both'
+                    # channel = 1
                     self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                     
                 elif '2' in self.Channels[0]:
                     Intensity_2 = pklf['intensity_2']
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image=Intensity_2.astype(np.uint16)
                     channel = 'both'
+                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                     self.image_2_times_roi = self.Current_image_2
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                     
                 else:
                     pass
     
             elif len(self.Channels)==2:
-                
+                dpg.configure_item('cp_roi_1',enabled = True)
+                dpg.configure_item('cp_roi_2',enabled = True)
                 Intensity_1 = pklf['intensity_1'] 
                 Intensity_2 = pklf['intensity_2']
                 self.processor_1 = ImageROIProcessor()
@@ -3088,7 +3161,8 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                self.display_images(channel)
     
         else:
     
@@ -3099,12 +3173,14 @@ class _Phot2conc_vars_funct:
                     self.processor_1.image=Intensity_1.astype(np.uint16)
                     self.roi_1 = np.zeros(self.Current_image_1.shape)
                     channel = 'both'
+                    # channel = 1
                     self.Current_image_1 = Intensity_1/np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                     
                 elif '2' in self.Channels[0]:
                     Intensity_2 = pklf['intensity_2']
@@ -3113,11 +3189,13 @@ class _Phot2conc_vars_funct:
                     self.roi_2 = np.zeros(self.Current_image_2.shape)
                     self.image_2_times_roi = self.Current_image_2
                     channel = 'both'
+                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                    self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                    self.display_images(channel)
                     
                 else:
                     pass
@@ -3137,7 +3215,8 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2/np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
+                self.display_images(channel)
 
 
     def overlayrgba(self,im,rgba_image,mask_image,full_mask,ovrl):
@@ -3187,7 +3266,8 @@ class _Phot2conc_vars_funct:
         #      'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
         # ratio_w = ratio['width']
     
-        
+        # lprint(vars(self.processor_1).keys())
+        # lprint(vars(self.processor_2).keys())
         
         # w = (dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2
         # h = w
@@ -3202,23 +3282,38 @@ class _Phot2conc_vars_funct:
         auto_roi = dpg.get_value('Auto_ROI_checkbox')
         file_roi = dpg.get_value('FILE_ROI_checkbox')
         no_roi = dpg.get_value('Auto_ROI_checkbox') == False and dpg.get_value('FILE_ROI_checkbox') == False
-    
+        
+        
+        if sender.startswith('cp_roi_'):
+            
+            if sender[-1]=='1':
+                cp_value = dpg.get_value('cp_roi_1')
+                if cp_value:
+                    dpg.set_value('cp_roi_2',False)
+                else:
+                    pass
+            elif sender[-1]=='2':
+                cp_value = dpg.get_value('cp_roi_2')
+                if cp_value:
+                    dpg.set_value('cp_roi_1',False)
+                else:
+                    pass
         # lnprint(auto_roi,file_roi,no_roi)
         # lnprint(roi)
         
         if sender[-1]=='1':
-    
+            
             contrast = dpg.get_value("img_contrast_1")
             brightness = dpg.get_value("img_Brightness_1")/255
             ovrl = dpg.get_value("img_roi_alpha_1")
             # dpg.set_value("img_roi_alpha_2",ovrl)
             # find_nucleus = dpg.get_value('nucleus_search_1')
-            # cell_rat = dpg.get_value('cell_tresh_ratio_1')
-            # nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
+            # cell_rat = dpg.get_value('cell_thres_ratio_1')
+            # nucl_rat = dpg.get_value('nucl_thres_ratio_1')
             img = self.processor_1.image#.astype(np.uint16)
             # disp = processor_1.image
             disp = np.clip(self.processor_1.image/np.max(self.processor_1.image),0,1).astype(np.float64)
-            froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+            
     
             if no_roi:
                 # lnprint('im_to_rgbim')
@@ -3235,67 +3330,164 @@ class _Phot2conc_vars_funct:
                 # lnprint('rgba_to_dpgtex in')
                 
             elif auto_roi:
+                cp_value = dpg.get_value('cp_roi_1')
+                cp_value2 = dpg.get_value('cp_roi_2')
+                find_roi_mode = dpg.get_value('ROI_mode_1')
                 
-                find_nucleus = dpg.get_value('nucleus_search_1')
-                cell_rat = dpg.get_value('cell_tresh_ratio_1')
-                nucl_rat = dpg.get_value('nucl_tresh_ratio_1')
-                # lnprint('disp',disp.dtype)
-                cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
-                # lnprint(cell_rat,nucl_rat)
-                if not find_nucleus:    
-                    full_mask = cell_roi_image
-                else:
+                if find_roi_mode == 'Detect cell':
+                    # find_nucleus = False #dpg.get_value('nucleus_search_1')
+                    
+                
+                    # cell_rat = dpg.get_value('cell_thres_ratio_1')
+                    # nucl_rat = dpg.get_value('nucl_thres_ratio_1')
+                    # lnprint('disp',disp.dtype)
+
+                    # if cp_value:
+                    
+                    #     froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+                    #     cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    #     nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+                    #     cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+
+                    # elif not cp_value:
+                    
+                    froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+                    cell_rat = dpg.get_value('cell_thres_ratio_1')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_1')
+                    cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
+
+                    if cp_value:
+                        if 'roi_mask' in vars(self.processor_2).keys():
+                            cell_roi_image = self.processor_2.roi_mask
+                            self.processor_1.roi_mask = cell_roi_image
+                        else:
+                            self._update_textures_both_roi('cell_thres_ratio_2',None)
+                    elif not cp_value:
+                        self.processor_1.roi_mask = cell_roi_image
+
+                    
+                    # lnprint(cell_rat,nucl_rat)
+                    # if not find_nucleus:    
+                    full_mask = cell_roi_image.astype(np.uint8)
+                    # else:
+                    #     nucleus_roi = self.processor_1.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    #     full_mask = self.processor_1.make_full_roi(cell_roi_image, nucleus_roi)
+        
+                    roi = np.where(full_mask==0,np.nan,1)
+        
+                    self.image_1_times_roi = img*roi
+                    
+                    self.pkl_data['channel_1']={
+                        'image':self.processor_1.image,
+                        'ROI':full_mask,
+                        'cell_thresold':cell_rat,
+                        'roi_mode':find_roi_mode,
+                        'cp_roi':cp_value,
+                        'nucl_thresold':nucl_rat,
+                    }
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+        
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    # lnprint(np.max(disp))
+                    
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+                   
+                elif find_roi_mode == 'Detect nucleus':
+                    # find_nucleus = False #dpg.get_value('nucleus_search_1')
+                    
+                
+                    # if cp_value:
+                    
+                    #     froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+                    #     cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    #     nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+                    #     cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                    #     nucleus_roi = self.processor_2.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    #     full_mask = self.processor_2.make_full_roi(cell_roi_image, nucleus_roi)
+
+                    # elif not cp_value:
+                    
+                    froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+                    cell_rat = dpg.get_value('cell_thres_ratio_1')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_1')
+                    cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
+                    if cp_value:
+                        if 'roi_mask' in vars(self.processor_2).keys():
+                            cell_roi_image = self.processor_2.roi_mask
+                            self.processor_1.roi_mask = cell_roi_image
+                        else:
+                            self._update_textures_both_roi('cell_thres_ratio_2',None)
+                    elif not cp_value:
+                        self.processor_1.roi_mask = cell_roi_image 
+                    # lnprint(cell_rat,nucl_rat)
+                    # if not find_nucleus:    
+                    # full_mask = cell_roi_image
+                    # else:
                     nucleus_roi = self.processor_1.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
                     full_mask = self.processor_1.make_full_roi(cell_roi_image, nucleus_roi)
-    
-                roi = np.where(full_mask==0,np.nan,1)
-    
-                self.image_1_times_roi = img*roi
-                
-                self.pkl_data['channel_1']={
-                    'image':self.processor_1.image,
-                    'ROI':full_mask,
-                    'cell_treshold':cell_rat,
-                    'nucl_chk':find_nucleus,
-                    'nucl_treshold':nucl_rat,
-                }
-                rgba_image = self.im_to_rgbim(disp)
-                mask_image=rgba_image.copy()
-    
-                rgb = rgba_image[..., :3]
-                adjusted_image = rgb * contrast + brightness
-                adjusted_rgb = adjusted_image#.astype(np.uint8)
-                rgba_image[..., :3] = adjusted_rgb
-                
-                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
-                # lnprint(np.max(disp))
-                
-                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+        
+                    roi = np.where(full_mask==0,np.nan,1)
+        
+                    self.image_1_times_roi = img*roi
+                    
+                    self.pkl_data['channel_1']={
+                        'image':self.processor_1.image,
+                        'ROI':full_mask,
+                        'cell_thresold':cell_rat,
+                        'roi_mode':find_roi_mode,
+                        'cp_roi':cp_value,
+                        'nucl_thresold':nucl_rat,
+                    }
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+        
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    # lnprint(np.max(disp))
+                    
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+                if cp_value2:
+                    
+                    self._update_textures_both_roi('cell_thres_ratio_2',None)
+                elif not cp_value:
+                    pass
             elif file_roi:
-                roi = self.processor_1.roi_image
-                
-                full_mask = np.nan_to_num(roi*255, nan=0)
-                
-                
-                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
-                # lnprint(np.max(full_mask))
-                self.image_1_times_roi = img*roi
-    
-                
-    
-                
-                rgba_image = self.im_to_rgbim(disp)
-                mask_image=rgba_image.copy()
-    
-                rgb = rgba_image[..., :3]
-                adjusted_image = rgb * contrast + brightness
-                adjusted_rgb = adjusted_image#.astype(np.uint8)
-                rgba_image[..., :3] = adjusted_rgb
-                
-                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
-                # lnprint(np.max(disp))
-                
-                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+
+                if len(self.Channels)==1:
+                    if '1' in self.Channels[0]:
+                        roi = self.processor_1.roi_image
+                        full_mask = np.nan_to_num(roi*255, nan=0)
+                        self.image_1_times_roi = img*roi
+                        rgba_image = self.im_to_rgbim(disp)
+                        mask_image=rgba_image.copy()
+                        rgb = rgba_image[..., :3]
+                        adjusted_image = rgb * contrast + brightness
+                        adjusted_rgb = adjusted_image#.astype(np.uint8)
+                        rgba_image[..., :3] = adjusted_rgb
+                        rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                        self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
+                elif len(self.Channels)==2:
+                    roi = self.processor_1.roi_image
+                    full_mask = np.nan_to_num(roi*255, nan=0)
+                    self.image_1_times_roi = img*roi
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
                 
                 
         elif sender[-1]=='2': 
@@ -3306,7 +3498,7 @@ class _Phot2conc_vars_funct:
             img = self.processor_2.image#.astype(np.uint8)
             # disp = processor_2.image
             disp = np.clip(self.processor_2.image/np.max(self.processor_2.image),0,1).astype(np.float64)
-            froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+            # froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
     
             if no_roi:
                 # lnprint('im_to_rgbim')
@@ -3322,78 +3514,180 @@ class _Phot2conc_vars_funct:
                 self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
                 # lnprint('rgba_to_dpgtex out')
             elif auto_roi:
+                cp_value = dpg.get_value('cp_roi_2')
+                cp_value2 = dpg.get_value('cp_roi_1')
                 # lnprint('auto_roi',auto_roi)
-                find_nucleus = dpg.get_value('nucleus_search_2')
-                cell_rat = dpg.get_value('cell_tresh_ratio_2')
-                nucl_rat = dpg.get_value('nucl_tresh_ratio_2')
-    
-                cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
-                # lnprint(cell_rat,nucl_rat)
-                if not find_nucleus:    
+                find_roi_mode = dpg.get_value('ROI_mode_2')
+                cp_roi = dpg.get_value('cp_roi_2')
+                if find_roi_mode == 'Detect cell':
+                # find_nucleus = dpg.get_value('nucleus_search_2')
+                    cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+
+                    # if cp_value:
+                    
+                    #     froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+                    #     cell_rat = dpg.get_value('cell_thres_ratio_1')
+                    #     nucl_rat = dpg.get_value('nucl_thres_ratio_1')
+                    #     cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
+
+                    # elif not cp_value:
+                    
+                    froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+                    cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+                    cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                    if cp_value:
+                        if 'roi_mask' in vars(self.processor_1).keys():
+                            cell_roi_image = self.processor_1.roi_mask
+                            self.processor_2.roi_mask = cell_roi_image
+                        else:
+                            self._update_textures_both_roi('cell_thres_ratio_1',None)
+                    elif not cp_value:
+                        self.processor_2.roi_mask = cell_roi_image 
+                    
+                    # cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                    # lnprint(cell_rat,nucl_rat)
+                    # if not find_nucleus:    
                     full_mask = cell_roi_image.astype(np.uint8)
-                else:
+                    # else:
+                    #     nucleus_roi = self.processor_2.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    #     full_mask = self.processor_2.make_full_roi(cell_roi_image, nucleus_roi).astype(np.uint8)
+                    # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
+                    roi = np.where(full_mask==0,np.nan,1)
+                    # lnprint(pd.DataFrame(roi)[[1,128]].describe())
+                    # lnprint('roi\n',roi)
+                    
+                    # roi=full_mask/np.max(full_mask)
+        
+                    self.image_2_times_roi = img*roi
+                    # df=pd.DataFrame(image_2_times_roi)
+                    # lnprint(df[[1,128]].info(),df[[1,128]].describe())
+        
+                    
+                    
+                    self.pkl_data['channel_2']={
+                        'image':self.processor_2.image,
+                        'ROI':full_mask,
+                        'cell_thresold':cell_rat,
+                        'roi_mode':find_roi_mode,
+                        'cp_roi':cp_value,
+                        'nucl_thresold':nucl_rat,
+                    }
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+        
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    # lnprint(np.max(disp))
+                    
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+                elif find_roi_mode == 'Detect nucleus':
+                    cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+
+                    # if cp_value:
+                    
+                    #     froi = np.clip(self.processor_1.image,0,255).astype(np.uint8)
+                    #     cell_rat = dpg.get_value('cell_thres_ratio_1')
+                    #     nucl_rat = dpg.get_value('nucl_thres_ratio_1')
+                    #     cell_roi_image = self.processor_1.detect_cell_roi(froi,cell_rat)
+                    #     nucleus_roi = self.processor_1.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+                    #     full_mask = self.processor_1.make_full_roi(cell_roi_image, nucleus_roi).astype(np.uint8)
+
+                    # elif not cp_value:
+                    
+                    froi = np.clip(self.processor_2.image,0,255).astype(np.uint8)
+                    cell_rat = dpg.get_value('cell_thres_ratio_2')
+                    nucl_rat = dpg.get_value('nucl_thres_ratio_2')
+                    cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                    if cp_value:
+                        if 'roi_mask' in vars(self.processor_1).keys():
+                            cell_roi_image = self.processor_1.roi_mask
+                            self.processor_2.roi_mask = cell_roi_image
+                        else:
+                            self._update_textures_both_roi('cell_thres_ratio_1',None)
+                    elif not cp_value:
+                        self.processor_2.roi_mask = cell_roi_image 
                     nucleus_roi = self.processor_2.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
                     full_mask = self.processor_2.make_full_roi(cell_roi_image, nucleus_roi).astype(np.uint8)
-                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
-                roi = np.where(full_mask==0,np.nan,1)
-                # lnprint(pd.DataFrame(roi)[[1,128]].describe())
-                # lnprint('roi\n',roi)
-                
-                # roi=full_mask/np.max(full_mask)
-    
-                self.image_2_times_roi = img*roi
-                # df=pd.DataFrame(image_2_times_roi)
-                # lnprint(df[[1,128]].info(),df[[1,128]].describe())
-    
-                
-                
-                self.pkl_data['channel_2']={
-                    'image':self.processor_2.image,
-                    'ROI':full_mask,
-                    'cell_treshold':cell_rat,
-                    'nucl_chk':find_nucleus,
-                    'nucl_treshold':nucl_rat,
-                }
-                rgba_image = self.im_to_rgbim(disp)
-                mask_image=rgba_image.copy()
-    
-                rgb = rgba_image[..., :3]
-                adjusted_image = rgb * contrast + brightness
-                adjusted_rgb = adjusted_image#.astype(np.uint8)
-                rgba_image[..., :3] = adjusted_rgb
-                
-                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
-                # lnprint(np.max(disp))
-                
-                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+                    
+                    # cell_roi_image = self.processor_2.detect_cell_roi(froi,cell_rat)
+                    # lnprint(cell_rat,nucl_rat)
+                    # if not find_nucleus:    
+                    # full_mask = cell_roi_image.astype(np.uint8)
+                    # else:
+                    
+                    # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
+                    roi = np.where(full_mask==0,np.nan,1)
+                    # lnprint(pd.DataFrame(roi)[[1,128]].describe())
+                    # lnprint('roi\n',roi)
+                    
+                    # roi=full_mask/np.max(full_mask)
+        
+                    self.image_2_times_roi = img*roi
+                    # df=pd.DataFrame(image_2_times_roi)
+                    # lnprint(df[[1,128]].info(),df[[1,128]].describe())
+        
+                    
+                    
+                    self.pkl_data['channel_2']={
+                        'image':self.processor_2.image,
+                        'ROI':full_mask,
+                        'cell_thresold':cell_rat,
+                        'roi_mode':find_roi_mode,
+                        'cp_roi':cp_value,
+                        'nucl_thresold':nucl_rat,
+                    }
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+        
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    # lnprint(np.max(disp))
+                    
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+                if cp_value2:
+                    
+                    self._update_textures_both_roi('cell_thres_ratio_1',None)
+                elif not cp_value:
+                    pass
             elif file_roi:
-                roi = self.processor_2.roi_image
-                # lnprint(pd.DataFrame(roi)[[1,128]].describe())
-                full_mask = np.nan_to_num(roi*255, nan=0)
-                
-                
-                # lnprint('full_mask\n',full_mask,'\nmax full_mask\n',np.max(full_mask))
-                # lnprint(np.max(full_mask))
-                self.image_2_times_roi = img*roi
-    
-                # df=pd.DataFrame(self.image_2_times_roi)
-                # lnprint(df[[1,128]].info(),df[[1,128]].describe())
-                
-    
-                
-                rgba_image = self.im_to_rgbim(disp)
-                mask_image=rgba_image.copy()
-    
-                rgb = rgba_image[..., :3]
-                adjusted_image = rgb * contrast + brightness
-                adjusted_rgb = adjusted_image#.astype(np.uint8)
-                rgba_image[..., :3] = adjusted_rgb
-                
-                rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
-                # lnprint(np.max(disp))
-                
-                self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
-        # lnprint('callback_calculate')
+
+                if len(self.Channels)==1:
+                    if '2' in self.Channels[0]:
+                        roi = self.processor_2.roi_image
+                        full_mask = np.nan_to_num(roi*255, nan=0)
+                        self.image_2_times_roi = img*roi
+                        rgba_image = self.im_to_rgbim(disp)
+                        mask_image=rgba_image.copy()
+                        rgb = rgba_image[..., :3]
+                        adjusted_image = rgb * contrast + brightness
+                        adjusted_rgb = adjusted_image#.astype(np.uint8)
+                        rgba_image[..., :3] = adjusted_rgb
+                        rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                        self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+                elif len(self.Channels)==2:
+                    roi = self.processor_2.roi_image
+                    full_mask = np.nan_to_num(roi*255, nan=0)
+                    self.image_2_times_roi = img*roi
+                    rgba_image = self.im_to_rgbim(disp)
+                    mask_image=rgba_image.copy()
+                    rgb = rgba_image[..., :3]
+                    adjusted_image = rgb * contrast + brightness
+                    adjusted_rgb = adjusted_image#.astype(np.uint8)
+                    rgba_image[..., :3] = adjusted_rgb
+                    rgba_image = self.overlayrgba(disp,rgba_image,mask_image,full_mask,ovrl)
+                    self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
+        
         self.callback_calculate(sender,None)
         # lnprint(dpg.get_item_width(tex_1_name),dpg.get_item_height(tex_1_name))
 
@@ -3606,13 +3900,16 @@ class _Phot2conc_vars_funct:
                             'Br_err_1':dpg.get_value('Brightness_err_input_ch_1'),
                             'Br_err_2':dpg.get_value('Brightness_err_input_ch_2'),
                             },
-            'autoroi_tresh':{
-                            'cell_1':dpg.get_value('cell_tresh_ratio_1'),
-                            'cell_2':dpg.get_value('cell_tresh_ratio_2'),
-                            'check_1':dpg.get_value('nucleus_search_1'),
-                            'check_2':dpg.get_value('nucleus_search_2'),
-                            'nucl_1':dpg.get_value('nucl_tresh_ratio_1'),
-                            'nucl_2':dpg.get_value('nucl_tresh_ratio_2')
+            'autoroi_thres':{
+                            'cell_1':dpg.get_value('cell_thres_ratio_1'),
+                            'cell_2':dpg.get_value('cell_thres_ratio_2'),
+                            'nucl_1':dpg.get_value('nucl_thres_ratio_1'),
+                            'nucl_2':dpg.get_value('nucl_thres_ratio_2'),          
+                            'ROI_mode_1':dpg.get_value('ROI_mode_1'),
+                            'ROI_mode_2':dpg.get_value('ROI_mode_2'),
+                            'cp_roi_1':dpg.get_value('cp_roi_1'),
+                            'cp_roi_2':dpg.get_value('cp_roi_2')
+                            
                             
                 
                             }
@@ -3645,12 +3942,16 @@ class _Phot2conc_vars_funct:
         dpg.set_value('Brightness_input_ch_2',pkl['FCS_data']['Br_2'])
         dpg.set_value('Brightness_err_input_ch_1',pkl['FCS_data']['Br_err_1'])
         dpg.set_value('Brightness_err_input_ch_2',pkl['FCS_data']['Br_err_2'])
-        dpg.set_value('cell_tresh_ratio_1',pkl['autoroi_tresh']['cell_1'])
-        dpg.set_value('cell_tresh_ratio_2',pkl['autoroi_tresh']['cell_2'])
-        dpg.set_value('nucleus_search_1',pkl['autoroi_tresh']['check_1'])
-        dpg.set_value('nucleus_search_2',pkl['autoroi_tresh']['check_2'])
-        dpg.set_value('nucl_tresh_ratio_1',pkl['autoroi_tresh']['nucl_1'])
-        dpg.set_value('nucl_tresh_ratio_2',pkl['autoroi_tresh']['nucl_2'])
+        
+        dpg.set_value('cell_thres_ratio_1',pkl['autoroi_thres']['cell_1'])
+        dpg.set_value('cell_thres_ratio_2',pkl['autoroi_thres']['cell_2'])
+        dpg.set_value('nucl_thres_ratio_1',pkl['autoroi_thres']['nucl_1'])
+        dpg.set_value('nucl_thres_ratio_2',pkl['autoroi_thres']['nucl_2'])
+        dpg.set_value('ROI_mode_1',pkl['autoroi_thres']['ROI_mode_1'])
+        dpg.set_value('ROI_mode_2',pkl['autoroi_thres']['ROI_mode_2'])
+        dpg.set_value('cp_roi_1',pkl['autoroi_thres']['cp_roi_1'])
+        dpg.set_value('cp_roi_2',pkl['autoroi_thres']['cp_roi_2'])
+        
     
         dpg.set_value('FILE_ROI_checkbox',pkl['ROI_mode'][0])
         dpg.set_value('Auto_ROI_checkbox',pkl['ROI_mode'][1])

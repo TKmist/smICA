@@ -114,7 +114,7 @@ def Phot2conc_resizer(sender,app_data):
     
 
     for item in init_resizable_items:
-
+        # lprint(item)
         props =eval('mode_init.'+item) 
 
             
@@ -242,7 +242,118 @@ with dpg.window(label='',
                              callback=mode_cmn.callback_select_autoroi,
                              enabled=False)
 
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False,
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   policy=dpg.mvTable_SizingFixedFit,
+                   tag='auto_ROI_ch_table',
+                   parent='PTU_DATA_window',
+                   show=False):
+        dpg.add_table_column(label="",tag='auto_ROI_ch_table_col1', width = mode_init.auto_ROI_ch_table_col1['width'],width_fixed=True)
+        dpg.add_table_column(label="",tag='auto_ROI_ch_table_col2', width = mode_init.auto_ROI_ch_table_col2['width'],width_stretch=True)
+        dpg.add_table_column(label="",tag='auto_ROI_ch_table_col3', width = mode_init.auto_ROI_ch_table_col3['width'],width_stretch=True)
+        with dpg.table_row(tag='auto_ROI_ch_table_row1'):
+            dpg.add_text("",tag='auto_ROI_ch_table_row1_text_1')
+            dpg.add_text("ROI channel 1",tag='auto_ROI_ch_table_row1_text_2')
+            dpg.add_text("ROI channel 2",tag='auto_ROI_ch_table_row1_text_3')
+        with dpg.table_row(tag='auto_ROI_ch_table_row2'):
+            dpg.add_text("Thres. Cell:",tag='auto_ROI_ch_table_row2_text_1')
+            dpg.add_drag_float(tag = 'cell_thres_ratio_1',
+                               default_value = 1.0,
+                               max_value = 5.,
+                               min_value = 0.0,
+                               speed = 0.001,
+                               enabled = False,
+                               width = mode_init.cell_thres_ratio_1['width'],
+                               format = '%.3f',
+                               callback = mode_cmn._update_textures_both_roi
+                              )
+            with dpg.tooltip('cell_thres_ratio_1',tag='cell_thres_ratio_1_tooltip'):
+                dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_1_tooltip_text')
 
+            dpg.add_drag_float(tag='cell_thres_ratio_2',
+                               default_value =1.0,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.cell_thres_ratio_2['width'],
+                               enabled=False,
+                               format = '%.3f',
+                               callback=mode_cmn._update_textures_both_roi
+                              )
+            with dpg.tooltip('cell_thres_ratio_2',tag='cell_thres_ratio_2_tooltip'):
+                dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_2_tooltip_text')
+
+        with dpg.table_row(tag='auto_ROI_ch_table_row3'):
+            dpg.add_text("Thres. Nucl.:",tag='auto_ROI_ch_table_row3_text_1')
+
+            dpg.add_drag_float(tag='nucl_thres_ratio_1',
+                               default_value =1.5,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.nucl_thres_ratio_1['width'],
+                               enabled=False,
+                               format = '%.3f',
+                               callback = mode_cmn._update_textures_both_roi
+                              )
+            with dpg.tooltip('nucl_thres_ratio_1',tag='nucl_thres_ratio_1_tooltip'):
+                dpg.add_text("Set threshold to detect nucleus.",tag='nucl_thres_ratio_1_tooltip_text')
+
+            dpg.add_drag_float(tag='nucl_thres_ratio_2',
+                               default_value =1.5,
+                               max_value=5.,
+                               min_value=0.0,
+                               speed=0.001,
+                               width=mode_init.nucl_thres_ratio_2['width'],
+                               enabled=False,
+                               format = '%.3f',
+                               callback = mode_cmn._update_textures_both_roi
+                              )
+            with dpg.tooltip('nucl_thres_ratio_2',tag='nucl_thres_ratio_2_tooltip'):
+                dpg.add_text("Set threshold to detect nucleus.",tag='nucl_thres_ratio_2_tooltip_text')
+        with dpg.table_row(tag='auto_ROI_ch_table_row4'):
+            dpg.add_text("ROI mode:",tag='auto_ROI_ch_table_row4_text_1')
+            dpg.add_combo(tag = 'ROI_mode_1',
+                          width = mode_init.ROI_mode_1['width'],
+                          items = mode_init.ROI_mode_1['items'],
+                          default_value = mode_init.ROI_mode_1['items'][0],
+                          callback = mode_cmn._update_textures_both_roi,
+                          enabled=False,
+                         )
+            dpg.add_combo(tag = 'ROI_mode_2',
+                          width = mode_init.ROI_mode_2['width'],
+                          items = mode_init.ROI_mode_2['items'],
+                          default_value = mode_init.ROI_mode_2['items'][0],
+                          callback = mode_cmn._update_textures_both_roi,
+                          enabled=False,
+                         )
+        with dpg.table_row(tag='auto_ROI_ch_table_row5'):
+            dpg.add_text("Copy ROI:",tag='auto_ROI_ch_table_row5_text_1')
+            
+            dpg.add_checkbox(label='Channel 2 \u2192 1', 
+                             tag='cp_roi_1',
+                             default_value = False,
+                             enabled=False,
+                             # width=-1,
+                             callback=mode_cmn._update_textures_both_roi,
+                             # parent='image_window_1'
+                            )
+            dpg.add_checkbox(label='Channel 1 \u2192 2', 
+                             tag='cp_roi_2',
+                             default_value = False,
+                             enabled=False,
+                             # width=-1,
+                             callback=mode_cmn._update_textures_both_roi,
+                             # parent='image_window_1'
+                            )
             
 globalITEMS.windows.extend(['PTU_DATA_window',
                             'PTU_meta',
@@ -271,6 +382,38 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'ROI_table_col1',
                             'ROI_table_col2',
                             'ROI_table_row1',
+                            'auto_ROI_ch_table',
+                            'auto_ROI_ch_table_col1',
+                            'auto_ROI_ch_table_col2',
+                            'auto_ROI_ch_table_col3',
+                            'auto_ROI_ch_table_row1',
+                            'auto_ROI_ch_table_row1_text_1',
+                            'auto_ROI_ch_table_row1_text_2',
+                            'auto_ROI_ch_table_row1_text_3',
+                            'auto_ROI_ch_table_row2',
+                            'auto_ROI_ch_table_row2_text_1',
+                            'cell_thres_ratio_1',
+                            'cell_thres_ratio_1_tooltip',
+                            'cell_thres_ratio_1_tooltip_text',
+                            'cell_thres_ratio_2',
+                            'cell_thres_ratio_2_tooltip',
+                            'cell_thres_ratio_2_tooltip_text',
+                            'auto_ROI_ch_table_row3',
+                            'auto_ROI_ch_table_row3_text_1',
+                            'nucl_thres_ratio_1',
+                            'nucl_thres_ratio_1_tooltip',
+                            'nucl_thres_ratio_1_tooltip_text',
+                            'nucl_thres_ratio_2',
+                            'nucl_thres_ratio_2_tooltip',
+                            'nucl_thres_ratio_2_tooltip_text',
+                            'auto_ROI_ch_table_row4',
+                            'auto_ROI_ch_table_row4_text_1',
+                            'ROI_mode_1',
+                            'ROI_mode_2',
+                            'auto_ROI_ch_table_row5',
+                            'auto_ROI_ch_table_row5_text_1',
+                            'cp_roi_1',
+                            'cp_roi_2',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox'
                             
@@ -343,10 +486,17 @@ with dpg.window(label='',
     
     dpg.add_text(default_value='Export Images as arrays',show=True,tag='exp_data_to_img_csv')
 
-    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
-                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
-                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-                                   no_clip=True,tag='EXPORT_ops_table',parent='file_window'):
+    with dpg.table(header_row=False,
+                   width=-1,
+                   borders_innerH=False, 
+                   borders_outerH=False,
+                   borders_innerV=False,
+                   borders_outerV=False,
+                   no_pad_innerX=False,
+                   no_pad_outerX=True,
+                   no_host_extendX=True,
+                   no_clip=True,
+                   tag='EXPORT_ops_table',parent='file_window'):
         dpg.add_table_column(label="",tag='EXPORT_ops_table_col1', width = mode_init.EXPORT_ops_table_col1['width'])
         dpg.add_table_column(label="",tag='EXPORT_ops_table_col2', width = mode_init.EXPORT_ops_table_col2['width'])
         with dpg.table_row(tag='EXPORT_ops_table_row1'):
@@ -431,49 +581,53 @@ with dpg.window(label = 'Channel 1',
     
 
 
-    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
-                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
-                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-                                   no_clip=True,tag='img_win_1_table',parent='image_window_1'):
-            # Add headers
-        dpg.add_table_column(label="",tag='img_win_1_table_col1', width = mode_init.img_win_1_table_col1['width'])
-        dpg.add_table_column(label="",tag='img_win_1_table_col2', width = mode_init.img_win_1_table_col2['width'])
-        dpg.add_table_column(label="",tag='img_win_1_table_col3', width = mode_init.img_win_1_table_col3['width'])
+    # with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+    #                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
+    #                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+    #                                no_clip=True,tag='img_win_1_table',parent='image_window_1'):
+    #         # Add headers
+    #     dpg.add_table_column(label="",tag='img_win_1_table_col1', width = mode_init.img_win_1_table_col1['width'])
+    #     dpg.add_table_column(label="",tag='img_win_1_table_col2', width = mode_init.img_win_1_table_col2['width'])
+    #     dpg.add_table_column(label="",tag='img_win_1_table_col3', width = mode_init.img_win_1_table_col3['width'])
+    #     dpg.add_table_column(label="",tag='img_win_1_table_col4', width = mode_init.img_win_1_table_col4['width'])
 
-        # Add rows and columns
-        with dpg.table_row(tag='img_win_1_table_row1'):
-            dpg.add_drag_float(tag='cell_tresh_ratio_1',
-                               default_value =1.0,
-                               max_value=5.,
-                               min_value=0.0,
-                               speed=0.001,
-                               enabled=False,
-                               width=mode_init.cell_tresh_ratio_1['width'],
-                               callback=mode_cmn._update_textures_both_roi
-                              )
+    #     # Add rows and columns
+    #     with dpg.table_row(tag='img_win_1_table_row1'):
+            # dpg.add_drag_float(tag = 'cell_thres_ratio_1',
+            #                    default_value = 1.0,
+            #                    max_value = 5.,
+            #                    min_value = 0.0,
+            #                    speed = 0.001,
+            #                    enabled = False,
+            #                    width = mode_init.cell_thres_ratio_1['width'],
+            #                    format = 'Thres. Cell: %.1f',
+            #                    callback = mode_cmn._update_textures_both_roi
+            #                   )
+            # with dpg.tooltip('cell_thres_ratio_1',tag='cell_thres_ratio_1_tooltip'):
+            #     dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_1_tooltip_text')
 
 
             
             # with dpg.group(tag='log_checkbox_group', horizontal=True,
             #    horizontal_spacing=init.group_spacer,
             #    show=True):
-            dpg.add_checkbox(label='Find nucleus', 
-                             tag='nucleus_search_1',
-                             default_value = False,
-                             enabled=False,
-                             # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
-                             # parent='image_window_1'
-                            )
-            dpg.add_drag_float(tag='nucl_tresh_ratio_1',
-                               default_value =1.5,
-                               max_value=5.,
-                               min_value=0.0,
-                               speed=0.001,
-                               width=mode_init.nucl_tresh_ratio_1['width'],
-                               enabled=False,
-                               callback = mode_cmn._update_textures_both_roi
-                              )
+            # dpg.add_checkbox(label='Nucleus', 
+            #                  tag='nucleus_search_1',
+            #                  default_value = False,
+            #                  enabled=False,
+            #                  # width=-1,
+            #                  callback=mode_cmn._update_textures_both_roi,
+            #                  # parent='image_window_1'
+            #                 )
+            # dpg.add_checkbox(label='Ch2\u21921', 
+            #                  tag='cp_roi_1',
+            #                  default_value = False,
+            #                  enabled=False,
+            #                  # width=-1,
+            #                  callback=mode_cmn._update_textures_both_roi,
+            #                  # parent='image_window_1'
+            #                 )
+            
     
     
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
@@ -485,7 +639,7 @@ with dpg.window(label = 'Channel 1',
         dpg.add_table_column(label="",tag='img_win_1_table_2_col3', width = mode_init.img_win_1_table_2_col3['width'])
         with dpg.table_row(tag='img_win_1_table_2_row1'):
             dpg.add_drag_float(tag='img_contrast_1',
-                                   format ='Contrast: %.1f',
+                                   format = 'Contrast: %.1f',
                                    default_value =1.0,
                                    max_value=10.,
                                    min_value=0.1,
@@ -532,14 +686,20 @@ globalITEMS.windows.extend(['image_window_ch1',
                             'IMAGE_CH1_top_sep',
                             'texture_CH_1',
                             'IMAGE_CH1_top_sep_2',
-                            'img_win_1_table',
-                            'img_win_1_table_col1',
-                            'img_win_1_table_col2',
-                            'img_win_1_table_col3',
-                            'img_win_1_table_row1',
-                            'cell_tresh_ratio_1',
-                            'nucleus_search_1',
-                            'nucl_tresh_ratio_1',
+                            # 'img_win_1_table',
+                            # 'img_win_1_table_col1',
+                            # 'img_win_1_table_col2',
+                            # 'img_win_1_table_col3',
+                            # 'img_win_1_table_col4',
+                            # 'img_win_1_table_row1',
+                            # 'cell_thres_ratio_1',
+                            # 'cell_thres_ratio_1_tooltip',
+                            # 'cell_thres_ratio_1_tooltip_text',
+                            # 'nucleus_search_1',
+                            # 'cp_roi_1',
+                            # 'nucl_thres_ratio_1',
+                            # 'nucl_thres_ratio_1_tooltip',
+                            # 'nucl_thres_ratio_1_tooltip_text',
                             'img_win_1_table_2',
                             'img_win_1_table_2_col1',
                             'img_win_1_table_2_col1',
@@ -572,50 +732,54 @@ with dpg.window(label = 'Channel 2',
     
     
     
-    with dpg.table(header_row=False, width=-1,borders_innerH=False, 
-                                   borders_outerH=False, borders_innerV=False, borders_outerV=False,
-                                   no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-                                   no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
-            # Add headers
-        dpg.add_table_column(label="",tag='img_win_2_table_col1', width = mode_init.img_win_2_table_col1['width'])
-        dpg.add_table_column(label="",tag='img_win_2_table_col2', width = mode_init.img_win_2_table_col2['width'])
-        dpg.add_table_column(label="",tag='img_win_2_table_col3', width = mode_init.img_win_2_table_col3['width'])
+    # with dpg.table(header_row=False, width=-1,borders_innerH=False, 
+    #                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
+    #                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
+    #                                no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
+    #         # Add headers
+    #     dpg.add_table_column(label="",tag='img_win_2_table_col1', width = mode_init.img_win_2_table_col1['width'])
+    #     dpg.add_table_column(label="",tag='img_win_2_table_col2', width = mode_init.img_win_2_table_col2['width'])
+    #     dpg.add_table_column(label="",tag='img_win_2_table_col3', width = mode_init.img_win_2_table_col3['width'])
+    #     dpg.add_table_column(label="",tag='img_win_2_table_col4', width = mode_init.img_win_2_table_col4['width'])
         
 
-        # Add rows and columns
-        with dpg.table_row(tag='img_win_2_table_row1'):
-            dpg.add_drag_float(tag='cell_tresh_ratio_2',
-                               default_value =1.0,
-                               max_value=5.,
-                               min_value=0.0,
-                               speed=0.001,
-                               width=mode_init.cell_tresh_ratio_2['width'],
-                               enabled=False,
-                               callback=mode_cmn._update_textures_both_roi
-                              )
-
+    #     # Add rows and columns
+    #     with dpg.table_row(tag='img_win_2_table_row1'):
+            # dpg.add_drag_float(tag='cell_thres_ratio_2',
+            #                    default_value =1.0,
+            #                    max_value=5.,
+            #                    min_value=0.0,
+            #                    speed=0.001,
+            #                    width=mode_init.cell_thres_ratio_2['width'],
+            #                    enabled=False,
+            #                    format = 'Thres. Cell: %.1f',
+            #                    callback=mode_cmn._update_textures_both_roi
+            #                   )
+            # with dpg.tooltip('cell_thres_ratio_2',tag='cell_thres_ratio_2_tooltip'):
+            #     dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_2_tooltip_text')
 
             
             # with dpg.group(tag='log_checkbox_group', horizontal=True,
             #    horizontal_spacing=init.group_spacer,
             #    show=True):
-            dpg.add_checkbox(label='Find nucleus', 
-                             tag='nucleus_search_2',
-                             default_value = False,
-                             enabled=False,
-                             # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
-                             # parent='image_window_1'
-                            )
-            dpg.add_drag_float(tag='nucl_tresh_ratio_2',
-                               default_value =1.5,
-                               max_value=5.,
-                               min_value=0.0,
-                               speed=0.001,
-                               width=mode_init.nucl_tresh_ratio_2['width'],
-                               enabled=False,
-                               callback = mode_cmn._update_textures_both_roi
-                              )
+            # dpg.add_checkbox(label='Nucleus', 
+            #                  tag='nucleus_search_2',
+            #                  default_value = False,
+            #                  enabled=False,
+            #                  # width=-1,
+            #                  callback=mode_cmn._update_textures_both_roi,
+            #                  # parent='image_window_1'
+            #                 )
+            # dpg.add_checkbox(label='Ch1\u21922', 
+            #                  tag='cp_roi_2',
+            #                  default_value = False,
+            #                  enabled=False,
+            #                  # width=-1,
+            #                  callback=mode_cmn._update_textures_both_roi,
+            #                  # parent='image_window_1'
+            #                 )
+            # 
+            
     
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
                                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
@@ -634,6 +798,7 @@ with dpg.window(label = 'Channel 2',
                                    min_value=0.1,
                                    speed=0.01,
                                    enabled=True,
+                                   
                                    width=mode_init.img_contrast_2['width'],
                                    callback=mode_cmn._update_textures_both_roi
                                   )
@@ -673,14 +838,19 @@ globalITEMS.windows.extend(['image_window_ch2',
                             'IMAGE_CH2_top_sep',
                             'texture_CH_2',
                             'IMAGE_CH2_top_sep_2',
-                            'img_win_2_table',
-                            'img_win_2_table_col1',
-                            'img_win_2_table_col2',
-                            'img_win_2_table_col3',
-                            'img_win_2_table_row1',
-                            'cell_tresh_ratio_2',
-                            'nucleus_search_2',
-                            'nucl_tresh_ratio_2',
+                            # 'img_win_2_table',
+                            # 'img_win_2_table_col1',
+                            # 'img_win_2_table_col2',
+                            # 'img_win_2_table_col3',
+                            # 'img_win_2_table_row1',
+                            # 'cell_thres_ratio_2',
+                            # 'cell_thres_ratio_2_tooltip',
+                            # 'cell_thres_ratio_2_tooltip_text',
+                            # 'nucleus_search_2',
+                            # 'cp_roi_2',
+                            # 'nucl_thres_ratio_2',
+                            # 'nucl_thres_ratio_2_tooltip',
+                            # 'nucl_thres_ratio_2_tooltip_text',
                             'img_win_2_table_2',
                             'img_win_2_table_2_col1',
                             'img_win_2_table_2_col1',

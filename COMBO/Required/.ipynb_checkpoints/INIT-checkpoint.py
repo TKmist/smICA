@@ -35,6 +35,7 @@ class _basicF:
                 dpg.add_font_range(0x0300, 0x03ff)
                 dpg.add_font_range(0x0200, 0x02ff)
                 dpg.add_font_range(0x2080, 0x209C)
+                dpg.add_font_range(0x2190, 0x2193)
                 default_font = font_18
             dpg.bind_font(default_font)
         
@@ -183,6 +184,7 @@ class _init_Menu:
     def __init__(self,VERSION):
         self.VERSION = VERSION
 
+    
     def callback_license(self,sender,app_data):
         if not 'License_title' in dpg.get_aliases():
             with dpg.window(tag='License_win',width=dpg.get_viewport_width()/2,
@@ -234,6 +236,7 @@ class _init_Menu:
                              default_value = License,
                              wrap = int(0.95*(dpg.get_viewport_width()/2)))
 
+    
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):

@@ -35,6 +35,7 @@ class _basicF:
                 dpg.add_font_range(0x0300, 0x03ff)
                 dpg.add_font_range(0x0200, 0x02ff)
                 dpg.add_font_range(0x2080, 0x209C)
+                dpg.add_font_range(0x2190, 0x2193)
                 default_font = font_18
             dpg.bind_font(default_font)
         
