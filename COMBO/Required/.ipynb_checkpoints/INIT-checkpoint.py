@@ -178,7 +178,20 @@ class _init_varaibles:
                               'pos':(0,0)
                                 }
         self.mounted_method = None
+        # self.icopath()
+        
+    def icopath(self):
+        osname = os.name
 
+        if osname == 'posix':
+
+            ico_path=os.path.join('res','icons','smICA.png')
+            
+        else:
+            ico_path=os.path.join('res','icons','smICA.ico')
+            # self.init_bottom_indent = 2*11
+            # self.init_right_indent = 2*11
+        return ico_path
 
 class _init_Menu:
     def __init__(self,VERSION):

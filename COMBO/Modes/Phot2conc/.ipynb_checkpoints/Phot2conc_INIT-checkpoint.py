@@ -593,6 +593,7 @@ class _Phot2conc_vars_funct:
         self.last_directory = last_directory
         self.size_ratio = self.mode_init.size_ratio 
         self.Sing_Results_DF = pd.DataFrame()
+        self.initialize_res_df()
         self.anal_file = ''
         self.tex_1_name = self.mode_init.tex_1_name
         self.tex_2_name = self.mode_init.tex_2_name
@@ -1108,11 +1109,21 @@ class _Phot2conc_vars_funct:
         
         
         
-        
+    def initialize_res_df(self):    
+        self.Sing_Results_DF = pd.DataFrame(columns=['File',
+                                                     'Channel',
+                                                     '<Counts>',
+                                                     'Counts_std',
+                                                     '<N_p>',
+                                                     'N_p_err',
+                                                     '<C>',
+                                                     'C_err',
+                                                     'C_median',
+                                                     'C_median_abs_err'])
         
     def callback_PTU_directory_select(self,sender,app_data):
         
-        self.Sing_Results_DF = pd.DataFrame(columns=['File', 'Channel','<Counts>','Counts_std','<N_p>','N_p_err','<C>', 'C_err','C_median', 'C_median_abs_err'])
+        self.initialize_res_df()
         self.files=()
         dpg.set_value('FILE_ROI_checkbox',False)
         self.directory = app_data['file_path_name']
@@ -2046,7 +2057,7 @@ class _Phot2conc_vars_funct:
 
 
     def callback_calculate_all(self,sender,app_data):
-
+        self.initialize_res_df()
         # print(self.files)
         filenames = [f.replace('.ptu','') for f in self.files]
         # print(filenames)
@@ -2057,8 +2068,8 @@ class _Phot2conc_vars_funct:
             
             dpg.configure_item('file_box', default_value=an_file)
             self.callback_listbox('file_box',self.anal_file)
-            self.load_PTU_images(an_file)
-            self.callback_calculate(sender,app_data)
+            # self.load_PTU_images(an_file)
+            # self.callback_calculate(sender,app_data)
             
             
             
@@ -2120,10 +2131,10 @@ class _Phot2conc_vars_funct:
                                                      self.median_err_C_ch_2]],
                                                    columns=self.Sing_Results_DF.columns)
     
-    
+            
     
             self.Sing_Results_DF=pd.concat([self.Sing_Results_DF,Sing_Results_DF_tmp]).reset_index(drop=True)
-            
+            self._pkl_file()
     
     def callback_directory_select(self,sender,app_data):
         self.files=()
@@ -2361,16 +2372,13 @@ class _Phot2conc_vars_funct:
 
     
     def callback_reset_results_DF(self):
-        self.Sing_Results_DF = pd.DataFrame(columns=['File',
-                                                     'Channel',
-                                                     '<Counts>',
-                                                     'Counts_std',
-                                                     '<N_p>',
-                                                     'N_p_err',
-                                                     '<C>',
-                                                     'C_err',
-                                                     'C_median',
-                                                     'C_median_abs_err'])
+        self.initialize_res_df()
+        
+        files = os.listdir(self.last_directory)
+        files = [f for f in files if f.endswith('.rpk')]
+        for f in files:
+            os.remove(os.path.join(self.last_directory,f))
+        
 
     def callback_select_lt_to_roi(self,sender,app_data):
         self.load_PTU_images(self.anal_file)
