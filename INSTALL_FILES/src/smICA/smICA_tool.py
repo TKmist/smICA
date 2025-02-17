@@ -12,6 +12,9 @@ def execfile(filepath, globals=globals(), locals=None):
     })
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), globals, locals)
+
+
+
 import platform
 import os
 if platform.system().upper() == "LINUX":
@@ -20,6 +23,7 @@ from decorator import decorator
 import dearpygui.dearpygui as dpg
 # import os
 import datetime
+import numpy as np
 import warnings
 import Required.INIT as inits
 warnings.filterwarnings('ignore')
@@ -29,6 +33,8 @@ def callback_none():
 basf = inits._basicF()
 
 inV=inits._init_varaibles()
+
+    
 viewport = inV.VIEWPORT_prop
 menu = inits._init_Menu(VERSION=VERSION)
 
@@ -79,7 +85,15 @@ for method in inV.METHODS:
     path =os.path.join(method,basf.path_to_method_anal_menu_item(method))
     # lprint(path)
     execfile(path)
+basf.P2C_manu_F = P2C_manu_F
+basf.PE_manu_F = PE_manu_F
+dpg.set_viewport_resize_callback(basf.basic_resizer)
+basf.mount_inint_buttons()
 
+
+
+
+# print(P2C_manu_F,PE_manu_F)
 # print(vars(menu))
 
 

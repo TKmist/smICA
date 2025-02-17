@@ -154,9 +154,94 @@ class _basicF:
    
         
     
+    def callback_init_buttons(self,sender,app_data):
+        
+        if sender == 'EXTRACT_FROM_PTU_INIT_BUTTON':
+            # print('EXTRACT_FROM_PTU_INIT_BUTTON')
+            self.PE_manu_F.callback_PHOTEXTR_menu()  
+            # 
+
+        elif sender == 'Phot_2_Conc_INIT_BUTTON':
+            # print('Phot_2_Conc_INIT_BUTTON')
+            self.P2C_manu_F.callback_PHOT2CONC_menu()  
+        
+        self.unmount_inint_buttons()
+
+        dpg.add_menu_item(label="Extract from PTU",
+                          parent ='menu_analysis_method_dropout' ,
+                          tag='Analysis_submenu_item_PhotExtract',
+                          callback=self.PE_manu_F.callback_PHOTEXTR_menu)
+        
+        dpg.add_menu_item(label="Phot2Conc",
+                          parent ='menu_analysis_method_dropout' ,
+                          tag='Analysis_submenu_item_Phot2conc',
+                          callback=self.P2C_manu_F.callback_PHOT2CONC_menu)
+        
+        
+
+    def unmount_inint_buttons(self):
+        dpg.hide_item('initial_window')
+        dpg.delete_item('Phot_2_Conc_INIT_BUTTON')
+        dpg.delete_item('EXTRACT_FROM_PTU_INIT_BUTTON')
+        dpg.delete_item('initial_window')
+        
+    def basic_resizer(self):
+        self.unmount_inint_buttons()
+        self.mount_inint_buttons()
+        
     
-    
-    
+    def mount_inint_buttons(self):
+
+        VP = {'width':dpg.get_viewport_width(),
+             'height':dpg.get_viewport_height()}
+
+        initial_window = {'name':'initial_window',
+                            'width':int(VP['width']/3),
+                            'height':int(VP['height']/3),
+                            'pos':(int(VP['width']/2-(VP['width']/3)/2),
+                                   int(VP['height']/2-(VP['height']/3)/2))
+                            }
+        EXTRACT_FROM_PTU_INIT_BUTTON = {'name':'EXTRACT_FROM_PTU_INIT_BUTTON',
+                                             'width':-1,
+                                             'height':int(initial_window['height']/2.2),
+                                             }
+        Phot_2_Conc_INIT_BUTTON = {'name':'Phot_2_Conc_INIT_BUTTON',
+                                             'width':-1,
+                                             'height':int(initial_window['height']/2.2),
+                                             }
+
+        
+
+        
+        with dpg.window(tag = 'initial_window',
+                                width = initial_window['width'],
+                                height = initial_window['height'],
+                                pos = initial_window['pos'],
+                                menubar=False,
+                                autosize=False,
+                                no_title_bar=True,
+                                no_move=True,
+                                no_resize=True,
+                                no_background=True,
+                                modal=False,
+                                show=True
+                               ):
+            dpg.add_button(label="EXTRACT from PTU",
+                       callback=self.callback_init_buttons,
+                       width = EXTRACT_FROM_PTU_INIT_BUTTON['width'],
+                       height = EXTRACT_FROM_PTU_INIT_BUTTON['height'],
+                       tag='EXTRACT_FROM_PTU_INIT_BUTTON',
+                       show=True,enabled=True
+                      )
+            dpg.bind_item_theme('EXTRACT_FROM_PTU_INIT_BUTTON', 'fit_button_theme')
+            dpg.add_button(label="Phot 2 Conc",
+                       callback=self.callback_init_buttons,
+                       width = Phot_2_Conc_INIT_BUTTON['width'],
+                       height = Phot_2_Conc_INIT_BUTTON['height'],
+                       tag='Phot_2_Conc_INIT_BUTTON',
+                       show=True,enabled=True
+                      )
+            dpg.bind_item_theme('Phot_2_Conc_INIT_BUTTON', 'fit_button_theme')
         
     
     
@@ -188,22 +273,7 @@ class _init_varaibles:
         self.mounted_method = None
 
 
-        self.initial_window = {'name':'initial_window',
-                            'width':int(450),
-                            'height':int(250),
-                            'pos':(int(self.VIEWPORT_prop['width']/2-int(450)/2),
-                                   int(self.VIEWPORT_prop['height']/2-int(250)/2))
-                            }
-        self.EXTRACT_FROM_PTU_INIT_BUTTON = {'name':'EXTRACT_FROM_PTU_INIT_BUTTON',
-                                             'width':-1,
-                                             'height':int(self.initial_window['height']/2.2),
-                                             }
-        self.Phot_2_Conc_INIT_BUTTON = {'name':'Phot_2_Conc_INIT_BUTTON',
-                                             'width':-1,
-                                             'height':int(self.initial_window['height']/2.2),
-                                             }
         
-        #self.icopath()
         
     def icopath(self):
         osname = os.name
