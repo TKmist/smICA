@@ -167,18 +167,25 @@ class _init_varaibles:
         self.init_size_ratio = {'width':1,
                           'height':1}
         self.init_top_indent = 24+11
-        self.init_bottom_indent = 11
+        if os.name == 'posix':
+
+            self.init_bottom_indent = 11
+            self.init_right_indent = 11
+        else:
+            self.init_bottom_indent = 5*11
+            self.init_right_indent = int(np.round(2.5*11))
+
         self.init_left_indent = 11
-        self.init_right_indent = 11
+        
         self.init_internal_indent = 11
         self.init_group_spacer = 2
         self.init_font_size = 18
         self.VIEWPORT_prop = {'width':1585,
-                              'height':950+2*self.init_bottom_indent,
+                              'height':950+2*11,
                               'pos':(0,0)
                                 }
         self.mounted_method = None
-        # self.icopath()
+        #self.icopath()
         
     def icopath(self):
         osname = os.name
@@ -189,8 +196,8 @@ class _init_varaibles:
             
         else:
             ico_path=os.path.join('res','icons','smICA.ico')
-            # self.init_bottom_indent = 2*11
-            # self.init_right_indent = 2*11
+            #self.init_bottom_indent = 2*11
+            #self.init_right_indent = 2*11
         return ico_path
 
 class _init_Menu:

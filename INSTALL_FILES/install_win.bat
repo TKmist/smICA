@@ -62,7 +62,7 @@ if %errorlevel% neq 0 (
 :: Install dependencies
 echo Installing dependencies...
 "%PIP_EXE%" cache purge
-"%PYTHON_EXE%" -m pip install --upgrade pip
+"%PYTHON_EXE%" -m pip install --upgrade pip --progress-bar -v 
 
 "%~dp0%VENV_DIR%\Scripts\pip.exe" install . --no-warn-script-location --disable-pip-version-check --verbose >install.log 2>&1
 if %errorlevel% neq 0 (
@@ -75,9 +75,10 @@ echo Creating the smICA.bat file...
 echo @echo off > %LAUNCHER_BAT%
 
 echo call "%~dp0%VENV_DIR%\Scripts\activate.bat" >> %LAUNCHER_BAT%
-echo cd /d "%~dp0smICA" >> %LAUNCHER_BAT%
+echo cd /d "%~dp0smICA\smICA" >> %LAUNCHER_BAT%
 echo python smICA_tool.py >> "%LAUNCHER_BAT%"
 echo call "%~dp0%VENV_DIR%\Scripts\deactivate.bat" >> %LAUNCHER_BAT%
+echo cd /d "%~dp0smICA" >> %LAUNCHER_BAT%
 if %errorlevel% neq 0 (
     echo Failed to create launcher .bat file. Exiting.
     exit /b 1
@@ -87,7 +88,7 @@ if %errorlevel% neq 0 (
 echo Creating the Windows shortcut on the Desktop...
 set SHORTCUT_NAME=smICA.lnk
 set SHORTCUT_PATH="%USERPROFILE%\Desktop\%SHORTCUT_NAME%"
-set ICON_PATH="%~dp0smICA\res\icons\smICA.ico"
+set ICON_PATH="%~dp0smICA\smICA\res\icons\smICA.ico"
 set TEMP_VBS="%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"
 
 :: Generate VBScript for shortcut creation
@@ -95,7 +96,7 @@ echo Set oWS = WScript.CreateObject("WScript.Shell") >> %TEMP_VBS%
 echo Set oLink = oWS.CreateShortcut(%SHORTCUT_PATH%) >> %TEMP_VBS%
 echo oLink.TargetPath = %LAUNCHER_BAT% >> %TEMP_VBS%
 echo oLink.IconLocation = %ICON_PATH% >> %TEMP_VBS%
-echo oLink.Description = "Launch FcsIT Application" >> %TEMP_VBS%
+echo oLink.Description = "Launch smICA Application" >> %TEMP_VBS%
 echo oLink.Save >> %TEMP_VBS%
 
 :: Execute VBScript to create the shortcut
@@ -129,10 +130,10 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Move files to the FcsIT directory
-echo Moving files to FcsIT directory...
+:: Move files to the smICA directory
+echo Moving files to smICA directory...
 for %%f in (*) do (
-    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "run_smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI"(
+    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI" (
         move "%%f" smICA\
         if %errorlevel% neq 0 (
             echo Failed to move file %%f to FcsIT directory. Exiting.
@@ -144,8 +145,11 @@ for %%f in (*) do (
 :: Remove setup.py and install_win.bat
 echo Removing setup.py and install_win.bat...
 del setup.py
-del install_win.bat
+
 
 
 echo Installation completed successfully!
-pause
+@echo off
+del install_win.bat
+
+

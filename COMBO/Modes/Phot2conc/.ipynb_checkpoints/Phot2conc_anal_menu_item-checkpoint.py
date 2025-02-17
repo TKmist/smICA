@@ -104,12 +104,12 @@ class _PHOT2CONC_menu_functions:
         
 P2C_manu_F = _PHOT2CONC_menu_functions()
 
-dpg.add_menu_item(label="Phot2Conc",
-                          parent ='menu_analysis_method_dropout' ,
-                          tag='Analysis_submenu_item_Phot2conc',
-                          callback=P2C_manu_F.callback_PHOT2CONC_menu)
+# dpg.add_menu_item(label="Phot2Conc",
+#                           parent ='menu_analysis_method_dropout' ,
+#                           tag='Analysis_submenu_item_Phot2conc',
+#                           callback=P2C_manu_F.callback_PHOT2CONC_menu)
 
 
 
 
-P2C_manu_F.callback_PHOT2CONC_menu()
+# P2C_manu_F.callback_PHOT2CONC_menu()

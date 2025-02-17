@@ -81,10 +81,10 @@ class _PHOTEXTR_menu_functions:
         
 PE_manu_F = _PHOTEXTR_menu_functions()
 
-dpg.add_menu_item(label="Extract from PTU",
-                          parent ='menu_analysis_method_dropout' ,
-                          tag='Analysis_submenu_item_PhotExtract',
-                          callback=PE_manu_F.callback_PHOTEXTR_menu)
+# dpg.add_menu_item(label="Extract from PTU",
+#                           parent ='menu_analysis_method_dropout' ,
+#                           tag='Analysis_submenu_item_PhotExtract',
+#                           callback=PE_manu_F.callback_PHOTEXTR_menu)
 
 
 

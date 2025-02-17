@@ -71,6 +71,9 @@ class _Phot2conc_init:
         self.font_size = int(np.round(font_size*self.fnt_ratio,0))
         self.im_scaller =int(32)#1.1
         self.files =[]
+
+		
+        print(self.right_indent,self.bottom_indent)
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
         self.ROI_mode_items = ['Detect cell',
