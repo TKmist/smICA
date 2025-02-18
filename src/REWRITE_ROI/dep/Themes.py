@@ -1,3 +1,9 @@
+'''
+This file is part of the smICA repository that is distributed under the MIT license; see below.
+
+
+############################################################################
+
 MIT License
 
 Copyright (c) 2024 Tomasz Kalwarczyk
@@ -19,10 +25,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+'''
 
-############################################################################
-
-This repository also includes a copy of the DejaVu Sans Condensed font (TTF file), 
-which is distributed under its own license.
-Please refer to the font file or the accompanying LICENSE file
-for details on its usage and redistribution terms.
+with dpg.theme(tag="Error_window_theme"):
+    '''Theme for Error windows'''
+    with dpg.theme_component(dpg.mvWindowAppItem):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg,
+                            (139,16,16,255)
+                           )
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive,
+                            (83,23,23,255)
+                           )
+    with dpg.theme_component(dpg.mvButton):
+        dpg.add_theme_color(dpg.mvThemeCol_Button,
+                            (56,5,15,255)
+                           )

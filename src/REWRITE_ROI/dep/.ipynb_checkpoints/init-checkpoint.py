@@ -1,3 +1,9 @@
+'''
+This file is part of the smICA repository that is distributed under the MIT license; see below.
+
+
+############################################################################
+
 MIT License
 
 Copyright (c) 2024 Tomasz Kalwarczyk
@@ -19,10 +25,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+'''
 
-############################################################################
 
-This repository also includes a copy of the DejaVu Sans Condensed font (TTF file), 
-which is distributed under its own license.
-Please refer to the font file or the accompanying LICENSE file
-for details on its usage and redistribution terms.
+
+
+init_font_size = font_size = 18
+
+init_top_indent = 24+11
+init_left_indent = 11
