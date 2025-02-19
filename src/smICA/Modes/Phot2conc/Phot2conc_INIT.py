@@ -2446,19 +2446,22 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('nucl_thres_ratio_2',enabled=True)
             dpg.configure_item('ROI_mode_2',enabled=True)
             dpg.configure_item('cp_roi_2',enabled=True)
-            self.mode_init.file_box['num_items'] = 11
+            self.mode_init.file_box['num_items'] = 8
             self.mode_init.PTU_DATA_window['height'] = int(315*self.mode_init.size_ratio['height'])
 
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
-                            
+                         
             
             
             dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
             dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
-            dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
-
+            dpg.configure_item('file_window',
+                               pos=self.mode_init.file_window['pos'])
+            lprint(dpg.get_item_height('PTU_DATA_window'))
             
-
+            self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
+            dpg.configure_item('file_window',
+                               height=self.mode_init.file_window['height'])
         
             
         else:
@@ -2472,12 +2475,16 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('nucl_thres_ratio_2',enabled=False)
             dpg.configure_item('ROI_mode_2',enabled=False)
             dpg.configure_item('cp_roi_1',enabled=False)
-            self.mode_init.file_box['num_items'] = 17
+            self.mode_init.file_box['num_items'] = 11
             self.mode_init.PTU_DATA_window['height'] = int(175*self.mode_init.size_ratio['height'])
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
+            
             dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
             dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
             dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
+            lprint(dpg.get_item_height('PTU_DATA_window'))
+            self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
+            dpg.configure_item('file_window',height=self.mode_init.file_window['height'])
             
         self.load_PTU_images(self.anal_file)
     
