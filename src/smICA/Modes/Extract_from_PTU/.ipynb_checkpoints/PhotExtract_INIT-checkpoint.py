@@ -260,7 +260,7 @@ class _PhotExtr_init:
                                  }
         self.Calculate_filters = {'name':'Calculate_filters',
                             'width':int(350*self.size_ratio['width']),
-                            'height':int(350*self.size_ratio['height'])
+                            'height':int(25*self.size_ratio['height'])
                                  }
 
         self.decays_tab_list_tag = {'name':'decays_tab_list_tag',
