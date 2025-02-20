@@ -61,11 +61,11 @@ class _PHOT2CONC_mounting_functions:
                   before = 'menu_item_exit',
                          )
 
-        dpg.add_menu_item(label="Export settings",
-                  tag='Export_settings_menu_item',
-                  parent = 'menu_file_dropout',
-                  before = 'menu_item_exit',
-                         )
+        # dpg.add_menu_item(label="Export settings",
+        #           tag='Export_settings_menu_item',
+        #           parent = 'menu_file_dropout',
+        #           before = 'menu_item_exit',
+        #                  )
     
 
 
@@ -74,7 +74,8 @@ class _PHOT2CONC_mounting_functions:
                                     'Open_ROI_menu_item',
                                     'File_menu_sep_1',
                                     'Reset_results_menu_item',
-                                    'Export_settings_menu_item'])
+                                    # 'Export_settings_menu_item'
+                                   ])
         
         
 class _PHOT2CONC_menu_functions:

@@ -708,7 +708,7 @@ class _Phot2conc_vars_funct:
         dpg.configure_item('Open_PTU_menu_item',callback=lambda: dpg.show_item("PTU_file_dialog_id"))
         dpg.configure_item('Open_ROI_menu_item',callback=lambda: dpg.show_item("ROI_folder_dialog_id"))
         dpg.configure_item('Reset_results_menu_item',callback=self.callback_reset_results_DF)
-        dpg.configure_item('Export_settings_menu_item',callback=self.callback_exportsettings)
+        # dpg.configure_item('Export_settings_menu_item',callback=self.callback_exportsettings)
 
     # def callback_reset_results_DF(self):
     #     pass
