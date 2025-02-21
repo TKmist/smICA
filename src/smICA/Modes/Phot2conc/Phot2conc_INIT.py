@@ -106,7 +106,7 @@ class _Phot2conc_init:
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res','img','NO_image_INT.npy'))
         
         self.ROI_mode_items = ['Detect cell',
-                               'Detect nucleus']
+                               'Subtract nucleus']
         
         bf.remove_font_from_registry()
         bf.add_font_to_registry(self.font_size)
@@ -2457,7 +2457,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
             dpg.configure_item('file_window',
                                pos=self.mode_init.file_window['pos'])
-            lprint(dpg.get_item_height('PTU_DATA_window'))
+            # lprint(dpg.get_item_height('PTU_DATA_window'))
             
             self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
             dpg.configure_item('file_window',
@@ -3070,6 +3070,14 @@ class _Phot2conc_vars_funct:
         dpg.set_value('sinle_mols_err_output_ch_2',0)
         dpg.set_value('single_conc_output_ch_2',0)
         dpg.set_value('single_conc_err_output_ch_2',0)
+
+        dpg.set_value('cell_thres_ratio_1',1.0)
+        dpg.set_value('cell_thres_ratio_2',1.0)
+        dpg.set_value('nucl_thres_ratio_1',1.5)
+        dpg.set_value('nucl_thres_ratio_2',1.5)
+        
+        
+        
         if self.PTU_N_frames>1:
             self.PTU_N_frames = self.PTU_N_frames-1
         else:
@@ -3445,7 +3453,7 @@ class _Phot2conc_vars_funct:
                     
                     self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_1_name)
                    
-                elif find_roi_mode == 'Detect nucleus':
+                elif find_roi_mode == 'Subtract nucleus':
                     # find_nucleus = False #dpg.get_value('nucleus_search_1')
                     
                 
@@ -3633,7 +3641,7 @@ class _Phot2conc_vars_funct:
                     # lnprint(np.max(disp))
                     
                     self.rgba_to_dpgtex(rgba_image,np.max(disp),self.tex_2_name)
-                elif find_roi_mode == 'Detect nucleus':
+                elif find_roi_mode == 'Subtract nucleus':
                     cell_rat = dpg.get_value('cell_thres_ratio_2')
                     nucl_rat = dpg.get_value('nucl_thres_ratio_2')
 

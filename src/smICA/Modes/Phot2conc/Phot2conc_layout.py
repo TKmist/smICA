@@ -334,7 +334,7 @@ with dpg.window(label='',
                                callback = mode_cmn._update_textures_both_roi
                               )
             with dpg.tooltip('nucl_thres_ratio_1',tag='nucl_thres_ratio_1_tooltip'):
-                dpg.add_text("Set threshold to detect nucleus.",tag='nucl_thres_ratio_1_tooltip_text')
+                dpg.add_text("Set threshold to subtract nucleus.",tag='nucl_thres_ratio_1_tooltip_text')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_2',
                                default_value =1.5,
@@ -347,7 +347,7 @@ with dpg.window(label='',
                                callback = mode_cmn._update_textures_both_roi
                               )
             with dpg.tooltip('nucl_thres_ratio_2',tag='nucl_thres_ratio_2_tooltip'):
-                dpg.add_text("Set threshold to detect nucleus.",tag='nucl_thres_ratio_2_tooltip_text')
+                dpg.add_text("Set threshold to subtract nucleus.",tag='nucl_thres_ratio_2_tooltip_text')
         with dpg.table_row(tag='auto_ROI_ch_table_row4'):
             dpg.add_text("ROI mode:",tag='auto_ROI_ch_table_row4_text_1')
             dpg.add_combo(tag = 'ROI_mode_1',
@@ -485,7 +485,7 @@ with dpg.window(label='',
     with dpg.tooltip('Calculate_button',tag='Calculate_button_tooltip'):
         dpg.add_text("Press to make calculation on single file.",tag='Calculate_button_tooltip_text')
 
-    dpg.add_button(label="Add to Results",
+    dpg.add_button(label="Add to results",
                callback=mode_cmn.add_single_result_to_DF,
                width = mode_init.add_to_res_single_button['width'],
                tag='add_to_res_single_button',
