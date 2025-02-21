@@ -3071,10 +3071,10 @@ class _Phot2conc_vars_funct:
         dpg.set_value('single_conc_output_ch_2',0)
         dpg.set_value('single_conc_err_output_ch_2',0)
 
-        dpg.set_value('cell_thres_ratio_1',1.0)
-        dpg.set_value('cell_thres_ratio_2',1.0)
-        dpg.set_value('nucl_thres_ratio_1',1.5)
-        dpg.set_value('nucl_thres_ratio_2',1.5)
+        # dpg.set_value('cell_thres_ratio_1',1.0)
+        # dpg.set_value('cell_thres_ratio_2',1.0)
+        # dpg.set_value('nucl_thres_ratio_1',1.5)
+        # dpg.set_value('nucl_thres_ratio_2',1.5)
         
         
         
