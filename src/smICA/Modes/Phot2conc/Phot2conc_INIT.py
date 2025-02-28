@@ -2433,325 +2433,61 @@ class _Phot2conc_vars_funct:
         else:
             dpg.show_item('ROI_folder_dialog_id')
 
-    def callback_select_autoroi(self,sender,app_data):
-        if dpg.get_value(sender):
-            dpg.set_value('FILE_ROI_checkbox',False)
-            dpg.show_item('auto_ROI_ch_table')
-            dpg.configure_item('cell_thres_ratio_1',enabled=True)
-            dpg.configure_item('nucl_thres_ratio_1',enabled=True)
-            dpg.configure_item('ROI_mode_1',enabled=True)
-            dpg.configure_item('cp_roi_1',enabled=True)
-            
-            dpg.configure_item('cell_thres_ratio_2',enabled=True)
-            dpg.configure_item('nucl_thres_ratio_2',enabled=True)
-            dpg.configure_item('ROI_mode_2',enabled=True)
-            dpg.configure_item('cp_roi_2',enabled=True)
+    def callback_select_autoroi(self, sender, app_data):
+        """Toggle Auto ROI mode and update UI dynamically for multiple cells."""
+
+        is_auto_roi = dpg.get_value(sender)
+
+        # Disable File ROI checkbox when Auto ROI is selected
+        dpg.set_value('FILE_ROI_checkbox', False)
+
+        # Show/Hide Auto ROI table
+        dpg.show_item('auto_ROI_ch_table') if is_auto_roi else dpg.hide_item('auto_ROI_ch_table')
+
+        # # Get the number of cells dynamically (replace with actual logic)
+        # num_cells = self.get_number_of_cells()  # Example method to fetch cell count
+        #
+        # # Enable or disable ROI elements for each cell dynamically
+        # for i in range(1, num_cells + 1):
+        #     dpg.configure_item(f'cell_thres_ratio_{i}', enabled=is_auto_roi)
+        #     dpg.configure_item(f'nucl_thres_ratio_{i}', enabled=is_auto_roi)
+        #     dpg.configure_item(f'ROI_mode_{i}', enabled=is_auto_roi)
+        #     dpg.configure_item(f'cp_roi_{i}', enabled=is_auto_roi)
+
+        # Adjust layout based on number of cells
+        if is_auto_roi:
             self.mode_init.file_box['num_items'] = 8
-            self.mode_init.PTU_DATA_window['height'] = int(315*self.mode_init.size_ratio['height'])
-
-            self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
-                         
-            
-            
-            dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
-            dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
-            dpg.configure_item('file_window',
-                               pos=self.mode_init.file_window['pos'])
-            # lprint(dpg.get_item_height('PTU_DATA_window'))
-            
-            self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
-            dpg.configure_item('file_window',
-                               height=self.mode_init.file_window['height'])
-        
-            
+            self.mode_init.PTU_DATA_window['height'] = int(315 * self.mode_init.size_ratio['height'])
         else:
-            dpg.hide_item('auto_ROI_ch_table')
-            dpg.configure_item('cell_thres_ratio_1',enabled=False)
-            dpg.configure_item('nucl_thres_ratio_1',enabled=False)
-            dpg.configure_item('ROI_mode_1',enabled=False)
-            dpg.configure_item('cp_roi_1',enabled=False)
-            
-            dpg.configure_item('cell_thres_ratio_2',enabled=False)
-            dpg.configure_item('nucl_thres_ratio_2',enabled=False)
-            dpg.configure_item('ROI_mode_2',enabled=False)
-            dpg.configure_item('cp_roi_1',enabled=False)
             self.mode_init.file_box['num_items'] = 11
-            self.mode_init.PTU_DATA_window['height'] = int(175*self.mode_init.size_ratio['height'])
-            self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
-            
-            dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
-            dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
-            dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
-            lprint(dpg.get_item_height('PTU_DATA_window'))
-            self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
-            dpg.configure_item('file_window',height=self.mode_init.file_window['height'])
-            
+            self.mode_init.PTU_DATA_window['height'] = int(175 * self.mode_init.size_ratio['height'])
+
+        self.mode_init.file_window['pos'] = (
+            self.mode_init.left_indent,
+            self.mode_init.top_indent + self.mode_init.PTU_DATA_window['height'] + self.mode_init.internal_indent
+        )
+
+        # Apply new configurations to UI elements
+        dpg.configure_item('file_box', num_items=self.mode_init.file_box['num_items'])
+        dpg.configure_item('PTU_DATA_window', height=self.mode_init.PTU_DATA_window['height'])
+        dpg.configure_item('file_window', pos=self.mode_init.file_window['pos'])
+
+        # Adjust file window height dynamically
+        self.mode_init.file_window['height'] = (
+                dpg.get_viewport_height()
+                - (self.mode_init.top_indent + dpg.get_item_height(
+            'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
+        )
+
+        dpg.configure_item('file_window', height=self.mode_init.file_window['height'])
+
+        # Load PTU images with the updated configuration
         self.load_PTU_images(self.anal_file)
-    
-    # def callback_show_int(self,sender,app_data):
-    #     self.load_PTU_images(self.anal_file)
 
-    # def callback_show_lt(self,sender,app_data):
-    #     self.load_PTU_images(self.anal_file)
+    def get_number_of_cells(self):
+        """Determine the number of cells to configure dynamically."""
+        return dpg.get_value("num_cells_selector")  # Example: Fetch value from a dropdown or input
 
-    # def callback_test(self,sender,app_data):
-    #     items = dpg.get_aliases()
-    #     if 'texture_tag_chan_1' in items:
-    #         dpg.delete_item('texture_tag_chan_1')
-            
-        
-        
-    #     else:
-    #         pass
-
-
-
-
-    # def callback_windows_size(sender,app_data):
-    #     global image_width1,image_height1,dpg_image1
-    #     global ratio_w ,ratio_h ,top_indent,bottom_indent,left_indent,right_indent,internal_indent
-    #     global group_spacer,var_def_group_1_spacer
-    #     global init_widths, init_heights,init_position
-    #     global DF,DF2
-    #     global Current_image_1,Current_image_2
-    #     global tex_1_name,tex_2_name,dif_vp0_width
-    #     global inf_w
-    #     # lnprint('RUNNING: callback_windows_size')
-    #     inf_w = dpg.get_viewport_width()-dif_vp0_width
-        
-    #     inf_h = dpg.get_viewport_height()
-        
-    #     items = dpg.get_aliases()
-        
-    #     # lnprint('reseize',inf_w,inf_h)
-    
-    #     item_types = []
-    #     for item in items:
-    #         item_types.append(dpg.get_item_type(item))
-    #     item_types=set(item_types)
-    #     item_types_dict = {}
-    #     for item_type in item_types:
-    #         its = []
-    #         for item in items:
-    #             if dpg.get_item_type(item) == item_type:
-    #                 its.append(item)
-    #         item_types_dict[item_type]=its
-        
-    #     items = [item for item in items if dpg.get_item_type(item) in resizable_items ]
-    #     ratio_w = inf_w/(init_widths['VIEWPORT']-dif_vp0_width)
-    #     ratio_h = inf_h/init_heights['VIEWPORT']
-    #     # lnprint('line 2577',ratio_w,ratio_h)
-    
-        
-    #     top_indent = int(init_top_indent*ratio_h)
-    #     bottom_indent = int(init_bottom_indent*ratio_h)
-    #     left_indent = int(init_left_indent*ratio_w)
-    #     right_indent = int(init_right_indent*ratio_w)
-    #     internal_indent = int(init_internal_indent*ratio_w)
-    #     group_spacer = int(np.round(init_group_spacer*ratio_w))
-    #     image_width1 = int(init_image_width1*ratio_w)
-    #     image_height1 = int(init_image_height1*ratio_h)
-    #     var_def_group_1_spacer = int(init_var_def_group_1_spacer*ratio_w)
-        
-    #     item = 'PTU_DATA_window'
-    #     # lnprint('line 2591',item)
-    #     new_width = int(init_widths[item]*ratio_w)
-    #     new_height = int(init_heights[item]*ratio_h)
-    #     new_pos = (left_indent,top_indent)
-        
-    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
-        
-    #     item = 'file_window'
-    #     # lnprint('line 2599',item)
-    #     new_width = dpg.get_item_width('PTU_DATA_window')
-        
-    #     #int(init_heights[item]*ratio_h)
-        
-    #     new_pos = (dpg.get_item_pos('PTU_DATA_window')[0],
-    #                top_indent+dpg.get_item_height('PTU_DATA_window')+internal_indent)
-    
-    #     new_height = dpg.get_viewport_height() -(new_pos[1]+bottom_indent)
-    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
-        
-        
-    #     item1 = 'image_window_ch1'
-    #     # lnprint('line 2610',item1)
-    #     item2 = 'image_window_ch2'
-    #     # lnprint('line 2612',item2)
-    #     mult = ((init_widths['VIEWPORT']-dif_vp0_width)*ratio_w -left_indent-2*internal_indent-init_widths['PTU_DATA_window']-internal_indent- right_indent-5)/2/init_widths[item1]
-    #     # lnprint('line 2614',mult)
-        
-        
-        
-        
-    #     new_width = int((dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2)
-    #     new_height = new_width
-    
-    #     image_position_1 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
-    #                   top_indent)
-        
-    #     img = processor_1.image#.astype(np.uint8)
-    #     # lnprint(np.max(img))
-    #     rgba_image = im_to_rgbim(img)
-                
-    #     # lnprint(img.shape,rgba_image.shape,(new_width, new_height))
-    #     rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
-    #     # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
-        
-    #     dpg_image_1 = rgba_image.flatten().tolist()
-        
-    #     # rgba_to_dpgtex(rgba_image,np.max(disp),tex_1_name)
-    
-        
-    
-    #     # dpg_image_1 = update_texture(Current_image_1)
-    
-        
-        
-    #     # lnprint('_update_textures_both_roi 1 in')
-    #     # _update_textures_both_roi('ch1',None)
-    #     # lnprint('_update_textures_both_roi 1 out')
-    #     dpg.set_item_pos('image_window_ch1',image_position_1)
-    
-        
-    #     if tex_1_name in dpg.get_aliases():
-    #         dpg.delete_item(tex_1_name)
-            
-    #         dpg.remove_alias(tex_1_name)
-    #         dpg.delete_item('texture_CH_1')
-            
-    #         dpg.add_dynamic_texture(width=new_width,
-    #                         height=new_height,
-    #                         default_value=dpg_image_1,
-    #                         tag=tex_1_name,
-    #                         parent = 'texture_reg')
-            
-    #         dpg.add_image(tex_1_name,parent = 'image_window_ch1'
-    #                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',before='img_win_1_table')
-    
-    #     _update_textures_both_roi('ch1',None)  
-        
-        
-    
-    #     image_position_2 = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
-    #                   top_indent)
-        
-        
-    #     # dpg_image_2 = update_texture(Current_image_2)
-    #     img = processor_2.image#.astype(np.uint8)
-    #     rgba_image = im_to_rgbim(img)
-                
-        
-    #     rgba_image  =cv2.resize(rgba_image, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
-    #     # rgba_image=rgba_image.astype(np.float32) /np.max(img)#np.max(rgba_image)#255
-        
-    #     dpg_image_2 = rgba_image.flatten().tolist() 
-       
-    #     dpg.set_item_pos('image_window_ch2',image_position_2)
-    #     if tex_2_name in dpg.get_aliases():
-    #         dpg.delete_item(tex_2_name)
-    #         dpg.remove_alias(tex_2_name)
-    #         dpg.delete_item('texture_CH_2')
-    #         dpg.add_dynamic_texture(width=new_width,
-    #                         height=new_height,
-    #                         default_value=dpg_image_2,
-    #                         tag=tex_2_name,
-    #                         parent = 'texture_reg')
-            
-    #         dpg.add_image(tex_2_name,parent = 'image_window_ch2'
-    #                               ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',before='img_win_2_table')
-        
-    #     _update_textures_both_roi('ch2',None)
-    #     item = 'FCS_window'
-    #     new_weight = int(init_widths[item]*ratio_w)
-    #     new_height = int(init_heights[item]*ratio_h)
-    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent+dpg.get_item_width(tex_2_name)+2*internal_indent
-                   
-    #                ,top_indent)
-    #     wdt_hgt_pos(item,new_weight,new_height,new_pos)
-        
-    #     item = 'results_window'
-    #     new_weight = int(init_widths[item]*ratio_w)
-    #     new_height = int(init_heights[item]*ratio_h)
-    #     new_pos = (dpg.get_item_pos('FCS_window')[0],dpg.get_item_pos('FCS_window')[1]+dpg.get_item_height('FCS_window')+internal_indent)
-    #     wdt_hgt_pos(item,new_weight,new_height,new_pos)
-        
-        
-        
-    
-        
-        
-        
-    #     item = 'hist_window_ch1'
-    #     # print('line 2719',item)
-    #     new_width = dpg.get_item_width(tex_1_name)+int(1.5*init_internal_indent)
-    #     new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
-    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent,
-    #                2*top_indent+dpg.get_item_height(tex_1_name)*hist_scaller+int(4.5*init_internal_indent))
-        
-    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
-        
-        
-    #     item = 'hist_window_ch2'
-    #     # print('line 2729',item)
-    #     new_width = dpg.get_item_width(tex_2_name)+int(1.5*init_internal_indent)
-    #     new_height = dpg.get_viewport_height()-(2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent)+bottom_indent)
-    #     new_pos = (left_indent+dpg.get_item_width('PTU_DATA_window')+internal_indent+dpg.get_item_width(tex_1_name)+2*internal_indent,
-    #                2*top_indent+dpg.get_item_height(tex_2_name)*hist_scaller+int(4.5*init_internal_indent))
-        
-    #     wdt_hgt_pos(item,new_width,new_height,new_pos)
-        
-        
-        
-        
-        
-    
-        
-    
-        
-        
-    #     for item in file_panel_items:
-    #         # lnprint(item)
-    #         new_weight = int(init_widths[item]*ratio_w)
-    #         wdt_hgt_pos(item,new_weight,None,None)
-            
-    
-    
-    
-    
-        
-    #     for item in dialogs:
-    #         # lnprint(item)
-    #         new_weight = int(init_widths[item]*ratio_w)
-    #         new_height = int(init_heights[item]*ratio_h)
-    
-    #         wdt_hgt_pos(item,new_weight,new_height,None)
-        
-        
-    
-        
-        
-        
-    #     '''Group spacer resizing'''
-    #     for item in item_types_dict['mvAppItemType::mvGroup']:
-    #         # lnprint(item)
-    #         if dpg.get_item_configuration(item)['horizontal']:
-                
-    #             dpg.configure_item(item,horizontal_spacing = group_spacer)
-    #         else:
-    #             pass
-            
-    #     # if platform.system().upper() == "LINUX":
-            
-    #     #     dpg.set_viewport_resizable(False)
-    
-    
-    #     # lnprint(dpg.get_item_width('img_win_2_table_2_2'))
-
-    
-    
-    
-    # def display_images(self,dframes,channel):
     def display_images(self,channel):
         
         # if channel == 'both':
@@ -2776,6 +2512,23 @@ class _Phot2conc_vars_funct:
         elif channel =='both':
             self._update_textures_both_roi('ch1',None)
             self._update_textures_both_roi('ch2',None)
+
+
+    def callback_next_cell_button(self):
+
+        try:
+            value = dpg.get_value("Photons_array_checkbox")
+
+            if value:
+                dpg.set_value("Photons_array_checkbox", False)
+
+            else:
+                dpg.set_value("Photons_array_checkbox", True)
+
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
 
     # def extract_PTU(self,Directory,ptu_file,):
     #     jsn={}
@@ -3033,246 +2786,155 @@ class _Phot2conc_vars_funct:
     #     output = {**dict1, **dict2}
     #     return output
 
-    def load_PTU_images(self,an_file):
-        self.pkl_data = {}
-       
-        pickle_file = os.path.join(self.PTU_directory,an_file+'.pkl')
-    
-        with open(pickle_file, 'rb') as pcklf:
-            pklf = pickle.load(pcklf)
-        
-        ptu_meta = pklf['File info']#json.load(f)    
-        try:
-            self.DF=self.DF2=[]
-        except:
-            pass
-        
-        self.PTU_Resolution = str(ptu_meta['Pixels per line'])+'x'+str(ptu_meta['Number of lines'])
+    def load_PTU_images(self, an_file):
+        """Load PTU image metadata and process image data with optional ROI."""
+
+        # Load metadata from pickle file
+        pickle_path = os.path.join(self.PTU_directory, f"{an_file}.pkl")
+
+        with open(pickle_path, 'rb') as pcklf:
+            metadata = pickle.load(pcklf)
+
+        ptu_meta = metadata['File info']
+
+        # Store PTU metadata in attributes
+        self.PTU_Resolution = f"{ptu_meta['Pixels per line']}x{ptu_meta['Number of lines']}"
         self.PTU_Px_size = ptu_meta['Pixels size']
-        self.PTU_N_frames = ptu_meta['Number of frames']
+        self.PTU_N_frames = max(ptu_meta['Number of frames'] - 1, 1)  # Ensure at least 1 frame
         self.PTU_Px_dwell = ptu_meta['Pixel dwell']
-        # tau_resolution = ptu_meta['Lifetime resolution']
-        
-        dpg.set_value('Resolution_output','Resolution: '+self.PTU_Resolution)
-        dpg.set_value('Pixel_size_output',self.PTU_Px_size)
-        dpg.set_value('Nframes_output',self.PTU_N_frames)
-        dpg.set_value('Pixel_dwell_output',self.PTU_Px_dwell)
-        
-        dpg.set_value('sinle_phot_output_ch_1',0)
-        dpg.set_value('sinle_phot_err_output_ch_1',0)
-        dpg.set_value('sinle_mols_output_ch_1',0)
-        dpg.set_value('sinle_mols_err_output_ch_1',0)
-        dpg.set_value('single_conc_output_ch_1',0)
-        dpg.set_value('single_conc_err_output_ch_1',0)
-        dpg.set_value('sinle_phot_output_ch_2',0)
-        dpg.set_value('sinle_phot_err_output_ch_2',0)
-        dpg.set_value('sinle_mols_output_ch_2',0)
-        dpg.set_value('sinle_mols_err_output_ch_2',0)
-        dpg.set_value('single_conc_output_ch_2',0)
-        dpg.set_value('single_conc_err_output_ch_2',0)
 
-        # dpg.set_value('cell_thres_ratio_1',1.0)
-        # dpg.set_value('cell_thres_ratio_2',1.0)
-        # dpg.set_value('nucl_thres_ratio_1',1.5)
-        # dpg.set_value('nucl_thres_ratio_2',1.5)
-        
-        
-        
-        if self.PTU_N_frames>1:
-            self.PTU_N_frames = self.PTU_N_frames-1
+        # Update UI elements dynamically
+        ui_updates = {
+            "Resolution_output": f"Resolution: {self.PTU_Resolution}",
+            "Pixel_size_output": self.PTU_Px_size,
+            "Nframes_output": self.PTU_N_frames,
+            "Pixel_dwell_output": self.PTU_Px_dwell
+        }
+
+        for key, value in ui_updates.items():
+            dpg.set_value(key, value)
+
+        # Initialize analysis parameters in UI
+        ui_defaults = [
+            "sinle_phot_output_ch_1", "sinle_phot_err_output_ch_1",
+            "sinle_mols_output_ch_1", "sinle_mols_err_output_ch_1",
+            "single_conc_output_ch_1", "single_conc_err_output_ch_1",
+            "sinle_phot_output_ch_2", "sinle_phot_err_output_ch_2",
+            "sinle_mols_output_ch_2", "sinle_mols_err_output_ch_2",
+            "single_conc_output_ch_2", "single_conc_err_output_ch_2"
+        ]
+
+        for key in ui_defaults:
+            dpg.set_value(key, 0)
+
+        # Identify available PTU files and channels
+        self.Channels = [ch[-1] for ch in metadata.keys() if ch.startswith('export_df')]
+
+        # Process images based on ROI settings
+        use_file_roi = dpg.get_value('FILE_ROI_checkbox')
+        use_auto_roi = dpg.get_value('Auto_ROI_checkbox')
+
+        if use_file_roi:
+            self.process_images_with_file_roi(an_file, metadata)
+        elif use_auto_roi:
+            self.process_images_with_auto_roi(metadata)
         else:
-            pass
-        ptu_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
-        
+            self.process_images_without_roi(metadata)
 
-        self.Channels = list(pklf.keys())
-        self.Channels = [f for f in self.Channels if f.startswith('export_df')]
-        self.Channels = [ch[-1] for ch in self.Channels]
-    
-                
-        if dpg.get_value('FILE_ROI_checkbox'):
-            
-        
-            if len(self.Channels)==1:
-                if '1' in self.Channels[0]:
-                    Intensity_1 = pklf['intensity_1'] 
-                    
-                    Intensity_1 = Intensity_1
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=Intensity_1.astype(np.uint16)
-    
-    
-    
-                    roi_1_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_1.dat')
-                    self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
-                    self.processor_1.roi_image = self.roi_1
-                    Intensity_1 = Intensity_1
-                    channel = 'both'
-                    # channel = 1
-    
-                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                    self.image_1_times_roi = self.Current_image_1
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                    
-                elif '2' in self.Channels[0]:
-                    Intensity_2 = pklf['intensity_2']
-                    Intensity_2 = Intensity_2
-                    
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=Intensity_2.astype(np.uint16)
-    
-    
-                    roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
-                    self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
-                    self.processor_2.roi_image = self.roi_2
-                    channel = 'both'
-                    # channel = 2
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
-                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                    self.image_2_times_roi = self.Current_image_2
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                else:
-                    pass
-    
-            elif len(self.Channels)==2:
-                
-                Intensity_1 = pklf['intensity_1']
-                Intensity_2 = pklf['intensity_2']
-                
-                self.processor_1 = ImageROIProcessor()
-                self.processor_1.image=Intensity_1.astype(np.uint16)
+    def process_images_with_file_roi(self, an_file, metadata):
+        """Process images using saved ROI files."""
+        channels = self.Channels
+
+        def load_roi_and_process(channel_num):
+            intensity_key = f"intensity_{channel_num}"
+            roi_path = os.path.join(self.ROI_directory, f"{an_file}_roi_ch_{channel_num}.dat")
+
+            intensity = metadata[intensity_key].astype(np.uint16)
+            roi = self.load_ROI(roi_path).to_numpy()
+
+            processor = ImageROIProcessor()
+            processor.image = intensity
+            processor.roi_image = roi
+
+            return intensity, processor
+
+        if len(channels) == 1:
+            ch = channels[0]
+            if ch == '1':
+                self.Current_image_1, self.processor_1 = load_roi_and_process(1)
+                self.Current_image_2 = self.NO_IMAGE_INTENSITY
                 self.processor_2 = ImageROIProcessor()
-                self.processor_2.image=Intensity_2.astype(np.uint16)
-                roi_1_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_1.dat')
-                self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
-                roi_2_path = os.path.join(self.ROI_directory,an_file + '_roi_ch_2.dat')
-                self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
-                self.processor_1.roi_image = self.roi_1
-                self.processor_2.roi_image = self.roi_2
-                channel = 'both'
-                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                self.image_1_times_roi = self.Current_image_1
-                self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                self.display_images(channel)
-                    
-        elif dpg.get_value('Auto_ROI_checkbox'):
-            
-            if len(self.Channels)==1:
-                dpg.configure_item('cp_roi_1',enabled = False)
-                dpg.configure_item('cp_roi_2',enabled = False)
-                dpg.set_value('cp_roi_1',False)
-                dpg.set_value('cp_roi_2',False)
-                if '1' in self.Channels[0]:
-                    Intensity_1 = pklf['intensity_1'] 
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=Intensity_1.astype(np.uint16)
-                    channel = 'both'
-                    # channel = 1
-                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                    self.image_1_times_roi = self.Current_image_1
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                    
-                elif '2' in self.Channels[0]:
-                    Intensity_2 = pklf['intensity_2']
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=Intensity_2.astype(np.uint16)
-                    channel = 'both'
-                    # channel = 2
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
-                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                    self.image_2_times_roi = self.Current_image_2
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                    
-                else:
-                    pass
-    
-            elif len(self.Channels)==2:
-                dpg.configure_item('cp_roi_1',enabled = True)
-                dpg.configure_item('cp_roi_2',enabled = True)
-                Intensity_1 = pklf['intensity_1'] 
-                Intensity_2 = pklf['intensity_2']
+            else:
+                self.Current_image_2, self.processor_2 = load_roi_and_process(2)
+                self.Current_image_1 = self.NO_IMAGE_INTENSITY
                 self.processor_1 = ImageROIProcessor()
-                self.processor_1.image=Intensity_1.astype(np.uint16)
-                self.processor_2 = ImageROIProcessor()
-                self.processor_2.image=Intensity_2.astype(np.uint16)
-                channel = 'both'
-                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                self.image_1_times_roi = self.Current_image_1
-                self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                self.display_images(channel)
-    
         else:
-    
-            if len(self.Channels)==1:
-                if '1' in self.Channels[0]:
-                    Intensity_1 = pklf['intensity_1']
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=Intensity_1.astype(np.uint16)
-                    self.roi_1 = np.zeros(self.Current_image_1.shape)
-                    channel = 'both'
-                    # channel = 1
-                    self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                    self.image_1_times_roi = self.Current_image_1
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                    
-                elif '2' in self.Channels[0]:
-                    Intensity_2 = pklf['intensity_2']
-                    self.processor_2 = ImageROIProcessor()
-                    self.processor_2.image=Intensity_2.astype(np.uint16)
-                    self.roi_2 = np.zeros(self.Current_image_2.shape)
-                    self.image_2_times_roi = self.Current_image_2
-                    channel = 'both'
-                    # channel = 2
-                    self.processor_1 = ImageROIProcessor()
-                    self.processor_1.image=np.clip((self.NO_IMAGE_INTENSITY),0,1).astype(np.float64)
-                    self.Current_image_1 = self.NO_IMAGE_INTENSITY
-                    self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                    self.display_images(channel)
-                    
-                else:
-                    pass
+            self.Current_image_1, self.processor_1 = load_roi_and_process(1)
+            self.Current_image_2, self.processor_2 = load_roi_and_process(2)
 
-            elif len(self.Channels)==2:
-                
-                Intensity_1 = pklf['intensity_1']
-                Intensity_2 = pklf['intensity_2']
-                self.roi_1 = np.zeros(self.Current_image_1.shape)
-                self.roi_2 = np.zeros(self.Current_image_2.shape)
-                self.processor_1 = ImageROIProcessor()
-                self.processor_1.image=Intensity_1.astype(np.uint16)
+        self.display_images("both")
+
+    def process_images_with_auto_roi(self, metadata):
+        """Process images automatically without user-defined ROI."""
+        channels = self.Channels
+
+        # Disable manual ROI controls in UI
+        for item in ['cp_roi_1', 'cp_roi_2']:
+            dpg.configure_item(item, enabled=False)
+            dpg.set_value(item, False)
+
+        def process_channel(channel_num):
+            intensity_key = f"intensity_{channel_num}"
+            intensity = metadata[intensity_key].astype(np.uint16)
+
+            processor = ImageROIProcessor()
+            processor.image = intensity
+
+            return intensity, processor
+
+        if len(channels) == 1:
+            ch = channels[0]
+            if ch == '1':
+                self.Current_image_1, self.processor_1 = process_channel(1)
+                self.Current_image_2 = self.NO_IMAGE_INTENSITY
                 self.processor_2 = ImageROIProcessor()
-                self.processor_2.image=Intensity_2.astype(np.uint16)
-                channel = 'both'
-                self.Current_image_1 = Intensity_1/np.max(Intensity_1)
-                self.Current_image_2 = Intensity_2/np.max(Intensity_2)
-                self.image_1_times_roi = self.Current_image_1
-                self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
-                self.display_images(channel)
+            else:
+                self.Current_image_2, self.processor_2 = process_channel(2)
+                self.Current_image_1 = self.NO_IMAGE_INTENSITY
+                self.processor_1 = ImageROIProcessor()
+        else:
+            self.Current_image_1, self.processor_1 = process_channel(1)
+            self.Current_image_2, self.processor_2 = process_channel(2)
 
+        self.display_images("both")
+
+    def process_images_without_roi(self, metadata):
+        """Process images without applying any ROI."""
+        channels = self.Channels
+
+        def process_channel(channel_num):
+            intensity_key = f"intensity_{channel_num}"
+            intensity = metadata[intensity_key].astype(np.uint16)
+
+            processor = ImageROIProcessor()
+            processor.image = intensity
+            return intensity, processor
+
+        if len(channels) == 1:
+            ch = channels[0]
+            if ch == '1':
+                self.Current_image_1, self.processor_1 = process_channel(1)
+                self.Current_image_2 = self.NO_IMAGE_INTENSITY
+                self.processor_2 = ImageROIProcessor()
+            else:
+                self.Current_image_2, self.processor_2 = process_channel(2)
+                self.Current_image_1 = self.NO_IMAGE_INTENSITY
+                self.processor_1 = ImageROIProcessor()
+        else:
+            self.Current_image_1, self.processor_1 = process_channel(1)
+            self.Current_image_2, self.processor_2 = process_channel(2)
+
+        self.display_images("both")
 
     def overlayrgba(self,im,rgba_image,mask_image,full_mask,ovrl):
         overlay_alpha = ovrl  

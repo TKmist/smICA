@@ -261,15 +261,25 @@ with dpg.window(label='',
                                    no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
                                    no_clip=True,tag='ROI_table',parent='PTU_DATA_window'):
 
+
+
         dpg.add_table_column(label="",tag='ROI_table_col1', width = mode_init.ROI_table_col1['width'])
         dpg.add_table_column(label="",tag='ROI_table_col2', width = mode_init.ROI_table_col2['width'])
+        dpg.add_table_column(label="", tag='ROI_table_col3', width=mode_init.ROI_table_col2['width'])
         with dpg.table_row(tag='ROI_table_row1'):
+
             dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox',default_value = False,
                              callback=mode_cmn.callback_select_roi,
                              enabled=False)
+
             dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox',default_value = False,
                              callback=mode_cmn.callback_select_autoroi,
                              enabled=False)
+
+            dpg.add_checkbox(label='Multiple Cells', tag='Multiple_Cells_checkbox', default_value = False,
+                             callback=mode_cmn.callback_select_autoroi,
+                             enabled=False)
+
 
     with dpg.table(header_row=False,
                    width=-1,
@@ -606,58 +616,7 @@ with dpg.window(label = 'Channel 1',
                ):
     
     dpg.add_separator(tag ='IMAGE_CH1_top_sep',show=True)
-    
-    
 
-
-    # with dpg.table(header_row=False, width=-1,borders_innerH=False, 
-    #                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
-    #                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-    #                                no_clip=True,tag='img_win_1_table',parent='image_window_1'):
-    #         # Add headers
-    #     dpg.add_table_column(label="",tag='img_win_1_table_col1', width = mode_init.img_win_1_table_col1['width'])
-    #     dpg.add_table_column(label="",tag='img_win_1_table_col2', width = mode_init.img_win_1_table_col2['width'])
-    #     dpg.add_table_column(label="",tag='img_win_1_table_col3', width = mode_init.img_win_1_table_col3['width'])
-    #     dpg.add_table_column(label="",tag='img_win_1_table_col4', width = mode_init.img_win_1_table_col4['width'])
-
-    #     # Add rows and columns
-    #     with dpg.table_row(tag='img_win_1_table_row1'):
-            # dpg.add_drag_float(tag = 'cell_thres_ratio_1',
-            #                    default_value = 1.0,
-            #                    max_value = 5.,
-            #                    min_value = 0.0,
-            #                    speed = 0.001,
-            #                    enabled = False,
-            #                    width = mode_init.cell_thres_ratio_1['width'],
-            #                    format = 'Thres. Cell: %.1f',
-            #                    callback = mode_cmn._update_textures_both_roi
-            #                   )
-            # with dpg.tooltip('cell_thres_ratio_1',tag='cell_thres_ratio_1_tooltip'):
-            #     dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_1_tooltip_text')
-
-
-            
-            # with dpg.group(tag='log_checkbox_group', horizontal=True,
-            #    horizontal_spacing=init.group_spacer,
-            #    show=True):
-            # dpg.add_checkbox(label='Nucleus', 
-            #                  tag='nucleus_search_1',
-            #                  default_value = False,
-            #                  enabled=False,
-            #                  # width=-1,
-            #                  callback=mode_cmn._update_textures_both_roi,
-            #                  # parent='image_window_1'
-            #                 )
-            # dpg.add_checkbox(label='Ch2\u21921', 
-            #                  tag='cp_roi_1',
-            #                  default_value = False,
-            #                  enabled=False,
-            #                  # width=-1,
-            #                  callback=mode_cmn._update_textures_both_roi,
-            #                  # parent='image_window_1'
-            #                 )
-            
-    
     
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
                                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
@@ -666,6 +625,26 @@ with dpg.window(label = 'Channel 1',
         dpg.add_table_column(label="",tag='img_win_1_table_2_col1', width = mode_init.img_win_1_table_2_col1['width'])
         dpg.add_table_column(label="",tag='img_win_1_table_2_col2', width = mode_init.img_win_1_table_2_col2['width'])
         dpg.add_table_column(label="",tag='img_win_1_table_2_col3', width = mode_init.img_win_1_table_2_col3['width'])
+
+        with dpg.table_row(tag='img_win_1_table_2_row0'):
+
+
+            dpg.add_button(
+                label="previous cell",  # Label for the button
+                tag="previous_cell_roi",  # Unique tag for the button
+                width=mode_init.img_roi_alpha_1['width'],  # Set width similar to drag_int
+                callback=mode_cmn._update_textures_both_roi)
+
+
+
+            dpg.add_button(
+                label="next cell",  # Label for the button
+                tag="next_cell_roi",  # Unique tag for the button
+                width=mode_init.img_roi_alpha_1['width'],  # Set width similar to drag_int
+                callback=mode_cmn.callback_next_cell_button)
+
+
+
         with dpg.table_row(tag='img_win_1_table_2_row1'):
             dpg.add_drag_float(tag='img_contrast_1',
                                    format = 'Contrast: %.1f',
@@ -688,6 +667,8 @@ with dpg.window(label = 'Channel 1',
                                    width=mode_init.img_Brightness_1['width'],
                                    callback=mode_cmn._update_textures_both_roi
                                   )
+
+
             dpg.add_drag_int(tag='img_roi_alpha_1',
                                    # label="Brightness",
                                    format ='ROI alpha: %.d\u0025',
@@ -699,6 +680,11 @@ with dpg.window(label = 'Channel 1',
                                    width=mode_init.img_roi_alpha_1['width'],
                                    callback=mode_cmn._update_textures_both_roi
                                   )
+
+
+
+
+
     dpg.add_separator(tag ='IMAGE_CH1_top_sep_2',show=True,parent='image_window_ch1',before='texture_CH_1')
     # shift=(dpg.get_item_width('image_window_ch1')-dpg.get_item_width(mode_init.tex_1_name))
     dpg.add_image(mode_init.tex_1_name,
@@ -755,59 +741,7 @@ with dpg.window(label = 'Channel 2',
                ):
     pass
     dpg.add_separator(tag ='IMAGE_CH2_top_sep',show=True)
-    
-    
 
-    
-    
-    
-    # with dpg.table(header_row=False, width=-1,borders_innerH=False, 
-    #                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
-    #                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-    #                                no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
-    #         # Add headers
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col1', width = mode_init.img_win_2_table_col1['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col2', width = mode_init.img_win_2_table_col2['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col3', width = mode_init.img_win_2_table_col3['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col4', width = mode_init.img_win_2_table_col4['width'])
-        
-
-    #     # Add rows and columns
-    #     with dpg.table_row(tag='img_win_2_table_row1'):
-            # dpg.add_drag_float(tag='cell_thres_ratio_2',
-            #                    default_value =1.0,
-            #                    max_value=5.,
-            #                    min_value=0.0,
-            #                    speed=0.001,
-            #                    width=mode_init.cell_thres_ratio_2['width'],
-            #                    enabled=False,
-            #                    format = 'Thres. Cell: %.1f',
-            #                    callback=mode_cmn._update_textures_both_roi
-            #                   )
-            # with dpg.tooltip('cell_thres_ratio_2',tag='cell_thres_ratio_2_tooltip'):
-            #     dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_2_tooltip_text')
-
-            
-            # with dpg.group(tag='log_checkbox_group', horizontal=True,
-            #    horizontal_spacing=init.group_spacer,
-            #    show=True):
-            # dpg.add_checkbox(label='Nucleus', 
-            #                  tag='nucleus_search_2',
-            #                  default_value = False,
-            #                  enabled=False,
-            #                  # width=-1,
-            #                  callback=mode_cmn._update_textures_both_roi,
-            #                  # parent='image_window_1'
-            #                 )
-            # dpg.add_checkbox(label='Ch1\u21922', 
-            #                  tag='cp_roi_2',
-            #                  default_value = False,
-            #                  enabled=False,
-            #                  # width=-1,
-            #                  callback=mode_cmn._update_textures_both_roi,
-            #                  # parent='image_window_1'
-            #                 )
-            # 
             
     
     with dpg.table(header_row=False, width=-1,borders_innerH=False, 
@@ -818,6 +752,22 @@ with dpg.window(label = 'Channel 2',
             dpg.add_table_column(label="",tag='img_win_2_table_2_col1', width = mode_init.img_win_2_table_2_col1['width'])
             dpg.add_table_column(label="",tag='img_win_2_table_2_col2', width = mode_init.img_win_2_table_2_col2['width'])
             dpg.add_table_column(label="",tag='img_win_2_table_2_col3', width = mode_init.img_win_2_table_2_col3['width'])
+
+            with dpg.table_row(tag='img_win_2_table_2_row0'):
+                dpg.add_button(
+                    label="previous cell",  # Label for the button
+                    tag="previous_cell_roi_2",  # Unique tag for the button
+                    width=mode_init.img_roi_alpha_1['width'],  # Set width similar to drag_int
+                    callback=mode_cmn._update_textures_both_roi)
+
+                dpg.add_button(
+                    label="next cell",  # Label for the button
+                    tag="next_cell_roi_2",  # Unique tag for the button
+                    width=mode_init.img_roi_alpha_1['width'],  # Set width similar to drag_int
+                    callback=mode_cmn._update_textures_both_roi)
+
+
+
             with dpg.table_row(tag='img_win_2_table_2_row1'):
                 
                 dpg.add_drag_float(tag='img_contrast_2',

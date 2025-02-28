@@ -3310,29 +3310,6 @@ class _Phot2conc_vars_funct:
 
 
     def _update_textures_both_roi(self,sender,app_data):
-        # global pkl_data#,_fin_im_size
-        # global processor_1,processor_2
-        # global tex_1_name,tex_2_name
-        # global Current_image_1,Current_image_2
-        # global image_1_times_roi, image_2_times_roi
-        # # global anal_file, PTU_directory, ROI_directory,roi_1,roi_2,last_directory
-        # # lnprint('static',time.time())
-        # ratio = {'width': np.round(dpg.get_viewport_width()/init_widths['VIEWPORT'],4),
-        #      'height': np.round(dpg.get_viewport_height()/init_heights['VIEWPORT'],4)} 
-        # ratio_w = ratio['width']
-    
-        # lprint(vars(self.processor_1).keys())
-        # lprint(vars(self.processor_2).keys())
-        
-        # w = (dpg.get_viewport_width()-left_indent-dpg.get_item_width('PTU_DATA_window')-5*internal_indent-init_widths['FCS_window']*ratio_w)//2
-        # h = w
-        # w = dpg.get_item_width(tex_1_name)
-        # h = dpg.get_item_height(tex_1_name)
-        # lnprint(w,h)
-        # _fin_im_size = (w,h)
-        # w = _fin_im_size[0] # int(np.round(dpg.get_item_width('image_window_ch1')))-int(np.round(15*ratio_w))
-        # h = _fin_im_size[1]
-        # ovrl = 15
     
         auto_roi = dpg.get_value('Auto_ROI_checkbox')
         file_roi = dpg.get_value('FILE_ROI_checkbox')
