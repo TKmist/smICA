@@ -2419,19 +2419,23 @@ class _Phot2conc_vars_funct:
     def callback_select_roi(self,sender,app_data):
         if dpg.get_value(sender):
             dpg.set_value('Auto_ROI_checkbox',False)
-            dpg.configure_item('cell_thres_ratio_1',enabled=False)
-            dpg.configure_item('nucleus_search_1',enabled=False)
-            dpg.configure_item('nucl_thres_ratio_1',enabled=False)
-            dpg.configure_item('cell_thres_ratio_2',enabled=False)
-            dpg.configure_item('nucleus_search_2',enabled=False)
-            dpg.configure_item('nucl_thres_ratio_2',enabled=False)
+            self.callback_select_autoroi('Auto_ROI_checkbox',False)
+            # dpg.configure_item('cell_thres_ratio_1',enabled=False)
+            # dpg.configure_item('nucleus_search_1',enabled=False)
+            # dpg.configure_item('nucl_thres_ratio_1',enabled=False)
+            # dpg.configure_item('cell_thres_ratio_2',enabled=False)
+            # dpg.configure_item('nucleus_search_2',enabled=False)
+            # dpg.configure_item('nucl_thres_ratio_2',enabled=False)
+            # dpg.configure_item('cp_roi_1',enabled=False)
+            # dpg.configure_item('cp_roi_2',enabled=False)
+            if self.ROI_directory!=None:
+                self.load_PTU_images(self.anal_file)
+                
+            else:
+                dpg.show_item('ROI_folder_dialog_id')
         else:
             pass
-        if self.ROI_directory!=None:
-            self.load_PTU_images(self.anal_file)
             
-        else:
-            dpg.show_item('ROI_folder_dialog_id')
 
     def callback_select_autoroi(self,sender,app_data):
         if dpg.get_value(sender):
@@ -2462,9 +2466,11 @@ class _Phot2conc_vars_funct:
             self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
             dpg.configure_item('file_window',
                                height=self.mode_init.file_window['height'])
+            # self.load_PTU_images(self.anal_file)
         
             
         else:
+            lprint(sender,dpg.get_value(sender))
             dpg.hide_item('auto_ROI_ch_table')
             dpg.configure_item('cell_thres_ratio_1',enabled=False)
             dpg.configure_item('nucl_thres_ratio_1',enabled=False)
@@ -2474,7 +2480,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('cell_thres_ratio_2',enabled=False)
             dpg.configure_item('nucl_thres_ratio_2',enabled=False)
             dpg.configure_item('ROI_mode_2',enabled=False)
-            dpg.configure_item('cp_roi_1',enabled=False)
+            dpg.configure_item('cp_roi_2',enabled=False)
             self.mode_init.file_box['num_items'] = 11
             self.mode_init.PTU_DATA_window['height'] = int(175*self.mode_init.size_ratio['height'])
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,self.mode_init.top_indent+self.mode_init.PTU_DATA_window['height']+self.mode_init.internal_indent)
@@ -2482,7 +2488,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('file_box',num_items=self.mode_init.file_box['num_items'])
             dpg.configure_item('PTU_DATA_window',height=self.mode_init.PTU_DATA_window['height'])
             dpg.configure_item('file_window',pos=self.mode_init.file_window['pos'])
-            lprint(dpg.get_item_height('PTU_DATA_window'))
+            # lprint(dpg.get_item_height('PTU_DATA_window'))
             self.mode_init.file_window['height'] = dpg.get_viewport_height()-(self.mode_init.top_indent+dpg.get_item_height('PTU_DATA_window')+self.mode_init.internal_indent+self.mode_init.bottom_indent)
             dpg.configure_item('file_window',height=self.mode_init.file_window['height'])
             
@@ -4014,7 +4020,8 @@ class _Phot2conc_vars_funct:
             self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
             
         else:
-            self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+            # self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
+            self.callback_select_roi('FILE_ROI_checkbox',pkl['ROI_mode'][0])
             
         
     
