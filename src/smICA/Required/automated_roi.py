@@ -110,18 +110,9 @@ class ImageROIProcessor:
         # Klasyfikacja konturów
             external_contour, internal_contour = self._classify_contours_by_area(contours, hierarchy)
 
-        # Dopasowanie elipsy i stworzenie maski ROI
-        # ellipse_mask = np.zeros(image_to_processshape, dtype=np.uint8)
-        # if self.find_nucleus and internal_contour is not None:
-        #     ellipse_mask, _ = self._fit_ellipse_to_contour(internal_contour, image_to_process.shape)
 
         # Tworzenie maski zewnętrznego konturu
             external_mask = self._create_external_mask(external_contour, image_to_process.shape)
-
-        # Łączenie masek w finalną ROI
-        # roi_image = self._create_final_mask(external_mask, ellipse_mask, image_to_process.shape)
-        # self.all_contours = contours
-        # self.all_hierarchy = hierarchy
 
         return external_mask
 
@@ -139,19 +130,7 @@ class ImageROIProcessor:
         full_mask = cell_roi-nucleus_roi
         return full_mask
         
-    # def invert_and_apply_mask(self):
-    #     """
-    #     Inverts the ROI mask and applies it to make the mask transparent where the mask is black and non-transparent where the mask is white.
-    #     """
-    #     if self.roi_image is None:
-    #         raise ValueError("ROI mask is not available. Ensure detect_roi() was called successfully.")
-    
-    #     # Invert the ROI mask: 0 becomes 255, and 255 becomes 0
-    #     inverted_mask = cv2.bitwise_not(self.roi_image)
 
-    #     return inverted_mask
-
-        
     def save_roi(self):
         """
         Zapisuje wynikowy obraz ROI do wyjściowej ścieżki.
@@ -207,6 +186,7 @@ class ImageROIProcessor:
         _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
     
         return dynamic_thresh
+
     @staticmethod
     def _classify_contours_by_area(contours, hierarchy):
         largest_external_contour = None
