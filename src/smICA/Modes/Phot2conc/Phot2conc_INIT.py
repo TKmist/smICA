@@ -2853,21 +2853,35 @@ class _Phot2conc_vars_funct:
             nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
             full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
         else:
-            full_mask = cell_roi_image.astype(np.uint8)
+            #full_mask = cell_roi_image.astype(np.uint8)
+            full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
 
         # Update texture
         self._update_texture(channel, disp, full_mask, contrast, brightness, ovrl)
 
-    def _update_texture(self, channel, disp, mask, contrast, brightness, ovrl):
+    # def _update_texture(self, channel, disp, mask, contrast, brightness, ovrl):
+    #     rgba_image = self.im_to_rgbim(disp)
+    #     rgb = rgba_image[..., :3]
+    #     adjusted_rgb = np.clip(rgb * contrast + brightness, 0, 1)
+    #     rgba_image[..., :3] = adjusted_rgb
+    #
+    #     if mask is not None:
+    #         rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), mask, ovrl)
+    #
+    #     self.rgba_to_dpgtex(rgba_image, np.max(disp), getattr(self, f'tex_{channel}_name'))
+
+    def _update_texture(self, channel, disp, masks, contrast, brightness, ovrl):
         rgba_image = self.im_to_rgbim(disp)
         rgb = rgba_image[..., :3]
         adjusted_rgb = np.clip(rgb * contrast + brightness, 0, 1)
         rgba_image[..., :3] = adjusted_rgb
 
-        if mask is not None:
-            rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), mask, ovrl)
+        if masks is not None:
+            for mask in masks:
+                rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), mask, ovrl)
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), getattr(self, f'tex_{channel}_name'))
+
 
     def _get_cell_roi(self, channel, processor, froi, cell_rat, cp_value, ui_state):
         other_channel = '2' if channel == '1' else '1'

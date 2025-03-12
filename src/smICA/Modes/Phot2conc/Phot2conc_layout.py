@@ -30,6 +30,7 @@ SOFTWARE.
 from Modes.Phot2conc.Phot2conc_INIT import _Phot2conc_init, _Phot2conc_vars_funct
 import numpy as np
 import cv2
+import dearpygui as dpg
 
 
 def Phot2conc_resizer(sender, app_data):
