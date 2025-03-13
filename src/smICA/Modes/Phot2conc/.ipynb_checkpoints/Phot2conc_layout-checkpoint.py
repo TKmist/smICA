@@ -131,7 +131,7 @@ def Phot2conc_resizer(sender,app_data):
     
     dpg.add_image(mode_init.tex_1_name,parent = 'image_window_ch1'
                           ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_1',indent=mode_init.shift)
-
+    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
     dpg.add_dynamic_texture(width=mode_init.image_window_ch2['width']-mode_init.im_scaller,
                         height=mode_init.image_window_ch2['width']-mode_init.im_scaller,
                     default_value=dpg_image_2,
@@ -140,7 +140,7 @@ def Phot2conc_resizer(sender,app_data):
     
     dpg.add_image(mode_init.tex_2_name,parent = 'image_window_ch2'
                           ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',indent=mode_init.shift)
-    
+    dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
     for item in init_resizable_items:
         # lprint(item)
@@ -705,8 +705,16 @@ with dpg.window(label = 'Channel 1',
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_1',indent=mode_init.shift)
+    
+    dpg.add_item_clicked_handler(tag = 'img1_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_1',None),parent='handler_image_1')
+    lprint(mode_init.tex_1_name)
 
-
+    
+    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
+    lprint(dpg.get_item_children('handler_image_1')[1][0])
+    lprint(dpg.get_item_alias(dpg.get_item_children('handler_image_1')[1][0]))
+    lprint(dpg.get_item_callback('img1_click_hand'))
+    
 # lprint(dpg.get_item_width('image_window_ch1'),dpg.get_item_width(mode_init.tex_1_name),shift)
 
 
@@ -736,7 +744,8 @@ globalITEMS.windows.extend(['image_window_ch1',
                             'img_win_1_table_2_row1',
                             'img_contrast_1',
                             'img_Brightness_1',
-                            'img_roi_alpha_1'
+                            'img_roi_alpha_1',
+                            'img1_click_hand'
                             
                            ])
 '''Image 2 window items'''
@@ -857,12 +866,15 @@ with dpg.window(label = 'Channel 2',
                                    callback=mode_cmn._update_textures_both_roi
                                   )
     dpg.add_separator(tag ='IMAGE_CH2_top_sep_2',show=True,parent='image_window_ch2',before='texture_CH_2')
+    
     dpg.add_image(mode_init.tex_2_name,
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_2',indent=mode_init.shift
                   # before='img_win_2_table'
                  )
+    dpg.add_item_clicked_handler(tag = 'img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None),parent='handler_image_2')
+    dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 globalITEMS.windows.extend(['image_window_ch2',
                             'IMAGE_CH2_top_sep',
                             'texture_CH_2',
@@ -887,7 +899,8 @@ globalITEMS.windows.extend(['image_window_ch2',
                             'img_win_2_table_2_row1',
                             'img_contrast_2',
                             'img_Brightness_2',
-                            'img_roi_alpha_2'
+                            'img_roi_alpha_2',
+                            'img2_click_hand'
                             
                            ])
 '''Histogram 1 window items'''

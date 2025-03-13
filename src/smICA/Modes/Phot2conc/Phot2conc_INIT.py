@@ -3315,6 +3315,37 @@ class _Phot2conc_vars_funct:
         dpg.set_value(tex_name, new_texture_data)
 
 
+    def on_image_click(self,sender, app_data, user_data):
+        lprint(sender,app_data,user_data)
+        image_tag, contours = user_data  # Unpack which texture and its contours
+        mouse_pos = dpg.get_mouse_pos()
+        image_pos = dpg.get_item_pos(image_tag)
+        # image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
+        # Compute relative click position
+        relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
+    
+        # # Check if click is within image bounds
+        # # if 0 <= relative_pos[0] < image_width and 0 <= relative_pos[1] < image_height:
+        # #     x, y = int(relative_pos[0]), int(relative_pos[1])
+            
+        # #     # Determine which shape (if any) was clicked
+        # #     clicked_shape = None
+        # #     for i, contour in enumerate(contours):
+        # #         if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
+        # #             clicked_shape = i + 1
+        # #             break
+            
+        # #     if clicked_shape:
+        # #         print(f"Clicked inside Shape {clicked_shape} in {image_tag} at position: ({x}, {y})")
+        # #     else:
+        # #         print(f"Click was outside all shapes in {image_tag} at position: ({x}, {y})")
+        # # else:
+        #     # print(f"Click was outside the image {image_tag}.")
+        print('image channel: ',image_tag)
+        print('mouse_pos: ',mouse_pos)
+        print('image_pos: ',image_pos)
+        print('relative_pos: ',relative_pos)
+
     def _update_textures_both_roi(self,sender,app_data):
         # global pkl_data#,_fin_im_size
         # global processor_1,processor_2

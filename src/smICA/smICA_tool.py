@@ -96,7 +96,7 @@ inf_w, inf_h = get_monitors()[0].width, get_monitors()[0].height
 dpg.create_context()
 execfile('Required/Themes.py')             # Load the themes definitions.
 execfile('Required/Fonts.py') 
-# execfile('dep/Handlers.py') 
+execfile('Required/Handlers.py') 
 
 
 dpg.create_viewport(title='smICA',small_icon = inV.icopath(),width=viewport['width'], height=viewport['height'],x_pos=viewport['pos'][0],y_pos  =viewport['pos'][1]) 
