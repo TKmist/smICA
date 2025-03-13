@@ -2900,6 +2900,21 @@ class _Phot2conc_vars_funct:
         setattr(self, image_times_roi, processor.image)
         self.rgba_to_dpgtex(rgba_image, np.max(disp), tex_name)
 
+    def on_image_click(self, sender, app_data, user_data):
+        lprint(sender, app_data, user_data)
+        image_tag, contours = user_data  # Unpack which texture and its contours
+        mouse_pos = dpg.get_mouse_pos()
+        image_pos = dpg.get_item_pos(image_tag)
+        # image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
+        # Compute relative click position
+        relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
+
+        print('image channel: ', image_tag)
+        print('mouse_pos: ', mouse_pos)
+        print('image_pos: ', image_pos)
+        print('relative_pos: ', relative_pos)
+
+
 
     def load_ROI(self, path):
         df = pd.read_csv(path, sep='\t', header=None, skiprows=3, encoding='latin1')

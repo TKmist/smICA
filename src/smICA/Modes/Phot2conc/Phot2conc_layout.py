@@ -123,6 +123,8 @@ def Phot2conc_resizer(sender, app_data):
     dpg.add_image(mode_init.tex_1_name, parent='image_window_ch1'
                   , uv_min=(0, 0), uv_max=(1, 1), tag='texture_CH_1', indent=mode_init.shift)
 
+    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
+
     dpg.add_dynamic_texture(width=mode_init.image_window_ch2['width'] - mode_init.im_scaller,
                             height=mode_init.image_window_ch2['width'] - mode_init.im_scaller,
                             default_value=dpg_image_2,
@@ -131,6 +133,8 @@ def Phot2conc_resizer(sender, app_data):
 
     dpg.add_image(mode_init.tex_2_name, parent='image_window_ch2'
                   , uv_min=(0, 0), uv_max=(1, 1), tag='texture_CH_2', indent=mode_init.shift)
+
+    dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
     for item in init_resizable_items:
         # lprint(item)
@@ -570,15 +574,6 @@ globalITEMS.windows.extend(['file_window',
 '''Image 1 window items'''
 
 
-def toggle_checkbox(a, b, c):
-
-    dpg.set_value('Photons_array_checkbox', not dpg.get_value('Photons_array_checkbox'))
-
-
-
-with dpg.item_handler_registry(tag="image_handler"):
-    dpg.add_item_clicked_handler(callback=toggle_checkbox, user_data='texture_CH_1')
-
 
 with dpg.window(label='Channel 1',
                 tag='image_window_ch1',
@@ -599,11 +594,10 @@ with dpg.window(label='Channel 1',
                   uv_max=(1, 1),
                   tag='texture_CH_1', indent=mode_init.shift)
 
+    dpg.add_item_clicked_handler(tag='img1_click_hand', callback=mode_cmn.on_image_click,
+                                 user_data=('texture_CH_1', None), parent='handler_image_1')
 
-    dpg.bind_item_handler_registry('texture_CH_1', "image_handler")
-
-
-
+    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
 
     dpg.add_separator(tag='IMAGE_CH1_top_sep', show=True)
 
@@ -704,52 +698,6 @@ with dpg.window(label='Channel 2',
     pass
     dpg.add_separator(tag='IMAGE_CH2_top_sep', show=True)
 
-    # with dpg.table(header_row=False, width=-1,borders_innerH=False,
-    #                                borders_outerH=False, borders_innerV=False, borders_outerV=False,
-    #                                no_pad_innerX=False,no_pad_outerX=True,no_host_extendX=True,
-    #                                no_clip=True,tag='img_win_2_table',parent='image_window_ch2'):
-    #         # Add headers
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col1', width = mode_init.img_win_2_table_col1['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col2', width = mode_init.img_win_2_table_col2['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col3', width = mode_init.img_win_2_table_col3['width'])
-    #     dpg.add_table_column(label="",tag='img_win_2_table_col4', width = mode_init.img_win_2_table_col4['width'])
-
-    #     # Add rows and columns
-    #     with dpg.table_row(tag='img_win_2_table_row1'):
-    # dpg.add_drag_float(tag='cell_thres_ratio_2',
-    #                    default_value =1.0,
-    #                    max_value=5.,
-    #                    min_value=0.0,
-    #                    speed=0.001,
-    #                    width=mode_init.cell_thres_ratio_2['width'],
-    #                    enabled=False,
-    #                    format = 'Thres. Cell: %.1f',
-    #                    callback=mode_cmn._update_textures_both_roi
-    #                   )
-    # with dpg.tooltip('cell_thres_ratio_2',tag='cell_thres_ratio_2_tooltip'):
-    #     dpg.add_text("Set threshold to detect cell.",tag='cell_thres_ratio_2_tooltip_text')
-
-    # with dpg.group(tag='log_checkbox_group', horizontal=True,
-    #    horizontal_spacing=init.group_spacer,
-    #    show=True):
-    # dpg.add_checkbox(label='Nucleus',
-    #                  tag='nucleus_search_2',
-    #                  default_value = False,
-    #                  enabled=False,
-    #                  # width=-1,
-    #                  callback=mode_cmn._update_textures_both_roi,
-    #                  # parent='image_window_1'
-    #                 )
-    # dpg.add_checkbox(label='Ch1\u21922',
-    #                  tag='cp_roi_2',
-    #                  default_value = False,
-    #                  enabled=False,
-    #                  # width=-1,
-    #                  callback=mode_cmn._update_textures_both_roi,
-    #                  # parent='image_window_1'
-    #                 )
-    #
-
     with dpg.table(header_row=False, width=-1, borders_innerH=False,
                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                    no_pad_innerX=False, no_pad_outerX=True, no_host_extendX=True,
@@ -802,6 +750,10 @@ with dpg.window(label='Channel 2',
                   tag='texture_CH_2', indent=mode_init.shift
                   # before='img_win_2_table'
                   )
+
+    dpg.add_item_clicked_handler(tag = 'img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
+    dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
+
 globalITEMS.windows.extend(['image_window_ch2',
                             'IMAGE_CH2_top_sep',
                             'texture_CH_2',
