@@ -43,6 +43,9 @@ texture_data[:] = opencv_image_with_alpha
 
 # Callback to get pixel position and value and limit click to shapes
 def on_image_click(sender, app_data, user_data):
+
+    print('ok')
+
     # Get the global mouse position
     mouse_pos = dpg.get_mouse_pos()
     

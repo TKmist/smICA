@@ -2849,26 +2849,21 @@ class _Phot2conc_vars_funct:
         # ROI detection logic
         cell_roi_image = self._get_cell_roi(channel, processor, froi, cell_rat, cp_value, ui_state)
 
+
         if find_roi_mode == 'Subtract nucleus':
             nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
             full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
         else:
             #full_mask = cell_roi_image.astype(np.uint8)
+
+            # if not isinstance(cell_roi_image, (list, tuple)):
+            #     cell_roi_image = [cell_roi_image]  # Convert single element to a list
+
             full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
 
         # Update texture
         self._update_texture(channel, disp, full_mask, contrast, brightness, ovrl)
 
-    # def _update_texture(self, channel, disp, mask, contrast, brightness, ovrl):
-    #     rgba_image = self.im_to_rgbim(disp)
-    #     rgb = rgba_image[..., :3]
-    #     adjusted_rgb = np.clip(rgb * contrast + brightness, 0, 1)
-    #     rgba_image[..., :3] = adjusted_rgb
-    #
-    #     if mask is not None:
-    #         rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), mask, ovrl)
-    #
-    #     self.rgba_to_dpgtex(rgba_image, np.max(disp), getattr(self, f'tex_{channel}_name'))
 
     def _update_texture(self, channel, disp, masks, contrast, brightness, ovrl):
         rgba_image = self.im_to_rgbim(disp)
@@ -2884,11 +2879,19 @@ class _Phot2conc_vars_funct:
 
 
     def _get_cell_roi(self, channel, processor, froi, cell_rat, cp_value, ui_state):
+
         other_channel = '2' if channel == '1' else '1'
         # not sure we need this if statement
         if cp_value and hasattr(getattr(self, f'processor_{other_channel}'), 'roi_mask'):
             return getattr(self, f'processor_{other_channel}').roi_mask
-        return processor.detect_cell_roi(froi, cell_rat)
+
+        cell_roi = processor.detect_cell_roi(froi, cell_rat)
+
+        if ui_state['multiple_cells_checkbox'] == False:
+
+            cell_roi = [cell_roi[0]]
+
+        return cell_roi
 
     def _process_no_roi(self, channel, processor, disp, contrast, brightness, tex_name, image_times_roi):
         rgba_image = self.im_to_rgbim(disp)
