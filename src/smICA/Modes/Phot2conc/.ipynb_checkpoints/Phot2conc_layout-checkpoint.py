@@ -705,7 +705,7 @@ with dpg.window(label = 'Channel 1',
                   uv_min=(0,0),
                   uv_max=(1,1),
                   tag = 'texture_CH_1',indent=mode_init.shift)
-    
+    dpg.add_item_hover_handler(tag = 'img1_hover_hand',callback=mode_cmn.onHover, user_data="texture_CH_1",parent='handler_image_1')
     dpg.add_item_clicked_handler(tag = 'img1_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_1',None),parent='handler_image_1')
     lprint(mode_init.tex_1_name)
 
@@ -873,6 +873,7 @@ with dpg.window(label = 'Channel 2',
                   tag = 'texture_CH_2',indent=mode_init.shift
                   # before='img_win_2_table'
                  )
+    dpg.add_item_hover_handler(tag = 'img2_hover_hand',callback=mode_cmn.onHover, user_data="texture_CH_2",parent='handler_image_2')
     dpg.add_item_clicked_handler(tag = 'img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None),parent='handler_image_2')
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 globalITEMS.windows.extend(['image_window_ch2',

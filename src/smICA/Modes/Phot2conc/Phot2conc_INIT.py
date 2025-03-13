@@ -3314,33 +3314,56 @@ class _Phot2conc_vars_funct:
         new_texture_data = rgba_image.flatten().tolist()
         dpg.set_value(tex_name, new_texture_data)
 
+    def onHover(self,sender, app_data, user_data):
+        # global mouse_pos
+        dpg.focus_item(user_data)
+        # mouse_pos = dpg.get_mouse_pos()
+        # print(mouse_pos)
+        pass
 
     def on_image_click(self,sender, app_data, user_data):
         lprint(sender,app_data,user_data)
         image_tag, contours = user_data  # Unpack which texture and its contours
         mouse_pos = dpg.get_mouse_pos()
         image_pos = dpg.get_item_pos(image_tag)
-        # image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
+        
         # Compute relative click position
+        print(image_tag,self.tex_1_name)
+        if image_tag == 'texture_CH_1':
+            texture_image =self.tex_1_name
+        elif image_tag == 'texture_CH_2':
+            texture_image =self.tex_2_name
+        image_width = dpg.get_item_width(texture_image)
+        image_height = dpg.get_item_height(texture_image)
+        image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
+
+        height_delta=dpg.get_item_height(image_tag)-dpg.get_item_height(texture_image)
+        print(height_delta)
+        image_pos[1]=image_pos[1]-self.mode_init.im_scaller#height_delta
+        print(self.mode_init.im_scaller)
         relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
-    
-        # # Check if click is within image bounds
-        # # if 0 <= relative_pos[0] < image_width and 0 <= relative_pos[1] < image_height:
-        # #     x, y = int(relative_pos[0]), int(relative_pos[1])
+        
+        
+        print('image:',dpg.get_item_width(image_tag),dpg.get_item_height(image_tag))
+        print('texture:',image_width,image_height)
+        # Check if click is within image bounds
+        if 0 <= relative_pos[0] < image_width and 0 <= relative_pos[1] < image_height:
+            x, y = int(relative_pos[0]), int(relative_pos[1])
             
-        # #     # Determine which shape (if any) was clicked
-        # #     clicked_shape = None
-        # #     for i, contour in enumerate(contours):
-        # #         if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
-        # #             clicked_shape = i + 1
-        # #             break
+            # Determine which shape (if any) was clicked
+            clicked_shape = None
+            if type(contours) is not type(None) and len(contours)>0:
+                for i, contour in enumerate(contours):
+                    if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
+                        clicked_shape = i + 1
+                        break
             
-        # #     if clicked_shape:
-        # #         print(f"Clicked inside Shape {clicked_shape} in {image_tag} at position: ({x}, {y})")
-        # #     else:
-        # #         print(f"Click was outside all shapes in {image_tag} at position: ({x}, {y})")
-        # # else:
-        #     # print(f"Click was outside the image {image_tag}.")
+            if clicked_shape:
+                print(f"Clicked inside Shape {clicked_shape} in {image_tag} at position: ({x}, {y})")
+            else:
+                print(f"Click was outside all shapes in {image_tag} at position: ({x}, {y})")
+        else:
+            print(f"Click was outside the image {image_tag}.")
         print('image channel: ',image_tag)
         print('mouse_pos: ',mouse_pos)
         print('image_pos: ',image_pos)

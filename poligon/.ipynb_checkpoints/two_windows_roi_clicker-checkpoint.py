@@ -2,6 +2,7 @@ import numpy as np
 
 import dearpygui.dearpygui as dpg
 import cv2
+import time
 # Texture dimensions
 image_width, image_height = 512, 512
 
@@ -40,16 +41,47 @@ contours_2 = [
 # Generate texture images
 texture_data_1 = create_texture_with_contours(contours_1)
 texture_data_2 = create_texture_with_contours(contours_2)
-
+mouse_pos=None
+def onHover(sender, app_data, user_data):
+    # global mouse_pos
+    dpg.focus_item(user_data[0])
+    mouse_pos = dpg.get_mouse_pos()
+    print(mouse_pos)
+    pass
+click_data = {}   
 # Click handler function
 def on_image_click(sender, app_data, user_data):
+    # global click_data
+    # print(sender,dpg.get_item_alias(sender))
+    # global mouse_pos
+    # print(mouse_pos)
+    # print(click_data)
+    # current_time = time.time()
+    
     image_tag, contours = user_data  # Unpack which texture and its contours
-    mouse_pos = dpg.get_mouse_pos()
+
+    # if image_tag not in click_data:
+    #     click_data[image_tag] = {"count": 0, "last_time": 0}
+    
+    # click_info = click_data[image_tag]
+    # click_info["count"] += 1
+
+    # # If first click, start waiting for second click
+    # if click_info["count"] == 1:
+    #     click_info["last_time"] = current_time
+    #     return  # Do nothing on first click
+
+    # # If second click happens within 0.3s, proceed
+    # if click_info["count"] == 2 and (current_time - click_info["last_time"]) < 0.5:
+    #     click_info["count"] = 0  # Reset counter after double click
+    mouse_pos = dpg.get_mouse_pos(local=True)
+    print(dpg.get_item_alias(dpg.get_active_window()))
+    mouse_pos1 = dpg.get_mouse_pos(local=False)
     image_pos = dpg.get_item_pos(image_tag)
-    image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
+    # image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
     # Compute relative click position
     relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
-
+    
     # Check if click is within image bounds
     if 0 <= relative_pos[0] < image_width and 0 <= relative_pos[1] < image_height:
         x, y = int(relative_pos[0]), int(relative_pos[1])
@@ -67,7 +99,11 @@ def on_image_click(sender, app_data, user_data):
             print(f"Click was outside all shapes in {image_tag} at position: ({x}, {y})")
     else:
         print(f"Click was outside the image {image_tag}.")
-
+    print('image channel: ',image_tag)
+    print('mouse_pos: ',mouse_pos)
+    print('mouse_pos1: ',mouse_pos1)
+    print('image_pos: ',image_pos)
+    print('relative_pos: ',relative_pos)
 # Setup Dear PyGui context
 dpg.create_context()
 dpg.create_viewport(title='Multiple Image Windows', width=1200, height=600)
@@ -80,10 +116,11 @@ with dpg.texture_registry():
 
 # Create handler registries for each image
 with dpg.item_handler_registry(tag="image_handler_1"):
-    pass
+    dpg.add_item_hover_handler(callback=onHover, user_data=("texture_CH_1", contours_1))
     
 
 with dpg.item_handler_registry(tag="image_handler_2"):
+    dpg.add_item_hover_handler(callback=onHover,user_data=("texture_CH_2", contours_2))
     pass
     
 
@@ -91,13 +128,13 @@ with dpg.item_handler_registry(tag="image_handler_2"):
 with dpg.window(label="Image Window 1", tag="image_window_1", pos=(50, 50)):
     dpg.add_image("cnt_texture_CH_1", tag="texture_CH_1",uv_min=(0,0),
                   uv_max=(1,1),indent=8)
-    # dpg.add_item_clicked_handler(callback=on_image_click, user_data=("texture_CH_1", contours_1),parent = 'image_handler_1')
-    dpg.add_item_clicked_handler(callback=lambda: print('dupa'), user_data=("texture_CH_1", contours_1),parent = 'image_handler_1')
+    dpg.add_item_clicked_handler(tag='img1_hand',callback=on_image_click, user_data=("texture_CH_1", contours_1),parent = 'image_handler_1')
+    # dpg.add_item_clicked_handler(callback=lambda: print('dupa'), user_data=("texture_CH_1", contours_1),parent = 'image_handler_1')
     dpg.bind_item_handler_registry("texture_CH_1", "image_handler_1")
 
 with dpg.window(label="Image Window 2", tag="image_window_2", pos=(600, 50)):
     dpg.add_image("cnt_texture_CH_2", tag="texture_CH_2")
-    dpg.add_item_clicked_handler(callback=on_image_click, user_data=("texture_CH_2", contours_2),parent = 'image_handler_2')
+    dpg.add_item_clicked_handler(tag='img2_hand',callback=on_image_click, user_data=("texture_CH_2", contours_2),parent = 'image_handler_2')
     dpg.bind_item_handler_registry("texture_CH_2", "image_handler_2")
 
 # Set the viewport
