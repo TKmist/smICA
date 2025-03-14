@@ -142,6 +142,11 @@ def Phot2conc_resizer(sender,app_data):
                           ,uv_min=(0,0),uv_max=(1,1),tag = 'texture_CH_2',indent=mode_init.shift)
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
+    # lprint(mode_cmn.img_height_shift['shift'])
+    mode_cmn.img_height_shift['shift']=int(np.round(24*mode_init.size_ratio['height']))
+    # lprint(mode_init.size_ratio['width'])
+    # lprint(mode_cmn.img_height_shift['shift'])                                 
+                            
     for item in init_resizable_items:
         # lprint(item)
         props =eval('mode_init.'+item) 

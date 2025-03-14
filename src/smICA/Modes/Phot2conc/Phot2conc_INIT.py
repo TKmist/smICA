@@ -597,6 +597,7 @@ class _Phot2conc_init:
                             'height':int(600*self.size_ratio['width'])
                                  
                             }
+        
     
     def im_to_rgbim(self,im):
         '''Converts grayscale image into rgba(float) image.'''
@@ -689,6 +690,10 @@ class _Phot2conc_vars_funct:
         self.roi_1 = None
         self.roi_2 = None
 
+        self.img_height_shift = {'name':'img_height_shift',
+                            'shift':int(24*self.size_ratio['height'])
+                                 
+                            }
         
 
     
@@ -3336,11 +3341,13 @@ class _Phot2conc_vars_funct:
         image_width = dpg.get_item_width(texture_image)
         image_height = dpg.get_item_height(texture_image)
         image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
-
+        # lprint(self.img_height_shift)
+        # lprint(dpg.get_item_pos('img_Brightness_1'))
+        # lprint(image_pos[1]-self.img_height_shift['shift'])
         height_delta=dpg.get_item_height(image_tag)-dpg.get_item_height(texture_image)
-        print(height_delta)
-        image_pos[1]=image_pos[1]-self.mode_init.im_scaller#height_delta
-        print(self.mode_init.im_scaller)
+        # print(height_delta)
+        image_pos[1]=image_pos[1]-self.img_height_shift['shift']#-self.mode_init.im_scaller#height_delta
+        # print(self.mode_init.im_scaller)
         relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
         
         

@@ -206,7 +206,7 @@ class _basicF:
                           tag='Analysis_submenu_item_Phot2conc',
                           callback=self.P2C_manu_F.callback_PHOT2CONC_menu)
         
-        dpg.maximize_viewport()
+        # dpg.maximize_viewport()
 
     def unmount_inint_buttons(self):
         dpg.hide_item('initial_window')
