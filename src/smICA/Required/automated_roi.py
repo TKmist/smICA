@@ -33,6 +33,7 @@ import numpy as np
 from tqdm import tqdm
 import pickle
 
+
 class ImageROIProcessor:
     def __init__(self):
         """
@@ -45,7 +46,6 @@ class ImageROIProcessor:
         self.roi_image = None
         self.all_contours = None
         self.all_hierarchy = None
-        
 
     def load_image(self):
         """
@@ -61,8 +61,7 @@ class ImageROIProcessor:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
 
 
-
-    def detect_cell_roi(self,image_to_process,ratio):
+    def detect_cell_roi(self, image_to_process, ratio):
         """
         Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
         """
@@ -70,7 +69,7 @@ class ImageROIProcessor:
             raise ValueError("Obraz nie został załadowany. Użyj metody load_image().")
 
         # Preprocessing: rozmycie i progowanie
-        thresholded = self._preprocess_image_dynamic(image_to_process,ratio)
+        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
 
         # Znajdowanie konturów
         contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
@@ -78,29 +77,29 @@ class ImageROIProcessor:
             # raise ValueError("Nie znaleziono konturów w obrazie.")
             external_mask = self._create_external_mask(None, image_to_process.shape)
         else:
-        # Klasyfikacja konturów
+            # Klasyfikacja konturów
             external_contour = self._classify_contours_by_area(contours, hierarchy)
 
-
-        # Tworzenie maski zewnętrznego konturu
+            # Tworzenie maski zewnętrznego konturu
             external_mask = self._create_external_mask(external_contour, image_to_process.shape)
+
+            self.all_contours = list(external_contour)
 
         return external_mask
 
-    def detect_nucleus_roi(self,original_image,cell_roi,ratio):
-        
-        processed_image = cv2.bitwise_not(original_image)*(cell_roi).astype(int)
+    def detect_nucleus_roi(self, original_image, cell_roi, ratio):
+
+        processed_image = cv2.bitwise_not(original_image) * (cell_roi).astype(int)
         # print(processed_image)
         processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
-        
-        nucleus_roi = self.detect_cell_roi(processed_image,ratio)
+
+        nucleus_roi = self.detect_cell_roi(processed_image, ratio)
         return nucleus_roi
 
-    def make_full_roi(self,cell_roi,nucleus_roi):
-        
-        full_mask = cell_roi-nucleus_roi
+    def make_full_roi(self, cell_roi, nucleus_roi):
+
+        full_mask = cell_roi - nucleus_roi
         return full_mask
-        
 
     def save_roi(self):
         """
@@ -113,12 +112,10 @@ class ImageROIProcessor:
         formatted_array = np.where(self.roi_image == 0, '-', '1')
         np.savetxt(self.output_path.replace('.png', '.dat'), formatted_array, fmt='%s', delimiter='\t')
 
-
         return 0
 
-
     @staticmethod
-    def _preprocess_image_dynamic(image,ratio):
+    def _preprocess_image_dynamic(image, ratio):
         """
         Preprocess the image: reduce noise, blure and apply thresholding.
         """
@@ -128,12 +125,12 @@ class ImageROIProcessor:
 
         # Step 3: Adaptive thresholding or Otsu's method
         _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    
+
         # Optional: Modify the threshold dynamically based on the Otsu result
         # If you want to increase or decrease the threshold level
         dynamic_threshold = _ * ratio  # Example: Increase the threshold by 20%
         _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
-    
+
         return dynamic_thresh
 
     # @staticmethod
@@ -224,6 +221,7 @@ class ImageROIProcessor:
             return [contour for (area, contour) in external_contours[:top_n]]
         else:
             return [contour for (area, contour) in external_contours]
+
     @staticmethod
     def _create_external_mask(external_contours, image_shape):
         masks = []
@@ -241,5 +239,3 @@ class ImageROIProcessor:
         final_mask = np.zeros(image_shape, dtype=np.uint8)
         final_mask[mask_between == 255] = 1
         return final_mask
-
-

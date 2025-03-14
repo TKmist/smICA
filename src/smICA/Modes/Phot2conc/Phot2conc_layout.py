@@ -751,7 +751,7 @@ with dpg.window(label='Channel 2',
                   # before='img_win_2_table'
                   )
 
-    dpg.add_item_clicked_handler(tag = 'img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
+    dpg.add_item_clicked_handler(tag='img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
 globalITEMS.windows.extend(['image_window_ch2',

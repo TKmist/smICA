@@ -121,7 +121,8 @@ class _Phot2conc_init:
                             'height': dpg.get_viewport_height() - (self.top_indent + self.PTU_DATA_window[
                                 'height'] + self.internal_indent + self.bottom_indent),
                             'pos': (
-                            self.left_indent, self.top_indent + self.PTU_DATA_window['height'] + self.internal_indent)
+                                self.left_indent,
+                                self.top_indent + self.PTU_DATA_window['height'] + self.internal_indent)
                             }
         self.image_window_ch1 = {'name': 'image_window_ch1',
                                  'width': int(386 * self.size_ratio['width']),
@@ -188,8 +189,8 @@ class _Phot2conc_init:
                                 'width': self.image_window_ch1['width'],
                                 # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
                                 'height': dpg.get_viewport_height() - (
-                                            self.image_window_ch1['pos'][1] + self.image_window_ch1[
-                                        'height'] + self.internal_indent + self.bottom_indent),
+                                        self.image_window_ch1['pos'][1] + self.image_window_ch1[
+                                    'height'] + self.internal_indent + self.bottom_indent),
                                 # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
                                 #        2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
                                 'pos': (self.image_window_ch1['pos'][0],
@@ -204,8 +205,8 @@ class _Phot2conc_init:
                                 # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
                                 #        2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
                                 'height': dpg.get_viewport_height() - (
-                                            self.image_window_ch2['pos'][1] + self.image_window_ch2[
-                                        'height'] + self.internal_indent + self.bottom_indent),
+                                        self.image_window_ch2['pos'][1] + self.image_window_ch2[
+                                    'height'] + self.internal_indent + self.bottom_indent),
 
                                 'pos': (self.image_window_ch2['pos'][0],
                                         self.image_window_ch2['pos'][1] + self.image_window_ch2[
@@ -701,6 +702,7 @@ class _Phot2conc_vars_funct:
         self.processor_2 = self.mode_init.processor_2
         self.Current_image_1 = self.processor_1.image
         self.Current_image_2 = self.processor_2.image
+
         self.pkl_data = None
 
         self.im_to_rgbim = self.mode_init.im_to_rgbim
@@ -2151,7 +2153,6 @@ class _Phot2conc_vars_funct:
         '''Empty function. Do nothing.'''
         pass
 
-
     def callback_kappa_err_input(self, sender, app_data):
 
         if sender == 'kappa_err_input_ch_1':
@@ -2390,8 +2391,8 @@ class _Phot2conc_vars_funct:
             # lprint(dpg.get_item_height('PTU_DATA_window'))
 
             self.mode_init.file_window['height'] = dpg.get_viewport_height() - (
-                        self.mode_init.top_indent + dpg.get_item_height(
-                    'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
+                    self.mode_init.top_indent + dpg.get_item_height(
+                'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
             dpg.configure_item('file_window',
                                height=self.mode_init.file_window['height'])
             # self.load_PTU_images(self.anal_file)
@@ -2420,12 +2421,11 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('file_window', pos=self.mode_init.file_window['pos'])
             # lprint(dpg.get_item_height('PTU_DATA_window'))
             self.mode_init.file_window['height'] = dpg.get_viewport_height() - (
-                        self.mode_init.top_indent + dpg.get_item_height(
-                    'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
+                    self.mode_init.top_indent + dpg.get_item_height(
+                'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
             dpg.configure_item('file_window', height=self.mode_init.file_window['height'])
 
         self.load_PTU_images(self.anal_file)
-
 
     def display_images(self, channel):
 
@@ -2438,8 +2438,6 @@ class _Phot2conc_vars_funct:
         elif channel == 'both':
             self._update_textures_both_roi('ch1', None)
             self._update_textures_both_roi('ch2', None)
-
-
 
     def hide_histograms(self):
         dpg.set_value('c_dist_ser_ch_1', (np.empty(2), np.empty(2)))
@@ -2480,7 +2478,6 @@ class _Phot2conc_vars_funct:
         dpg.hide_item('hist_np_plot_ch2')
         dpg.hide_item('hist_phot_plot_ch2')
 
-
     def import_ROI(self, sender, app_data, user_data):
 
         # global DF, DF2,pck_list,roi_1,roi_2
@@ -2518,8 +2515,6 @@ class _Phot2conc_vars_funct:
         else:
             # self.display_images([self.DF],chan)
             self.display_images(chan)
-
-
 
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
@@ -2785,135 +2780,148 @@ class _Phot2conc_vars_funct:
         new_texture_data = rgba_image.flatten().tolist()
         dpg.set_value(tex_name, new_texture_data)
 
-
-
-    def _update_textures_both_roi(self, sender, app_data):
-        # Cache UI states upfront
-        ui_state = {
+    def get_ui_state(self, channel):
+        """Get UI state parameters for a specific channel"""
+        return {
             'auto_roi': dpg.get_value('Auto_ROI_checkbox'),
             'file_roi': dpg.get_value('FILE_ROI_checkbox'),
-            'cp_1': dpg.get_value('cp_roi_1'),
-            'cp_2': dpg.get_value('cp_roi_2'),
-            'multiple_cells_checkbox': dpg.get_value('multiple_cells_checkbox')
+            'cp': dpg.get_value(f'cp_roi_{channel}'),
+            'multiple_cells_checkbox': dpg.get_value('multiple_cells_checkbox'),
+            'processor': getattr(self, f'processor_{channel}'),
+            'tex_name': getattr(self, f'tex_{channel}_name'),
+            'image_times_roi': f'image_{channel}_times_roi',
+            'contrast': dpg.get_value(f'img_contrast_{channel}'),
+            'brightness': dpg.get_value(f'img_Brightness_{channel}') / 255,
+            'ovrl': dpg.get_value(f'img_roi_alpha_{channel}'),
+            'cell_thres_ratio': dpg.get_value(f'cell_thres_ratio_{channel}'),
+            'nucl_thres_ratio': dpg.get_value(f'nucl_thres_ratio_{channel}'),
+            'find_roi_mode': dpg.get_value(f'ROI_mode_{channel}')
         }
 
+    def process_channel(self, channel, ui_state):
+        """Process image channel using centralized UI state"""
+        processor = ui_state['processor']
+        disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+
+        if ui_state['auto_roi']:
+            self._process_auto_roi(channel, disp, ui_state)
+        elif ui_state['file_roi']:
+            self._process_file_roi(channel, disp, ui_state)
+        else:
+            self._process_no_roi(channel, disp, ui_state)
+
+    def _update_textures_both_roi(self, sender, app_data):
+        """Handle texture updates with proper state management"""
         # Handle checkbox mutual exclusion
         if sender.startswith('cp_roi_'):
             with dpg.mutex():
-                target, other = ('cp_1', 'cp_2') if sender.endswith('1') else ('cp_2', 'cp_1')
+                target_channel = sender[-1]
+                other_channel = '2' if target_channel == '1' else '1'
                 if dpg.get_value(sender):
-                    dpg.set_value(f'cp_roi_{other[-1]}', False)
-                    ui_state[other] = False
-                    ui_state[target] = True
-
-        # Unified channel processing
-        def process_channel(channel):
-            # Get channel-specific values
-            processor = getattr(self, f'processor_{channel}')
-            tex_name = getattr(self, f'tex_{channel}_name')
-            image_times_roi = f'image_{channel}_times_roi'
-
-            # Common parameters
-            contrast = dpg.get_value(f'img_contrast_{channel}')
-            brightness = dpg.get_value(f'img_Brightness_{channel}') / 255
-            ovrl = dpg.get_value(f'img_roi_alpha_{channel}')
-            disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-
-            # ROI mode determination
-            if ui_state['auto_roi']:
-                self._process_auto_roi(channel, processor, disp, contrast, brightness, ovrl, ui_state)
-            elif ui_state['file_roi']:
-                self._process_file_roi(channel, processor, disp, contrast, brightness, ovrl)
-            else:
-                self._process_no_roi(channel, processor, disp, contrast, brightness, tex_name, image_times_roi)
+                    dpg.set_value(f'cp_roi_{other_channel}', False)
 
         # Determine which channels to update
         if sender.endswith(('1', '2')):
-            process_channel(sender[-1])
-        else:  # Update both if needed
-            process_channel('1')
-            process_channel('2')
+            channel = sender[-1]
+            self.process_channel(channel, self.get_ui_state(channel))
+        else:
+            for channel in ['1', '2']:
+                self.process_channel(channel, self.get_ui_state(channel))
 
         self.callback_calculate(sender, None)
 
-    # Helper methods
-    def _process_auto_roi(self, channel, processor, disp, contrast, brightness, ovrl, ui_state):
-        cp_value = ui_state[f'cp_{channel}']
-        find_roi_mode = dpg.get_value(f'ROI_mode_{channel}')
-
-        # Unified ROI detection
+    def _process_auto_roi(self, channel, disp, ui_state):
+        """Handle auto ROI processing using UI state"""
+        processor = ui_state['processor']
         froi = np.clip(processor.image, 0, 255).astype(np.uint8)
-        cell_rat = dpg.get_value(f'cell_thres_ratio_{channel}')
-        nucl_rat = dpg.get_value(f'nucl_thres_ratio_{channel}')
 
         # ROI detection logic
-        cell_roi_image = self._get_cell_roi(channel, processor, froi, cell_rat, cp_value, ui_state)
+        cell_roi_image = self._get_cell_roi(channel, froi, ui_state)
 
-
-        if find_roi_mode == 'Subtract nucleus':
-            nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, nucl_rat)
+        if ui_state['find_roi_mode'] == 'Subtract nucleus':
+            nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, ui_state['nucl_thres_ratio'])
             full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
         else:
-            #full_mask = cell_roi_image.astype(np.uint8)
-
-            # if not isinstance(cell_roi_image, (list, tuple)):
-            #     cell_roi_image = [cell_roi_image]  # Convert single element to a list
-
             full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
 
-        # Update texture
-        self._update_texture(channel, disp, full_mask, contrast, brightness, ovrl)
+        # Store contours in processor instead of instance variable
+        processor.all_contours = full_mask
+        self._update_texture(channel, disp, ui_state)
 
-
-    def _update_texture(self, channel, disp, masks, contrast, brightness, ovrl):
-        rgba_image = self.im_to_rgbim(disp)
-        rgb = rgba_image[..., :3]
-        adjusted_rgb = np.clip(rgb * contrast + brightness, 0, 1)
-        rgba_image[..., :3] = adjusted_rgb
-
-        if masks is not None:
-            for mask in masks:
-                rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), mask, ovrl)
-
-        self.rgba_to_dpgtex(rgba_image, np.max(disp), getattr(self, f'tex_{channel}_name'))
-
-
-    def _get_cell_roi(self, channel, processor, froi, cell_rat, cp_value, ui_state):
-
+    def _get_cell_roi(self, channel, froi, ui_state):
+        """Get cell ROI using parameters from UI state"""
         other_channel = '2' if channel == '1' else '1'
-        # not sure we need this if statement
-        if cp_value and hasattr(getattr(self, f'processor_{other_channel}'), 'roi_mask'):
-            return getattr(self, f'processor_{other_channel}').roi_mask
+        processor = ui_state['processor']
 
-        cell_roi = processor.detect_cell_roi(froi, cell_rat)
+        if ui_state['cp'] and hasattr(getattr(self, f'processor_{other_channel}'), 'all_contours'):
+            # Get contours from other channel's processor
+            return getattr(self, f'processor_{other_channel}').all_contours
 
-        if ui_state['multiple_cells_checkbox'] == False:
+        cell_roi = processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
 
+        if not ui_state['multiple_cells_checkbox']:
             cell_roi = [cell_roi[0]]
 
         return cell_roi
 
-    def _process_no_roi(self, channel, processor, disp, contrast, brightness, tex_name, image_times_roi):
+    def _update_texture(self, channel, disp, ui_state):
+        """Update texture using parameters from UI state"""
+        processor = ui_state['processor']
         rgba_image = self.im_to_rgbim(disp)
-        adjusted_rgb = np.clip(rgba_image[..., :3] * contrast + brightness, 0, 1)
+        adjusted_rgb = np.clip(rgba_image[..., :3] * ui_state['contrast'] + ui_state['brightness'], 0, 1)
         rgba_image[..., :3] = adjusted_rgb
-        setattr(self, image_times_roi, processor.image)
-        self.rgba_to_dpgtex(rgba_image, np.max(disp), tex_name)
+
+        # Use contours from processor
+        if hasattr(processor, 'all_contours') and processor.all_contours is not None:
+            for cell_contour in processor.all_contours:
+                rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_contour, ui_state['ovrl'])
+
+        self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
+
+    def _process_no_roi(self, channel, disp, ui_state):
+        """Handle no ROI case using UI state"""
+        processor = ui_state['processor']
+        rgba_image = self.im_to_rgbim(disp)
+        adjusted_rgb = np.clip(rgba_image[..., :3] * ui_state['contrast'] + ui_state['brightness'], 0, 1)
+        rgba_image[..., :3] = adjusted_rgb
+        setattr(self, ui_state['image_times_roi'], processor.image)
+        self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
 
     def on_image_click(self, sender, app_data, user_data):
-        lprint(sender, app_data, user_data)
+        """Handle image clicks to select specific cell contours"""
         image_tag, contours = user_data  # Unpack which texture and its contours
         mouse_pos = dpg.get_mouse_pos()
         image_pos = dpg.get_item_pos(image_tag)
-        # image_pos[0]=image_pos[0]+dpg.get_item_configuration(image_tag)['indent']
-        # Compute relative click position
+
         relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
+        x, y = int(relative_pos[0]), int(relative_pos[1])
 
-        print('image channel: ', image_tag)
-        print('mouse_pos: ', mouse_pos)
-        print('image_pos: ', image_pos)
-        print('relative_pos: ', relative_pos)
+        # # Get channel from image tag (assuming tags end with '_1' or '_2')
+        channel = '1' if image_tag.endswith('_1') else '2'
+        ui_state = self.get_ui_state(channel)
+        processor = ui_state['processor']
 
+        #processor.all_contours = [processor.all_contours[0]]
+        #
+        # # Get contours from processor
+        if hasattr(processor, 'all_contours') and processor.all_contours:
+
+            print('it is true')
+
+            processor.all_contours = [processor.all_contours[0]]
+
+            # #Find and select clicked contour
+            # for i, contour in enumerate(processor.all_contours):
+            #     if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
+            #         # Store selected contour in processor
+            #         processor.all_contours = [processor.all_contours[i]]
+            #         print(f'Selected contour {i} on channel {channel}')
+            #         break
+
+            # Update display with selected contour
+            disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+            self._update_texture(channel, disp, ui_state)
+            self.callback_calculate(sender, None)
 
 
     def load_ROI(self, path):
@@ -3015,8 +3023,6 @@ class _Phot2conc_vars_funct:
             dpg.configure_item("file_box", default_value='')
 
             # def wdt_hgt_pos(self,item,wdth,hght,pos):
-
-
 
     def callback_exportsettings(self, sender, app_data):
         setts = {
