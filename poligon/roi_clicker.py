@@ -78,7 +78,7 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 # Create a texture registry and add the modified texture
 with dpg.texture_registry():
-    dpg.add_static_texture(image_width, image_height, texture_data.flatten(), tag="contours_texture")
+    dpg.add_dynamic_texture(image_width, image_height, texture_data.flatten(), tag="contours_texture")
 
 # Create an item handler registry
 with dpg.item_handler_registry(tag="image_handler"):
