@@ -61,6 +61,8 @@ def on_image_click(sender, app_data, user_data):
         # Iterate through the contours to check if the clicked point is inside any of the shapes
         clicked_shape = None
         for i, contour in enumerate(contours):
+
+            print(contour)
             # Check if the point is inside the current shape using pointPolygonTest
             if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
                 clicked_shape = i + 1  # Label of the clicked shape (1-indexed)

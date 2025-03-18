@@ -45,6 +45,7 @@ class ImageROIProcessor:
         self.image = None
         self.roi_image = None
         self.all_contours = None
+        self.all_masks = None
         self.all_hierarchy = None
 
     def load_image(self):
@@ -84,8 +85,9 @@ class ImageROIProcessor:
             external_mask = self._create_external_mask(external_contour, image_to_process.shape)
 
             self.all_contours = list(external_contour)
+            self.all_masks = list(external_mask)
 
-        return external_mask
+        #return external_mask
 
     def detect_nucleus_roi(self, original_image, cell_roi, ratio):
 

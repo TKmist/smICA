@@ -697,6 +697,11 @@ class _Phot2conc_vars_funct:
         self.roi_1 = None
         self.roi_2 = None
 
+        self.img_height_shift = {'name': 'img_height_shift',
+                                 'shift': int(24 * self.size_ratio['height'])
+
+                                 }
+
         self.NO_IMAGE_INTENSITY = self.mode_init.NO_IMAGE_INTENSITY
         self.processor_1 = self.mode_init.processor_1
         self.processor_2 = self.mode_init.processor_2
@@ -2836,16 +2841,17 @@ class _Phot2conc_vars_funct:
         froi = np.clip(processor.image, 0, 255).astype(np.uint8)
 
         # ROI detection logic
-        cell_roi_image = self._get_cell_roi(channel, froi, ui_state)
-
-        if ui_state['find_roi_mode'] == 'Subtract nucleus':
-            nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, ui_state['nucl_thres_ratio'])
-            full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
-        else:
-            full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
+        # cell_roi_image = self._get_cell_roi(channel, froi, ui_state)
+        #
+        # if ui_state['find_roi_mode'] == 'Subtract nucleus':
+        #     nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, ui_state['nucl_thres_ratio'])
+        #     full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
+        # else:
+        #     full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
+        self._get_cell_roi(channel, froi, ui_state)
 
         # Store contours in processor instead of instance variable
-        processor.all_contours = full_mask
+        #processor.all_contours = full_mask
         self._update_texture(channel, disp, ui_state)
 
     def _get_cell_roi(self, channel, froi, ui_state):
@@ -2857,12 +2863,15 @@ class _Phot2conc_vars_funct:
             # Get contours from other channel's processor
             return getattr(self, f'processor_{other_channel}').all_contours
 
-        cell_roi = processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
+        #cell_roi = processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
+
+        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
 
         if not ui_state['multiple_cells_checkbox']:
-            cell_roi = [cell_roi[0]]
+            processor.all_contours = [processor.all_contours[0]]
+            processor.all_masks = [processor.all_masks[0]]
 
-        return cell_roi
+        #return cell_roi
 
     def _update_texture(self, channel, disp, ui_state):
         """Update texture using parameters from UI state"""
@@ -2873,8 +2882,8 @@ class _Phot2conc_vars_funct:
 
         # Use contours from processor
         if hasattr(processor, 'all_contours') and processor.all_contours is not None:
-            for cell_contour in processor.all_contours:
-                rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_contour, ui_state['ovrl'])
+            for cell_mask in processor.all_masks:
+                rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
 
@@ -2889,39 +2898,61 @@ class _Phot2conc_vars_funct:
 
     def on_image_click(self, sender, app_data, user_data):
         """Handle image clicks to select specific cell contours"""
-        image_tag, contours = user_data  # Unpack which texture and its contours
+        image_tag, contours = user_data
         mouse_pos = dpg.get_mouse_pos()
         image_pos = dpg.get_item_pos(image_tag)
+        print(image_tag)
+        # Get image's position and size in screen coordinates
 
-        relative_pos = (mouse_pos[0] - image_pos[0], mouse_pos[1] - image_pos[1])
-        x, y = int(relative_pos[0]), int(relative_pos[1])
-
-        # # Get channel from image tag (assuming tags end with '_1' or '_2')
+        # Get channel and processor
         channel = '1' if image_tag.endswith('_1') else '2'
         ui_state = self.get_ui_state(channel)
         processor = ui_state['processor']
 
-        #processor.all_contours = [processor.all_contours[0]]
-        #
-        # # Get contours from processor
+
+        displayed_width = dpg.get_item_width(image_tag)
+        displayed_height = dpg.get_item_height(image_tag)
+
+        # Get original image dimensions from processor
+        original_height, original_width = processor.image.shape[:2]
+
+
+        # Calculate scaling factors
+        scale_x = original_width / displayed_width
+        scale_y = original_height / displayed_height
+
+        print((scale_x, scale_y))
+
+
+        # # Check if the click is within the image bounds
+        # if not (image_min[0] <= mouse_pos[0] <= image_max[0] and image_min[1] <= mouse_pos[1] <= image_max[1]):
+        #     return
+
+        # Calculate relative position within the displayed image
+        relative_x = mouse_pos[0]
+        relative_y = mouse_pos[1]
+
+        x = int(relative_x * scale_x)
+        y = int(relative_y * scale_y)
+
+        print(f"Scaled coordinates: ({x}, {y})")
+        print(len(processor.all_contours))
+
+        # Check contours
         if hasattr(processor, 'all_contours') and processor.all_contours:
+            for i, contour in enumerate(processor.all_contours):
+                if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
+                    processor.all_contours = [contour]
+                    processor.all_masks = [processor.all_masks[i]]
+                    print(f'Selected contour {i} on channel {channel}')
+                    break
 
-            print('it is true')
-
-            processor.all_contours = [processor.all_contours[0]]
-
-            # #Find and select clicked contour
-            # for i, contour in enumerate(processor.all_contours):
-            #     if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
-            #         # Store selected contour in processor
-            #         processor.all_contours = [processor.all_contours[i]]
-            #         print(f'Selected contour {i} on channel {channel}')
-            #         break
-
-            # Update display with selected contour
+            # Update display
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
+
+
 
 
     def load_ROI(self, path):
