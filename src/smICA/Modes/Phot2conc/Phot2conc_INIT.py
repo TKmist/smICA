@@ -252,11 +252,14 @@ class _Phot2conc_init:
                                           'width': int(self.PTU_DATA_window['width'] / 2)
                                           }
         self.ROI_table_col1 = {'name': 'ROI_table_col1',
-                               'width': int(self.PTU_DATA_window['width'] / 2)
+                               'width': int(self.PTU_DATA_window['width'] / 3)
                                }
         self.ROI_table_col2 = {'name': 'ROI_table_col2',
-                               'width': int(self.PTU_DATA_window['width'] / 2)
+                               'width': int(self.PTU_DATA_window['width'] / 3)
                                }
+        self.ROI_table_col3 = {'name':'ROI_table_col3',
+                            'width':int(self.PTU_DATA_window['width']/3)
+                                 }
 
         self.auto_ROI_ch_table_col1 = {'name': 'auto_ROI_ch_table_col1',
                                        'width': int(self.PTU_DATA_window['width'] / 5)
@@ -876,9 +879,20 @@ class _Phot2conc_vars_funct:
 
     def add_single_result_to_DF(self, sender, app_data):
 
+        # stored_results = self.Sing_Results_DF.File.values
+        # if self.anal_file in stored_results:
+        #     self.Sing_Results_DF.File = self.Sing_Results_DF.File.where(self.Sing_Results_DF.File != self.anal_file)
+        #     self.Sing_Results_DF.dropna(inplace=True)
+        # else:
+        #     pass
+
         stored_results = self.Sing_Results_DF.File.values
         if self.anal_file in stored_results:
-            self.Sing_Results_DF.File = self.Sing_Results_DF.File.where(self.Sing_Results_DF.File != self.anal_file)
+            for index, row in self.Sing_Results_DF.iterrows():
+                if row['File'] == self.anal_file and row['ROI_name'] == dpg.get_value('ROI_name_tag'):
+                    self.Sing_Results_DF.at[index, 'File'] = np.nan
+                    self.Sing_Results_DF.at[index, 'ROI_name'] = np.nan
+                
             self.Sing_Results_DF.dropna(inplace=True)
         else:
             pass
@@ -886,6 +900,7 @@ class _Phot2conc_vars_funct:
 
             if '1' in self.Channels[0]:
                 self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                          dpg.get_value('ROI_name_tag'),
                                                           1,
                                                           self.mean_Photons_ch_1,
                                                           self.mean_Photons_err_ch_1,
@@ -899,6 +914,7 @@ class _Phot2conc_vars_funct:
                                                         columns=self.Sing_Results_DF.columns)
             elif '2' in self.Channels[0]:
                 self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                          dpg.get_value('ROI_name_tag'),
                                                           2,
                                                           self.mean_Photons_ch_2,
                                                           self.mean_Photons_err_ch_2,
@@ -913,6 +929,7 @@ class _Phot2conc_vars_funct:
                 pass
         if len(self.Channels) == 2:
             self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                      dpg.get_value('ROI_name_tag'),
                                                       1,
                                                       self.mean_Photons_ch_1,
                                                       self.mean_Photons_err_ch_1,
@@ -923,6 +940,7 @@ class _Phot2conc_vars_funct:
                                                       self.median_C_ch_1,
                                                       self.median_err_C_ch_1],
                                                      [self.anal_file,
+                                                      dpg.get_value('ROI_name_tag'),
                                                       2,
                                                       self.mean_Photons_ch_2,
                                                       self.mean_Photons_err_ch_2,
@@ -1121,6 +1139,7 @@ class _Phot2conc_vars_funct:
 
     def initialize_res_df(self):
         self.Sing_Results_DF = pd.DataFrame(columns=['File',
+                                                     'ROI_name',
                                                      'Channel',
                                                      '<Counts>',
                                                      'Counts_std',
@@ -2085,6 +2104,7 @@ class _Phot2conc_vars_funct:
                 if '1' in self.Channels[0]:
 
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                         dpg.get_value('ROI_name_tag'),
                                                          1,
                                                          self.mean_Photons_ch_1,
                                                          self.mean_Photons_err_ch_1,
@@ -2098,6 +2118,7 @@ class _Phot2conc_vars_funct:
 
                 elif '2' in self.Channels[0]:
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                         dpg.get_value('ROI_name_tag'),
                                                          2,
                                                          self.mean_Photons_ch_2,
                                                          self.mean_Photons_err_ch_2,
@@ -2113,6 +2134,7 @@ class _Phot2conc_vars_funct:
 
             if len(self.Channels) == 2:
                 Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                     dpg.get_value('ROI_name_tag'),
                                                      1,
                                                      self.mean_Photons_ch_1,
                                                      self.mean_Photons_err_ch_1,
@@ -2123,6 +2145,7 @@ class _Phot2conc_vars_funct:
                                                      self.median_C_ch_1,
                                                      self.median_err_C_ch_1],
                                                     [self.anal_file,
+                                                     dpg.get_value('ROI_name_tag'),
                                                      2,
                                                      self.mean_Photons_ch_2,
                                                      self.mean_Photons_err_ch_2,
@@ -2523,7 +2546,7 @@ class _Phot2conc_vars_funct:
 
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
-
+        dpg.set_value('ROI_name_tag','ROI_0')
         pickle_file = os.path.join(self.PTU_directory, an_file + '.pkl')
 
         with open(pickle_file, 'rb') as pcklf:

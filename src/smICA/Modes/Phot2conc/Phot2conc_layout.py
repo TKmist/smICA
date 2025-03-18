@@ -246,6 +246,7 @@ with dpg.window(label='',
                    no_clip=True, tag='ROI_table', parent='PTU_DATA_window'):
         dpg.add_table_column(label="", tag='ROI_table_col1', width=mode_init.ROI_table_col1['width'])
         dpg.add_table_column(label="", tag='ROI_table_col2', width=mode_init.ROI_table_col2['width'])
+        dpg.add_table_column(label="",tag='ROI_table_col3', width = mode_init.ROI_table_col3['width'])
         with dpg.table_row(tag='ROI_table_row1'):
             dpg.add_checkbox(label='ROI from files', tag='FILE_ROI_checkbox', default_value=False,
                              callback=mode_cmn.callback_select_roi,
@@ -253,6 +254,7 @@ with dpg.window(label='',
             dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox', default_value=False,
                              callback=mode_cmn.callback_select_autoroi,
                              enabled=False)
+            dpg.add_input_text(tag='ROI_name_tag',default_value='ROI_0',on_enter=True,multiline=False,width=-1)
 
     with dpg.table(header_row=False,
                    width=-1,
@@ -400,6 +402,7 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'ROI_table',
                             'ROI_table_col1',
                             'ROI_table_col2',
+                            'ROI_table_col3',
                             'ROI_table_row1',
                             'auto_ROI_ch_table',
                             'auto_ROI_ch_table_col1',
@@ -434,7 +437,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'cp_roi_1',
                             'cp_roi_2',
                             'FILE_ROI_checkbox',
-                            'Auto_ROI_checkbox'
+                            'Auto_ROI_checkbox',
+                            'ROI_name_tag'
 
                             ])
 # lprint(globalITEMS.windows)
