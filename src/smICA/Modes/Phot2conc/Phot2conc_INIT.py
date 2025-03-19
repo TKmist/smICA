@@ -2921,45 +2921,23 @@ class _Phot2conc_vars_funct:
 
     def on_image_click(self, sender, app_data, user_data):
         """Handle image clicks to select specific cell contours"""
+
         image_tag, contours = user_data
         mouse_pos = dpg.get_mouse_pos()
         image_pos = dpg.get_item_pos(image_tag)
-        print(image_tag)
-        # Get image's position and size in screen coordinates
-
-        # Get channel and processor
         channel = '1' if image_tag.endswith('_1') else '2'
         ui_state = self.get_ui_state(channel)
-        processor = ui_state['processor']
+        processor = self.get_ui_state(channel)['processor']
 
+        # Calculate positions and scaling
+        displayed_w, displayed_h = dpg.get_item_width(image_tag), dpg.get_item_height(image_tag)
+        original_h, original_w = processor.image.shape[:2]
+        indent = dpg.get_item_configuration(image_tag)['indent']
+        image_pos = (image_pos[0] + indent, image_pos[1] - self.img_height_shift['shift'])
 
-        displayed_width = dpg.get_item_width(image_tag)
-        displayed_height = dpg.get_item_height(image_tag)
-
-        # Get original image dimensions from processor
-        original_height, original_width = processor.image.shape[:2]
-
-
-        # Calculate scaling factors
-        scale_x = original_width / displayed_width
-        scale_y = original_height / displayed_height
-
-        print((scale_x, scale_y))
-
-
-        # # Check if the click is within the image bounds
-        # if not (image_min[0] <= mouse_pos[0] <= image_max[0] and image_min[1] <= mouse_pos[1] <= image_max[1]):
-        #     return
-
-        # Calculate relative position within the displayed image
-        relative_x = mouse_pos[0]
-        relative_y = mouse_pos[1]
-
-        x = int(relative_x * scale_x)
-        y = int(relative_y * scale_y)
-
-        print(f"Scaled coordinates: ({x}, {y})")
-        print(len(processor.all_contours))
+        # Convert mouse coordinates to image space
+        scale = (original_w / displayed_w, original_h / displayed_h)
+        x, y = (int((mouse_pos[i] - image_pos[i]) * scale[i]) for i in (0, 1))
 
         # Check contours
         if hasattr(processor, 'all_contours') and processor.all_contours:

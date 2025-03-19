@@ -438,7 +438,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'cp_roi_2',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox',
-                            'ROI_name_tag'
+                            'ROI_name_tag',
+                            'multiple_cells_checkbox'
 
                             ])
 # lprint(globalITEMS.windows)
