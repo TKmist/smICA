@@ -2952,11 +2952,13 @@ class _Phot2conc_vars_funct:
                 if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
                     processor.all_contours = [contour]
                     processor.all_masks = [processor.all_masks[i]]
+                    dpg.set_value('ROI_name_tag', f'ROI_{i}')
                     print(f'Selected contour {i} on channel {channel}')
                     break
 
             # Update display
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
 
