@@ -2808,6 +2808,13 @@ class _Phot2conc_vars_funct:
         new_texture_data = rgba_image.flatten().tolist()
         dpg.set_value(tex_name, new_texture_data)
 
+    def onHover(self,sender, app_data, user_data):
+         # global mouse_pos
+         dpg.focus_item(user_data)
+         # mouse_pos = dpg.get_mouse_pos()
+         # print(mouse_pos)
+         pass
+
     def get_ui_state(self, channel):
         """Get UI state parameters for a specific channel"""
         return {
