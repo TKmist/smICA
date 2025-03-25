@@ -2893,13 +2893,11 @@ class _Phot2conc_vars_funct:
             # Get contours from other channel's processor
             return getattr(self, f'processor_{other_channel}').all_contours
 
-        #cell_roi = processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
-
-        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
+        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
 
         if not ui_state['multiple_cells_checkbox']:
             processor.all_contours = [processor.all_contours[0]]
-            processor.all_external_masks = [processor.all_external_masks[0]]
+            processor.all_masks = [processor.all_masks[0]]
 
         #return cell_roi
 
@@ -2913,7 +2911,7 @@ class _Phot2conc_vars_funct:
         # Use contours from processor
         if hasattr(processor, 'all_contours') and processor.all_contours is not None:
 
-            for cell_mask in processor.all_external_masks:
+            for cell_mask in processor.all_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])

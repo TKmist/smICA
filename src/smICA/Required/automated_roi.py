@@ -46,8 +46,7 @@ class ImageROIProcessor:
         self.image = None
         self.roi_image = None
         self.all_contours = None
-        self.all_external_masks = None
-        self.all_internal_masks = None
+        self.all_masks = None
         self.all_hierarchy = None
 
     def load_image(self):
@@ -64,48 +63,67 @@ class ImageROIProcessor:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
 
 
-    def detect_cell_roi(self, image_to_process, ratio, nucleus=False):
+    def detect_cell_roi(self, image_to_process, ratio, find_nucleus=False):
         """
         Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
         """
-        if image_to_process is None:
-            raise ValueError("Obraz nie został załadowany. Użyj metody load_image().")
 
         # Preprocessing: rozmycie i progowanie
         thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
 
         # Znajdowanie konturów
-        contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-        if not contours or hierarchy is None:
-            raise ValueError("Nie znaleziono konturów w obrazie.")
-            #external_mask = self._create_external_mask(None, image_to_process.shape)
+        found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+
+        #hierarchy = hierarchy if len(hierarchy) == 2 else hierarchy[0]
+
+        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
+
+
+        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+
+        # Tworzenie maski zewnętrznego konturu
+
+        if find_nucleus:
+            # Generate masks for nucleus ROI
+            self.all_masks = self.detect_nucleus_roi(classified_contours_hierarchy, image_to_process.shape)
         else:
-            # Klasyfikacja konturów
-            classified_contours = self._classify_contours_by_area(contours, hierarchy)
+            # Use only external contours
+            found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+            self.all_masks = self._create_mask(found_contours, image_to_process.shape)
 
-            external = [ext_contour for (ext_contour, _) in classified_contours]
+        self.all_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
 
-            internal = [int_contour for (_, int_contour) in classified_contours]
+    def detect_nucleus_roi(self, classified_contours, image_shape):
+        """
+        Creates masks between each external contour and its largest internal contour.
 
-            # Tworzenie maski zewnętrznego konturu
-            external_masks = self._create_mask(external, internal, image_to_process.shape)
+        Args:
+            classified_contours (list): List of tuples (external_contour, largest_internal_contour).
+            image_shape (tuple): Shape of the image to create masks of the same size.
 
-            internal_masks = self._create_mask(internal, internal, image_to_process.shape)
+        Returns:
+            list: Generated masks for each external-internal contour pair.
+        """
+        masks = []
+        for ext_contour, largest_internal in classified_contours:
+            # Create a blank mask
+            mask = np.zeros(image_shape[:2], dtype=np.uint8)
+            # Draw the external contour filled
+            cv2.drawContours(mask, [ext_contour], -1, 255, cv2.FILLED)
+            if largest_internal is not None:
+                # Subtract the largest internal contour
+                cv2.drawContours(mask, [largest_internal], -1, 0, cv2.FILLED)
+            masks.append(mask)
+        return masks
 
-            self.all_contours = list(external)
-            self.all_external_masks = list(external_masks)
-            self.all_internal_masks = list(internal_masks)
-
-        #return external_mask
-
-    def detect_nucleus_roi(self, original_image, cell_roi, ratio):
-
-        processed_image = cv2.bitwise_not(original_image) * (cell_roi).astype(int)
-        # print(processed_image)
-        processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
-
-        nucleus_roi = self.detect_cell_roi(processed_image, ratio)
-        return nucleus_roi
+    # def detect_nucleus_roi(self, original_image, cell_roi, ratio):
+    #
+    #     processed_image = cv2.bitwise_not(original_image) * (cell_roi).astype(int)
+    #     # print(processed_image)
+    #     processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
+    #
+    #     nucleus_roi = self.detect_cell_roi(processed_image, ratio)
+    #     return nucleus_roi
 
     def make_full_roi(self, cell_roi, nucleus_roi):
 
@@ -224,14 +242,17 @@ class ImageROIProcessor:
 
         external_contours = []
 
-        # Identify external contours and collect their internals
+        # Identify external contours and collect their largest internal
         for i in range(len(contours)):
             if hierarchy[0][i][3] == -1:  # External contour has no parent
                 ext_contour = contours[i]
                 area = cv2.contourArea(ext_contour)
-                # Get direct internal contours (immediate children)
                 internal_contours = parent_children_map.get(i, [])
-                external_contours.append((area, ext_contour, internal_contours))
+                # Find the largest internal contour if any
+                largest_internal = None
+                if internal_contours:
+                    largest_internal = max(internal_contours, key=lambda c: cv2.contourArea(c))
+                external_contours.append((area, ext_contour, largest_internal))
 
         # Sort by external contour area (descending)
         external_contours.sort(reverse=True, key=lambda x: x[0])
@@ -240,8 +261,8 @@ class ImageROIProcessor:
         if top_n is not None:
             external_contours = external_contours[:top_n]
 
-        # Return (external_contour, internal_contours_list) tuples
-        return [(ext, internals) for (_, ext, internals) in external_contours]
+        # Return tuples (external_contour, largest_internal_contour)
+        return [(ext, largest_internal) for (_, ext, largest_internal) in external_contours]
 
     @staticmethod
     def _create_mask(contours, image_shape):

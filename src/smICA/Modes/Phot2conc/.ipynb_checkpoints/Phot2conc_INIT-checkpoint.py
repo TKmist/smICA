@@ -2892,7 +2892,7 @@ class _Phot2conc_vars_funct:
 
         if not ui_state['multiple_cells_checkbox']:
             processor.all_contours = [processor.all_contours[0]]
-            processor.all_external_masks = [processor.all_external_masks[0]]
+            processor.all_masks = [processor.all_masks[0]]
 
         #return cell_roi
 
@@ -2905,7 +2905,7 @@ class _Phot2conc_vars_funct:
 
         # Use contours from processor
         if hasattr(processor, 'all_contours') and processor.all_contours is not None:
-            for cell_mask in processor.all_external_masks:
+            for cell_mask in processor.all_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
