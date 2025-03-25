@@ -2877,9 +2877,9 @@ class _Phot2conc_vars_funct:
         #     nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, ui_state['nucl_thres_ratio'])
         #     full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
         # else:
-        #     full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
-        self._get_cell_roi(channel, froi, ui_state)
+            #full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
 
+        self._get_cell_roi(channel, froi, ui_state)
         # Store contours in processor instead of instance variable
         #processor.all_contours = full_mask
         self._update_texture(channel, disp, ui_state)
@@ -2899,7 +2899,7 @@ class _Phot2conc_vars_funct:
 
         if not ui_state['multiple_cells_checkbox']:
             processor.all_contours = [processor.all_contours[0]]
-            processor.all_masks = [processor.all_masks[0]]
+            processor.all_external_masks = [processor.all_external_masks[0]]
 
         #return cell_roi
 
@@ -2912,7 +2912,8 @@ class _Phot2conc_vars_funct:
 
         # Use contours from processor
         if hasattr(processor, 'all_contours') and processor.all_contours is not None:
-            for cell_mask in processor.all_masks:
+
+            for cell_mask in processor.all_external_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
@@ -2952,13 +2953,12 @@ class _Phot2conc_vars_funct:
                 if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
                     processor.all_contours = [contour]
                     processor.all_masks = [processor.all_masks[i]]
+
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
-                    print(f'Selected contour {i} on channel {channel}')
                     break
 
             # Update display
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
 

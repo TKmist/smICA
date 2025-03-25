@@ -30,6 +30,7 @@ SOFTWARE.
 import os
 import cv2
 import numpy as np
+from collections import defaultdict
 from tqdm import tqdm
 import pickle
 
@@ -45,7 +46,8 @@ class ImageROIProcessor:
         self.image = None
         self.roi_image = None
         self.all_contours = None
-        self.all_masks = None
+        self.all_external_masks = None
+        self.all_internal_masks = None
         self.all_hierarchy = None
 
     def load_image(self):
@@ -62,7 +64,7 @@ class ImageROIProcessor:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
 
 
-    def detect_cell_roi(self, image_to_process, ratio):
+    def detect_cell_roi(self, image_to_process, ratio, nucleus=False):
         """
         Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
         """
@@ -75,17 +77,24 @@ class ImageROIProcessor:
         # Znajdowanie konturów
         contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         if not contours or hierarchy is None:
-            # raise ValueError("Nie znaleziono konturów w obrazie.")
-            external_mask = self._create_external_mask(None, image_to_process.shape)
+            raise ValueError("Nie znaleziono konturów w obrazie.")
+            #external_mask = self._create_external_mask(None, image_to_process.shape)
         else:
             # Klasyfikacja konturów
-            external_contour = self._classify_contours_by_area(contours, hierarchy)
+            classified_contours = self._classify_contours_by_area(contours, hierarchy)
+
+            external = [ext_contour for (ext_contour, _) in classified_contours]
+
+            internal = [int_contour for (_, int_contour) in classified_contours]
 
             # Tworzenie maski zewnętrznego konturu
-            external_mask = self._create_external_mask(external_contour, image_to_process.shape)
+            external_masks = self._create_mask(external, internal, image_to_process.shape)
 
-            self.all_contours = list(external_contour)
-            self.all_masks = list(external_mask)
+            internal_masks = self._create_mask(internal, internal, image_to_process.shape)
+
+            self.all_contours = list(external)
+            self.all_external_masks = list(external_masks)
+            self.all_internal_masks = list(internal_masks)
 
         #return external_mask
 
@@ -197,37 +206,47 @@ class ImageROIProcessor:
     @staticmethod
     def _classify_contours_by_area(contours, hierarchy, top_n=None):
         """
-        Finds external contours and sorts them by area in descending order.
+        Finds external contours and their internal contours, sorted by area in descending order.
 
         Args:
             contours (list): List of contours.
             hierarchy (numpy.ndarray): Contour hierarchy information.
-            top_n (int, optional): Number of top contours to return. If None, returns all.
+            top_n (int, optional): Number of top external contours to return. If None, returns all.
 
         Returns:
-            list: List of external contours sorted by area in descending order.
+            list: Tuples of (external_contour, internal_contours_list) sorted by external contour area.
         """
+        # Map parent indices to their child contours
+        parent_children_map = defaultdict(list)
+        for j, h in enumerate(hierarchy[0]):
+            parent_idx = h[3]
+            parent_children_map[parent_idx].append(contours[j])
+
         external_contours = []
 
+        # Identify external contours and collect their internals
         for i in range(len(contours)):
-            # Check if the contour is external (no parent)
-            if hierarchy[0][i][3] == -1:
-                area = cv2.contourArea(contours[i])
-                external_contours.append((area, contours[i]))
+            if hierarchy[0][i][3] == -1:  # External contour has no parent
+                ext_contour = contours[i]
+                area = cv2.contourArea(ext_contour)
+                # Get direct internal contours (immediate children)
+                internal_contours = parent_children_map.get(i, [])
+                external_contours.append((area, ext_contour, internal_contours))
 
-        # Sort external contours by area in descending order
+        # Sort by external contour area (descending)
         external_contours.sort(reverse=True, key=lambda x: x[0])
 
-        # Return only the top N contours (without areas)
+        # Apply top_n limit
         if top_n is not None:
-            return [contour for (area, contour) in external_contours[:top_n]]
-        else:
-            return [contour for (area, contour) in external_contours]
+            external_contours = external_contours[:top_n]
+
+        # Return (external_contour, internal_contours_list) tuples
+        return [(ext, internals) for (_, ext, internals) in external_contours]
 
     @staticmethod
-    def _create_external_mask(external_contours, image_shape):
+    def _create_mask(contours, image_shape):
         masks = []
-        for contour in external_contours:
+        for contour in contours:
             mask = np.zeros(image_shape, dtype=np.uint8)
             if contour is not None:
                 cv2.drawContours(mask, [contour], -1, 255, cv2.FILLED)
@@ -235,9 +254,9 @@ class ImageROIProcessor:
             print(len(masks))
         return masks
 
-    @staticmethod
-    def _create_final_mask(external_mask, ellipse_mask, image_shape):
-        mask_between = cv2.bitwise_and(external_mask, cv2.bitwise_not(ellipse_mask))
-        final_mask = np.zeros(image_shape, dtype=np.uint8)
-        final_mask[mask_between == 255] = 1
-        return final_mask
+    # @staticmethod
+    # def _create_final_mask(external_mask, ellipse_mask, image_shape):
+    #     mask_between = cv2.bitwise_and(external_mask, cv2.bitwise_not(ellipse_mask))
+    #     final_mask = np.zeros(image_shape, dtype=np.uint8)
+    #     final_mask[mask_between == 255] = 1
+    #     return final_mask
