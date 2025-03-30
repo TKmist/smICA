@@ -366,7 +366,7 @@ with dpg.window(label='',
                              default_value=False,
                              enabled=False,
                              # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
+                             callback=mode_cmn.copy_roi_from_channel,
                              # parent='image_window_1'
                              )
             dpg.add_checkbox(label='Channel 1 \u2192 2',
@@ -374,7 +374,7 @@ with dpg.window(label='',
                              default_value=False,
                              enabled=False,
                              # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
+                             callback=mode_cmn.copy_roi_from_channel,
                              # parent='image_window_1'
                              )
 

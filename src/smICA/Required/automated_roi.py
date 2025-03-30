@@ -74,12 +74,8 @@ class ImageROIProcessor:
         # Znajdowanie konturów
         found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
 
-        #hierarchy = hierarchy if len(hierarchy) == 2 else hierarchy[0]
 
         classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
-
-
-        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
 
         # Tworzenie maski zewnętrznego konturu
 
@@ -116,32 +112,6 @@ class ImageROIProcessor:
             masks.append(mask)
         return masks
 
-    # def detect_nucleus_roi(self, original_image, cell_roi, ratio):
-    #
-    #     processed_image = cv2.bitwise_not(original_image) * (cell_roi).astype(int)
-    #     # print(processed_image)
-    #     processed_image = (processed_image * (255 / processed_image.max())).astype(np.uint8)
-    #
-    #     nucleus_roi = self.detect_cell_roi(processed_image, ratio)
-    #     return nucleus_roi
-
-    def make_full_roi(self, cell_roi, nucleus_roi):
-
-        full_mask = cell_roi - nucleus_roi
-        return full_mask
-
-    def save_roi(self):
-        """
-        Zapisuje wynikowy obraz ROI do wyjściowej ścieżki.
-        """
-        if self.roi_image is None:
-            raise ValueError("ROI nie zostało wykryte. Użyj metody detect_roi().")
-        cv2.imwrite(self.output_path, self.roi_image * 255)
-
-        formatted_array = np.where(self.roi_image == 0, '-', '1')
-        np.savetxt(self.output_path.replace('.png', '.dat'), formatted_array, fmt='%s', delimiter='\t')
-
-        return 0
 
     @staticmethod
     def _preprocess_image_dynamic(image, ratio):
@@ -161,65 +131,6 @@ class ImageROIProcessor:
         _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
 
         return dynamic_thresh
-
-    # @staticmethod
-    # def _classify_contours_by_area(contours, hierarchy):
-    #     largest_external_contour = None
-    #     largest_external_area = 0
-    #     corresponding_internal_contour = None
-    #
-    #     for i in range(len(contours)):
-    #         # Sprawdź, czy kontur jest zewnętrzny (brak rodzica)
-    #         if hierarchy[0][i][3] == -1:
-    #             area = cv2.contourArea(contours[i])
-    #             # Jeśli ten kontur jest większy niż poprzednio znaleziony
-    #             if area > largest_external_area:
-    #                 largest_external_contour = contours[i]
-    #                 largest_external_area = area
-    #
-    #                 # Szukamy wewnętrznego konturu dla tego zewnętrznego konturu
-    #                 corresponding_internal_contour = None
-    #                 for j in range(len(contours)):
-    #                     # Jeśli kontur `j` ma `i` jako rodzica
-    #                     if hierarchy[0][j][3] == i:
-    #                         corresponding_internal_contour = contours[j]
-    #                         break  # Bierzemy pierwszy wewnętrzny kontur, jeśli istnieje
-    #
-    #     return largest_external_contour, corresponding_internal_contour
-
-    # @staticmethod
-    # def _classify_contours_by_area(contours, hierarchy):
-    #     # List to store the largest contours and their corresponding internal contours
-    #     largest_contours = []
-    #
-    #     for i in range(len(contours)):
-    #         # Check if the contour is external (no parent)
-    #         if hierarchy[0][i][3] == -1:
-    #             area = cv2.contourArea(contours[i])
-    #             # If this contour is larger than the smallest in our list, replace it
-    #             if len(largest_contours) < 2:
-    #                 largest_contours.append((area, contours[i], None))
-    #             else:
-    #                 # Find the smallest area in the list
-    #                 min_area_index = min(range(len(largest_contours)), key=lambda x: largest_contours[x][0])
-    #                 if area > largest_contours[min_area_index][0]:
-    #                     largest_contours[min_area_index] = (area, contours[i], None)
-    #
-    #             # Sort the list to keep the largest contours at the top
-    #             largest_contours.sort(reverse=True, key=lambda x: x[0])
-    #
-    #
-    #             # Find the corresponding internal contour for the largest external contours
-    #             # for j in range(len(largest_contours)):
-    #             #     if largest_contours[j][2] is None:
-    #             #         for k in range(len(contours)):
-    #             #             if hierarchy[0][k][3] == i:
-    #             #                 largest_contours[j] = (largest_contours[j][0], largest_contours[j][1], contours[k])
-    #             #                 break  # Take the first internal contour if it exists
-    #
-    #     # Return the two largest external contours and their corresponding internal contours
-    #     #return [(contour, internal) for (area, contour, internal) in largest_contours]
-    #     return largest_contours
 
     @staticmethod
     def _classify_contours_by_area(contours, hierarchy, top_n=None):
@@ -275,9 +186,4 @@ class ImageROIProcessor:
             print(len(masks))
         return masks
 
-    # @staticmethod
-    # def _create_final_mask(external_mask, ellipse_mask, image_shape):
-    #     mask_between = cv2.bitwise_and(external_mask, cv2.bitwise_not(ellipse_mask))
-    #     final_mask = np.zeros(image_shape, dtype=np.uint8)
-    #     final_mask[mask_between == 255] = 1
-    #     return final_mask
+

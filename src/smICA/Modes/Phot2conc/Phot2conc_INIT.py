@@ -257,9 +257,9 @@ class _Phot2conc_init:
         self.ROI_table_col2 = {'name': 'ROI_table_col2',
                                'width': int(self.PTU_DATA_window['width'] / 3)
                                }
-        self.ROI_table_col3 = {'name':'ROI_table_col3',
-                            'width':int(self.PTU_DATA_window['width']/3)
-                                 }
+        self.ROI_table_col3 = {'name': 'ROI_table_col3',
+                               'width': int(self.PTU_DATA_window['width'] / 3)
+                               }
 
         self.auto_ROI_ch_table_col1 = {'name': 'auto_ROI_ch_table_col1',
                                        'width': int(self.PTU_DATA_window['width'] / 5)
@@ -892,7 +892,7 @@ class _Phot2conc_vars_funct:
                 if row['File'] == self.anal_file and row['ROI_name'] == dpg.get_value('ROI_name_tag'):
                     self.Sing_Results_DF.at[index, 'File'] = np.nan
                     self.Sing_Results_DF.at[index, 'ROI_name'] = np.nan
-                
+
             self.Sing_Results_DF.dropna(inplace=True)
         else:
             pass
@@ -2546,7 +2546,7 @@ class _Phot2conc_vars_funct:
 
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
-        dpg.set_value('ROI_name_tag','ROI_0')
+        dpg.set_value('ROI_name_tag', 'ROI_0')
         pickle_file = os.path.join(self.PTU_directory, an_file + '.pkl')
 
         with open(pickle_file, 'rb') as pcklf:
@@ -2808,12 +2808,11 @@ class _Phot2conc_vars_funct:
         new_texture_data = rgba_image.flatten().tolist()
         dpg.set_value(tex_name, new_texture_data)
 
-    def onHover(self,sender, app_data, user_data):
-         # global mouse_pos
-         dpg.focus_item(user_data)
-         # mouse_pos = dpg.get_mouse_pos()
-         # print(mouse_pos)
-         pass
+    def onHover(self, sender, app_data, user_data):
+
+        dpg.focus_item(user_data)
+
+        pass
 
     def get_ui_state(self, channel):
         """Get UI state parameters for a specific channel"""
@@ -2847,13 +2846,6 @@ class _Phot2conc_vars_funct:
 
     def _update_textures_both_roi(self, sender, app_data):
         """Handle texture updates with proper state management"""
-        # Handle checkbox mutual exclusion
-        if sender.startswith('cp_roi_'):
-            with dpg.mutex():
-                target_channel = sender[-1]
-                other_channel = '2' if target_channel == '1' else '1'
-                if dpg.get_value(sender):
-                    dpg.set_value(f'cp_roi_{other_channel}', False)
 
         # Determine which channels to update
         if sender.endswith(('1', '2')):
@@ -2863,43 +2855,57 @@ class _Phot2conc_vars_funct:
             for channel in ['1', '2']:
                 self.process_channel(channel, self.get_ui_state(channel))
 
+
+        self.callback_calculate(sender, None)
+
+    def copy_roi_from_channel(self, sender):
+
+        current_channel = sender[-1]
+        other_channel = '2' if current_channel == '1' else '1'
+        with dpg.mutex():
+                    if dpg.get_value(sender):
+                        dpg.set_value(f'cp_roi_{other_channel}', False)
+
+        if dpg.get_value(sender):
+            processor = getattr(self, f'processor_{current_channel}')
+            other_processor = getattr(self, f'processor_{other_channel}')
+
+            setattr(other_processor, 'all_masks',  processor.all_masks.copy())
+            setattr(other_processor, 'all_contours',  processor.all_contours.copy())
+
+            disp = np.clip(other_processor.image / np.max(other_processor.image), 0, 1).astype(np.float64)
+            self._update_texture(other_channel, disp, self.get_ui_state(other_channel))
+
+        else:
+
+            print('Condition works')
+            self.process_channel(other_channel, self.get_ui_state(other_channel))
+
         self.callback_calculate(sender, None)
 
     def _process_auto_roi(self, channel, disp, ui_state):
         """Handle auto ROI processing using UI state"""
         processor = ui_state['processor']
-        froi = np.clip(processor.image, 0, 255).astype(np.uint8)
 
-        # ROI detection logic
-        # cell_roi_image = self._get_cell_roi(channel, froi, ui_state)
-        #
-        # if ui_state['find_roi_mode'] == 'Subtract nucleus':
-        #     nucleus_roi = processor.detect_nucleus_roi(froi, cell_roi_image, ui_state['nucl_thres_ratio'])
-        #     full_mask = processor.make_full_roi(cell_roi_image, nucleus_roi)
-        # else:
-            #full_mask = [cell.astype(np.uint8) for cell in cell_roi_image]
+        froi = np.clip(processor.image, 0, 255).astype(np.uint8)
 
         self._get_cell_roi(channel, froi, ui_state)
         # Store contours in processor instead of instance variable
-        #processor.all_contours = full_mask
+        # processor.all_contours = full_mask
         self._update_texture(channel, disp, ui_state)
 
     def _get_cell_roi(self, channel, froi, ui_state):
         """Get cell ROI using parameters from UI state"""
-        other_channel = '2' if channel == '1' else '1'
+
         processor = ui_state['processor']
 
-        if ui_state['cp'] and hasattr(getattr(self, f'processor_{other_channel}'), 'all_contours'):
-            # Get contours from other channel's processor
-            return getattr(self, f'processor_{other_channel}').all_contours
-
         processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
+
 
         if not ui_state['multiple_cells_checkbox']:
             processor.all_contours = [processor.all_contours[0]]
             processor.all_masks = [processor.all_masks[0]]
 
-        #return cell_roi
 
     def _update_texture(self, channel, disp, ui_state):
         """Update texture using parameters from UI state"""
@@ -2959,8 +2965,6 @@ class _Phot2conc_vars_funct:
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
-
-
 
 
     def load_ROI(self, path):
