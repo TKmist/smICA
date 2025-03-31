@@ -2816,7 +2816,7 @@ class _Phot2conc_vars_funct:
 
     def get_ui_state(self, channel):
         """Get UI state parameters for a specific channel"""
-        return {
+        ui_state = {
             'auto_roi': dpg.get_value('Auto_ROI_checkbox'),
             'file_roi': dpg.get_value('FILE_ROI_checkbox'),
             'cp': dpg.get_value(f'cp_roi_{channel}'),
@@ -2830,29 +2830,49 @@ class _Phot2conc_vars_funct:
             'cell_thres_ratio': dpg.get_value(f'cell_thres_ratio_{channel}'),
             'nucl_thres_ratio': dpg.get_value(f'nucl_thres_ratio_{channel}'),
             'find_roi_mode': dpg.get_value(f'ROI_mode_{channel}')
-        }
+            }
+        lprint(ui_state)
+        return ui_state
 
     def process_channel(self, channel, ui_state):
         """Process image channel using centralized UI state"""
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-
+        lprint(channel, self.Channels)
         if ui_state['auto_roi']:
-            self._process_auto_roi(channel, disp, ui_state)
+            if len(self.Channels) == 1:
+                if channel == self.Channels[0]:
+                    self._process_auto_roi(channel, disp, ui_state)
+                else:
+                    pass
+            else:
+                self._process_auto_roi(channel, disp, ui_state)
         elif ui_state['file_roi']:
-            self._process_file_roi(channel, disp, ui_state)
+            if len(self.Channels) == 1:
+                if channel == self.Channels[0]:
+                    self._process_file_roi(channel, disp, ui_state)
+                else:
+                    pass
+            else:
+                self._process_file_roi(channel, disp, ui_state)
         else:
             self._process_no_roi(channel, disp, ui_state)
 
     def _update_textures_both_roi(self, sender, app_data):
         """Handle texture updates with proper state management"""
-
+        lprint(self.Channels)
         # Determine which channels to update
         if sender.endswith(('1', '2')):
+            
+            # if len(self.Channels)==1:
+            #     channel = self.Channels[0]
+            # else:
             channel = sender[-1]
+            lprint(channel,self.Channels)
             self.process_channel(channel, self.get_ui_state(channel))
         else:
-            for channel in ['1', '2']:
+            
+            for channel in self.Channels:
                 self.process_channel(channel, self.get_ui_state(channel))
 
 
@@ -2896,9 +2916,9 @@ class _Phot2conc_vars_funct:
 
     def _get_cell_roi(self, channel, froi, ui_state):
         """Get cell ROI using parameters from UI state"""
-
+        lprint(ui_state)
         processor = ui_state['processor']
-
+            
         processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
 
 
