@@ -2853,8 +2853,8 @@ class _Phot2conc_vars_funct:
                     self._process_file_roi(channel, disp, ui_state)
                 else:
                     pass
-            else:
-                self._process_file_roi(channel, disp, ui_state)
+                
+            self._process_file_roi(channel, disp, ui_state)
         else:
             self._process_no_roi(channel, disp, ui_state)
 
@@ -2880,26 +2880,26 @@ class _Phot2conc_vars_funct:
 
     def copy_roi_from_channel(self, sender):
 
-        current_channel = sender[-1]
-        other_channel = '2' if current_channel == '1' else '1'
+        copy_to_channel = sender[-1]
+        copy_from_channel = '2' if copy_to_channel == '1' else '1'
         with dpg.mutex():
                     if dpg.get_value(sender):
-                        dpg.set_value(f'cp_roi_{other_channel}', False)
+                        dpg.set_value(f'cp_roi_{copy_from_channel}', False)
 
         if dpg.get_value(sender):
-            processor = getattr(self, f'processor_{current_channel}')
-            other_processor = getattr(self, f'processor_{other_channel}')
+            copy_from_processor = getattr(self, f'processor_{copy_to_channel}')
+            copy_to_processor = getattr(self, f'processor_{copy_from_channel}')
 
-            setattr(other_processor, 'all_masks',  processor.all_masks.copy())
-            setattr(other_processor, 'all_contours',  processor.all_contours.copy())
+            setattr(copy_to_processor, 'all_masks',  copy_from_processor.all_masks.copy())
+            setattr(copy_to_processor, 'all_contours',  copy_from_processor.all_contours.copy())
 
-            disp = np.clip(other_processor.image / np.max(other_processor.image), 0, 1).astype(np.float64)
-            self._update_texture(other_channel, disp, self.get_ui_state(other_channel))
+            disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
+            self._update_texture(copy_from_channel, disp, self.get_ui_state(copy_from_channel))
 
         else:
 
             print('Condition works')
-            self.process_channel(other_channel, self.get_ui_state(other_channel))
+            self.process_channel(copy_from_channel, self.get_ui_state(copy_from_channel))
 
         self.callback_calculate(sender, None)
 
