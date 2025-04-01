@@ -40,7 +40,8 @@ class _PHOTEXTR_mounting_functions:
         # dpg.delete_item('keyword_handler_Phot2conc')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
-        inV.mounted_method = None        
+        inV.mounted_method = None
+        
     def mount_me(self):
         dpg.add_menu_item(label="Open PTU directory",
                   tag='Open_PTU_menu_item',
@@ -71,6 +72,8 @@ class _PHOTEXTR_menu_functions:
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
         inV.mounted_method = None
+        globalITEMS.last_directory = mode_init.last_directory
+        # print(mode_init.last_directory)
         globalITEMS.windows=[]
         
     def callback_PHOTEXTR_menu(self):

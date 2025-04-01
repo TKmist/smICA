@@ -300,6 +300,7 @@ class _init_varaibles:
                               'pos':(0,0)
                                 }
         self.mounted_method = None
+        self.main_last_directory = None
 
 
         

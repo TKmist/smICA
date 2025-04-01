@@ -549,7 +549,7 @@ class _PhotExtr_vars_funct:
         else:
             flim_data_stack, intensity_image_all_channels,special,sync = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
         
-        ntchannels = flim_data_stack.shape[3]
+        self.ntchannels = flim_data_stack.shape[3]
         self.MODE = ptu_image.head['UsrPulseCfg']
         dpg.set_value('mode_text','MODE: '+self.MODE)
         if flim_data_stack.ndim == 4:
@@ -571,8 +571,8 @@ class _PhotExtr_vars_funct:
         
             for channel in range(len(channels)):
                 
-                tau = np.linspace(0,ntchannels,ntchannels, dtype = int)*self.tau_resolution
-                self.Tchanx1 = self.Tchanx2 = np.linspace(0,ntchannels,ntchannels, dtype = int)
+                tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
+                self.Tchanx1 = self.Tchanx2 = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
                 if self.MODE == 'PIE':
                     if len(channels)>1:
                         '''PIE MODE two channels'''
@@ -590,7 +590,7 @@ class _PhotExtr_vars_funct:
                         dpg.configure_item('L_dline_ch2',show=True)
                         dpg.configure_item('U_dline_ch2',show=True)
     
-                        midle_sep = ntchannels//2
+                        midle_sep = self.ntchannels//2
                         
                         self.tau_mid = midle_sep*self.tau_resolution
     
@@ -672,7 +672,7 @@ class _PhotExtr_vars_funct:
                     else:
                         '''PIE MODE one channels'''
                         
-                        midle_sep = ntchannels//2
+                        midle_sep = self.ntchannels//2
                         
                         self.tau_mid = midle_sep*self.tau_resolution
                         if channels[channel] == 0:
@@ -1222,7 +1222,7 @@ class _PhotExtr_vars_funct:
                                                  'name':'(Ch1) '+self.anal_file.split('/')[-1],
                                                  'file_path':self.anal_file,
                                                 'TCSPC_resolution':int(np.round(self.tau_resolution*1e-9*1e12)),
-                                                'TCSPC_channels':ntchannels,
+                                                'TCSPC_channels':self.ntchannels,
                                                  'Tchanx1' : self.Tchanx1,
                                                  'Tchany1' : self.Tchany1,
                                                  'tchanx1' : self.tchanx1,
@@ -1282,7 +1282,7 @@ class _PhotExtr_vars_funct:
                                              'name':'(Ch2) '+self.anal_file.split('/')[-1],
                                              'file_path':self.anal_file,
                                             'TCSPC_resolution':int(np.round(self.tau_resolution*1e-9*1e12)),
-                                            'TCSPC_channels':ntchannels,
+                                            'TCSPC_channels':self.ntchannels,
                                              'Tchanx2' : self.Tchanx2,
                                              'Tchany2' : self.Tchany2,
                                              'tchanx2' : self.tchanx2,
@@ -2444,7 +2444,7 @@ class _PhotExtr_vars_funct:
                 jsn_dict[channel_name][name]={
                         'EXC-wavelength':wavelength,
                         'TCSPC_resolution':TCSPC_resolution,
-                        'TCSPC_channels':ntchannels,
+                        'TCSPC_channels':self.ntchannels,
                         'Description':describe,
                         'npy_path':npy_path
                         }
@@ -2457,7 +2457,7 @@ class _PhotExtr_vars_funct:
                         name:{
                         'EXC-wavelength':wavelength,
                         'TCSPC_resolution':TCSPC_resolution,
-                        'TCSPC_channels':ntchannels,
+                        'TCSPC_channels':self.ntchannels,
                         'Description':describe,
                         'npy_path':npy_path
                         }
@@ -2584,7 +2584,7 @@ class _PhotExtr_vars_funct:
                     'Lifetime resolution':float(self.tau_resolution)}
         infoname = file+'.info'
     
-        ntchannels = flim_data_stack.shape[3]
+        self.ntchannels = flim_data_stack.shape[3]
     
     
         json_pickle_all = {'File info':info_dict
@@ -2609,10 +2609,10 @@ class _PhotExtr_vars_funct:
     
     
     
-                tau = np.linspace(0,ntchannels,ntchannels, dtype = int)*self.tau_resolution
-                XS = np.linspace(0,ntchannels,ntchannels, dtype = int)
+                tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
+                XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
                 lprint(len(XS))
-                midle_sep = ntchannels//2
+                midle_sep = self.ntchannels//2
                 lprint(midle_sep)
                 if channels[channel] == 0:
     
@@ -2628,7 +2628,7 @@ class _PhotExtr_vars_funct:
     
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_1'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 1')
-                        filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,ntchannels,tcspc_reolution,self.filtering_routine,1)
+                        filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,1)
     
                         FILTRY_ch_1 = self.calculate_stat_filter(filtering_decays_ch_1,ys)
     
@@ -2661,7 +2661,7 @@ class _PhotExtr_vars_funct:
                     ys = ys[np.where(XS<=midle_sep)[0]]
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_2'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 2')
-                        filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,ntchannels,tcspc_reolution,self.filtering_routine,2)
+                        filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,2)
     
                         FILTRY_ch_2 = self.calculate_stat_filter(filtering_decays_ch_2,ys)
     
@@ -2681,8 +2681,8 @@ class _PhotExtr_vars_funct:
             else:
                 NT_channels = flim_data_stack.shape[3]
     
-                tau = np.linspace(0,ntchannels,ntchannels, dtype = int)*self.tau_resolution
-                XS = np.linspace(0,ntchannels,ntchannels, dtype = int)
+                tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
+                XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
     
     
                 if channels[channel] == 0:
@@ -2692,10 +2692,11 @@ class _PhotExtr_vars_funct:
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
                     ys = np.sum(ys, axis = 0).astype(float)
-    
+                    fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
+                    fYS = np.sum(fYS, axis = 0).astype(float)
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_1'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 1')
-                        filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,ntchannels,tcspc_reolution,self.filtering_routine,1)
+                        filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,1)
                         FILTRY_ch_1 = self.calculate_stat_filter(filtering_decays_ch_1,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 1')
@@ -2715,9 +2716,11 @@ class _PhotExtr_vars_funct:
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
                     ys = np.sum(ys, axis = 0).astype(float)
+                    fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
+                    fYS = np.sum(fYS, axis = 0).astype(float)
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_2'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 2')
-                        filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,ntchannels,tcspc_reolution,self.filtering_routine,2)
+                        filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,2)
                         FILTRY_ch_2 = self.calculate_stat_filter(filtering_decays_ch_2,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 2')

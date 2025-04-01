@@ -1225,7 +1225,7 @@ class _Phot2conc_vars_funct:
 
     #     self.callback_windows_size(sender,app_data)
     #     self.callback_font_size(sender,app_data)
-
+    
     def callback_calculate(self, sender, app_data):
         cmap = 'afmhot'
         rect = 0.1, 0.1, 0.85, 0.9
@@ -1237,8 +1237,14 @@ class _Phot2conc_vars_funct:
                 Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
                 Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
                 # DF = Current_image_1
-
-                self.DF = self.image_1_times_roi
+                if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                    lprint('in if1')
+                    ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                    roi = np.where(ROI==0,np.nan,1)
+                    img = self.processor_1.image
+                    self.DF = img*roi
+                else:
+                    self.DF = self.image_1_times_roi
                 Photons_1 = pd.DataFrame(self.DF)
 
                 n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
@@ -1452,7 +1458,17 @@ class _Phot2conc_vars_funct:
                 Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
                 # DF2 = Current_image_2
 
-                self.DF2 = self.image_2_times_roi
+                if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                    lprint('in if2')
+                    ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                    roi = np.where(ROI==0,np.nan,1)
+                    img = self.processor_2.image
+                    self.DF2 = img*roi
+                    
+                else:
+                    self.DF2 = self.image_2_times_roi
+                
+                # self.DF2 = self.image_2_times_roi
                 Photons_2 = pd.DataFrame(self.DF2)
                 n_pixels_2 = Photons_2.stack().reset_index(drop=True).dropna().count()
 
@@ -1668,7 +1684,15 @@ class _Phot2conc_vars_funct:
             Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
             Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
             # DF = Current_image_1
-            self.DF = self.image_1_times_roi
+            if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                lprint('in if1')
+                ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                roi = np.where(ROI==0,np.nan,1)
+                img = self.processor_1.image
+                self.DF = img*roi
+            else:
+                self.DF = self.image_1_times_roi
+            # self.DF = self.image_1_times_roi
             Photons_1 = pd.DataFrame(self.DF)
             n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
 
@@ -1881,7 +1905,15 @@ class _Phot2conc_vars_funct:
             Veff_ch_2 = 1e-15 * dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
             # DF2 = Current_image_2
-            self.DF2 = self.image_2_times_roi
+            if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                lprint('in if2')
+                ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                roi = np.where(ROI==0,np.nan,1)
+                img = self.processor_2.image
+                self.DF2 = img*roi
+            else:
+                self.DF2 = self.image_2_times_roi
+            # self.DF2 = self.image_2_times_roi
             Photons_2 = pd.DataFrame(self.DF2)
             n_pixels_2 = Photons_2.stack().reset_index(drop=True).dropna().count()
 
@@ -2390,7 +2422,7 @@ class _Phot2conc_vars_funct:
             else:
                 dpg.show_item('ROI_folder_dialog_id')
         else:
-            pass
+            self.load_PTU_images(self.anal_file)
 
     def callback_select_autoroi(self, sender, app_data):
         if dpg.get_value(sender):
@@ -2834,6 +2866,29 @@ class _Phot2conc_vars_funct:
         lprint(ui_state)
         return ui_state
 
+    def _process_file_roi(self,channel, disp, ui_state):
+        if dpg.get_value('FILE_ROI_checkbox'):
+            lprint('I am here')
+            processor = getattr(self, f'processor_{channel}')
+            img = processor.image
+            roi = processor.roi_image
+            lprint(channel)
+            lprint(roi)
+            lprint('I am still here')
+            full_mask = np.nan_to_num(roi*255, nan=0)
+            lprint(full_mask)
+            setattr(self, f'image_{channel}_times_roi',  img*roi)
+            
+            setattr(processor, 'all_masks',  [full_mask])
+            lprint('end')
+            # self.image_1_times_roi = img*roi
+            self._update_texture(channel, disp, ui_state)
+            lprint('finished')
+        else:
+            lprint('else')
+            self.process_channel(channel, self.get_ui_state(channel))
+        
+    
     def process_channel(self, channel, ui_state):
         """Process image channel using centralized UI state"""
         processor = ui_state['processor']
@@ -2887,19 +2942,19 @@ class _Phot2conc_vars_funct:
                         dpg.set_value(f'cp_roi_{copy_from_channel}', False)
 
         if dpg.get_value(sender):
-            copy_from_processor = getattr(self, f'processor_{copy_to_channel}')
-            copy_to_processor = getattr(self, f'processor_{copy_from_channel}')
+            copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
+            copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
 
             setattr(copy_to_processor, 'all_masks',  copy_from_processor.all_masks.copy())
             setattr(copy_to_processor, 'all_contours',  copy_from_processor.all_contours.copy())
 
             disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
-            self._update_texture(copy_from_channel, disp, self.get_ui_state(copy_from_channel))
+            self._update_texture(copy_to_channel, disp, self.get_ui_state(copy_to_channel))
 
         else:
 
             print('Condition works')
-            self.process_channel(copy_from_channel, self.get_ui_state(copy_from_channel))
+            self.process_channel(copy_to_channel, self.get_ui_state(copy_to_channel))
 
         self.callback_calculate(sender, None)
 
@@ -2935,7 +2990,7 @@ class _Phot2conc_vars_funct:
         rgba_image[..., :3] = adjusted_rgb
 
         # Use contours from processor
-        if hasattr(processor, 'all_contours') and processor.all_contours is not None:
+        if hasattr(processor, 'all_masks') and processor.all_masks is not None:
 
             for cell_mask in processor.all_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])

@@ -95,6 +95,7 @@ class _PHOT2CONC_menu_functions:
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
         inV.mounted_method = None
+        globalITEMS.last_directory = mode_init.last_directory
         globalITEMS.windows=[]
         
     def callback_PHOT2CONC_menu(self):
