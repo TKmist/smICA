@@ -122,7 +122,8 @@ mode_init = _PhotExtr_init(inV.init_size_ratio,
 
 mode_cmn = _PhotExtr_vars_funct(mode_init,
                                      globalITEMS.last_directory,
-                                     basf
+                                     basf,
+                                    globalITEMS
                                     )
 # method_cmn.mount_fcs_handlers()
 

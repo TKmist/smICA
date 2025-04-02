@@ -632,10 +632,12 @@ class _Phot2conc_vars_funct:
     def __init__(self,
                  INIT,
                  last_directory,
-                 basf):
+                 basf,
+                      _globalITEMS):
         self.mode_init = INIT
         self.basf = basf
         self.last_directory = last_directory
+        self._GI = _globalITEMS
         self.size_ratio = self.mode_init.size_ratio
         self.Sing_Results_DF = pd.DataFrame()
         self.initialize_res_df()
@@ -1238,7 +1240,7 @@ class _Phot2conc_vars_funct:
                 Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
                 # DF = Current_image_1
                 if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                    lprint('in if1')
+                    # lprint('in if1')
                     ROI = self.processor_1.all_masks[0].astype(np.uint8)
                     roi = np.where(ROI==0,np.nan,1)
                     img = self.processor_1.image
@@ -1459,7 +1461,7 @@ class _Phot2conc_vars_funct:
                 # DF2 = Current_image_2
 
                 if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                    lprint('in if2')
+                    # lprint('in if2')
                     ROI = self.processor_2.all_masks[0].astype(np.uint8)
                     roi = np.where(ROI==0,np.nan,1)
                     img = self.processor_2.image
@@ -1685,7 +1687,7 @@ class _Phot2conc_vars_funct:
             Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
             # DF = Current_image_1
             if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                lprint('in if1')
+                # lprint('in if1')
                 ROI = self.processor_1.all_masks[0].astype(np.uint8)
                 roi = np.where(ROI==0,np.nan,1)
                 img = self.processor_1.image
@@ -1906,7 +1908,7 @@ class _Phot2conc_vars_funct:
             Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
             # DF2 = Current_image_2
             if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                lprint('in if2')
+                # lprint('in if2')
                 ROI = self.processor_2.all_masks[0].astype(np.uint8)
                 roi = np.where(ROI==0,np.nan,1)
                 img = self.processor_2.image
@@ -2459,7 +2461,7 @@ class _Phot2conc_vars_funct:
 
 
         else:
-            lprint(sender, dpg.get_value(sender))
+            # lprint(sender, dpg.get_value(sender))
             dpg.hide_item('auto_ROI_ch_table')
             dpg.configure_item('cell_thres_ratio_1', enabled=False)
             dpg.configure_item('nucl_thres_ratio_1', enabled=False)
@@ -2863,29 +2865,29 @@ class _Phot2conc_vars_funct:
             'nucl_thres_ratio': dpg.get_value(f'nucl_thres_ratio_{channel}'),
             'find_roi_mode': dpg.get_value(f'ROI_mode_{channel}')
             }
-        lprint(ui_state)
+        # lprint(ui_state)
         return ui_state
 
     def _process_file_roi(self,channel, disp, ui_state):
         if dpg.get_value('FILE_ROI_checkbox'):
-            lprint('I am here')
+            # lprint('I am here')
             processor = getattr(self, f'processor_{channel}')
             img = processor.image
             roi = processor.roi_image
-            lprint(channel)
-            lprint(roi)
-            lprint('I am still here')
+            # lprint(channel)
+            # lprint(roi)
+            # lprint('I am still here')
             full_mask = np.nan_to_num(roi*255, nan=0)
-            lprint(full_mask)
+            # lprint(full_mask)
             setattr(self, f'image_{channel}_times_roi',  img*roi)
             
             setattr(processor, 'all_masks',  [full_mask])
-            lprint('end')
+            # lprint('end')
             # self.image_1_times_roi = img*roi
             self._update_texture(channel, disp, ui_state)
-            lprint('finished')
+            # lprint('finished')
         else:
-            lprint('else')
+            # lprint('else')
             self.process_channel(channel, self.get_ui_state(channel))
         
     
@@ -2893,7 +2895,7 @@ class _Phot2conc_vars_funct:
         """Process image channel using centralized UI state"""
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-        lprint(channel, self.Channels)
+        # lprint(channel, self.Channels)
         if ui_state['auto_roi']:
             if len(self.Channels) == 1:
                 if channel == self.Channels[0]:
@@ -2915,7 +2917,7 @@ class _Phot2conc_vars_funct:
 
     def _update_textures_both_roi(self, sender, app_data):
         """Handle texture updates with proper state management"""
-        lprint(self.Channels)
+        # lprint(self.Channels)
         # Determine which channels to update
         if sender.endswith(('1', '2')):
             
@@ -2923,7 +2925,7 @@ class _Phot2conc_vars_funct:
             #     channel = self.Channels[0]
             # else:
             channel = sender[-1]
-            lprint(channel,self.Channels)
+            # lprint(channel,self.Channels)
             self.process_channel(channel, self.get_ui_state(channel))
         else:
             
@@ -2953,7 +2955,7 @@ class _Phot2conc_vars_funct:
 
         else:
 
-            print('Condition works')
+            # print('Condition works')
             self.process_channel(copy_to_channel, self.get_ui_state(copy_to_channel))
 
         self.callback_calculate(sender, None)
@@ -2971,7 +2973,7 @@ class _Phot2conc_vars_funct:
 
     def _get_cell_roi(self, channel, froi, ui_state):
         """Get cell ROI using parameters from UI state"""
-        lprint(ui_state)
+        # lprint(ui_state)
         processor = ui_state['processor']
             
         processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
@@ -3118,7 +3120,7 @@ class _Phot2conc_vars_funct:
 
         # dpg.configure_item('TT_file_dialog_id_ch_2',default_path=last_directory)
         # dpg.configure_item('TT_file_dialog_id_ch_1',default_path=last_directory)
-
+        self._GI.last_directory = last_directory
         dpg.configure_item('ROI_folder_dialog_id', default_path=last_directory)
         dpg.configure_item('file_dialog_id', default_path=last_directory)
         dpg.configure_item('PTU_file_dialog_id', default_path=last_directory)

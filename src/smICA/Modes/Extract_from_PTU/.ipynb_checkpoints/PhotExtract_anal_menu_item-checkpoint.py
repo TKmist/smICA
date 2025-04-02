@@ -72,7 +72,11 @@ class _PHOTEXTR_menu_functions:
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
         inV.mounted_method = None
-        globalITEMS.last_directory = mode_init.last_directory
+        # print(mode_init.last_directory)
+        # print(globalITEMS.last_directory)
+        # globalITEMS.last_directory = mode_init.last_directory
+        # print(mode_init.last_directory)
+        print(globalITEMS.last_directory)
         # print(mode_init.last_directory)
         globalITEMS.windows=[]
         
@@ -81,7 +85,7 @@ class _PHOTEXTR_menu_functions:
         if self.is_mounted:
             self.mnt.unmount_me(globalITEMS.windows)
             globalITEMS.windows=[]
-            print(dpg.get_aliases())
+            # print(dpg.get_aliases())
         else:
             if inV.mounted_method != None:
                 

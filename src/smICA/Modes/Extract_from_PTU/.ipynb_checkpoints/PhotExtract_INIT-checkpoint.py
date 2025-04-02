@@ -365,7 +365,8 @@ class _PhotExtr_vars_funct:
     def __init__(self,
                  INIT,
                 last_directory,
-                 basf):
+                 basf,
+                 _globalITEMS):
         self.mode_init=INIT
         self.GI = self.mode_init.GI
         self.files=self.mode_init.files
@@ -404,6 +405,7 @@ class _PhotExtr_vars_funct:
         self.Btch_limit_ch_2 = None
         self.Utch_limit_ch_2 = None
         self.curve_list = []
+        self._GI=_globalITEMS
         
         
         
@@ -417,6 +419,8 @@ class _PhotExtr_vars_funct:
         
         path = app_data['current_path']
         self.last_directory = path
+        self._GI.last_directory = path
+        # lprint(self._GI.last_directory)
         fls = os.listdir(path)
         self.files = [f for f in fls if f.endswith('.ptu')]
         self.files.sort()
@@ -2004,7 +2008,7 @@ class _PhotExtr_vars_funct:
             dpg.configure_item('loading_cnt_butt',label=str(perc)+'%')
     
     
-            lprint(an_file)
+            # lprint(an_file)
           # lprint(self.B_limit_ch_1, self.U_limit_ch_1, self.B_limit_ch_2, self.U_limit_ch_2)
             self.extract_from_ptu(self.last_directory,
                                   an_file,
@@ -2033,7 +2037,7 @@ class _PhotExtr_vars_funct:
         dpg.configure_item('loading_butt',label=an_file)
         try:
           # lprint(an_file)
-            lprint(self.B_limit_ch_1, self.U_limit_ch_1, self.B_limit_ch_2, self.U_limit_ch_2)
+            # lprint(self.B_limit_ch_1, self.U_limit_ch_1, self.B_limit_ch_2, self.U_limit_ch_2)
             self.extract_from_ptu(self.last_directory,
                                   an_file,
                                   self.B_limit_ch_1,
@@ -2611,9 +2615,9 @@ class _PhotExtr_vars_funct:
     
                 tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
                 XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
-                lprint(len(XS))
+                # lprint(len(XS))
                 midle_sep = self.ntchannels//2
-                lprint(midle_sep)
+                # lprint(midle_sep)
                 if channels[channel] == 0:
     
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
@@ -2621,7 +2625,7 @@ class _PhotExtr_vars_funct:
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     
                     ys = np.sum(ys, axis = 0).astype(float)
-                    lprint(len(ys))
+                    # lprint(len(ys))
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
                     ys = ys[np.where(XS>midle_sep)[0]]

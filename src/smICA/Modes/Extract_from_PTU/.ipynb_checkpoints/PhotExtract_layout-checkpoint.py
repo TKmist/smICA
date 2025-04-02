@@ -122,7 +122,8 @@ mode_init = _PhotExtr_init(inV.init_size_ratio,
 
 mode_cmn = _PhotExtr_vars_funct(mode_init,
                                      globalITEMS.last_directory,
-                                     basf
+                                     basf,
+                                    globalITEMS
                                     )
 # method_cmn.mount_fcs_handlers()
 
@@ -227,7 +228,7 @@ with dpg.window(label="Lifetime Channel 1",
                      )
     dpg.add_button(label='Calculate filters',
                    tag='Remove_bgd_butt_ch_1',
-                   width = mode_init.Remove_bgd_butt_ch_1['width'],
+                   width = mode_init.Remove_bgd_butt_ch_1['width'],                   
                    callback = mode_cmn.show_br_fltr_wndw,
                    enabled = False,
                    show=False
@@ -615,6 +616,7 @@ with dpg.window(label="Lifetime background filtering",
                 dpg.add_button(label='Calculate filters',
                                tag='Calculate_filters',
                                width = mode_init.Calculate_filters['width'],
+                               height = mode_init.Calculate_filters['height'],
                                callback = mode_cmn.callback_Calculate_filters,
                                enabled = True
                                )

@@ -166,7 +166,8 @@ mode_init = _Phot2conc_init(inV.init_size_ratio,
 
 mode_cmn = _Phot2conc_vars_funct(mode_init,
                                  globalITEMS.last_directory,
-                                 basf
+                                 basf,
+                      globalITEMS
                                  )
 # method_cmn.mount_fcs_handlers()
 
