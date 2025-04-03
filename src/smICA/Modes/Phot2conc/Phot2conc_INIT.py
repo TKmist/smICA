@@ -1358,7 +1358,7 @@ class _Phot2conc_vars_funct:
                 dpg.configure_item('c_med_ser_ch_1', label='Median = ' + str(np.round(self.median_C_ch_1, 4)))
 
                 dpg.configure_item('np_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Molecules_ch_1, 2)))
-                dpg.configure_item('np_med_ser_ch_1', label='Median = ' + str(np.round(self.median_Molecules_ch_1, 2)))
+                dpg.configure_item('np_med_ser_ch_1', label='Median = ' + str(np.round(median_Molecules_ch_1, 2)))
 
                 dpg.configure_item('phot_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Photons_ch_1, 1)))
                 dpg.configure_item('phot_med_ser_ch_1', label='Median = ' + str(np.round(median_Photons_ch_1, 1)))
@@ -2257,7 +2257,7 @@ class _Phot2conc_vars_funct:
         self.anal_file = app_data
 
         pkl_file = self.anal_file + '.rpk'
-        pkl_path = os.path.join(self.last_directory, pkl_file)
+        pkl_path = os.path.join(self.PTU_directory, pkl_file)
         # lnprint(pkl_file)
         if os.path.exists(pkl_path):
             # lnprint('loading_pkl')
@@ -2401,7 +2401,7 @@ class _Phot2conc_vars_funct:
         files = os.listdir(self.last_directory)
         files = [f for f in files if f.endswith('.rpk')]
         for f in files:
-            os.remove(os.path.join(self.last_directory, f))
+            os.remove(os.path.join(self.PTU_directory, f))
 
     def callback_select_lt_to_roi(self, sender, app_data):
         self.load_PTU_images(self.anal_file)
@@ -3226,7 +3226,7 @@ class _Phot2conc_vars_funct:
 
         }
         # lnprint(pkl)
-        pkl_path = os.path.join(self.last_directory, self.anal_file + '.rpk')
+        pkl_path = os.path.join(self.PTU_directory, self.anal_file + '.rpk')
         with open(pkl_path, 'wb') as f:
             pickle.dump(pkl, f)
 
