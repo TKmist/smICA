@@ -183,7 +183,7 @@ class ImageROIProcessor:
             if contour is not None:
                 cv2.drawContours(mask, [contour], -1, 255, cv2.FILLED)
             masks.append(mask)
-            print(len(masks))
+            # print(len(masks))
         return masks
 
 

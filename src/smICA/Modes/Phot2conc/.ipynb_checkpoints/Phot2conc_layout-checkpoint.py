@@ -166,7 +166,8 @@ mode_init = _Phot2conc_init(inV.init_size_ratio,
 
 mode_cmn = _Phot2conc_vars_funct(mode_init,
                                  globalITEMS.last_directory,
-                                 basf
+                                 basf,
+                      globalITEMS
                                  )
 # method_cmn.mount_fcs_handlers()
 
@@ -254,8 +255,13 @@ with dpg.window(label='',
             dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox', default_value=False,
                              callback=mode_cmn.callback_select_autoroi,
                              enabled=False)
-            dpg.add_input_text(tag='ROI_name_tag',default_value='ROI_0',on_enter=True,multiline=False,width=-1)
-
+            with dpg.group(tag='roi_name_group'):
+                dpg.add_input_text(tag='ROI_name_tag',default_value='ROI_0',on_enter=True,multiline=False,width=-1)
+                dpg.add_combo(tag='ROI_names_combo_tag',
+                              items=mode_init.ROI_names_combo_tag['items'],
+                              default_value=mode_init.ROI_names_combo_tag['items'][0],
+                              width=mode_init.ROI_names_combo_tag['width'],
+                              show=False)
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -270,6 +276,8 @@ with dpg.window(label='',
                    tag='auto_ROI_ch_table',
                    parent='PTU_DATA_window',
                    show=False):
+
+
         dpg.add_table_column(label="", tag='auto_ROI_ch_table_col1', width=mode_init.auto_ROI_ch_table_col1['width'],
                              width_fixed=True)
         dpg.add_table_column(label="", tag='auto_ROI_ch_table_col2', width=mode_init.auto_ROI_ch_table_col2['width'],
@@ -364,7 +372,7 @@ with dpg.window(label='',
                              default_value=False,
                              enabled=False,
                              # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
+                             callback=mode_cmn.copy_roi_from_channel,
                              # parent='image_window_1'
                              )
             dpg.add_checkbox(label='Channel 1 \u2192 2',
@@ -372,7 +380,7 @@ with dpg.window(label='',
                              default_value=False,
                              enabled=False,
                              # width=-1,
-                             callback=mode_cmn._update_textures_both_roi,
+                             callback=mode_cmn.copy_roi_from_channel,
                              # parent='image_window_1'
                              )
 
@@ -398,13 +406,16 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'Pixel_dwell_output_tooltip',
                             'Pixel_dwell_output_tooltip_text',
                             'PTU_roi',
+                            'roi_name_group'
                             'PTU_DATA_mid_sep_2',
                             'ROI_table',
                             'ROI_table_col1',
                             'ROI_table_col2',
                             'ROI_table_col3',
                             'ROI_table_row1',
+                            'ROI_names_combo_tag'
                             'auto_ROI_ch_table',
+                            'auto_ROI_ch_table_row0',
                             'auto_ROI_ch_table_col1',
                             'auto_ROI_ch_table_col2',
                             'auto_ROI_ch_table_col3',
@@ -438,7 +449,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'cp_roi_2',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox',
-                            'ROI_name_tag'
+                            'ROI_name_tag',
+                            'multiple_cells_checkbox'
 
                             ])
 # lprint(globalITEMS.windows)
@@ -594,16 +606,7 @@ with dpg.window(label='Channel 1',
                 no_bring_to_front_on_focus=True,
                 show=True
                 ):
-
-    dpg.add_image(mode_init.tex_1_name,
-                  uv_min=(0, 0),
-                  uv_max=(1, 1),
-                  tag='texture_CH_1', indent=mode_init.shift)
-
-    dpg.add_item_clicked_handler(tag='img1_click_hand', callback=mode_cmn.on_image_click,
-                                 user_data=('texture_CH_1', None), parent='handler_image_1')
-
-    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
+    pass
 
     dpg.add_separator(tag='IMAGE_CH1_top_sep', show=True)
 
@@ -611,7 +614,7 @@ with dpg.window(label='Channel 1',
     with dpg.table(header_row=False, width=-1, borders_innerH=False,
                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                    no_pad_innerX=False, no_pad_outerX=True, no_host_extendX=True,
-                   no_clip=True, tag='img_win_1_table_2', parent='image_window_1'):
+                   no_clip=True, tag='img_win_1_table_2', parent='image_window_ch1'):
         dpg.add_table_column(label="", tag='img_win_1_table_2_col1', width=mode_init.img_win_1_table_2_col1['width'])
         dpg.add_table_column(label="", tag='img_win_1_table_2_col2', width=mode_init.img_win_1_table_2_col2['width'])
         dpg.add_table_column(label="", tag='img_win_1_table_2_col3', width=mode_init.img_win_1_table_2_col3['width'])
@@ -649,6 +652,20 @@ with dpg.window(label='Channel 1',
                              callback=mode_cmn._update_textures_both_roi
                              )
     dpg.add_separator(tag='IMAGE_CH1_top_sep_2', show=True, parent='image_window_ch1', before='texture_CH_1')
+
+
+    dpg.add_image(mode_init.tex_1_name,
+                  uv_min=(0, 0),
+                  uv_max=(1, 1),
+                  tag='texture_CH_1', indent=mode_init.shift)
+
+    dpg.add_item_hover_handler(tag='img1_hover_hand', callback=mode_cmn.onHover, user_data="texture_CH_1",
+                               parent='handler_image_1')
+
+    dpg.add_item_clicked_handler(tag='img1_click_hand', callback=mode_cmn.on_image_click,
+                                 user_data=('texture_CH_1', None), parent='handler_image_1')
+
+    dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
     # shift=(dpg.get_item_width('image_window_ch1')-dpg.get_item_width(mode_init.tex_1_name))
 
 
@@ -684,7 +701,9 @@ globalITEMS.windows.extend(['image_window_ch1',
                             'img_win_1_table_2_row1',
                             'img_contrast_1',
                             'img_Brightness_1',
-                            'img_roi_alpha_1'
+                            'img_roi_alpha_1',
+                            'img1_hover_hand',
+                            'img1_click_hand'
 
                             ])
 '''Image 2 window items'''
@@ -707,7 +726,7 @@ with dpg.window(label='Channel 2',
     with dpg.table(header_row=False, width=-1, borders_innerH=False,
                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                    no_pad_innerX=False, no_pad_outerX=True, no_host_extendX=True,
-                   no_clip=True, tag='img_win_2_table_2_2', parent='image_window_2'):
+                   no_clip=True, tag='img_win_2_table_2_2', parent='image_window_ch2'):
         # Add headers
         dpg.add_table_column(label="", tag='img_win_2_table_2_col1', width=mode_init.img_win_2_table_2_col1['width'])
         dpg.add_table_column(label="", tag='img_win_2_table_2_col2', width=mode_init.img_win_2_table_2_col2['width'])
@@ -757,6 +776,9 @@ with dpg.window(label='Channel 2',
                   # before='img_win_2_table'
                   )
 
+    dpg.add_item_hover_handler(tag='img2_hover_hand', callback=mode_cmn.onHover, user_data="texture_CH_2",
+                               parent='handler_image_2')
+
     dpg.add_item_clicked_handler(tag='img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
@@ -784,7 +806,9 @@ globalITEMS.windows.extend(['image_window_ch2',
                             'img_win_2_table_2_row1',
                             'img_contrast_2',
                             'img_Brightness_2',
-                            'img_roi_alpha_2'
+                            'img_roi_alpha_2',
+                            'img2_hover_hand',
+                            'img2_click_hand'
 
                             ])
 '''Histogram 1 window items'''

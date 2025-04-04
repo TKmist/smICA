@@ -111,9 +111,10 @@ def rewrtie_roi_txt(file,input_folder,output_roi_path,shape):
 
 def callback_open_source_folder(sender,app_data):
 
-    global source_type
+    global source_type, _path
     source_type = None
     path = app_data['file_path_name']
+    _path = path
     dpg.set_value('tag_source_path',path)
     
     files = os.listdir(path)
@@ -139,9 +140,12 @@ def callback_open_source_folder(sender,app_data):
     else:
         pass
     
-
+    dpg.configure_item('Target_file_dialog',default_path=_path)
     
 def callback_open_target_folder(sender,app_data):
+    
+    path = app_data['file_path_name']
+    
     dpg.set_value('tag_target_path',app_data['file_path_name'])
 
     

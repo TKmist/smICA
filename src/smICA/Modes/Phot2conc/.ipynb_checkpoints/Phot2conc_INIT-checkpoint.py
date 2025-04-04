@@ -609,6 +609,11 @@ class _Phot2conc_init:
 
                                      }
 
+        self.ROI_names_combo_tag = {'name': 'ROI_names_combo_tag',
+                                     'width': -1,
+                                     'items': ['ROI_0']
+                                     }
+
     def im_to_rgbim(self, im):
         '''Converts grayscale image into rgba(float) image.'''
         rgba_image = np.zeros((im.shape[0], im.shape[1], 4), dtype=np.float64)
@@ -717,6 +722,55 @@ class _Phot2conc_vars_funct:
 
         self.im_to_rgbim = self.mode_init.im_to_rgbim
 
+        self.ROIS_state = {'File roi':False,
+                           'Auto roi':{
+                               'state':False,
+                               'subs':{
+                                   'cell_thres_ratio_1':1.0,
+                                   'nucl_thres_ratio_1':1.5,
+                                   'ROI_mode_1':'Detect cell',
+                                   'cp_roi_1':False,
+                                   'cell_thres_ratio_2':1.0,
+                                   'nucl_thres_ratio_2':1.5,
+                                   'ROI_mode_2':'Detect cell',
+                                   'cp_roi_2':False,
+                                   }
+                               }
+                           }
+
+
+
+
+    
+
+    
+    def get_roi_state(self):
+        self.ROIS_state = {'File roi':dpg.get_value('FILE_ROI_checkbox'),
+                           'Auto roi':{
+                               'state':dpg.get_value('Auto_ROI_checkbox'),
+                               'subs':{
+                                   'cell_thres_ratio_1':dpg.get_value('cell_thres_ratio_1'),
+                                   'nucl_thres_ratio_1':dpg.get_value('nucl_thres_ratio_1'),
+                                   'ROI_mode_1':dpg.get_value('ROI_mode_1'),
+                                   'cp_roi_1':dpg.get_value('cp_roi_1'),
+                                   'cell_thres_ratio_2':dpg.get_value('cell_thres_ratio_2'),
+                                   'nucl_thres_ratio_2':dpg.get_value('nucl_thres_ratio_2'),
+                                   'ROI_mode_2':dpg.get_value('ROI_mode_2'),
+                                   'cp_roi_2':dpg.get_value('cp_roi_2'),
+                                   }
+                               }
+                           }
+        # lprint(self.ROIS_state)
+
+    def set_roi_state(self):
+        # lprint(self.ROIS_state)
+        dpg.set_value('FILE_ROI_checkbox',self.ROIS_state['File roi'])
+        dpg.set_value('Auto_ROI_checkbox',self.ROIS_state['Auto roi']['state'])
+        for key in self.ROIS_state['Auto roi']['subs'].keys():
+            dpg.set_value(key,self.ROIS_state['Auto roi']['subs'][key])
+                
+        
+    
     def define_file_menu_callbacks(self):
 
         dpg.configure_item('Open_PTU_menu_item', callback=lambda: dpg.show_item("PTU_file_dialog_id"))
@@ -2398,7 +2452,7 @@ class _Phot2conc_vars_funct:
     def callback_reset_results_DF(self):
         self.initialize_res_df()
 
-        files = os.listdir(self.last_directory)
+        files = os.listdir(self.PTU_directory)
         files = [f for f in files if f.endswith('.rpk')]
         for f in files:
             os.remove(os.path.join(self.PTU_directory, f))
@@ -2407,8 +2461,13 @@ class _Phot2conc_vars_funct:
         self.load_PTU_images(self.anal_file)
 
     def callback_select_roi(self, sender, app_data):
+
+        
+        
         if dpg.get_value(sender):
             dpg.set_value('Auto_ROI_checkbox', False)
+            dpg.hide_item('ROI_name_tag')
+            dpg.show_item('ROI_names_combo_tag')
             self.callback_select_autoroi('Auto_ROI_checkbox', False)
             # dpg.configure_item('cell_thres_ratio_1',enabled=False)
             # dpg.configure_item('nucleus_search_1',enabled=False)
@@ -2418,17 +2477,25 @@ class _Phot2conc_vars_funct:
             # dpg.configure_item('nucl_thres_ratio_2',enabled=False)
             # dpg.configure_item('cp_roi_1',enabled=False)
             # dpg.configure_item('cp_roi_2',enabled=False)
-            if self.ROI_directory != None:
-                self.load_PTU_images(self.anal_file)
+            if self.ROI_directory != None and len(self.ROI_directory)!=0 :
+                
+                try:
+                    self.load_PTU_images(self.anal_file)
+                except:
+                    self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
 
             else:
                 dpg.show_item('ROI_folder_dialog_id')
         else:
             self.load_PTU_images(self.anal_file)
 
+        self.get_roi_state()
+
     def callback_select_autoroi(self, sender, app_data):
         if dpg.get_value(sender):
             dpg.set_value('FILE_ROI_checkbox', False)
+            dpg.show_item('ROI_name_tag')
+            dpg.hide_item('ROI_names_combo_tag')
             dpg.show_item('auto_ROI_ch_table')
             dpg.configure_item('cell_thres_ratio_1', enabled=True)
             dpg.configure_item('nucl_thres_ratio_1', enabled=True)
@@ -2486,9 +2553,9 @@ class _Phot2conc_vars_funct:
                     self.mode_init.top_indent + dpg.get_item_height(
                 'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
             dpg.configure_item('file_window', height=self.mode_init.file_window['height'])
-
+        self.get_roi_state()
         self.load_PTU_images(self.anal_file)
-
+        
     def display_images(self, channel):
 
         if channel == 1:
@@ -2578,11 +2645,14 @@ class _Phot2conc_vars_funct:
             # self.display_images([self.DF],chan)
             self.display_images(chan)
 
+
+    # 
+    
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
         dpg.set_value('ROI_name_tag', 'ROI_0')
         pickle_file = os.path.join(self.PTU_directory, an_file + '.pkl')
-
+        # lprint(pickle_file)
         with open(pickle_file, 'rb') as pcklf:
             pklf = pickle.load(pcklf)
 
@@ -2641,6 +2711,33 @@ class _Phot2conc_vars_funct:
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
 
+                    def check_for_roi_files(path_to_search, anfile):
+                        try:
+                            roi_files = os.listdir(path_to_search)
+                        except:
+                            self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
+                            return 
+                        roi_files = [f for f in roi_files if anfile in f]
+                        output = {'ch_1':{},
+                                  'ch_2':{}
+                                 }
+                        for chan in ['ch_1','ch_2']:
+                            roi_files = [f for f in roi_files if chan in f]
+                            roi_files.sort()
+                            TU zmieniC
+                            for f in roi_files:
+                                roi_n = f.split('_')
+                                roi_n = [ r for r in roi_n if r.startswith('roi')]
+                                roin = roi_n[0][-1]
+                                # print(roin)
+                                output[chan]['ROI_'+roin]=f
+                        return output
+                    chan = 'ch_1'    
+                    
+                    lprint(check_for_roi_files(self.ROI_directory, an_file, chan))
+                    # except:
+                    #     self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
+                    
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
                     self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                     self.processor_1.roi_image = self.roi_1
@@ -2896,6 +2993,7 @@ class _Phot2conc_vars_funct:
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
         # lprint(channel, self.Channels)
+        # lprint(ui_state)
         if ui_state['auto_roi']:
             if len(self.Channels) == 1:
                 if channel == self.Channels[0]:
@@ -2910,8 +3008,8 @@ class _Phot2conc_vars_funct:
                     self._process_file_roi(channel, disp, ui_state)
                 else:
                     pass
-                
-            self._process_file_roi(channel, disp, ui_state)
+            else:   
+                self._process_file_roi(channel, disp, ui_state)
         else:
             self._process_no_roi(channel, disp, ui_state)
 
@@ -2926,6 +3024,7 @@ class _Phot2conc_vars_funct:
             # else:
             channel = sender[-1]
             # lprint(channel,self.Channels)
+            
             self.process_channel(channel, self.get_ui_state(channel))
         else:
             
@@ -3264,9 +3363,11 @@ class _Phot2conc_vars_funct:
         dpg.set_value('FILE_ROI_checkbox', pkl['ROI_mode'][0])
         dpg.set_value('Auto_ROI_checkbox', pkl['ROI_mode'][1])
         if pkl['ROI_mode'][1]:
+            self.set_roi_state()
             self.callback_select_autoroi('Auto_ROI_checkbox', pkl['ROI_mode'][1])
 
         else:
+            self.set_roi_state()
             # self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
             self.callback_select_roi('FILE_ROI_checkbox', pkl['ROI_mode'][0])
 

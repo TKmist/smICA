@@ -255,8 +255,13 @@ with dpg.window(label='',
             dpg.add_checkbox(label='Auto ROI', tag='Auto_ROI_checkbox', default_value=False,
                              callback=mode_cmn.callback_select_autoroi,
                              enabled=False)
-            dpg.add_input_text(tag='ROI_name_tag',default_value='ROI_0',on_enter=True,multiline=False,width=-1)
-
+            with dpg.group(tag='roi_name_group'):
+                dpg.add_input_text(tag='ROI_name_tag',default_value='ROI_0',on_enter=True,multiline=False,width=-1)
+                dpg.add_combo(tag='ROI_names_combo_tag',
+                              items=mode_init.ROI_names_combo_tag['items'],
+                              default_value=mode_init.ROI_names_combo_tag['items'][0],
+                              width=mode_init.ROI_names_combo_tag['width'],
+                              show=False)
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -401,12 +406,14 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'Pixel_dwell_output_tooltip',
                             'Pixel_dwell_output_tooltip_text',
                             'PTU_roi',
+                            'roi_name_group'
                             'PTU_DATA_mid_sep_2',
                             'ROI_table',
                             'ROI_table_col1',
                             'ROI_table_col2',
                             'ROI_table_col3',
                             'ROI_table_row1',
+                            'ROI_names_combo_tag'
                             'auto_ROI_ch_table',
                             'auto_ROI_ch_table_row0',
                             'auto_ROI_ch_table_col1',

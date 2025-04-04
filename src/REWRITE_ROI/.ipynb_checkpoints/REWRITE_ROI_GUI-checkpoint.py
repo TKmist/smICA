@@ -31,7 +31,7 @@ with open('../LICENSE', 'r') as file:
 with open('../VERSION', 'r') as file:
     VERSION = file.read()
 
-
+global _path
 line='=============================================================================='
 def execfile(filepath, globals=globals(), locals=None):
     '''Import module allowing execution of external python scripts as part of the main code. This part of the code is based on the following source: https://stackoverflow.com/a/41658338 '''
@@ -57,7 +57,7 @@ print(line)
 print(line,end='\n\n')
 
 
-
+_path = ''
 
 
 execfile(os.path.join('dep','Functions.py'))          

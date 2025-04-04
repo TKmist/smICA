@@ -26,12 +26,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-
+global _pathm
 dpg.add_file_dialog(directory_selector=True,
                     label = 'Select source ROI folder',
                     width =400,
                     height=300,
-                    
+                    default_path = _path,
                     show=False,
                     file_count=5,
 
@@ -47,7 +47,7 @@ dpg.add_file_dialog(directory_selector=True,
                     show=False,
                     width =400,
                     height=300,
-
+                    default_path = _path,
                     file_count=5,
 
                     callback=callback_open_target_folder,
