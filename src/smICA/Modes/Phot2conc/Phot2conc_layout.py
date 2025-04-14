@@ -261,6 +261,7 @@ with dpg.window(label='',
                               items=mode_init.ROI_names_combo_tag['items'],
                               default_value=mode_init.ROI_names_combo_tag['items'][0],
                               width=mode_init.ROI_names_combo_tag['width'],
+                              callback = mode_cmn.callback_ROI_names_combo,
                               show=False)
     with dpg.table(header_row=False,
                    width=-1,

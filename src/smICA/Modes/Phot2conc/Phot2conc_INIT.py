@@ -952,11 +952,18 @@ class _Phot2conc_vars_funct:
             self.Sing_Results_DF.dropna(inplace=True)
         else:
             pass
+
+        if dpg.get_value('Auto_ROI_checkbox'):
+            roiname = dpg.get_value('ROI_name_tag')
+        elif dpg.get_value('FILE_ROI_checkbox'):
+            roiname = dpg.get_value('ROI_names_combo_tag')
+        else:
+            roiname = dpg.get_value('ROI_name_tag')
         if len(self.Channels) == 1:
 
             if '1' in self.Channels[0]:
                 self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                          dpg.get_value('ROI_name_tag'),
+                                                          roiname,
                                                           1,
                                                           self.mean_Photons_ch_1,
                                                           self.mean_Photons_err_ch_1,
@@ -970,7 +977,7 @@ class _Phot2conc_vars_funct:
                                                         columns=self.Sing_Results_DF.columns)
             elif '2' in self.Channels[0]:
                 self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                          dpg.get_value('ROI_name_tag'),
+                                                          roiname,
                                                           2,
                                                           self.mean_Photons_ch_2,
                                                           self.mean_Photons_err_ch_2,
@@ -985,7 +992,7 @@ class _Phot2conc_vars_funct:
                 pass
         if len(self.Channels) == 2:
             self.Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                      dpg.get_value('ROI_name_tag'),
+                                                      roiname,
                                                       1,
                                                       self.mean_Photons_ch_1,
                                                       self.mean_Photons_err_ch_1,
@@ -996,7 +1003,7 @@ class _Phot2conc_vars_funct:
                                                       self.median_C_ch_1,
                                                       self.median_err_C_ch_1],
                                                      [self.anal_file,
-                                                      dpg.get_value('ROI_name_tag'),
+                                                      roiname,
                                                       2,
                                                       self.mean_Photons_ch_2,
                                                       self.mean_Photons_err_ch_2,
@@ -2178,21 +2185,54 @@ class _Phot2conc_vars_funct:
         # print(self.files)
         filenames = [f.replace('.ptu', '') for f in self.files]
         # print(filenames)
-
-        for cnt, an_file in enumerate(filenames):
-            # print(cnt,an_file)
-            self.anal_file = an_file
-
-            dpg.configure_item('file_box', default_value=an_file)
-            self.callback_listbox('file_box', self.anal_file)
-            # self.load_PTU_images(an_file)
-            # self.callback_calculate(sender,app_data)
-
-            if len(self.Channels) == 1:
-                if '1' in self.Channels[0]:
-
+        if dpg.get_value('Auto_ROI_checkbox') or (not dpg.get_value('Auto_ROI_checkbox') and not dpg.get_value('FILE_ROI_checkbox')):
+            roiname=dpg.get_value('ROI_name_tag')
+            for cnt, an_file in enumerate(filenames):
+                # print(cnt,an_file)
+                self.anal_file = an_file
+    
+                dpg.configure_item('file_box', default_value=an_file)
+                
+                # self.load_PTU_images(an_file)
+                # self.callback_calculate(sender,app_data)
+                
+                    
+                self.callback_listbox('file_box',self.anal_file)
+                if len(self.Channels) == 1:
+                    if '1' in self.Channels[0]:
+    
+                        Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                             roiname,
+                                                             1,
+                                                             self.mean_Photons_ch_1,
+                                                             self.mean_Photons_err_ch_1,
+                                                             self.mean_Molecules_ch_1,
+                                                             self.mean_Molecules_err_ch_1,
+                                                             self.mean_Concentration_ch_1,
+                                                             self.mean_Concentration_err_ch_1,
+                                                             self.median_C_ch_1,
+                                                             self.median_err_C_ch_1]],
+                                                           columns=self.Sing_Results_DF.columns)
+    
+                    elif '2' in self.Channels[0]:
+                        Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                             roiname,
+                                                             2,
+                                                             self.mean_Photons_ch_2,
+                                                             self.mean_Photons_err_ch_2,
+                                                             self.mean_Molecules_ch_2,
+                                                             self.mean_Molecules_err_ch_2,
+                                                             self.mean_Concentration_ch_2,
+                                                             self.mean_Concentration_err_ch_2,
+                                                             self.median_C_ch_2,
+                                                             self.median_err_C_ch_2]],
+                                                           columns=self.Sing_Results_DF.columns)
+                    else:
+                        pass
+    
+                if len(self.Channels) == 2:
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                         dpg.get_value('ROI_name_tag'),
+                                                         roiname,
                                                          1,
                                                          self.mean_Photons_ch_1,
                                                          self.mean_Photons_err_ch_1,
@@ -2201,12 +2241,9 @@ class _Phot2conc_vars_funct:
                                                          self.mean_Concentration_ch_1,
                                                          self.mean_Concentration_err_ch_1,
                                                          self.median_C_ch_1,
-                                                         self.median_err_C_ch_1]],
-                                                       columns=self.Sing_Results_DF.columns)
-
-                elif '2' in self.Channels[0]:
-                    Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                         dpg.get_value('ROI_name_tag'),
+                                                         self.median_err_C_ch_1],
+                                                        [self.anal_file,
+                                                         roiname,
                                                          2,
                                                          self.mean_Photons_ch_2,
                                                          self.mean_Photons_err_ch_2,
@@ -2217,36 +2254,91 @@ class _Phot2conc_vars_funct:
                                                          self.median_C_ch_2,
                                                          self.median_err_C_ch_2]],
                                                        columns=self.Sing_Results_DF.columns)
-                else:
-                    pass
+                self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
+                self._pkl_file()
+        elif dpg.get_value('FILE_ROI_checkbox'):
+            for cnt, an_file in enumerate(filenames):
+                # print(cnt,an_file)
+                self.anal_file = an_file
+    
+                dpg.configure_item('file_box', default_value=an_file)
+                
+                # self.load_PTU_images(an_file)
+                # self.callback_calculate(sender,app_data)
+                
+                    
+                # self.callback_listbox('file_box',self.anal_file)
+            
 
-            if len(self.Channels) == 2:
-                Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
-                                                     dpg.get_value('ROI_name_tag'),
-                                                     1,
-                                                     self.mean_Photons_ch_1,
-                                                     self.mean_Photons_err_ch_1,
-                                                     self.mean_Molecules_ch_1,
-                                                     self.mean_Molecules_err_ch_1,
-                                                     self.mean_Concentration_ch_1,
-                                                     self.mean_Concentration_err_ch_1,
-                                                     self.median_C_ch_1,
-                                                     self.median_err_C_ch_1],
-                                                    [self.anal_file,
-                                                     dpg.get_value('ROI_name_tag'),
-                                                     2,
-                                                     self.mean_Photons_ch_2,
-                                                     self.mean_Photons_err_ch_2,
-                                                     self.mean_Molecules_ch_2,
-                                                     self.mean_Molecules_err_ch_2,
-                                                     self.mean_Concentration_ch_2,
-                                                     self.mean_Concentration_err_ch_2,
-                                                     self.median_C_ch_2,
-                                                     self.median_err_C_ch_2]],
-                                                   columns=self.Sing_Results_DF.columns)
+                ROIS = dpg.get_item_configuration('ROI_names_combo_tag')['items']
+                
+                self.callback_listbox('file_box',self.anal_file)
 
-            self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
-            self._pkl_file()
+                for ROI in ROIS:
+                    self.callback_ROI_names_combo('ROI_names_combo_tag', ROI)
+                    roiname = ROI
+                    if len(self.Channels) == 1:
+                        if '1' in self.Channels[0]:
+        
+                            Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                                 roiname,
+                                                                 1,
+                                                                 self.mean_Photons_ch_1,
+                                                                 self.mean_Photons_err_ch_1,
+                                                                 self.mean_Molecules_ch_1,
+                                                                 self.mean_Molecules_err_ch_1,
+                                                                 self.mean_Concentration_ch_1,
+                                                                 self.mean_Concentration_err_ch_1,
+                                                                 self.median_C_ch_1,
+                                                                 self.median_err_C_ch_1]],
+                                                               columns=self.Sing_Results_DF.columns)
+        
+                        elif '2' in self.Channels[0]:
+                            Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                                 roiname,
+                                                                 2,
+                                                                 self.mean_Photons_ch_2,
+                                                                 self.mean_Photons_err_ch_2,
+                                                                 self.mean_Molecules_ch_2,
+                                                                 self.mean_Molecules_err_ch_2,
+                                                                 self.mean_Concentration_ch_2,
+                                                                 self.mean_Concentration_err_ch_2,
+                                                                 self.median_C_ch_2,
+                                                                 self.median_err_C_ch_2]],
+                                                               columns=self.Sing_Results_DF.columns)
+                        else:
+                            pass
+        
+                    elif len(self.Channels) == 2:
+                        Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
+                                                             roiname,
+                                                             1,
+                                                             self.mean_Photons_ch_1,
+                                                             self.mean_Photons_err_ch_1,
+                                                             self.mean_Molecules_ch_1,
+                                                             self.mean_Molecules_err_ch_1,
+                                                             self.mean_Concentration_ch_1,
+                                                             self.mean_Concentration_err_ch_1,
+                                                             self.median_C_ch_1,
+                                                             self.median_err_C_ch_1],
+                                                            [self.anal_file,
+                                                             roiname,
+                                                             2,
+                                                             self.mean_Photons_ch_2,
+                                                             self.mean_Photons_err_ch_2,
+                                                             self.mean_Molecules_ch_2,
+                                                             self.mean_Molecules_err_ch_2,
+                                                             self.mean_Concentration_ch_2,
+                                                             self.mean_Concentration_err_ch_2,
+                                                             self.median_C_ch_2,
+                                                             self.median_err_C_ch_2]],
+                                                           columns=self.Sing_Results_DF.columns)
+                
+                    self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
+                self._pkl_file()
+            
+
+            
 
     def callback_directory_select(self, sender, app_data):
         self.files = ()
@@ -2487,6 +2579,8 @@ class _Phot2conc_vars_funct:
             else:
                 dpg.show_item('ROI_folder_dialog_id')
         else:
+            dpg.show_item('ROI_name_tag')
+            dpg.hide_item('ROI_names_combo_tag')
             self.load_PTU_images(self.anal_file)
 
         self.get_roi_state()
@@ -2647,6 +2741,82 @@ class _Phot2conc_vars_funct:
 
 
     # 
+    def check_for_roi_files(self,path_to_search, anfile):
+        try:
+            roi_files = os.listdir(path_to_search)
+        except:
+            self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
+            return 
+        roi_files = [f for f in roi_files if anfile in f]
+        rois = []
+        
+        for f in roi_files:
+            roi_n = f.split('_')
+            
+            roi_n = [ r for r in roi_n if r.startswith('roi')]
+            roicnt = roi_n[0].replace('roi','')
+            if len(roicnt)!=0:
+                roin = 'ROI_'+roicnt
+            else:
+                roin = 'ROI_'+str(0)
+            # print(roin)
+            rois.append(roin)
+            # print(roin)
+        roiset = list(set(rois))
+        roiset.sort()
+        # lprint(roiset)
+        output = {k:{} for k in roiset}
+        for rs in roiset:
+            rn = rs[-1]
+            chns=[]
+            for f in roi_files:
+                if 'roi'+rn in f:
+                    ch = f.split('_ch_')
+                    ch = [ r for r in ch if r.endswith('.dat')][0][0]
+                    # print(ch)
+                    # chns.append(ch)
+            # for ch in chns:
+                    output[rs]['ch_'+ch] = f
+                    
+        # lprint(rois)
+        
+        
+        return output
+
+    def callback_ROI_names_combo(self, sender, app_data):
+        ROIn = app_data
+        roin = ROIn.replace('ROI_','')
+        # lprint(roin)
+        if len(self.Channels) == 1:
+            if '1' in self.Channels[0]:
+                roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_1.dat')
+                self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
+                self.processor_1.roi_image = self.roi_1
+                self.image_1_times_roi = self.Current_image_1
+                self.display_images('both')
+            elif '2' in self.Channels[0]:
+                roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_2.dat')
+                self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
+                self.processor_2.roi_image = self.roi_2
+                self.image_2_times_roi = self.Current_image_2
+                self.display_images('both')
+        elif len(self.Channels) == 2:
+            roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_1.dat')
+            self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
+            self.processor_1.roi_image = self.roi_1
+            self.image_1_times_roi = self.Current_image_1
+
+            roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_2.dat')
+            self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
+            self.processor_2.roi_image = self.roi_2
+            self.image_2_times_roi = self.Current_image_2
+
+            self.display_images('both')
+            
+            
+            
+        
+        
     
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
@@ -2702,7 +2872,10 @@ class _Phot2conc_vars_funct:
         self.Channels = [ch[-1] for ch in self.Channels]
 
         if dpg.get_value('FILE_ROI_checkbox'):
-
+            Existing_Rois = self.check_for_roi_files(self.ROI_directory, an_file)
+            dpg.configure_item('ROI_names_combo_tag',items=list(Existing_Rois.keys()))
+            dpg.set_value('ROI_names_combo_tag',list(Existing_Rois.keys())[0])
+        
             if len(self.Channels) == 1:
                 if '1' in self.Channels[0]:
                     Intensity_1 = pklf['intensity_1']
@@ -2711,34 +2884,21 @@ class _Phot2conc_vars_funct:
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
 
-                    def check_for_roi_files(path_to_search, anfile):
-                        try:
-                            roi_files = os.listdir(path_to_search)
-                        except:
-                            self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
-                            return 
-                        roi_files = [f for f in roi_files if anfile in f]
-                        output = {'ch_1':{},
-                                  'ch_2':{}
-                                 }
-                        for chan in ['ch_1','ch_2']:
-                            roi_files = [f for f in roi_files if chan in f]
-                            roi_files.sort()
-                            TU zmieniC
-                            for f in roi_files:
-                                roi_n = f.split('_')
-                                roi_n = [ r for r in roi_n if r.startswith('roi')]
-                                roin = roi_n[0][-1]
-                                # print(roin)
-                                output[chan]['ROI_'+roin]=f
-                        return output
-                    chan = 'ch_1'    
                     
-                    lprint(check_for_roi_files(self.ROI_directory, an_file, chan))
+                        
+                    
+                    
+                    
                     # except:
                     #     self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
+
                     
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
+                    if os.path.exists(roi_1_path):
+                        pass
+                    else:
+                        roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
+                    
                     self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                     self.processor_1.roi_image = self.roi_1
                     Intensity_1 = Intensity_1
@@ -2761,6 +2921,13 @@ class _Phot2conc_vars_funct:
                     self.processor_2.image = Intensity_2.astype(np.uint16)
 
                     roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
+                    
+                    if os.path.exists(roi_2_path):
+                        pass
+                    else:
+                        roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
+
+                    
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                     self.processor_2.roi_image = self.roi_2
                     channel = 'both'
@@ -2785,8 +2952,20 @@ class _Phot2conc_vars_funct:
                 self.processor_2 = ImageROIProcessor()
                 self.processor_2.image = Intensity_2.astype(np.uint16)
                 roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
+
+                if os.path.exists(roi_1_path):
+                    pass
+                else:
+                    roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
+                
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
+
+                if os.path.exists(roi_2_path):
+                    pass
+                else:
+                    roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
+                
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                 self.processor_1.roi_image = self.roi_1
                 self.processor_2.roi_image = self.roi_2
