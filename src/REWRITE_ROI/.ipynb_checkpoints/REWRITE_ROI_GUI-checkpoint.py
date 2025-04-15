@@ -42,7 +42,8 @@ def execfile(filepath, globals=globals(), locals=None):
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), globals, locals)
 
-
+import sys
+_Arguments = len(sys.argv) - 1
 import dearpygui.dearpygui as dpg
 import os
 import pandas as pd
@@ -58,6 +59,9 @@ print(line,end='\n\n')
 
 
 _path = ''
+
+
+
 
 
 execfile(os.path.join('dep','Functions.py'))          
@@ -157,6 +161,7 @@ with dpg.window(label='',
 
 
 
+    # print("No arguments provided.")
 
 
 
@@ -177,7 +182,23 @@ execfile(os.path.join('dep','Dialogs.py'))
 
 
 
-
+if _Arguments:
+    print(f"Script started with {_Arguments} argument(s): {sys.argv[1:]}")
+    source_path = {'file_path_name':sys.argv[1]}
+    resolution = sys.argv[2]
+    resolution = resolution.split('x')
+    target_path = {'file_path_name':sys.argv[3]}
+    # dpg.set_value('tag_source_path',source_path)
+    callback_open_source_folder('Source_file_dialog',source_path)
+    dpg.set_value('add_text_width',resolution[0])
+    dpg.set_value('add_text_height',resolution[1])
+    callback_open_target_folder('Target_file_dialog',target_path)
+    callback_proceed('Run_script',None)
+    dpg.stop_dearpygui()
+    
+    
+else:
+    pass
 
 
 
