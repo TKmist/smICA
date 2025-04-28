@@ -286,12 +286,17 @@ with dpg.window(label='',
         dpg.add_table_column(label="", tag='auto_ROI_ch_table_col3', width=mode_init.auto_ROI_ch_table_col3['width'],
                              width_stretch=True)
         with dpg.table_row(tag='auto_ROI_ch_table_row0'):
-
-            dpg.add_checkbox(label='Multiple Cells', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
-        with dpg.table_row(tag='auto_ROI_ch_table_row1'):
-            dpg.add_text("", tag='auto_ROI_ch_table_row1_text_1')
+            dpg.add_text("", tag='auto_ROI_ch_table_row0_text_1')
             dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
+            # dpg.add_checkbox(label='Multiple Cells', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
+        with dpg.table_row(tag='auto_ROI_ch_table_row1'):
+            
+            dpg.add_text("Many cells:", tag='auto_ROI_ch_table_row1_text_1')
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_ch2', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            # dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
+            # dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
         with dpg.table_row(tag='auto_ROI_ch_table_row2'):
             dpg.add_text("Thres. Cell:", tag='auto_ROI_ch_table_row2_text_1')
             dpg.add_drag_float(tag='cell_thres_ratio_1',
@@ -320,6 +325,41 @@ with dpg.window(label='',
             with dpg.tooltip('cell_thres_ratio_2', tag='cell_thres_ratio_2_tooltip'):
                 dpg.add_text("Set threshold to detect cell.", tag='cell_thres_ratio_2_tooltip_text')
 
+        with dpg.table_row(tag='auto_ROI_ch_table_row5'):
+            dpg.add_text("Copy cell ROI:", tag='auto_ROI_ch_table_row5_text_1')
+
+            dpg.add_checkbox(label='Channel 2 \u2192 1',
+                             tag='cp_roi_1',
+                             default_value=False,
+                             enabled=False,
+                             # width=-1,
+                             callback=mode_cmn.copy_roi_from_channel,
+                             # parent='image_window_1'
+                             )
+            dpg.add_checkbox(label='Channel 1 \u2192 2',
+                             tag='cp_roi_2',
+                             default_value=False,
+                             enabled=False,
+                             # width=-1,
+                             callback=mode_cmn.copy_roi_from_channel,
+                             # parent='image_window_1'
+                             )
+        with dpg.table_row(tag='auto_ROI_ch_table_row4'):
+            dpg.add_text("ROI mode:", tag='auto_ROI_ch_table_row4_text_1')
+            dpg.add_combo(tag='ROI_mode_1',
+                          width=mode_init.ROI_mode_1['width'],
+                          items=mode_init.ROI_mode_1['items'],
+                          default_value=mode_init.ROI_mode_1['items'][0],
+                          callback=mode_cmn._update_textures_both_roi,
+                          enabled=False,
+                          )
+            dpg.add_combo(tag='ROI_mode_2',
+                          width=mode_init.ROI_mode_2['width'],
+                          items=mode_init.ROI_mode_2['items'],
+                          default_value=mode_init.ROI_mode_2['items'][0],
+                          callback=mode_cmn._update_textures_both_roi,
+                          enabled=False,
+                          )
         with dpg.table_row(tag='auto_ROI_ch_table_row3'):
             dpg.add_text("Thres. Nucl.:", tag='auto_ROI_ch_table_row3_text_1')
 
@@ -349,41 +389,7 @@ with dpg.window(label='',
                                )
             with dpg.tooltip('nucl_thres_ratio_2', tag='nucl_thres_ratio_2_tooltip'):
                 dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_2_tooltip_text')
-        with dpg.table_row(tag='auto_ROI_ch_table_row4'):
-            dpg.add_text("ROI mode:", tag='auto_ROI_ch_table_row4_text_1')
-            dpg.add_combo(tag='ROI_mode_1',
-                          width=mode_init.ROI_mode_1['width'],
-                          items=mode_init.ROI_mode_1['items'],
-                          default_value=mode_init.ROI_mode_1['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
-                          enabled=False,
-                          )
-            dpg.add_combo(tag='ROI_mode_2',
-                          width=mode_init.ROI_mode_2['width'],
-                          items=mode_init.ROI_mode_2['items'],
-                          default_value=mode_init.ROI_mode_2['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
-                          enabled=False,
-                          )
-        with dpg.table_row(tag='auto_ROI_ch_table_row5'):
-            dpg.add_text("Copy ROI:", tag='auto_ROI_ch_table_row5_text_1')
-
-            dpg.add_checkbox(label='Channel 2 \u2192 1',
-                             tag='cp_roi_1',
-                             default_value=False,
-                             enabled=False,
-                             # width=-1,
-                             callback=mode_cmn.copy_roi_from_channel,
-                             # parent='image_window_1'
-                             )
-            dpg.add_checkbox(label='Channel 1 \u2192 2',
-                             tag='cp_roi_2',
-                             default_value=False,
-                             enabled=False,
-                             # width=-1,
-                             callback=mode_cmn.copy_roi_from_channel,
-                             # parent='image_window_1'
-                             )
+        
 
 globalITEMS.windows.extend(['PTU_DATA_window',
                             'PTU_meta',
@@ -417,6 +423,7 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'ROI_names_combo_tag'
                             'auto_ROI_ch_table',
                             'auto_ROI_ch_table_row0',
+                            'auto_ROI_ch_table_row0_text_1',
                             'auto_ROI_ch_table_col1',
                             'auto_ROI_ch_table_col2',
                             'auto_ROI_ch_table_col3',
@@ -451,7 +458,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox',
                             'ROI_name_tag',
-                            'multiple_cells_checkbox'
+                            'multiple_cells_checkbox',
+                            'multiple_cells_checkbox_ch2'
 
                             ])
 # lprint(globalITEMS.windows)

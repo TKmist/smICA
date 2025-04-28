@@ -262,13 +262,13 @@ class _Phot2conc_init:
                                }
 
         self.auto_ROI_ch_table_col1 = {'name': 'auto_ROI_ch_table_col1',
-                                       'width': int(self.PTU_DATA_window['width'] / 5)
+                                       'width': int(2*self.PTU_DATA_window['width'] / 8)
                                        }
         self.auto_ROI_ch_table_col2 = {'name': 'auto_ROI_ch_table_col2',
-                                       'width': int(2 * self.PTU_DATA_window['width'] / 5)
+                                       'width': int(3 * self.PTU_DATA_window['width'] / 8)
                                        }
         self.auto_ROI_ch_table_col3 = {'name': 'auto_ROI_ch_table_col3',
-                                       'width': int(2 * self.PTU_DATA_window['width'] / 5)
+                                       'width': int(3 * self.PTU_DATA_window['width'] / 8)
                                        }
         self.ROI_mode_1 = {'name': 'ROI_mode_1',
                            'width': -1,

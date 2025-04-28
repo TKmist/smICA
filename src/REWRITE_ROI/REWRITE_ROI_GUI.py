@@ -196,6 +196,7 @@ if _Arguments:
     callback_proceed('Run_script',None)
     dpg.stop_dearpygui()
     
+    dpg.destroy_context
     
 else:
     pass
