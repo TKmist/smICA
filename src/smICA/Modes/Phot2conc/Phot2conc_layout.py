@@ -30,7 +30,7 @@ SOFTWARE.
 from Modes.Phot2conc.Phot2conc_INIT import _Phot2conc_init, _Phot2conc_vars_funct
 import numpy as np
 import cv2
-#import dearpygui as dpg
+
 
 
 def Phot2conc_resizer(sender, app_data):
@@ -293,8 +293,8 @@ with dpg.window(label='',
         with dpg.table_row(tag='auto_ROI_ch_table_row1'):
             
             dpg.add_text("Many cells:", tag='auto_ROI_ch_table_row1_text_1')
-            dpg.add_checkbox(label='', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
-            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_ch2', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_1', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_2', default_value=False, callback=mode_cmn._update_textures_both_roi)
             # dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             # dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
         with dpg.table_row(tag='auto_ROI_ch_table_row2'):
