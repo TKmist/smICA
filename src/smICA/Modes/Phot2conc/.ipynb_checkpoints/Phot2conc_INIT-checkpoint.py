@@ -101,8 +101,10 @@ class _Phot2conc_init:
         # print(self.right_indent,self.bottom_indent)
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res', 'img', 'NO_image_INT.npy'))
 
-        self.ROI_mode_items = ['Detect cell',
-                               'Subtract nucleus']
+        self.ROI_mode_items = ['',
+                               'Find bark',
+                               'Find bright'
+                              ]
 
         bf.remove_font_from_registry()
         bf.add_font_to_registry(self.font_size)
@@ -728,11 +730,11 @@ class _Phot2conc_vars_funct:
                                'subs':{
                                    'cell_thres_ratio_1':1.0,
                                    'nucl_thres_ratio_1':1.5,
-                                   'ROI_mode_1':'Detect cell',
+                                   'ROI_mode_1':'',
                                    'cp_roi_1':False,
                                    'cell_thres_ratio_2':1.0,
                                    'nucl_thres_ratio_2':1.5,
-                                   'ROI_mode_2':'Detect cell',
+                                   'ROI_mode_2':'',
                                    'cp_roi_2':False,
                                    }
                                }
@@ -3130,7 +3132,7 @@ class _Phot2conc_vars_funct:
             'auto_roi': dpg.get_value('Auto_ROI_checkbox'),
             'file_roi': dpg.get_value('FILE_ROI_checkbox'),
             'cp': dpg.get_value(f'cp_roi_{channel}'),
-            'multiple_cells_checkbox': dpg.get_value('multiple_cells_checkbox'),
+            'multiple_cells_checkbox': dpg.get_value(f'multiple_cells_checkbox_{channel}'),
             'processor': getattr(self, f'processor_{channel}'),
             'tex_name': getattr(self, f'tex_{channel}_name'),
             'image_times_roi': f'image_{channel}_times_roi',
@@ -3146,24 +3148,21 @@ class _Phot2conc_vars_funct:
 
     def _process_file_roi(self,channel, disp, ui_state):
         if dpg.get_value('FILE_ROI_checkbox'):
-            # lprint('I am here')
+
             processor = getattr(self, f'processor_{channel}')
             img = processor.image
             roi = processor.roi_image
-            # lprint(channel)
-            # lprint(roi)
-            # lprint('I am still here')
+
             full_mask = np.nan_to_num(roi*255, nan=0)
-            # lprint(full_mask)
+
             setattr(self, f'image_{channel}_times_roi',  img*roi)
             
             setattr(processor, 'all_masks',  [full_mask])
-            # lprint('end')
-            # self.image_1_times_roi = img*roi
+
             self._update_texture(channel, disp, ui_state)
-            # lprint('finished')
+
         else:
-            # lprint('else')
+
             self.process_channel(channel, self.get_ui_state(channel))
         
     
@@ -3171,8 +3170,7 @@ class _Phot2conc_vars_funct:
         """Process image channel using centralized UI state"""
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-        # lprint(channel, self.Channels)
-        # lprint(ui_state)
+
         if ui_state['auto_roi']:
             if len(self.Channels) == 1:
                 if channel == self.Channels[0]:
@@ -3197,13 +3195,9 @@ class _Phot2conc_vars_funct:
         # lprint(self.Channels)
         # Determine which channels to update
         if sender.endswith(('1', '2')):
-            
-            # if len(self.Channels)==1:
-            #     channel = self.Channels[0]
-            # else:
+
             channel = sender[-1]
-            # lprint(channel,self.Channels)
-            
+
             self.process_channel(channel, self.get_ui_state(channel))
         else:
             
@@ -3245,15 +3239,16 @@ class _Phot2conc_vars_funct:
         froi = np.clip(processor.image, 0, 255).astype(np.uint8)
 
         self._get_cell_roi(channel, froi, ui_state)
-        # Store contours in processor instead of instance variable
-        # processor.all_contours = full_mask
+
         self._update_texture(channel, disp, ui_state)
 
     def _get_cell_roi(self, channel, froi, ui_state):
         """Get cell ROI using parameters from UI state"""
-        # lprint(ui_state)
+
         processor = ui_state['processor']
-            
+
+        print(processor)
+
         processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
 
 

@@ -101,8 +101,10 @@ class _Phot2conc_init:
         # print(self.right_indent,self.bottom_indent)
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res', 'img', 'NO_image_INT.npy'))
 
-        self.ROI_mode_items = ['Detect cell',
-                               'Subtract nucleus']
+        self.ROI_mode_items = ['',
+                               'Find bark',
+                               'Find bright'
+                              ]
 
         bf.remove_font_from_registry()
         bf.add_font_to_registry(self.font_size)
@@ -728,11 +730,11 @@ class _Phot2conc_vars_funct:
                                'subs':{
                                    'cell_thres_ratio_1':1.0,
                                    'nucl_thres_ratio_1':1.5,
-                                   'ROI_mode_1':'Detect cell',
+                                   'ROI_mode_1':'',
                                    'cp_roi_1':False,
                                    'cell_thres_ratio_2':1.0,
                                    'nucl_thres_ratio_2':1.5,
-                                   'ROI_mode_2':'Detect cell',
+                                   'ROI_mode_2':'',
                                    'cp_roi_2':False,
                                    }
                                }
