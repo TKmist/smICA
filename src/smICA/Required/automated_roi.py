@@ -45,8 +45,12 @@ class ImageROIProcessor:
         # self.find_nucleus = find_nucleus
         self.image = None
         self.roi_image = None
-        self.all_contours = None
+        self.all_cells_contours = None
+        self.all_cells_masks = None
+
         self.all_masks = None
+        self.all_contours = None
+
         self.all_hierarchy = None
 
     def load_image(self):
@@ -63,54 +67,91 @@ class ImageROIProcessor:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
 
 
-    def detect_cell_roi(self, image_to_process, ratio, find_nucleus=False):
+    def detect_cell_roi(self, image_to_process, ratio):
         """
         Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
         """
-
         # Preprocessing: rozmycie i progowanie
         thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
 
         # Znajdowanie konturów
         found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
 
+        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
+
+        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+
+        self.all_cells_masks = self._create_mask(found_contours, image_to_process.shape)
+        self.all_cells_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+
+        """
+        # Creates masks between each external contour and its largest internal contour.
+        # 
+        # Args:
+        #     classified_contours (list): List of tuples (external_contour, largest_internal_contour).
+        #     image_shape (tuple): Shape of the image to create masks of the same size.
+        # 
+        # Returns:
+        #     list: Generated masks for each external-internal contour pair.
+        # """
+        # masks = []
+        # for ext_contour, largest_internal in classified_contours:
+        #     # Create a blank mask
+        #     mask = np.zeros(image_shape[:2], dtype=np.uint8)
+        #     # Draw the external contour filled
+        #     cv2.drawContours(mask, [ext_contour], -1, 255, cv2.FILLED)
+        #     if largest_internal is not None:
+        #         # Subtract the largest internal contour
+        #         cv2.drawContours(mask, [largest_internal], -1, 0, cv2.FILLED)
+        #     masks.append(mask)
+        # return masks
+
+    def detect_dark_spot_inside_roi(self, ratio):
+
+
+
+        roi = self.all_cells_masks[0]/np.max(self.all_cells_masks[0])
+        image = np.clip(self.image, 0, 255).astype(np.uint8)
+
+        image_to_process = (~image * roi).astype(np.uint8)
+
+
+        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
+
+
+        # Znajdowanie konturów
+        found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
 
         classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
 
-        # Tworzenie maski zewnętrznego konturu
 
-        if find_nucleus:
-            # Generate masks for nucleus ROI
-            self.all_masks = self.detect_nucleus_roi(classified_contours_hierarchy, image_to_process.shape)
-        else:
-            # Use only external contours
-            found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
-            self.all_masks = self._create_mask(found_contours, image_to_process.shape)
+        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+        inside_mask = self._create_mask(found_contours, image_to_process.shape)
 
-        self.all_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+        self.all_masks = [self.all_cells_masks[0] - inside_mask[0]]
 
-    def detect_nucleus_roi(self, classified_contours, image_shape):
-        """
-        Creates masks between each external contour and its largest internal contour.
 
-        Args:
-            classified_contours (list): List of tuples (external_contour, largest_internal_contour).
-            image_shape (tuple): Shape of the image to create masks of the same size.
 
-        Returns:
-            list: Generated masks for each external-internal contour pair.
-        """
-        masks = []
-        for ext_contour, largest_internal in classified_contours:
-            # Create a blank mask
-            mask = np.zeros(image_shape[:2], dtype=np.uint8)
-            # Draw the external contour filled
-            cv2.drawContours(mask, [ext_contour], -1, 255, cv2.FILLED)
-            if largest_internal is not None:
-                # Subtract the largest internal contour
-                cv2.drawContours(mask, [largest_internal], -1, 0, cv2.FILLED)
-            masks.append(mask)
-        return masks
+    def detect_bright_spot_inside_roi(self, ratio):
+
+        roi = self.all_cells_masks[0]/np.max(self.all_cells_masks[0])
+        image = np.clip(self.image, 0, 255).astype(np.uint8)
+
+        image_to_process = (image * roi).astype(np.uint8)
+
+
+        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
+
+        # Znajdowanie konturów
+        found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+
+        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
+
+        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+        inside_mask = self._create_mask(found_contours, image_to_process.shape)
+
+        self.all_masks = [self.all_cells_masks[0] - inside_mask[0]]
+
 
 
     @staticmethod

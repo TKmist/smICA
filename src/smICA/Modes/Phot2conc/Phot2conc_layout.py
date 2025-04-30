@@ -289,7 +289,7 @@ with dpg.window(label='',
             dpg.add_text("", tag='auto_ROI_ch_table_row0_text_1')
             dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
-            # dpg.add_checkbox(label='Multiple Cells', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
+
         with dpg.table_row(tag='auto_ROI_ch_table_row1'):
             
             dpg.add_text("Many cells:", tag='auto_ROI_ch_table_row1_text_1')
@@ -350,41 +350,41 @@ with dpg.window(label='',
                           width=mode_init.ROI_mode_1['width'],
                           items=mode_init.ROI_mode_1['items'],
                           default_value=mode_init.ROI_mode_1['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
+                          callback=mode_cmn._roi_mode,
                           enabled=False,
                           )
             dpg.add_combo(tag='ROI_mode_2',
                           width=mode_init.ROI_mode_2['width'],
                           items=mode_init.ROI_mode_2['items'],
                           default_value=mode_init.ROI_mode_2['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
+                          callback=mode_cmn._roi_mode,
                           enabled=False,
                           )
         with dpg.table_row(tag='auto_ROI_ch_table_row3'):
             dpg.add_text("Thres. Nucl.:", tag='auto_ROI_ch_table_row3_text_1')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_1',
-                               default_value=1.5,
+                               default_value=2,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
                                width=mode_init.nucl_thres_ratio_1['width'],
                                enabled=False,
                                format='%.3f',
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._roi_mode
                                )
             with dpg.tooltip('nucl_thres_ratio_1', tag='nucl_thres_ratio_1_tooltip'):
                 dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_1_tooltip_text')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_2',
-                               default_value=1.5,
+                               default_value=2,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
                                width=mode_init.nucl_thres_ratio_2['width'],
                                enabled=False,
                                format='%.3f',
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._roi_mode
                                #callback=mode_cnm._nucleus_thres_ratio
                                )
             with dpg.tooltip('nucl_thres_ratio_2', tag='nucl_thres_ratio_2_tooltip'):
@@ -458,8 +458,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox',
                             'ROI_name_tag',
-                            'multiple_cells_checkbox',
-                            'multiple_cells_checkbox_ch2'
+                            'multiple_cells_checkbox_1',
+                            'multiple_cells_checkbox_2'
 
                             ])
 # lprint(globalITEMS.windows)

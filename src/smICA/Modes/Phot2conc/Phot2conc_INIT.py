@@ -102,7 +102,7 @@ class _Phot2conc_init:
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res', 'img', 'NO_image_INT.npy'))
 
         self.ROI_mode_items = ['',
-                               'Find bark',
+                               'Find dark',
                                'Find bright'
                               ]
 
@@ -3143,7 +3143,7 @@ class _Phot2conc_vars_funct:
             'nucl_thres_ratio': dpg.get_value(f'nucl_thres_ratio_{channel}'),
             'find_roi_mode': dpg.get_value(f'ROI_mode_{channel}')
             }
-        # lprint(ui_state)
+
         return ui_state
 
     def _process_file_roi(self,channel, disp, ui_state):
@@ -3215,19 +3215,26 @@ class _Phot2conc_vars_funct:
                     if dpg.get_value(sender):
                         dpg.set_value(f'cp_roi_{copy_from_channel}', False)
 
+
+
         if dpg.get_value(sender):
+
             copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
             copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
 
-            setattr(copy_to_processor, 'all_masks',  copy_from_processor.all_masks.copy())
-            setattr(copy_to_processor, 'all_contours',  copy_from_processor.all_contours.copy())
+            setattr(copy_to_processor, 'all_masks', copy_from_processor.all_masks.copy())
+            setattr(copy_to_processor, 'all_contours', copy_from_processor.all_contours.copy())
 
             disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
+
+            dpg.configure_item(f'cell_thres_ratio_{copy_to_channel}', enabled=False)
+
             self._update_texture(copy_to_channel, disp, self.get_ui_state(copy_to_channel))
+
 
         else:
 
-            # print('Condition works')
+            dpg.configure_item(f'cell_thres_ratio_{copy_to_channel}', enabled=True)
             self.process_channel(copy_to_channel, self.get_ui_state(copy_to_channel))
 
         self.callback_calculate(sender, None)
@@ -3247,14 +3254,73 @@ class _Phot2conc_vars_funct:
 
         processor = ui_state['processor']
 
-        print(processor)
-
-        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
-
+        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
 
         if not ui_state['multiple_cells_checkbox']:
-            processor.all_contours = [processor.all_contours[0]]
-            processor.all_masks = [processor.all_masks[0]]
+            processor.all_cells_contours = [processor.all_cells_contours[0]]
+            processor.all_cells_masks = [processor.all_cells_masks[0]]
+
+
+        processor.all_masks = processor.all_cells_masks
+        processor.all_contours = processor.all_cells_contours
+
+
+    def _roi_mode(self, sender, app_data, user_data):
+
+        # Logika z blokowaniem i wracaniem do znajdowania cell ROI
+
+        channel = sender[-1]
+
+        ui_state = self.get_ui_state(channel)
+
+        processor = ui_state['processor']
+
+        option_choosen = dpg.get_value(f'ROI_mode_{channel}')
+
+        drag_float_value = dpg.get_value(f'nucl_thres_ratio_{channel}')
+
+
+        if option_choosen == 'Find dark':
+
+
+            processor.detect_dark_spot_inside_roi(drag_float_value)
+            print('first')
+
+        elif option_choosen == 'Find bright':
+
+            processor.detect_bright_spot_inside_roi(drag_float_value)
+
+            print('second')
+
+        else:
+            pass
+
+
+        # image = np.clip(processor.image, 0, 255).astype(np.uint8)
+        #
+        #
+        # print(~image)
+        #
+        # to_roi = ~image
+        #
+        #
+        # np.save('array', to_roi)
+        # np.save('roi', processor.all_masks[0])
+        # print(to_roi)
+        #
+
+        #
+        # print('I did it')
+        #
+        # processor.detect_object_roi(to_roi, ui_state['nucl_thres_ratio'])
+        # processor.all_masks = [processor.all_masks[0]]
+
+        #processor.all_masks = [binary]
+        disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+        self._update_texture(channel, disp, ui_state)
+        self.callback_calculate(sender, None)
+
+        print('all right baby')
 
 
     def _update_texture(self, channel, disp, ui_state):
@@ -3271,6 +3337,9 @@ class _Phot2conc_vars_funct:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
+
+
+
 
     def _process_no_roi(self, channel, disp, ui_state):
         """Handle no ROI case using UI state"""
@@ -3309,6 +3378,7 @@ class _Phot2conc_vars_funct:
                     processor.all_masks = [processor.all_masks[i]]
 
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
+                    dpg.set_value(f'multiple_cells_checkbox_{channel}', False)
                     break
 
             # Update display

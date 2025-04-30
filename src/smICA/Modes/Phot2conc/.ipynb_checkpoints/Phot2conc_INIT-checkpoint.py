@@ -1302,9 +1302,9 @@ class _Phot2conc_vars_funct:
                 Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
                 Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
                 # DF = Current_image_1
-                if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                if self.processor_1.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if1')
-                    ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                    ROI = self.processor_1.all_cells_masks[0].astype(np.uint8)
                     roi = np.where(ROI==0,np.nan,1)
                     img = self.processor_1.image
                     self.DF = img*roi
@@ -1523,9 +1523,9 @@ class _Phot2conc_vars_funct:
                 Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
                 # DF2 = Current_image_2
 
-                if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                if self.processor_2.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if2')
-                    ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                    ROI = self.processor_2.all_cells_masks[0].astype(np.uint8)
                     roi = np.where(ROI==0,np.nan,1)
                     img = self.processor_2.image
                     self.DF2 = img*roi
@@ -1749,9 +1749,9 @@ class _Phot2conc_vars_funct:
             Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
             Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
             # DF = Current_image_1
-            if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+            if self.processor_1.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if1')
-                ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                ROI = self.processor_1.all_cells_masks[0].astype(np.uint8)
                 roi = np.where(ROI==0,np.nan,1)
                 img = self.processor_1.image
                 self.DF = img*roi
@@ -1970,9 +1970,9 @@ class _Phot2conc_vars_funct:
             Veff_ch_2 = 1e-15 * dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
             # DF2 = Current_image_2
-            if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+            if self.processor_2.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if2')
-                ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                ROI = self.processor_2.all_cells_masks[0].astype(np.uint8)
                 roi = np.where(ROI==0,np.nan,1)
                 img = self.processor_2.image
                 self.DF2 = img*roi
@@ -3219,8 +3219,8 @@ class _Phot2conc_vars_funct:
             copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
             copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
 
-            setattr(copy_to_processor, 'all_masks',  copy_from_processor.all_masks.copy())
-            setattr(copy_to_processor, 'all_contours',  copy_from_processor.all_contours.copy())
+            setattr(copy_to_processor, 'all_masks', copy_from_processor.all_cells_masks.copy())
+            setattr(copy_to_processor, 'all_contours', copy_from_processor.all_cells_contours.copy())
 
             disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
             self._update_texture(copy_to_channel, disp, self.get_ui_state(copy_to_channel))
@@ -3249,12 +3249,12 @@ class _Phot2conc_vars_funct:
 
         print(processor)
 
-        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
+        processor.detect_object_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
 
 
         if not ui_state['multiple_cells_checkbox']:
-            processor.all_contours = [processor.all_contours[0]]
-            processor.all_masks = [processor.all_masks[0]]
+            processor.all_cells_contours = [processor.all_cells_contours[0]]
+            processor.all_cells_masks = [processor.all_cells_masks[0]]
 
 
     def _update_texture(self, channel, disp, ui_state):
@@ -3265,9 +3265,9 @@ class _Phot2conc_vars_funct:
         rgba_image[..., :3] = adjusted_rgb
 
         # Use contours from processor
-        if hasattr(processor, 'all_masks') and processor.all_masks is not None:
+        if hasattr(processor, 'all_masks') and processor.all_cells_masks is not None:
 
-            for cell_mask in processor.all_masks:
+            for cell_mask in processor.all_cells_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
