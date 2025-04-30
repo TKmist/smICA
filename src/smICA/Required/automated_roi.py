@@ -150,7 +150,7 @@ class ImageROIProcessor:
         found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
         inside_mask = self._create_mask(found_contours, image_to_process.shape)
 
-        self.all_masks = [self.all_cells_masks[0] - inside_mask[0]]
+        self.all_masks = [inside_mask[0]]
 
 
 

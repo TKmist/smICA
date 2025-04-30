@@ -3222,6 +3222,7 @@ class _Phot2conc_vars_funct:
             copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
             copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
 
+            setattr(copy_to_processor, 'all_cells_masks', copy_from_processor.all_masks.copy())
             setattr(copy_to_processor, 'all_masks', copy_from_processor.all_masks.copy())
             setattr(copy_to_processor, 'all_contours', copy_from_processor.all_contours.copy())
 
@@ -3269,6 +3270,11 @@ class _Phot2conc_vars_funct:
 
         # Logika z blokowaniem i wracaniem do znajdowania cell ROI
 
+        # cp roi nie do końca działa jak coś z jądrem zrobisz -> done
+        # bright spot nie zaznacza tego co trzeba -> done
+        # nie działa odznaczenie wybranego combo -> done
+        #
+
         channel = sender[-1]
 
         ui_state = self.get_ui_state(channel)
@@ -3282,7 +3288,6 @@ class _Phot2conc_vars_funct:
 
         if option_choosen == 'Find dark':
 
-
             processor.detect_dark_spot_inside_roi(drag_float_value)
             print('first')
 
@@ -3293,29 +3298,8 @@ class _Phot2conc_vars_funct:
             print('second')
 
         else:
-            pass
+            self.process_channel(channel, ui_state)
 
-
-        # image = np.clip(processor.image, 0, 255).astype(np.uint8)
-        #
-        #
-        # print(~image)
-        #
-        # to_roi = ~image
-        #
-        #
-        # np.save('array', to_roi)
-        # np.save('roi', processor.all_masks[0])
-        # print(to_roi)
-        #
-
-        #
-        # print('I did it')
-        #
-        # processor.detect_object_roi(to_roi, ui_state['nucl_thres_ratio'])
-        # processor.all_masks = [processor.all_masks[0]]
-
-        #processor.all_masks = [binary]
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
         self._update_texture(channel, disp, ui_state)
         self.callback_calculate(sender, None)
