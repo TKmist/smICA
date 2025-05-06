@@ -3207,6 +3207,22 @@ class _Phot2conc_vars_funct:
 
         self.callback_calculate(sender, None)
 
+
+    def _image_buttons_controller(self, sender):
+
+        channel = sender[-1]
+
+
+        ui_state = self.get_ui_state(channel)
+
+        processor = ui_state['processor']
+
+        disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+
+        self._update_texture(channel, disp, ui_state)
+
+
+
     def copy_roi_from_channel(self, sender):
 
         copy_to_channel = sender[-1]
@@ -3266,14 +3282,9 @@ class _Phot2conc_vars_funct:
         processor.all_contours = processor.all_cells_contours
 
 
+
     def _roi_mode(self, sender, app_data, user_data):
 
-        # Logika z blokowaniem i wracaniem do znajdowania cell ROI
-
-        # cp roi nie do końca działa jak coś z jądrem zrobisz -> done
-        # bright spot nie zaznacza tego co trzeba -> done
-        # nie działa odznaczenie wybranego combo -> done
-        #
 
         channel = sender[-1]
 
@@ -3289,13 +3300,10 @@ class _Phot2conc_vars_funct:
         if option_choosen == 'Find dark':
 
             processor.detect_dark_spot_inside_roi(drag_float_value)
-            print('first')
 
         elif option_choosen == 'Find bright':
 
             processor.detect_bright_spot_inside_roi(drag_float_value)
-
-            print('second')
 
         else:
             self.process_channel(channel, ui_state)
@@ -3304,7 +3312,6 @@ class _Phot2conc_vars_funct:
         self._update_texture(channel, disp, ui_state)
         self.callback_calculate(sender, None)
 
-        print('all right baby')
 
 
     def _update_texture(self, channel, disp, ui_state):
@@ -3321,8 +3328,6 @@ class _Phot2conc_vars_funct:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
-
-
 
 
     def _process_no_roi(self, channel, disp, ui_state):
@@ -3358,8 +3363,13 @@ class _Phot2conc_vars_funct:
         if hasattr(processor, 'all_contours') and processor.all_contours:
             for i, contour in enumerate(processor.all_contours):
                 if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
+
+
                     processor.all_contours = [contour]
                     processor.all_masks = [processor.all_masks[i]]
+
+                    processor.all_cells_contours = [contour]
+                    processor.all_cells_masks = [processor.all_masks[i]]
 
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
                     dpg.set_value(f'multiple_cells_checkbox_{channel}', False)

@@ -636,7 +636,7 @@ with dpg.window(label='Channel 1',
                                speed=0.01,
                                enabled=True,
                                width=mode_init.img_contrast_1['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_float(tag='img_Brightness_1',
                                # label="Brightness",
@@ -647,7 +647,7 @@ with dpg.window(label='Channel 1',
                                speed=.1,
                                enabled=True,
                                width=mode_init.img_Brightness_1['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_int(tag='img_roi_alpha_1',
                              # label="Brightness",
@@ -658,7 +658,7 @@ with dpg.window(label='Channel 1',
                              speed=1,
                              enabled=True,
                              width=mode_init.img_roi_alpha_1['width'],
-                             callback=mode_cmn._update_textures_both_roi
+                             callback=mode_cmn._image_buttons_controller
                              )
     dpg.add_separator(tag='IMAGE_CH1_top_sep_2', show=True, parent='image_window_ch1', before='texture_CH_1')
 
@@ -750,7 +750,7 @@ with dpg.window(label='Channel 2',
                                enabled=True,
 
                                width=mode_init.img_contrast_2['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
 
             #     dpg.add_text('',tag='img_contrast_text_1')
@@ -764,7 +764,7 @@ with dpg.window(label='Channel 2',
                                speed=.1,
                                enabled=True,
                                width=mode_init.img_Brightness_2['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_int(tag='img_roi_alpha_2',
                              # label="Brightness",
@@ -775,7 +775,7 @@ with dpg.window(label='Channel 2',
                              speed=1,
                              enabled=True,
                              width=mode_init.img_roi_alpha_2['width'],
-                             callback=mode_cmn._update_textures_both_roi
+                             callback=mode_cmn._image_buttons_controller
                              )
     dpg.add_separator(tag='IMAGE_CH2_top_sep_2', show=True, parent='image_window_ch2', before='texture_CH_2')
     dpg.add_image(mode_init.tex_2_name,
