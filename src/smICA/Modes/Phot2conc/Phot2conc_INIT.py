@@ -3369,7 +3369,7 @@ class _Phot2conc_vars_funct:
                     processor.all_masks = [processor.all_masks[i]]
 
                     processor.all_cells_contours = [contour]
-                    processor.all_cells_masks = [processor.all_masks[i]]
+                    processor.all_cells_masks = processor.all_masks
 
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
                     dpg.set_value(f'multiple_cells_checkbox_{channel}', False)
