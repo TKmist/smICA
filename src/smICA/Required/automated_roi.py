@@ -31,8 +31,7 @@ import os
 import cv2
 import numpy as np
 from collections import defaultdict
-from tqdm import tqdm
-import pickle
+from skimage.filters import threshold_multiotsu
 
 
 class ImageROIProcessor:
@@ -66,87 +65,79 @@ class ImageROIProcessor:
         if self.image is None:
             raise FileNotFoundError(f"Nie udało się wczytać obrazu: {self.input_path}")
 
+    def _prepare_roi_image(self):
+        """Helper to prepare ROI mask and base image"""
+        roi_mask = (self.all_cells_masks[0] / np.max(self.all_cells_masks[0])).astype(np.uint8)
+        image = np.clip(self.image, 0, 255).astype(np.uint8)
+        return roi_mask, image
 
     def detect_cell_roi(self, image_to_process, ratio):
-        """
-        Znajduje ROI w obrazie i zapisuje wynik do atrybutu roi_image.
-        """
-        # Preprocessing: rozmycie i progowanie
-        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
-
-        # Znajdowanie konturów
+        """Finds ROI in image and stores result in roi_image attribute"""
+        thresholded = self.preprocess_image(image_to_process, ratio, 'gaussian', 'otsu')
         found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        classified = self._classify_contours_by_area(found_contours, hierarchy)
 
-        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
+        self.all_cells_masks = self._create_mask(
+            [ext_contour for (ext_contour, _) in classified],
+            image_to_process.shape
+        )
+        self.all_cells_contours = [ext_contour for (ext_contour, _) in classified]
 
-        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+    def detect_objects_inside(self, threshold, subtract=False, mode='bright', many=False):
+        """Generic function to detect bright or dark spots, single or many."""
+        roi_mask, image = self._prepare_roi_image()
 
-        self.all_cells_masks = self._create_mask(found_contours, image_to_process.shape)
-        self.all_cells_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
+        # Invert image for dark mode
+        if mode == 'dark':
+            image_to_process = (~image * roi_mask).astype(np.uint8)
+        else:
+            image_to_process = (image * roi_mask).astype(np.uint8)
 
+        if many:
+            _, thresh = cv2.threshold(image_to_process, threshold * 10, 255, cv2.THRESH_BINARY)
+            num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(thresh)
+            print(f"Components found: {num_labels}\nStats:\n{stats}")
+            mask = np.where(labels > 0, 255, 0).astype(np.uint8)
+        else:
+            inside_mask, _ = self._process_contours_pipeline(image_to_process, threshold)
+            mask = inside_mask[0]
 
-    def detect_dark_spot_inside_roi(self, ratio):
+        if subtract:
+            self.all_masks = [self.all_cells_masks[0] - mask]
+        else:
+            self.all_masks = [mask]
 
-        roi = self.all_cells_masks[0]/np.max(self.all_cells_masks[0])
-        image = np.clip(self.image, 0, 255).astype(np.uint8)
-
-        image_to_process = (~image * roi).astype(np.uint8)
-
-
-        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
-
-
-        # Znajdowanie konturów
+    def _process_contours_pipeline(self, image_to_process, ratio):
+        """Unified contour processing pipeline"""
+        thresholded = self.preprocess_image(image_to_process, ratio)
         found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        classified = self._classify_contours_by_area(found_contours, hierarchy)
+        contours = [ext_contour for (ext_contour, _) in classified]
+        mask = self._create_mask(contours, image_to_process.shape)
 
-        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
-
-
-        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
-        inside_mask = self._create_mask(found_contours, image_to_process.shape)
-
-        self.all_masks = [self.all_cells_masks[0] - inside_mask[0]]
-
-
-
-    def detect_bright_spot_inside_roi(self, ratio):
-
-        roi = self.all_cells_masks[0]/np.max(self.all_cells_masks[0])
-        image = np.clip(self.image, 0, 255).astype(np.uint8)
-
-        image_to_process = (image * roi).astype(np.uint8)
-
-
-        thresholded = self._preprocess_image_dynamic(image_to_process, ratio)
-
-        # Znajdowanie konturów
-        found_contours, hierarchy = cv2.findContours(thresholded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-
-        classified_contours_hierarchy = self._classify_contours_by_area(found_contours, hierarchy)
-
-        found_contours = [ext_contour for (ext_contour, _) in classified_contours_hierarchy]
-        inside_mask = self._create_mask(found_contours, image_to_process.shape)
-
-        self.all_masks = [inside_mask[0]]
-
-
+        return mask, contours
 
     @staticmethod
-    def _preprocess_image_dynamic(image, ratio):
+    def preprocess_image(image, ratio=1, blur='median', method='multiotsu'):
         """
-        Preprocess the image: reduce noise, blure and apply thresholding.
+        Generic preprocessing using blur and adaptive thresholding
         """
+        # Apply blur
+        if blur == 'gaussian':
+            blurred = cv2.GaussianBlur(image, (5, 5), 0)
+        elif blur == 'median':
+            blurred = cv2.medianBlur(image, 5)
 
-        # Step 2: Apply Gaussian blur for noise reduction
-        blurred = cv2.GaussianBlur(image, (5, 5), 0)
+        # Apply thresholding
+        if method == 'otsu':
+            otsu_threshold, _ = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            dynamic_threshold = otsu_threshold * ratio
+            _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
 
-        # Step 3: Adaptive thresholding or Otsu's method
-        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-        # Optional: Modify the threshold dynamically based on the Otsu result
-        # If you want to increase or decrease the threshold level
-        dynamic_threshold = _ * ratio  # Example: Increase the threshold by 20%
-        _, dynamic_thresh = cv2.threshold(blurred, dynamic_threshold, 255, cv2.THRESH_BINARY)
+        elif method == 'multiotsu':
+            thresholds = threshold_multiotsu(blurred, classes=3)
+            t_high = thresholds[1] * ratio
+            _, dynamic_thresh = cv2.threshold(blurred, t_high, 255, cv2.THRESH_BINARY)
 
         return dynamic_thresh
 
@@ -165,9 +156,6 @@ class ImageROIProcessor:
         """
         # Map parent indices to their child contours
         parent_children_map = defaultdict(list)
-        for j, h in enumerate(hierarchy[0]):
-            parent_idx = h[3]
-            parent_children_map[parent_idx].append(contours[j])
 
         external_contours = []
 
@@ -203,5 +191,3 @@ class ImageROIProcessor:
             masks.append(mask)
             # print(len(masks))
         return masks
-
-

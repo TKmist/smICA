@@ -364,7 +364,7 @@ with dpg.window(label='',
             dpg.add_text("Thres. Nucl.:", tag='auto_ROI_ch_table_row3_text_1')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_1',
-                               default_value=2,
+                               default_value=1,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
@@ -377,7 +377,7 @@ with dpg.window(label='',
                 dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_1_tooltip_text')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_2',
-                               default_value=2,
+                               default_value=1,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
