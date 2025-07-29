@@ -298,7 +298,7 @@ with dpg.window(label='',
             # dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             # dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
         with dpg.table_row(tag='auto_ROI_ch_table_row2'):
-            dpg.add_text("Thres. Cell:", tag='auto_ROI_ch_table_row2_text_1')
+            dpg.add_text("Detect cell:", tag='auto_ROI_ch_table_row2_text_1')
             dpg.add_drag_float(tag='cell_thres_ratio_1',
                                default_value=1.0,
                                max_value=5.,
@@ -345,7 +345,7 @@ with dpg.window(label='',
                              # parent='image_window_1'
                              )
         with dpg.table_row(tag='auto_ROI_ch_table_row4'):
-            dpg.add_text("ROI mode:", tag='auto_ROI_ch_table_row4_text_1')
+            dpg.add_text("Selection:", tag='auto_ROI_ch_table_row4_text_1')
             dpg.add_combo(tag='ROI_mode_1',
                           width=mode_init.ROI_mode_1['width'],
                           items=mode_init.ROI_mode_1['items'],
@@ -361,7 +361,7 @@ with dpg.window(label='',
                           enabled=False,
                           )
         with dpg.table_row(tag='auto_ROI_ch_table_row3'):
-            dpg.add_text("Thres. Nucl.:", tag='auto_ROI_ch_table_row3_text_1')
+            dpg.add_text("Sel. Thres.:", tag='auto_ROI_ch_table_row3_text_1')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_1',
                                default_value=1,
@@ -374,7 +374,7 @@ with dpg.window(label='',
                                callback=mode_cmn._roi_mode
                                )
             with dpg.tooltip('nucl_thres_ratio_1', tag='nucl_thres_ratio_1_tooltip'):
-                dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_1_tooltip_text')
+                dpg.add_text("Set threshold for selection.", tag='nucl_thres_ratio_1_tooltip_text')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_2',
                                default_value=1,
@@ -388,7 +388,7 @@ with dpg.window(label='',
                                #callback=mode_cnm._nucleus_thres_ratio
                                )
             with dpg.tooltip('nucl_thres_ratio_2', tag='nucl_thres_ratio_2_tooltip'):
-                dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_2_tooltip_text')
+                dpg.add_text("Set threshold for selection.", tag='nucl_thres_ratio_2_tooltip_text')
         
 
 globalITEMS.windows.extend(['PTU_DATA_window',

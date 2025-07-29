@@ -30,7 +30,7 @@ SOFTWARE.
 from Modes.Phot2conc.Phot2conc_INIT import _Phot2conc_init, _Phot2conc_vars_funct
 import numpy as np
 import cv2
-#import dearpygui as dpg
+
 
 
 def Phot2conc_resizer(sender, app_data):
@@ -289,16 +289,16 @@ with dpg.window(label='',
             dpg.add_text("", tag='auto_ROI_ch_table_row0_text_1')
             dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
-            # dpg.add_checkbox(label='Multiple Cells', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
+
         with dpg.table_row(tag='auto_ROI_ch_table_row1'):
             
             dpg.add_text("Many cells:", tag='auto_ROI_ch_table_row1_text_1')
-            dpg.add_checkbox(label='', tag='multiple_cells_checkbox', default_value=False, callback=mode_cmn._update_textures_both_roi)
-            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_ch2', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_1', default_value=False, callback=mode_cmn._update_textures_both_roi)
+            dpg.add_checkbox(label='', tag='multiple_cells_checkbox_2', default_value=False, callback=mode_cmn._update_textures_both_roi)
             # dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
             # dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
         with dpg.table_row(tag='auto_ROI_ch_table_row2'):
-            dpg.add_text("Thres. Cell:", tag='auto_ROI_ch_table_row2_text_1')
+            dpg.add_text("Detect cell:", tag='auto_ROI_ch_table_row2_text_1')
             dpg.add_drag_float(tag='cell_thres_ratio_1',
                                default_value=1.0,
                                max_value=5.,
@@ -345,50 +345,50 @@ with dpg.window(label='',
                              # parent='image_window_1'
                              )
         with dpg.table_row(tag='auto_ROI_ch_table_row4'):
-            dpg.add_text("ROI mode:", tag='auto_ROI_ch_table_row4_text_1')
+            dpg.add_text("Selection:", tag='auto_ROI_ch_table_row4_text_1')
             dpg.add_combo(tag='ROI_mode_1',
                           width=mode_init.ROI_mode_1['width'],
                           items=mode_init.ROI_mode_1['items'],
                           default_value=mode_init.ROI_mode_1['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
+                          callback=mode_cmn._roi_mode,
                           enabled=False,
                           )
             dpg.add_combo(tag='ROI_mode_2',
                           width=mode_init.ROI_mode_2['width'],
                           items=mode_init.ROI_mode_2['items'],
                           default_value=mode_init.ROI_mode_2['items'][0],
-                          callback=mode_cmn._update_textures_both_roi,
+                          callback=mode_cmn._roi_mode,
                           enabled=False,
                           )
         with dpg.table_row(tag='auto_ROI_ch_table_row3'):
-            dpg.add_text("Thres. Nucl.:", tag='auto_ROI_ch_table_row3_text_1')
+            dpg.add_text("Sel. Thres.:", tag='auto_ROI_ch_table_row3_text_1')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_1',
-                               default_value=1.5,
+                               default_value=1,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
                                width=mode_init.nucl_thres_ratio_1['width'],
                                enabled=False,
                                format='%.3f',
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._roi_mode
                                )
             with dpg.tooltip('nucl_thres_ratio_1', tag='nucl_thres_ratio_1_tooltip'):
-                dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_1_tooltip_text')
+                dpg.add_text("Set threshold for selection.", tag='nucl_thres_ratio_1_tooltip_text')
 
             dpg.add_drag_float(tag='nucl_thres_ratio_2',
-                               default_value=1.5,
+                               default_value=1,
                                max_value=5.,
                                min_value=0.0,
                                speed=0.001,
                                width=mode_init.nucl_thres_ratio_2['width'],
                                enabled=False,
                                format='%.3f',
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._roi_mode
                                #callback=mode_cnm._nucleus_thres_ratio
                                )
             with dpg.tooltip('nucl_thres_ratio_2', tag='nucl_thres_ratio_2_tooltip'):
-                dpg.add_text("Set threshold to subtract nucleus.", tag='nucl_thres_ratio_2_tooltip_text')
+                dpg.add_text("Set threshold for selection.", tag='nucl_thres_ratio_2_tooltip_text')
         
 
 globalITEMS.windows.extend(['PTU_DATA_window',
@@ -458,8 +458,8 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'FILE_ROI_checkbox',
                             'Auto_ROI_checkbox',
                             'ROI_name_tag',
-                            'multiple_cells_checkbox',
-                            'multiple_cells_checkbox_ch2'
+                            'multiple_cells_checkbox_1',
+                            'multiple_cells_checkbox_2'
 
                             ])
 # lprint(globalITEMS.windows)
@@ -636,7 +636,7 @@ with dpg.window(label='Channel 1',
                                speed=0.01,
                                enabled=True,
                                width=mode_init.img_contrast_1['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_float(tag='img_Brightness_1',
                                # label="Brightness",
@@ -647,7 +647,7 @@ with dpg.window(label='Channel 1',
                                speed=.1,
                                enabled=True,
                                width=mode_init.img_Brightness_1['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_int(tag='img_roi_alpha_1',
                              # label="Brightness",
@@ -658,7 +658,7 @@ with dpg.window(label='Channel 1',
                              speed=1,
                              enabled=True,
                              width=mode_init.img_roi_alpha_1['width'],
-                             callback=mode_cmn._update_textures_both_roi
+                             callback=mode_cmn._image_buttons_controller
                              )
     dpg.add_separator(tag='IMAGE_CH1_top_sep_2', show=True, parent='image_window_ch1', before='texture_CH_1')
 
@@ -750,7 +750,7 @@ with dpg.window(label='Channel 2',
                                enabled=True,
 
                                width=mode_init.img_contrast_2['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
 
             #     dpg.add_text('',tag='img_contrast_text_1')
@@ -764,7 +764,7 @@ with dpg.window(label='Channel 2',
                                speed=.1,
                                enabled=True,
                                width=mode_init.img_Brightness_2['width'],
-                               callback=mode_cmn._update_textures_both_roi
+                               callback=mode_cmn._image_buttons_controller
                                )
             dpg.add_drag_int(tag='img_roi_alpha_2',
                              # label="Brightness",
@@ -775,7 +775,7 @@ with dpg.window(label='Channel 2',
                              speed=1,
                              enabled=True,
                              width=mode_init.img_roi_alpha_2['width'],
-                             callback=mode_cmn._update_textures_both_roi
+                             callback=mode_cmn._image_buttons_controller
                              )
     dpg.add_separator(tag='IMAGE_CH2_top_sep_2', show=True, parent='image_window_ch2', before='texture_CH_2')
     dpg.add_image(mode_init.tex_2_name,

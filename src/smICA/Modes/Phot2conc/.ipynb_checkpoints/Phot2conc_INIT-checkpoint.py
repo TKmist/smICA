@@ -102,9 +102,15 @@ class _Phot2conc_init:
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res', 'img', 'NO_image_INT.npy'))
 
         self.ROI_mode_items = ['',
-                               'Find bark',
-                               'Find bright'
-                              ]
+                               'find dark',
+                               'subtract dark',
+                               'find bright',
+                               'subtract bright',
+                               'find many bright spots',
+                               'subtract many bright spots'
+                               # 'find many dark spots',
+                               # 'subtract many dark spots'
+                               ]
 
         bf.remove_font_from_registry()
         bf.add_font_to_registry(self.font_size)
@@ -264,7 +270,7 @@ class _Phot2conc_init:
                                }
 
         self.auto_ROI_ch_table_col1 = {'name': 'auto_ROI_ch_table_col1',
-                                       'width': int(2*self.PTU_DATA_window['width'] / 8)
+                                       'width': int(2 * self.PTU_DATA_window['width'] / 8)
                                        }
         self.auto_ROI_ch_table_col2 = {'name': 'auto_ROI_ch_table_col2',
                                        'width': int(3 * self.PTU_DATA_window['width'] / 8)
@@ -612,9 +618,9 @@ class _Phot2conc_init:
                                      }
 
         self.ROI_names_combo_tag = {'name': 'ROI_names_combo_tag',
-                                     'width': -1,
-                                     'items': ['ROI_0']
-                                     }
+                                    'width': -1,
+                                    'items': ['ROI_0']
+                                    }
 
     def im_to_rgbim(self, im):
         '''Converts grayscale image into rgba(float) image.'''
@@ -640,7 +646,7 @@ class _Phot2conc_vars_funct:
                  INIT,
                  last_directory,
                  basf,
-                      _globalITEMS):
+                 _globalITEMS):
         self.mode_init = INIT
         self.basf = basf
         self.last_directory = last_directory
@@ -724,55 +730,47 @@ class _Phot2conc_vars_funct:
 
         self.im_to_rgbim = self.mode_init.im_to_rgbim
 
-        self.ROIS_state = {'File roi':False,
-                           'Auto roi':{
-                               'state':False,
-                               'subs':{
-                                   'cell_thres_ratio_1':1.0,
-                                   'nucl_thres_ratio_1':1.5,
-                                   'ROI_mode_1':'',
-                                   'cp_roi_1':False,
-                                   'cell_thres_ratio_2':1.0,
-                                   'nucl_thres_ratio_2':1.5,
-                                   'ROI_mode_2':'',
-                                   'cp_roi_2':False,
-                                   }
+        self.ROIS_state = {'File roi': False,
+                           'Auto roi': {
+                               'state': False,
+                               'subs': {
+                                   'cell_thres_ratio_1': 1.0,
+                                   'nucl_thres_ratio_1': 1.5,
+                                   'ROI_mode_1': '',
+                                   'cp_roi_1': False,
+                                   'cell_thres_ratio_2': 1.0,
+                                   'nucl_thres_ratio_2': 1.5,
+                                   'ROI_mode_2': '',
+                                   'cp_roi_2': False,
                                }
                            }
+                           }
 
-
-
-
-    
-
-    
     def get_roi_state(self):
-        self.ROIS_state = {'File roi':dpg.get_value('FILE_ROI_checkbox'),
-                           'Auto roi':{
-                               'state':dpg.get_value('Auto_ROI_checkbox'),
-                               'subs':{
-                                   'cell_thres_ratio_1':dpg.get_value('cell_thres_ratio_1'),
-                                   'nucl_thres_ratio_1':dpg.get_value('nucl_thres_ratio_1'),
-                                   'ROI_mode_1':dpg.get_value('ROI_mode_1'),
-                                   'cp_roi_1':dpg.get_value('cp_roi_1'),
-                                   'cell_thres_ratio_2':dpg.get_value('cell_thres_ratio_2'),
-                                   'nucl_thres_ratio_2':dpg.get_value('nucl_thres_ratio_2'),
-                                   'ROI_mode_2':dpg.get_value('ROI_mode_2'),
-                                   'cp_roi_2':dpg.get_value('cp_roi_2'),
-                                   }
+        self.ROIS_state = {'File roi': dpg.get_value('FILE_ROI_checkbox'),
+                           'Auto roi': {
+                               'state': dpg.get_value('Auto_ROI_checkbox'),
+                               'subs': {
+                                   'cell_thres_ratio_1': dpg.get_value('cell_thres_ratio_1'),
+                                   'nucl_thres_ratio_1': dpg.get_value('nucl_thres_ratio_1'),
+                                   'ROI_mode_1': dpg.get_value('ROI_mode_1'),
+                                   'cp_roi_1': dpg.get_value('cp_roi_1'),
+                                   'cell_thres_ratio_2': dpg.get_value('cell_thres_ratio_2'),
+                                   'nucl_thres_ratio_2': dpg.get_value('nucl_thres_ratio_2'),
+                                   'ROI_mode_2': dpg.get_value('ROI_mode_2'),
+                                   'cp_roi_2': dpg.get_value('cp_roi_2'),
                                }
+                           }
                            }
         # lprint(self.ROIS_state)
 
     def set_roi_state(self):
         # lprint(self.ROIS_state)
-        dpg.set_value('FILE_ROI_checkbox',self.ROIS_state['File roi'])
-        dpg.set_value('Auto_ROI_checkbox',self.ROIS_state['Auto roi']['state'])
+        dpg.set_value('FILE_ROI_checkbox', self.ROIS_state['File roi'])
+        dpg.set_value('Auto_ROI_checkbox', self.ROIS_state['Auto roi']['state'])
         for key in self.ROIS_state['Auto roi']['subs'].keys():
-            dpg.set_value(key,self.ROIS_state['Auto roi']['subs'][key])
-                
-        
-    
+            dpg.set_value(key, self.ROIS_state['Auto roi']['subs'][key])
+
     def define_file_menu_callbacks(self):
 
         dpg.configure_item('Open_PTU_menu_item', callback=lambda: dpg.show_item("PTU_file_dialog_id"))
@@ -879,9 +877,14 @@ class _Phot2conc_vars_funct:
                         dpg.set_value('kappa_input_ch_1', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_1', data[k0]['kappa'][1])
 
-                        dpg.set_value('focal_vol_input_ch_1', data[k0]['V0'][0])
-                        dpg.set_value('focal_vol_err_input_ch_1', data[k0]['V0'][1])
+                        Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
 
+
+                        
+                        dpg.set_value('focal_vol_input_ch_1', Vf[0])
+                        dpg.set_value('focal_vol_err_input_ch_1', Vf[1])
+                        
+        
                         dpg.set_value('Brightness_input_ch_1', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_1', data[k0]['Mol.Brightness'][1])
 
@@ -893,8 +896,12 @@ class _Phot2conc_vars_funct:
                         dpg.set_value('kappa_input_ch_2', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_2', data[k0]['kappa'][1])
 
-                        dpg.set_value('focal_vol_input_ch_2', data[k0]['V0'][0])
-                        dpg.set_value('focal_vol_err_input_ch_2', data[k0]['V0'][1])
+                        Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
+
+
+                        
+                        dpg.set_value('focal_vol_input_ch_2', Vf[0])
+                        dpg.set_value('focal_vol_err_input_ch_2', Vf[1])
 
                         dpg.set_value('Brightness_input_ch_2', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_2', data[k0]['Mol.Brightness'][1])
@@ -1290,7 +1297,7 @@ class _Phot2conc_vars_funct:
 
     #     self.callback_windows_size(sender,app_data)
     #     self.callback_font_size(sender,app_data)
-    
+
     def callback_calculate(self, sender, app_data):
         cmap = 'afmhot'
         rect = 0.1, 0.1, 0.85, 0.9
@@ -1302,18 +1309,18 @@ class _Phot2conc_vars_funct:
                 Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
                 Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
                 # DF = Current_image_1
-                if self.processor_1.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if1')
-                    ROI = self.processor_1.all_cells_masks[0].astype(np.uint8)
-                    roi = np.where(ROI==0,np.nan,1)
+                    ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                    roi = np.where(ROI == 0, np.nan, 1)
                     img = self.processor_1.image
-                    self.DF = img*roi
+                    self.DF = img * roi
                 else:
                     self.DF = self.image_1_times_roi
                 Photons_1 = pd.DataFrame(self.DF)
 
                 n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
-
+                
                 Molecules_ch_1 = self.calc_molecules(self.DF,
                                                      self.PTU_Px_dwell,
                                                      self.PTU_N_frames,
@@ -1523,16 +1530,16 @@ class _Phot2conc_vars_funct:
                 Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
                 # DF2 = Current_image_2
 
-                if self.processor_2.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+                if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if2')
-                    ROI = self.processor_2.all_cells_masks[0].astype(np.uint8)
-                    roi = np.where(ROI==0,np.nan,1)
+                    ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                    roi = np.where(ROI == 0, np.nan, 1)
                     img = self.processor_2.image
-                    self.DF2 = img*roi
-                    
+                    self.DF2 = img * roi
+
                 else:
                     self.DF2 = self.image_2_times_roi
-                
+
                 # self.DF2 = self.image_2_times_roi
                 Photons_2 = pd.DataFrame(self.DF2)
                 n_pixels_2 = Photons_2.stack().reset_index(drop=True).dropna().count()
@@ -1749,12 +1756,12 @@ class _Phot2conc_vars_funct:
             Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
             Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
             # DF = Current_image_1
-            if self.processor_1.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+            if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if1')
-                ROI = self.processor_1.all_cells_masks[0].astype(np.uint8)
-                roi = np.where(ROI==0,np.nan,1)
+                ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                roi = np.where(ROI == 0, np.nan, 1)
                 img = self.processor_1.image
-                self.DF = img*roi
+                self.DF = img * roi
             else:
                 self.DF = self.image_1_times_roi
             # self.DF = self.image_1_times_roi
@@ -1765,7 +1772,7 @@ class _Phot2conc_vars_funct:
             # n_pixels_1test =  Photons_1t.stack().reset_index(drop=True).dropna().count()
 
             # lnprint('N pixel test', n_pixels_1,n_pixels_1test)
-
+            lprint(self.PTU_Px_dwell,self.PTU_N_frames,brightness_ch_1)
             Molecules_ch_1 = self.calc_molecules(self.DF,
                                                  self.PTU_Px_dwell,
                                                  self.PTU_N_frames,
@@ -1970,12 +1977,12 @@ class _Phot2conc_vars_funct:
             Veff_ch_2 = 1e-15 * dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
             # DF2 = Current_image_2
-            if self.processor_2.all_cells_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
+            if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if2')
-                ROI = self.processor_2.all_cells_masks[0].astype(np.uint8)
-                roi = np.where(ROI==0,np.nan,1)
+                ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                roi = np.where(ROI == 0, np.nan, 1)
                 img = self.processor_2.image
-                self.DF2 = img*roi
+                self.DF2 = img * roi
             else:
                 self.DF2 = self.image_2_times_roi
             # self.DF2 = self.image_2_times_roi
@@ -2187,22 +2194,22 @@ class _Phot2conc_vars_funct:
         # print(self.files)
         filenames = [f.replace('.ptu', '') for f in self.files]
         # print(filenames)
-        if dpg.get_value('Auto_ROI_checkbox') or (not dpg.get_value('Auto_ROI_checkbox') and not dpg.get_value('FILE_ROI_checkbox')):
-            roiname=dpg.get_value('ROI_name_tag')
+        if dpg.get_value('Auto_ROI_checkbox') or (
+                not dpg.get_value('Auto_ROI_checkbox') and not dpg.get_value('FILE_ROI_checkbox')):
+            roiname = dpg.get_value('ROI_name_tag')
             for cnt, an_file in enumerate(filenames):
                 # print(cnt,an_file)
                 self.anal_file = an_file
-    
+
                 dpg.configure_item('file_box', default_value=an_file)
-                
+
                 # self.load_PTU_images(an_file)
                 # self.callback_calculate(sender,app_data)
-                
-                    
-                self.callback_listbox('file_box',self.anal_file)
+
+                self.callback_listbox('file_box', self.anal_file)
                 if len(self.Channels) == 1:
                     if '1' in self.Channels[0]:
-    
+
                         Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                              roiname,
                                                              1,
@@ -2215,7 +2222,7 @@ class _Phot2conc_vars_funct:
                                                              self.median_C_ch_1,
                                                              self.median_err_C_ch_1]],
                                                            columns=self.Sing_Results_DF.columns)
-    
+
                     elif '2' in self.Channels[0]:
                         Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                              roiname,
@@ -2231,7 +2238,7 @@ class _Phot2conc_vars_funct:
                                                            columns=self.Sing_Results_DF.columns)
                     else:
                         pass
-    
+
                 if len(self.Channels) == 2:
                     Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                          roiname,
@@ -2262,26 +2269,24 @@ class _Phot2conc_vars_funct:
             for cnt, an_file in enumerate(filenames):
                 # print(cnt,an_file)
                 self.anal_file = an_file
-    
+
                 dpg.configure_item('file_box', default_value=an_file)
-                
+
                 # self.load_PTU_images(an_file)
                 # self.callback_calculate(sender,app_data)
-                
-                    
+
                 # self.callback_listbox('file_box',self.anal_file)
-            
 
                 ROIS = dpg.get_item_configuration('ROI_names_combo_tag')['items']
-                
-                self.callback_listbox('file_box',self.anal_file)
+
+                self.callback_listbox('file_box', self.anal_file)
 
                 for ROI in ROIS:
                     self.callback_ROI_names_combo('ROI_names_combo_tag', ROI)
                     roiname = ROI
                     if len(self.Channels) == 1:
                         if '1' in self.Channels[0]:
-        
+
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                                  roiname,
                                                                  1,
@@ -2294,7 +2299,8 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_1,
                                                                  self.median_err_C_ch_1]],
                                                                columns=self.Sing_Results_DF.columns)
-        
+                            lprint(Sing_Results_DF_tmp)
+
                         elif '2' in self.Channels[0]:
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                                  roiname,
@@ -2308,9 +2314,10 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_2,
                                                                  self.median_err_C_ch_2]],
                                                                columns=self.Sing_Results_DF.columns)
+                            lprint(Sing_Results_DF_tmp)
                         else:
                             pass
-        
+
                     elif len(self.Channels) == 2:
                         Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                              roiname,
@@ -2335,12 +2342,10 @@ class _Phot2conc_vars_funct:
                                                              self.median_C_ch_2,
                                                              self.median_err_C_ch_2]],
                                                            columns=self.Sing_Results_DF.columns)
-                
+                        lprint(Sing_Results_DF_tmp)
+
                     self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
                 self._pkl_file()
-            
-
-            
 
     def callback_directory_select(self, sender, app_data):
         self.files = ()
@@ -2556,8 +2561,6 @@ class _Phot2conc_vars_funct:
 
     def callback_select_roi(self, sender, app_data):
 
-        
-        
         if dpg.get_value(sender):
             dpg.set_value('Auto_ROI_checkbox', False)
             dpg.hide_item('ROI_name_tag')
@@ -2571,8 +2574,8 @@ class _Phot2conc_vars_funct:
             # dpg.configure_item('nucl_thres_ratio_2',enabled=False)
             # dpg.configure_item('cp_roi_1',enabled=False)
             # dpg.configure_item('cp_roi_2',enabled=False)
-            if self.ROI_directory != None and len(self.ROI_directory)!=0 :
-                
+            if self.ROI_directory != None and len(self.ROI_directory) != 0:
+
                 try:
                     self.load_PTU_images(self.anal_file)
                 except:
@@ -2651,7 +2654,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('file_window', height=self.mode_init.file_window['height'])
         self.get_roi_state()
         self.load_PTU_images(self.anal_file)
-        
+
     def display_images(self, channel):
 
         if channel == 1:
@@ -2741,85 +2744,96 @@ class _Phot2conc_vars_funct:
             # self.display_images([self.DF],chan)
             self.display_images(chan)
 
-
-    # 
-    def check_for_roi_files(self,path_to_search, anfile):
+    #
+    def check_for_roi_files(self, path_to_search, anfile):
         try:
             roi_files = os.listdir(path_to_search)
         except:
             self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
-            return 
+            return
         roi_files = [f for f in roi_files if anfile in f]
+        roi_files = [f for f in roi_files if '_roi' in f]
         rois = []
-        
+        lprint(roi_files)
         for f in roi_files:
             roi_n = f.split('_')
-            
-            roi_n = [ r for r in roi_n if r.startswith('roi')]
-            roicnt = roi_n[0].replace('roi','')
-            if len(roicnt)!=0:
-                roin = 'ROI_'+roicnt
+
+            roi_n = [r for r in roi_n if r.startswith('roi')]
+            roicnt = roi_n[0].replace('roi', '')
+            if len(roicnt) != 0:
+                roin = 'ROI_' + roicnt
             else:
-                roin = 'ROI_'+str(0)
+                roin = 'ROI_' + str(0)
             # print(roin)
             rois.append(roin)
             # print(roin)
         roiset = list(set(rois))
         roiset.sort()
         # lprint(roiset)
-        output = {k:{} for k in roiset}
+        output = {k: {} for k in roiset}
         for rs in roiset:
             rn = rs[-1]
-            chns=[]
+            chns = []
             for f in roi_files:
-                if 'roi'+rn in f:
+                if 'roi' + rn in f:
                     ch = f.split('_ch_')
-                    ch = [ r for r in ch if r.endswith('.dat')][0][0]
+                    ch = [r for r in ch if r.endswith('.dat')][0][0]
                     # print(ch)
                     # chns.append(ch)
-            # for ch in chns:
-                    output[rs]['ch_'+ch] = f
-                    
+                    # for ch in chns:
+                    output[rs]['ch_' + ch] = f
+
         # lprint(rois)
-        
-        
+
         return output
 
     def callback_ROI_names_combo(self, sender, app_data):
         ROIn = app_data
-        roin = ROIn.replace('ROI_','')
-        # lprint(roin)
+        roin = ROIn.replace('ROI_', '')
+        lprint(roin)
         if len(self.Channels) == 1:
             if '1' in self.Channels[0]:
-                roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_1.dat')
+                roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
+                lprint(roi_1_path)
+                if os.path.exists(roi_1_path):
+                    pass
+                else:
+                    roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_1.dat')
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 self.processor_1.roi_image = self.roi_1
                 self.image_1_times_roi = self.Current_image_1
                 self.display_images('both')
             elif '2' in self.Channels[0]:
-                roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_2.dat')
+                roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_2.dat')
+                if os.path.exists(roi_2_path):
+                    pass
+                else:
+                    roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_2.dat')
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                 self.processor_2.roi_image = self.roi_2
                 self.image_2_times_roi = self.Current_image_2
                 self.display_images('both')
         elif len(self.Channels) == 2:
-            roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_1.dat')
+            roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
+            if os.path.exists(roi_1_path):
+                pass
+            else:
+                roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_1.dat')
             self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
             self.processor_1.roi_image = self.roi_1
             self.image_1_times_roi = self.Current_image_1
 
-            roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi'+roin+'_ch_2.dat')
+            roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_2.dat')
+            if os.path.exists(roi_2_path):
+                pass
+            else:
+                roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_2.dat')
             self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
             self.processor_2.roi_image = self.roi_2
             self.image_2_times_roi = self.Current_image_2
 
             self.display_images('both')
-            
-            
-            
-        
-        
-    
+
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
         dpg.set_value('ROI_name_tag', 'ROI_0')
@@ -2875,9 +2889,9 @@ class _Phot2conc_vars_funct:
 
         if dpg.get_value('FILE_ROI_checkbox'):
             Existing_Rois = self.check_for_roi_files(self.ROI_directory, an_file)
-            dpg.configure_item('ROI_names_combo_tag',items=list(Existing_Rois.keys()))
-            dpg.set_value('ROI_names_combo_tag',list(Existing_Rois.keys())[0])
-        
+            dpg.configure_item('ROI_names_combo_tag', items=list(Existing_Rois.keys()))
+            dpg.set_value('ROI_names_combo_tag', list(Existing_Rois.keys())[0])
+
             if len(self.Channels) == 1:
                 if '1' in self.Channels[0]:
                     Intensity_1 = pklf['intensity_1']
@@ -2886,21 +2900,15 @@ class _Phot2conc_vars_funct:
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
 
-                    
-                        
-                    
-                    
-                    
                     # except:
                     #     self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
 
-                    
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
                     if os.path.exists(roi_1_path):
                         pass
                     else:
                         roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
-                    
+
                     self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                     self.processor_1.roi_image = self.roi_1
                     Intensity_1 = Intensity_1
@@ -2923,13 +2931,12 @@ class _Phot2conc_vars_funct:
                     self.processor_2.image = Intensity_2.astype(np.uint16)
 
                     roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
-                    
+
                     if os.path.exists(roi_2_path):
                         pass
                     else:
                         roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
 
-                    
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                     self.processor_2.roi_image = self.roi_2
                     channel = 'both'
@@ -2959,7 +2966,7 @@ class _Phot2conc_vars_funct:
                     pass
                 else:
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
-                
+
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
 
@@ -2967,7 +2974,7 @@ class _Phot2conc_vars_funct:
                     pass
                 else:
                     roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
-                
+
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                 self.processor_1.roi_image = self.roi_1
                 self.processor_2.roi_image = self.roi_2
@@ -3142,32 +3149,32 @@ class _Phot2conc_vars_funct:
             'cell_thres_ratio': dpg.get_value(f'cell_thres_ratio_{channel}'),
             'nucl_thres_ratio': dpg.get_value(f'nucl_thres_ratio_{channel}'),
             'find_roi_mode': dpg.get_value(f'ROI_mode_{channel}')
-            }
-        # lprint(ui_state)
+        }
+
         return ui_state
 
-    def _process_file_roi(self,channel, disp, ui_state):
+    def _process_file_roi(self, channel, disp, ui_state):
         if dpg.get_value('FILE_ROI_checkbox'):
 
             processor = getattr(self, f'processor_{channel}')
             img = processor.image
             roi = processor.roi_image
 
-            full_mask = np.nan_to_num(roi*255, nan=0)
+            full_mask = np.nan_to_num(roi * 255, nan=0)
 
-            setattr(self, f'image_{channel}_times_roi',  img*roi)
-            
-            setattr(processor, 'all_masks',  [full_mask])
+            setattr(self, f'image_{channel}_times_roi', img * roi)
+
+            setattr(processor, 'all_masks', [full_mask])
 
             self._update_texture(channel, disp, ui_state)
 
         else:
 
             self.process_channel(channel, self.get_ui_state(channel))
-        
-    
+
     def process_channel(self, channel, ui_state):
         """Process image channel using centralized UI state"""
+
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
 
@@ -3185,10 +3192,25 @@ class _Phot2conc_vars_funct:
                     self._process_file_roi(channel, disp, ui_state)
                 else:
                     pass
-            else:   
+            else:
                 self._process_file_roi(channel, disp, ui_state)
         else:
             self._process_no_roi(channel, disp, ui_state)
+        # processor = ui_state['processor']
+        # disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+        #
+        # is_single_channel = len(self.Channels) == 1
+        # is_target_channel = (channel == self.Channels[0]) if is_single_channel else True
+        #
+        # if not is_target_channel:
+        #     pass  # Skip processing if not the selected single channel
+        #
+        # if ui_state['auto_roi']:
+        #     self._process_auto_roi(channel, disp, ui_state)
+        # elif ui_state['file_roi']:
+        #     self._process_file_roi(channel, disp, ui_state)
+        # else:
+        #     self._process_no_roi(channel, disp, ui_state)
 
     def _update_textures_both_roi(self, sender, app_data):
         """Handle texture updates with proper state management"""
@@ -3200,34 +3222,51 @@ class _Phot2conc_vars_funct:
 
             self.process_channel(channel, self.get_ui_state(channel))
         else:
-            
+
             for channel in self.Channels:
                 self.process_channel(channel, self.get_ui_state(channel))
 
-
         self.callback_calculate(sender, None)
+
+    def _image_buttons_controller(self, sender):
+
+        channel = sender[-1]
+
+        ui_state = self.get_ui_state(channel)
+
+        processor = ui_state['processor']
+
+        disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+
+        self._update_texture(channel, disp, ui_state)
 
     def copy_roi_from_channel(self, sender):
 
         copy_to_channel = sender[-1]
         copy_from_channel = '2' if copy_to_channel == '1' else '1'
         with dpg.mutex():
-                    if dpg.get_value(sender):
-                        dpg.set_value(f'cp_roi_{copy_from_channel}', False)
+            if dpg.get_value(sender):
+                dpg.set_value(f'cp_roi_{copy_from_channel}', False)
 
         if dpg.get_value(sender):
+
             copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
             copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
 
-            setattr(copy_to_processor, 'all_masks', copy_from_processor.all_cells_masks.copy())
-            setattr(copy_to_processor, 'all_contours', copy_from_processor.all_cells_contours.copy())
+            setattr(copy_to_processor, 'all_cells_masks', copy_from_processor.all_masks.copy())
+            setattr(copy_to_processor, 'all_masks', copy_from_processor.all_masks.copy())
+            setattr(copy_to_processor, 'all_contours', copy_from_processor.all_contours.copy())
 
             disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
+
+            dpg.configure_item(f'cell_thres_ratio_{copy_to_channel}', enabled=False)
+
             self._update_texture(copy_to_channel, disp, self.get_ui_state(copy_to_channel))
+
 
         else:
 
-            # print('Condition works')
+            dpg.configure_item(f'cell_thres_ratio_{copy_to_channel}', enabled=True)
             self.process_channel(copy_to_channel, self.get_ui_state(copy_to_channel))
 
         self.callback_calculate(sender, None)
@@ -3247,15 +3286,50 @@ class _Phot2conc_vars_funct:
 
         processor = ui_state['processor']
 
-        print(processor)
-
-        processor.detect_object_roi(froi, ui_state['cell_thres_ratio'], ui_state['find_roi_mode'] == 'Subtract nucleus')
-
+        processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
 
         if not ui_state['multiple_cells_checkbox']:
             processor.all_cells_contours = [processor.all_cells_contours[0]]
             processor.all_cells_masks = [processor.all_cells_masks[0]]
 
+        processor.all_masks = processor.all_cells_masks
+        processor.all_contours = processor.all_cells_contours
+
+    def _roi_mode(self, sender, app_data, user_data):
+
+        channel = sender[-1]
+
+        ui_state = self.get_ui_state(channel)
+
+        processor = ui_state['processor']
+
+        option_choosen = dpg.get_value(f'ROI_mode_{channel}')
+
+        drag_float_value = dpg.get_value(f'nucl_thres_ratio_{channel}')
+
+        option_actions = {
+            'subtract dark': {'params': {'mode': 'dark', 'many': False, 'subtract': True}},
+            'find dark': {'params': {'mode': 'dark', 'many': False, 'subtract': False}},
+            'subtract bright': {'params': {'mode': 'bright', 'many': False, 'subtract': True}},
+            'find bright': {'params': {'mode': 'bright', 'many': False, 'subtract': False}},
+            'subtract many dark spots': {'params': {'mode': 'dark', 'many': True, 'subtract': True}},
+            'find many dark spots': {'params': {'mode': 'dark', 'many': True, 'subtract': False}},
+            'subtract many bright spots': {'params': {'mode': 'bright', 'many': True, 'subtract': True}},
+            'find many bright spots': {'params': {'mode': 'bright', 'many': True, 'subtract': False}},
+        }
+
+        option = option_actions.get(option_choosen)
+
+        if option:
+
+            processor.detect_objects_inside(threshold=drag_float_value, **option['params'])
+
+        else:
+            self.process_channel(channel, ui_state)
+
+        disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
+        self._update_texture(channel, disp, ui_state)
+        self.callback_calculate(sender, None)
 
     def _update_texture(self, channel, disp, ui_state):
         """Update texture using parameters from UI state"""
@@ -3265,9 +3339,9 @@ class _Phot2conc_vars_funct:
         rgba_image[..., :3] = adjusted_rgb
 
         # Use contours from processor
-        if hasattr(processor, 'all_masks') and processor.all_cells_masks is not None:
+        if hasattr(processor, 'all_masks') and processor.all_masks is not None:
 
-            for cell_mask in processor.all_cells_masks:
+            for cell_mask in processor.all_masks:
                 rgba_image = self.overlayrgba(disp, rgba_image, rgba_image.copy(), cell_mask, ui_state['ovrl'])
 
         self.rgba_to_dpgtex(rgba_image, np.max(disp), ui_state['tex_name'])
@@ -3308,14 +3382,17 @@ class _Phot2conc_vars_funct:
                     processor.all_contours = [contour]
                     processor.all_masks = [processor.all_masks[i]]
 
+                    processor.all_cells_contours = [contour]
+                    processor.all_cells_masks = processor.all_masks
+
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
+                    dpg.set_value(f'multiple_cells_checkbox_{channel}', False)
                     break
 
             # Update display
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
-
 
     def load_ROI(self, path):
         df = pd.read_csv(path, sep='\t', header=None, skiprows=3, encoding='latin1')
@@ -3516,10 +3593,12 @@ class _Phot2conc_vars_funct:
         dpg.set_value('kappa_input_ch_2', pkl['FCS_data']['kappa_2'])
         dpg.set_value('kappa_err_input_ch_1', pkl['FCS_data']['kappa_err_1'])
         dpg.set_value('kappa_err_input_ch_2', pkl['FCS_data']['kappa_err_2'])
-        dpg.set_value('focal_vol_input_ch_1', pkl['FCS_data']['fv_1'])
-        dpg.set_value('focal_vol_input_ch_2', pkl['FCS_data']['fv_2'])
-        dpg.set_value('focal_vol_err_input_ch_1', pkl['FCS_data']['fv_err_1'])
-        dpg.set_value('focal_vol_err_input_ch_2', pkl['FCS_data']['fv_err_2'])
+        Vf1 = self.VEFF(pkl['FCS_data']['omega_1'], pkl['FCS_data']['kappa_1'], pkl['FCS_data']['omega_err_1'], pkl['FCS_data']['kappa_err_1'])
+        Vf2 = self.VEFF(pkl['FCS_data']['omega_2'], pkl['FCS_data']['kappa_2'], pkl['FCS_data']['omega_err_2'], pkl['FCS_data']['kappa_err_2'])
+        dpg.set_value('focal_vol_input_ch_1', Vf1[0])
+        dpg.set_value('focal_vol_input_ch_2', Vf2[0])
+        dpg.set_value('focal_vol_err_input_ch_1', Vf1[1])
+        dpg.set_value('focal_vol_err_input_ch_2', Vf2[1])
         dpg.set_value('Brightness_input_ch_1', pkl['FCS_data']['Br_1'])
         dpg.set_value('Brightness_input_ch_2', pkl['FCS_data']['Br_2'])
         dpg.set_value('Brightness_err_input_ch_1', pkl['FCS_data']['Br_err_1'])

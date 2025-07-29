@@ -877,9 +877,14 @@ class _Phot2conc_vars_funct:
                         dpg.set_value('kappa_input_ch_1', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_1', data[k0]['kappa'][1])
 
-                        dpg.set_value('focal_vol_input_ch_1', data[k0]['V0'][0])
-                        dpg.set_value('focal_vol_err_input_ch_1', data[k0]['V0'][1])
+                        Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
 
+
+                        
+                        dpg.set_value('focal_vol_input_ch_1', Vf[0])
+                        dpg.set_value('focal_vol_err_input_ch_1', Vf[1])
+                        
+        
                         dpg.set_value('Brightness_input_ch_1', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_1', data[k0]['Mol.Brightness'][1])
 
@@ -891,8 +896,12 @@ class _Phot2conc_vars_funct:
                         dpg.set_value('kappa_input_ch_2', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_2', data[k0]['kappa'][1])
 
-                        dpg.set_value('focal_vol_input_ch_2', data[k0]['V0'][0])
-                        dpg.set_value('focal_vol_err_input_ch_2', data[k0]['V0'][1])
+                        Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
+
+
+                        
+                        dpg.set_value('focal_vol_input_ch_2', Vf[0])
+                        dpg.set_value('focal_vol_err_input_ch_2', Vf[1])
 
                         dpg.set_value('Brightness_input_ch_2', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_2', data[k0]['Mol.Brightness'][1])
@@ -1311,7 +1320,7 @@ class _Phot2conc_vars_funct:
                 Photons_1 = pd.DataFrame(self.DF)
 
                 n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
-
+                
                 Molecules_ch_1 = self.calc_molecules(self.DF,
                                                      self.PTU_Px_dwell,
                                                      self.PTU_N_frames,
@@ -1763,7 +1772,7 @@ class _Phot2conc_vars_funct:
             # n_pixels_1test =  Photons_1t.stack().reset_index(drop=True).dropna().count()
 
             # lnprint('N pixel test', n_pixels_1,n_pixels_1test)
-
+            lprint(self.PTU_Px_dwell,self.PTU_N_frames,brightness_ch_1)
             Molecules_ch_1 = self.calc_molecules(self.DF,
                                                  self.PTU_Px_dwell,
                                                  self.PTU_N_frames,
@@ -2290,6 +2299,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_1,
                                                                  self.median_err_C_ch_1]],
                                                                columns=self.Sing_Results_DF.columns)
+                            lprint(Sing_Results_DF_tmp)
 
                         elif '2' in self.Channels[0]:
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
@@ -2304,6 +2314,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_2,
                                                                  self.median_err_C_ch_2]],
                                                                columns=self.Sing_Results_DF.columns)
+                            lprint(Sing_Results_DF_tmp)
                         else:
                             pass
 
@@ -2331,6 +2342,7 @@ class _Phot2conc_vars_funct:
                                                              self.median_C_ch_2,
                                                              self.median_err_C_ch_2]],
                                                            columns=self.Sing_Results_DF.columns)
+                        lprint(Sing_Results_DF_tmp)
 
                     self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
                 self._pkl_file()
@@ -2740,8 +2752,9 @@ class _Phot2conc_vars_funct:
             self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
             return
         roi_files = [f for f in roi_files if anfile in f]
+        roi_files = [f for f in roi_files if '_roi' in f]
         rois = []
-
+        lprint(roi_files)
         for f in roi_files:
             roi_n = f.split('_')
 
@@ -2777,27 +2790,44 @@ class _Phot2conc_vars_funct:
     def callback_ROI_names_combo(self, sender, app_data):
         ROIn = app_data
         roin = ROIn.replace('ROI_', '')
-        # lprint(roin)
+        lprint(roin)
         if len(self.Channels) == 1:
             if '1' in self.Channels[0]:
                 roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
+                lprint(roi_1_path)
+                if os.path.exists(roi_1_path):
+                    pass
+                else:
+                    roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_1.dat')
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 self.processor_1.roi_image = self.roi_1
                 self.image_1_times_roi = self.Current_image_1
                 self.display_images('both')
             elif '2' in self.Channels[0]:
                 roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_2.dat')
+                if os.path.exists(roi_2_path):
+                    pass
+                else:
+                    roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_2.dat')
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                 self.processor_2.roi_image = self.roi_2
                 self.image_2_times_roi = self.Current_image_2
                 self.display_images('both')
         elif len(self.Channels) == 2:
             roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
+            if os.path.exists(roi_1_path):
+                pass
+            else:
+                roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_1.dat')
             self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
             self.processor_1.roi_image = self.roi_1
             self.image_1_times_roi = self.Current_image_1
 
             roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_2.dat')
+            if os.path.exists(roi_2_path):
+                pass
+            else:
+                roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi_ch_2.dat')
             self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
             self.processor_2.roi_image = self.roi_2
             self.image_2_times_roi = self.Current_image_2
@@ -3563,10 +3593,12 @@ class _Phot2conc_vars_funct:
         dpg.set_value('kappa_input_ch_2', pkl['FCS_data']['kappa_2'])
         dpg.set_value('kappa_err_input_ch_1', pkl['FCS_data']['kappa_err_1'])
         dpg.set_value('kappa_err_input_ch_2', pkl['FCS_data']['kappa_err_2'])
-        dpg.set_value('focal_vol_input_ch_1', pkl['FCS_data']['fv_1'])
-        dpg.set_value('focal_vol_input_ch_2', pkl['FCS_data']['fv_2'])
-        dpg.set_value('focal_vol_err_input_ch_1', pkl['FCS_data']['fv_err_1'])
-        dpg.set_value('focal_vol_err_input_ch_2', pkl['FCS_data']['fv_err_2'])
+        Vf1 = self.VEFF(pkl['FCS_data']['omega_1'], pkl['FCS_data']['kappa_1'], pkl['FCS_data']['omega_err_1'], pkl['FCS_data']['kappa_err_1'])
+        Vf2 = self.VEFF(pkl['FCS_data']['omega_2'], pkl['FCS_data']['kappa_2'], pkl['FCS_data']['omega_err_2'], pkl['FCS_data']['kappa_err_2'])
+        dpg.set_value('focal_vol_input_ch_1', Vf1[0])
+        dpg.set_value('focal_vol_input_ch_2', Vf2[0])
+        dpg.set_value('focal_vol_err_input_ch_1', Vf1[1])
+        dpg.set_value('focal_vol_err_input_ch_2', Vf2[1])
         dpg.set_value('Brightness_input_ch_1', pkl['FCS_data']['Br_1'])
         dpg.set_value('Brightness_input_ch_2', pkl['FCS_data']['Br_2'])
         dpg.set_value('Brightness_err_input_ch_1', pkl['FCS_data']['Br_err_1'])

@@ -1607,6 +1607,7 @@ class _PhotExtr_vars_funct:
     def calculate_stat_filter(self,Pure_components_dict,raw_signal):
 
         pure_components = []
+        # lprint(Pure_components_dict)
         for c in Pure_components_dict.keys():
             pure_components.append(Pure_components_dict[c])
                 
@@ -2035,18 +2036,19 @@ class _PhotExtr_vars_funct:
         an_file = self.anal_file.split('/')[-1]   
         self.mount_status_modal()
         dpg.configure_item('loading_butt',label=an_file)
-        try:
+        # try:
+        # if 1==1:
           # lprint(an_file)
             # lprint(self.B_limit_ch_1, self.U_limit_ch_1, self.B_limit_ch_2, self.U_limit_ch_2)
-            self.extract_from_ptu(self.last_directory,
-                                  an_file,
-                                  self.B_limit_ch_1,
-                                  self.U_limit_ch_1,
-                                  self.B_limit_ch_2,
-                                  self.U_limit_ch_2)
-        except:
-            print('Something wrong with your input file, try again.')
-            print('Incorrect file: '+an_file)
+        self.extract_from_ptu(self.last_directory,
+                              an_file,
+                              self.B_limit_ch_1,
+                              self.U_limit_ch_1,
+                              self.B_limit_ch_2,
+                              self.U_limit_ch_2)
+        # except:
+        #     print('Something wrong with your input file, try again.')
+        #     print('Incorrect file: '+an_file)
             
     
     
@@ -2615,21 +2617,48 @@ class _PhotExtr_vars_funct:
     
                 tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
                 XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
-                # lprint(len(XS))
+                # lprint(XS,len(XS))
                 midle_sep = self.ntchannels//2
                 # lprint(midle_sep)
                 if channels[channel] == 0:
-    
-                    lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
-                    xs = XS[np.where(XS>midle_sep)[0]]
+                    # lprint('channel:',channels[channel])
+                    # if flim_data_stack.shape[3] % 2 == 0:
+                    #     xs = XS[np.where(XS>=midle_sep)[0]]
+                    
+                    
+                    if not flim_data_stack.shape[3] % 2 == 0:
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],midle_sep+1:ULim_ch_1]
+                        # lprint('tutaj')
+                        # lprint(LLim_ch_1+1,ULim_ch_1,channels[channel])
+                        
+                        # lprint('flim_data_stack',flim_data_stack.shape)
+                        # lprint(flim_data_stack.shape[3] % 2 == 0)
+                        # lprint(flim_data_stack.shape[3])
+                        # lprint('midle_sep',midle_sep)
+                        xs = XS[np.where(XS>midle_sep)[0]]
+                    else:
+                        # lprint('tutaj')
+                        # lprint(LLim_ch_1+1,ULim_ch_1,channels[channel])
+                        
+                        # lprint('flim_data_stack',flim_data_stack.shape)
+                        # lprint(flim_data_stack.shape[3] % 2 == 0)
+                        # lprint(flim_data_stack.shape[3])
+                        # lprint('midle_sep',midle_sep)
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],midle_sep+1:ULim_ch_1]
+                        xs = XS[np.where(XS>=midle_sep)[0]]
+                    # lprint('xs',xs,len(xs))
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     
                     ys = np.sum(ys, axis = 0).astype(float)
                     # lprint(len(ys))
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
-                    ys = ys[np.where(XS>midle_sep)[0]]
-    
+                    if not flim_data_stack.shape[3] % 2 == 0:
+                        ys = ys[np.where(XS>midle_sep)[0]]
+                    else:
+                        ys = ys[np.where(XS>=midle_sep)[0]]
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_1'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 1')
                         filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,1)
@@ -2655,14 +2684,34 @@ class _PhotExtr_vars_funct:
     
     
                 else:
-                    lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
-                    xs = XS[np.where(XS<=midle_sep)[0]]
+                    # lprint('channel:',channels[channel])
+                    
+                    if not flim_data_stack.shape[3] % 2 == 0:
+                        # lprint('tutaj')
+                        # lprint(LLim_ch_2,ULim_ch_2,channels[channel])
+                        
+                        # lprint('flim_data_stack',flim_data_stack.shape)
+                        # lprint(flim_data_stack.shape[3] % 2 == 0)
+                        # lprint(flim_data_stack.shape[3])
+                        # lprint('midle_sep',midle_sep)
+                        
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:midle_sep]
+                        xs = XS[np.where(XS<=midle_sep)[0]]
+                    else:
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2+1]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:midle_sep]
+                        xs = XS[np.where(XS<midle_sep)[0]]
+                    # lprint('xs',xs,len(xs))
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
                     ys = np.sum(ys, axis = 0).astype(float)
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
-                    ys = ys[np.where(XS<=midle_sep)[0]]
+                    if not flim_data_stack.shape[3] % 2 == 0:
+                        ys = ys[np.where(XS<=midle_sep)[0]]
+                    else:
+                        ys = ys[np.where(XS<midle_sep)[0]]
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_2'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 2')
                         filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,2)
@@ -2675,7 +2724,7 @@ class _PhotExtr_vars_funct:
                         filtered_image_data=np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
     
     
-    
+                        # lprint(lifetime_data.shape,filter_weight_ch_2.shape,FILTRY_ch_2['Current decay; CH 2'].shape,filtering_decays_ch_2['Current decay; CH 2'].shape,flim_data_stack.shape)
                         for j in range(lifetime_data.shape[2]):
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_2[j]
                         lifetime_data = filtered_image_data
@@ -2847,14 +2896,15 @@ class _PhotExtr_vars_funct:
                 break
     
         if filter_name == None:
-            log_it('No filters selected - ignoring','a')
-    
+            # log_it('No filters selected - ignoring','a')
+            raise ValueError("No filters selected - ignoring")
+
         else:
             F = filters_dict[filter_name]
-    
+            
             weight = F/max(F)
             weight = np.where(weight>0,weight,0)
-    
+        # lprint('filter_name',filter_name)
         return weight
     def mount_LIB_decay_table(self,decay_list,_dict):
 
@@ -3026,7 +3076,8 @@ class _PhotExtr_vars_funct:
 
         
     def prepare_input_to_calculate_filters_from_routine(self,XS,YS,TCSPC_SIZE,TCSPC_RESOLUTION,routine,channel):
-        
+        # lprint(XS.shape,YS.shape)
+        # lprint(routine)
         XS = XS*self.tau_resolution-(XS*self.tau_resolution)[0]
         curve_names = routine['Channel '+str(channel)].keys()
         curve_names = [c for c in curve_names if c!='BG']
@@ -3055,7 +3106,7 @@ class _PhotExtr_vars_funct:
                 adjusted = self.adjust_curves(df, pd.Series(XS).to_frame())
                 curve=adjusted.ydata.values
                 CURVES[curv]=curve
-                
+                # lprint(curv)
             if if_afterpulse:
     
                 afterpulse = 1/np.unique(XS).size
@@ -3111,7 +3162,7 @@ class _PhotExtr_vars_funct:
                 adjusted = self.adjust_curves(df, pd.Series(XS).to_frame())
                 curve=adjusted.ydata.values
                 CURVES[curv]=curve
-                
+                lprint(curv)
             if if_afterpulse:
                 afterpulse = 1/np.unique(xs).size
                 afterpulse = np.array([afterpulse for i in CURVES[cname]])

@@ -85,7 +85,7 @@ def rewrtie_roi(file,input_folder,output_roi_path,shape):
     
 def rewrtie_roi_txt(file,input_folder,output_roi_path,shape):
     infile = os.path.join(input_folder,file)
-    df = pd.read_csv(infile,sep='\t',header=None)
+    df = pd.read_csv(infile,sep=['\t',','],header=None)
     new_file = file.replace('.txt','.tmp')
     df=df.astype(int)
     df = df.where(df!=0,'-')
