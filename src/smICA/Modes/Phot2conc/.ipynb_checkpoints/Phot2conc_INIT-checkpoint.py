@@ -1298,6 +1298,39 @@ class _Phot2conc_vars_funct:
     #     self.callback_windows_size(sender,app_data)
     #     self.callback_font_size(sender,app_data)
 
+    def export_auto_roi(self,channel,ROI_array):
+        folder_path = os.path.join(self.PTU_directory,'ROI')
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            print(f"Utworzono folder: {folder_path}")
+        else:
+            print(f"Folder już istnieje: {folder_path}")
+        # os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_1.csv')    
+        roiname= dpg.get_value('ROI_name_tag').replace('ROI_','')
+        
+        fname = self.anal_file+'_roi'+roiname+'_ch_'+channel+'.tmp'
+        df=pd.DataFrame(ROI_array)
+      # lprint(fname,'\n',df)
+        df = df.where(df!=0,'-')
+        df.to_csv(os.path.join(folder_path,fname), index=False, sep='\t', header=None)
+        output_roi_fname = os.path.join(folder_path,fname.replace('.tmp','.dat'))
+        f = open(output_roi_fname,'w')
+        f.write("Events[Cnts]\n")
+        f.write("(x0 | y0) = (0.000[um] | 0.000[um])\n")
+        f.write("(x1 | y1) = (??.???[um] | ??.???[um])\n")
+        f.close()
+        with open(os.path.join(folder_path,fname)) as reader:
+            red_file = reader.read()
+            reader.close()
+        f = open(output_roi_fname, "a")
+        f.write(red_file)
+        f.close()
+        tmp_files = os.listdir(folder_path)
+        tmp_files = [f for f in tmp_files if f.endswith('.tmp')]
+        for tmp in tmp_files:
+            os.remove(os.path.join(folder_path,tmp))
+
+
     def callback_calculate(self, sender, app_data):
         cmap = 'afmhot'
         rect = 0.1, 0.1, 0.85, 0.9
@@ -1312,6 +1345,7 @@ class _Phot2conc_vars_funct:
                 if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if1')
                     ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                    self.export_auto_roi(self.Channels[0],ROI)
                     roi = np.where(ROI == 0, np.nan, 1)
                     img = self.processor_1.image
                     self.DF = img * roi
@@ -1533,6 +1567,7 @@ class _Phot2conc_vars_funct:
                 if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                     # lprint('in if2')
                     ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                    self.export_auto_roi(self.Channels[0],ROI)
                     roi = np.where(ROI == 0, np.nan, 1)
                     img = self.processor_2.image
                     self.DF2 = img * roi
@@ -1759,6 +1794,7 @@ class _Phot2conc_vars_funct:
             if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if1')
                 ROI = self.processor_1.all_masks[0].astype(np.uint8)
+                self.export_auto_roi(self.Channels[0],ROI)
                 roi = np.where(ROI == 0, np.nan, 1)
                 img = self.processor_1.image
                 self.DF = img * roi
@@ -1772,7 +1808,7 @@ class _Phot2conc_vars_funct:
             # n_pixels_1test =  Photons_1t.stack().reset_index(drop=True).dropna().count()
 
             # lnprint('N pixel test', n_pixels_1,n_pixels_1test)
-            lprint(self.PTU_Px_dwell,self.PTU_N_frames,brightness_ch_1)
+          # lprint(self.PTU_Px_dwell,self.PTU_N_frames,brightness_ch_1)
             Molecules_ch_1 = self.calc_molecules(self.DF,
                                                  self.PTU_Px_dwell,
                                                  self.PTU_N_frames,
@@ -1980,6 +2016,7 @@ class _Phot2conc_vars_funct:
             if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
                 # lprint('in if2')
                 ROI = self.processor_2.all_masks[0].astype(np.uint8)
+                self.export_auto_roi(self.Channels[1],ROI)
                 roi = np.where(ROI == 0, np.nan, 1)
                 img = self.processor_2.image
                 self.DF2 = img * roi
@@ -2299,7 +2336,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_1,
                                                                  self.median_err_C_ch_1]],
                                                                columns=self.Sing_Results_DF.columns)
-                            lprint(Sing_Results_DF_tmp)
+                          # lprint(Sing_Results_DF_tmp)
 
                         elif '2' in self.Channels[0]:
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
@@ -2314,7 +2351,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_2,
                                                                  self.median_err_C_ch_2]],
                                                                columns=self.Sing_Results_DF.columns)
-                            lprint(Sing_Results_DF_tmp)
+                          # lprint(Sing_Results_DF_tmp)
                         else:
                             pass
 
@@ -2342,7 +2379,7 @@ class _Phot2conc_vars_funct:
                                                              self.median_C_ch_2,
                                                              self.median_err_C_ch_2]],
                                                            columns=self.Sing_Results_DF.columns)
-                        lprint(Sing_Results_DF_tmp)
+                      # lprint(Sing_Results_DF_tmp)
 
                     self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
                 self._pkl_file()
@@ -2754,7 +2791,7 @@ class _Phot2conc_vars_funct:
         roi_files = [f for f in roi_files if anfile in f]
         roi_files = [f for f in roi_files if '_roi' in f]
         rois = []
-        lprint(roi_files)
+      # lprint(roi_files)
         for f in roi_files:
             roi_n = f.split('_')
 
@@ -2790,11 +2827,11 @@ class _Phot2conc_vars_funct:
     def callback_ROI_names_combo(self, sender, app_data):
         ROIn = app_data
         roin = ROIn.replace('ROI_', '')
-        lprint(roin)
+      # lprint(roin)
         if len(self.Channels) == 1:
             if '1' in self.Channels[0]:
                 roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
-                lprint(roi_1_path)
+              # lprint(roi_1_path)
                 if os.path.exists(roi_1_path):
                     pass
                 else:
@@ -3395,6 +3432,7 @@ class _Phot2conc_vars_funct:
             self.callback_calculate(sender, None)
 
     def load_ROI(self, path):
+      # lprint(path)
         df = pd.read_csv(path, sep='\t', header=None, skiprows=3, encoding='latin1')
         df = df.replace('-', -1.)
         try:
