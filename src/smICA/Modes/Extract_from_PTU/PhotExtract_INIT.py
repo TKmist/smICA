@@ -549,9 +549,9 @@ class _PhotExtr_vars_funct:
         
         if not dpg.get_value('skip_lines_check'):
     
-            flim_data_stack, intensity_image_all_channels,special,sync = ptu_image.get_flim_data_stack()
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack()
         else:
-            flim_data_stack, intensity_image_all_channels,special,sync = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
         
         self.ntchannels = flim_data_stack.shape[3]
         self.MODE = ptu_image.head['UsrPulseCfg']
@@ -2510,7 +2510,19 @@ class _PhotExtr_vars_funct:
         else:
             dpg.configure_item('skip_lines_drag',enabled=False)
 
+    def make_afterpulsing_weight(self,filters_dict,channel):
 
+        # available_filters = dpg.get_aliases()
+        # available_filters = [af for af in available_filters if af.startswith('filters_ch_'+str(channel)+'_tab_list_row_')]
+        # available_filters = [af for af in available_filters if af.endswith('_cell b_chk')]
+        # available_filters.sort()
+        
+        F = filters_dict['Afterpulsing and background']
+        
+        weight = F/max(F)
+        weight = np.where(weight>0,weight,0)
+        # lprint('filter_name',filter_name)
+        return weight
 
     def extract_from_ptu(self,folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
         dpg.configure_item('loading_status',label='Loading')
@@ -2519,7 +2531,7 @@ class _PhotExtr_vars_funct:
         file=ptu_file.replace('.ptu','')
         path_to_file = os.path.join(folder,ptu_file)
         ptu_image  = PTUreader(path_to_file, print_header_data = False)
-    
+        # raw_data = ptu_image._ptu_read_raw_data()
         mode = ptu_image.head['UsrPulseCfg']
         self.tau_resolution = ptu_image.head["MeasDesc_Resolution"]*1e9
         tcspc_reolution = int(np.round(self.tau_resolution*1e-9*1e12))
@@ -2547,10 +2559,10 @@ class _PhotExtr_vars_funct:
     
         if not dpg.get_value('skip_lines_check'):
     
-            flim_data_stack, intensity_image_all_channels,special,sync = ptu_image.get_flim_data_stack()
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack()
         else:
     
-            flim_data_stack, intensity_image_all_channels,special,sync = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
     
         number_of_frames = int(pd.Series(special).where(pd.Series(special)==4).dropna().count())
     
@@ -2559,12 +2571,16 @@ class _PhotExtr_vars_funct:
         number_of_lines = ptu_image.head['ImgHdr_PixY']
         pixel_size = 1e3*ptu_image.head['ImgHdr_PixResol']
         special_markers = pd.DataFrame(special,columns=['marker'])
+        special_markers['sync'] = sync
+        special_markers['channel'] = im_channels
+        # lprint(np.unique(im_channels))
+        special_markers['tcspc'] = tcspc*tcspc_reolution
         special_markers['event'] = sync/sync_rate
         special_markers['dif'] = special_markers.where(special_markers.marker!=0).where(special_markers.marker!=4).dropna().event.diff()
         pixel_dwell = float(np.round(1e6*(special_markers.dropna().where(special_markers.marker==2).dropna().dif.to_frame()/line_width).mean().values,2))
         if flim_data_stack.ndim == 4:
             number_of_channels = flim_data_stack.shape[2]
-    
+            # lprint(number_of_channels)
             Resolution = str(flim_data_stack.shape[0])+'x'+str(flim_data_stack.shape[1])
             ccnt =0
             channels = []
@@ -2666,19 +2682,29 @@ class _PhotExtr_vars_funct:
                         FILTRY_ch_1 = self.calculate_stat_filter(filtering_decays_ch_1,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 1')
-                        filter_weight_ch_1 = self.make_weight_from_filters(FILTRY_ch_1,1)
+                        FWeight = filter_weight_ch_1 = self.make_weight_from_filters(FILTRY_ch_1,1)
+                        afterpulsing_weight = self.make_afterpulsing_weight(FILTRY_ch_1,1)
                         dpg.configure_item('loading_status',label='Filtering channel 1')
                         filtered_image_data=np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
-    
+                        afterpulsing_data =np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
     
     
                         for j in range(lifetime_data.shape[2]):
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_1[j]
-    
+                            afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
-    
+                        background = afterpulsing_data
+
+                        
+                        filtered_taus = np.sum(lifetime_data, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+        
     
                     else:
+                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        FWeight = afterpulsing_weight = None
+                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
                         pass
     
     
@@ -2719,17 +2745,27 @@ class _PhotExtr_vars_funct:
                         FILTRY_ch_2 = self.calculate_stat_filter(filtering_decays_ch_2,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 1')
-                        filter_weight_ch_2 = self.make_weight_from_filters(FILTRY_ch_2,2)
+                        FWeight = filter_weight_ch_2 = self.make_weight_from_filters(FILTRY_ch_2,2)
+                        afterpulsing_weight = self.make_afterpulsing_weight(FILTRY_ch_2,2)
                         dpg.configure_item('loading_status',label='Filtering channel 2')
                         filtered_image_data=np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
-    
+                        afterpulsing_data =np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
     
                         # lprint(lifetime_data.shape,filter_weight_ch_2.shape,FILTRY_ch_2['Current decay; CH 2'].shape,filtering_decays_ch_2['Current decay; CH 2'].shape,flim_data_stack.shape)
                         for j in range(lifetime_data.shape[2]):
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_2[j]
+                            afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
+                        background = afterpulsing_data
+
+                        filtered_taus = np.sum(lifetime_data, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
     
                     else:
+                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        FWeight = afterpulsing_weight = None
+                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
                         pass
             else:
                 NT_channels = flim_data_stack.shape[3]
@@ -2753,14 +2789,25 @@ class _PhotExtr_vars_funct:
                         FILTRY_ch_1 = self.calculate_stat_filter(filtering_decays_ch_1,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 1')
-                        filter_weight_ch_1 = self.make_weight_from_filters(FILTRY_ch_1,1)
+                        FWeight = filter_weight_ch_1 = self.make_weight_from_filters(FILTRY_ch_1,1)
+                        afterpulsing_weight = self.make_afterpulsing_weight(FILTRY_ch_1,1)
                         dpg.configure_item('loading_status',label='Filtering channel 1')
                         filtered_image_data=np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
+                        afterpulsing_data =np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
                         for j in range(lifetime_data.shape[2]):
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_1[j]
+                            afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
+                        background = afterpulsing_data
+
+                        filtered_taus = np.sum(lifetime_data, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
     
                     else:
+                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        FWeight = afterpulsing_weight = None
+                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
                         pass
     
                 else:
@@ -2777,15 +2824,26 @@ class _PhotExtr_vars_funct:
                         FILTRY_ch_2 = self.calculate_stat_filter(filtering_decays_ch_2,ys)
     
                         dpg.configure_item('loading_status',label='Calculating weights channel 2')
-                        filter_weight_ch_2 = self.make_weight_from_filters(FILTRY_ch_2,2)
+                        FWeight = filter_weight_ch_2 = self.make_weight_from_filters(FILTRY_ch_2,2)
+                        afterpulsing_weight = self.make_afterpulsing_weight(FILTRY_ch_2,2)
                         dpg.configure_item('loading_status',label='Filtering channel 2')
                         filtered_image_data=np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
+                        afterpulsing_data =np.zeros((lifetime_data.shape[0],lifetime_data.shape[1],lifetime_data.shape[2]))
                         for j in range(lifetime_data.shape[2]):
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_2[j]
+                            afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
     
                         lifetime_data = filtered_image_data
+                        background = afterpulsing_data
+
+                        filtered_taus = np.sum(lifetime_data, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
     
                     else:
+                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        FWeight = afterpulsing_weight = None
+                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
                         pass
     
             taus = pd.DataFrame(xs,columns = ['Tau'])
@@ -2794,12 +2852,15 @@ class _PhotExtr_vars_funct:
     
             taus['Intensity'] = ys
             fulltaus['Intensity'] = fYS
-    
+            
+            filtered_taus_DF = pd.DataFrame(xs,columns = ['Tau'])
+            filtered_taus_DF['Intensity'] = filtered_taus
     
     
     
     
             intensity = np.sum(lifetime_data, axis = 2)
+            bgrnd = np.sum(background, axis = 2)
             lifetime = np.zeros(lifetime_data.shape)
     
             if channels[channel] == 0:
@@ -2861,13 +2922,20 @@ class _PhotExtr_vars_funct:
             export_df = pd.DataFrame(channel_data)
                 
     
-    
+            # lprint(FWeight)
             json_pickle_all['export_df_'+str(channels[channel]+1)]=export_df
             json_pickle_all['taus_'+str(channels[channel]+1)]=taus
             json_pickle_all['fulltaus_'+str(channels[channel]+1)]=fulltaus
             json_pickle_all['lifetimes_'+str(channels[channel]+1)]=lifetimes
             json_pickle_all['intensity_'+str(channels[channel]+1)]=intensity
-    
+            json_pickle_all['bgrnd_'+str(channels[channel]+1)]=bgrnd
+            json_pickle_all['filter_weight_'+str(channels[channel]+1)]= FWeight
+            json_pickle_all['filter_afterpulsing_weight_'+str(channels[channel]+1)] = afterpulsing_weight
+            json_pickle_all['special_markers'] = special_markers
+            json_pickle_all['filtered_taus'] = filtered_taus_DF
+           
+            
+            
         with open(os.path.join(folder,file+'.pkl'), 'wb') as pklf:
             pickle.dump(json_pickle_all, pklf)
     
