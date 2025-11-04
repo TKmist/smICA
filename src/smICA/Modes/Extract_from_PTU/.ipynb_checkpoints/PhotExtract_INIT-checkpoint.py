@@ -93,9 +93,9 @@ class _PhotExtr_init:
 
         
         
-        bf.remove_font_from_registry()
-        bf.add_font_to_registry(self.font_size)
-        
+        # bf.remove_font_from_registry()
+        # bf.add_font_to_registry(self.font_size)
+        dpg.set_global_font_scale(self.fnt_ratio)
         
         
         
@@ -594,18 +594,18 @@ class _PhotExtr_vars_funct:
                         dpg.configure_item('L_dline_ch2',show=True)
                         dpg.configure_item('U_dline_ch2',show=True)
     
-                        midle_sep = self.ntchannels//2
+                        self.midle_sep = self.ntchannels//2
                         
-                        self.tau_mid = midle_sep*self.tau_resolution
+                        self.tau_mid =self.midle_sep*self.tau_resolution
     
                         if channels[channel] == 0:
                             
-                            lifetime_data = flim_data_stack[:,:,channels[channel],midle_sep:]
+                            lifetime_data = flim_data_stack[:,:,channels[channel],self.midle_sep:]
                             ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                             ys = np.sum(ys, axis = 0).astype(float)
-                            self.tchanx1 = self.Tchanx1[np.where(self.Tchanx1>midle_sep)[0]]
+                            self.tchanx1 = self.Tchanx1[np.where(self.Tchanx1>self.midle_sep)[0]]
                             self.Tchany1 = ys
-                            self.tchany1 = self.Tchany1[np.where(self.Tchanx1>midle_sep)[0]]
+                            self.tchany1 = self.Tchany1[np.where(self.Tchanx1>self.midle_sep)[0]]
     
                             self.sindatax1, self.sindatay1 = tau,ys
                             dpg.set_value('tag_series_ch_1', [self.sindatax1, self.sindatay1])
@@ -638,12 +638,12 @@ class _PhotExtr_vars_funct:
                             
                             
                         else:
-                            self.tchanx2 = self.Tchanx2[np.where(self.Tchanx2<=midle_sep)[0]]
-                            lifetime_data = flim_data_stack[:,:,channels[channel],:midle_sep]
+                            self.tchanx2 = self.Tchanx2[np.where(self.Tchanx2<=self.midle_sep)[0]]
+                            lifetime_data = flim_data_stack[:,:,channels[channel],:self.midle_sep]
                             ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                             ys = np.sum(ys, axis = 0).astype(float)
                             self.Tchany2 = ys
-                            self.tchany2 = self.Tchany2[np.where(self.Tchanx2<=midle_sep)[0]]
+                            self.tchany2 = self.Tchany2[np.where(self.Tchanx2<=self.midle_sep)[0]]
                             self.sindatax2, self.sindatay2 = tau,ys
                             dpg.set_value('tag_series_ch_2', [self.sindatax2, self.sindatay2])
                             dpg.fit_axis_data("xaxis_chan2")
@@ -676,9 +676,9 @@ class _PhotExtr_vars_funct:
                     else:
                         '''PIE MODE one channels'''
                         
-                        midle_sep = self.ntchannels//2
+                        self.midle_sep = self.ntchannels//2
                         
-                        self.tau_mid = midle_sep*self.tau_resolution
+                        self.tau_mid =self.midle_sep*self.tau_resolution
                         if channels[channel] == 0:
                             
                             dpg.configure_item('bottom_limit_ch1',enabled=True)
@@ -699,9 +699,9 @@ class _PhotExtr_vars_funct:
                             ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                 
                             ys = np.sum(ys, axis = 0).astype(float)
-                            self.tchanx1 = self.Tchanx1[np.where(self.Tchanx1>midle_sep)[0]]
+                            self.tchanx1 = self.Tchanx1[np.where(self.Tchanx1>self.midle_sep)[0]]
                             self.Tchany1 = ys
-                            self.tchany1 = self.Tchany1[np.where(self.Tchanx1>midle_sep)[0]]
+                            self.tchany1 = self.Tchany1[np.where(self.Tchanx1>self.midle_sep)[0]]
                             
                             self.sindatax1, self.sindatay1 = tau,ys
                             dpg.set_value('tag_series_ch_1', [self.sindatax1, self.sindatay1])
@@ -750,9 +750,9 @@ class _PhotExtr_vars_funct:
                 
                             ys = np.sum(ys, axis = 0).astype(float)
                             
-                            self.tchanx2 = self.Tchanx2[np.where(self.Tchanx2<=midle_sep)[0]]
+                            self.tchanx2 = self.Tchanx2[np.where(self.Tchanx2<=self.midle_sep)[0]]
                             self.Tchany2 = ys
-                            self.tchany2 = self.Tchany2[np.where(self.Tchanx2<=midle_sep)[0]]
+                            self.tchany2 = self.Tchany2[np.where(self.Tchanx2<=self.midle_sep)[0]]
                             self.sindatax2, self.sindatay2 = tau,ys
                             dpg.set_value('tag_series_ch_2', [self.sindatax2, self.sindatay2])
                             dpg.fit_axis_data("xaxis_chan2")
@@ -2556,7 +2556,10 @@ class _PhotExtr_vars_funct:
             pass
     
     
-    
+        # lprint('boundaries:')
+        # print('ch1\t',LLim_ch_1,ULim_ch_1)
+        # print('ch2\t',LLim_ch_2,ULim_ch_2)
+        
         if not dpg.get_value('skip_lines_check'):
     
             flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack()
@@ -2607,7 +2610,7 @@ class _PhotExtr_vars_funct:
         infoname = file+'.info'
     
         self.ntchannels = flim_data_stack.shape[3]
-    
+        # print('middle_sep', self.ntchannels//2)
     
         json_pickle_all = {'File info':info_dict
                           }
@@ -2634,8 +2637,9 @@ class _PhotExtr_vars_funct:
                 tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
                 XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
                 # lprint(XS,len(XS))
-                midle_sep = self.ntchannels//2
-                # lprint(midle_sep)
+                self.midle_sep = self.ntchannels//2
+                # lprint('midle_sep',midle_sep)
+                # lprint(self.ntchannels)
                 if channels[channel] == 0:
                     # lprint('channel:',channels[channel])
                     # if flim_data_stack.shape[3] % 2 == 0:
@@ -2643,8 +2647,8 @@ class _PhotExtr_vars_funct:
                     
                     
                     if not flim_data_stack.shape[3] % 2 == 0:
-                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
-                        lifetime_data = flim_data_stack[:,:,channels[channel],midle_sep+1:ULim_ch_1]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],self.midle_sep+1:ULim_ch_1]
                         # lprint('tutaj')
                         # lprint(LLim_ch_1+1,ULim_ch_1,channels[channel])
                         
@@ -2652,7 +2656,9 @@ class _PhotExtr_vars_funct:
                         # lprint(flim_data_stack.shape[3] % 2 == 0)
                         # lprint(flim_data_stack.shape[3])
                         # lprint('midle_sep',midle_sep)
-                        xs = XS[np.where(XS>midle_sep)[0]]
+                        xs = XS[np.where(XS>LLim_ch_1)[0]]
+                        # lprint('xs',xs,len(xs))
+                        # lprint('lifetime_data',lifetime_data.shape)
                     else:
                         # lprint('tutaj')
                         # lprint(LLim_ch_1+1,ULim_ch_1,channels[channel])
@@ -2661,9 +2667,11 @@ class _PhotExtr_vars_funct:
                         # lprint(flim_data_stack.shape[3] % 2 == 0)
                         # lprint(flim_data_stack.shape[3])
                         # lprint('midle_sep',midle_sep)
-                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
-                        lifetime_data = flim_data_stack[:,:,channels[channel],midle_sep+1:ULim_ch_1]
-                        xs = XS[np.where(XS>=midle_sep)[0]]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],self.midle_sep:ULim_ch_1]
+                        xs = XS[np.where(XS>=LLim_ch_1)[0]]
+                        # lprint('xs',xs,len(xs))
+                        # lprint('lifetime_data',lifetime_data.shape)
                     # lprint('xs',xs,len(xs))
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     
@@ -2672,9 +2680,11 @@ class _PhotExtr_vars_funct:
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
                     if not flim_data_stack.shape[3] % 2 == 0:
-                        ys = ys[np.where(XS>midle_sep)[0]]
+                        ys = ys[np.where(XS>LLim_ch_1)[0]]
+                        # lprint('ys',ys,len(ys))
                     else:
-                        ys = ys[np.where(XS>=midle_sep)[0]]
+                        ys = ys[np.where(XS>=LLim_ch_1)[0]]
+                        # lprint('ys',ys,len(ys))
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_1'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 1')
                         filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,1)
@@ -2698,13 +2708,17 @@ class _PhotExtr_vars_funct:
                         
                         filtered_taus = np.sum(lifetime_data, axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
         
     
                     else:
-                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        background = np.zeros_like(lifetime_data)
                         FWeight = afterpulsing_weight = None
-                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(np.zeros_like(xs), axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        # lprint(filtered_taus)
+                        filtered_taus = np.atleast_1d(filtered_taus)
+                        # lprint(filtered_taus)
                         pass
     
     
@@ -2721,23 +2735,30 @@ class _PhotExtr_vars_funct:
                         # lprint(flim_data_stack.shape[3])
                         # lprint('midle_sep',midle_sep)
                         
-                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
-                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:midle_sep]
-                        xs = XS[np.where(XS<=midle_sep)[0]]
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2+1]
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:self.midle_sep+1]
+                        xs = XS[np.where(XS<=ULim_ch_2)[0]]
+                        # lprint('xs',xs,len(xs))
+                        # lprint('lifetime_data',lifetime_data.shape)
                     else:
-                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2+1]
-                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:midle_sep]
-                        xs = XS[np.where(XS<midle_sep)[0]]
-                    # lprint('xs',xs,len(xs))
+                        lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                        # lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:self.midle_sep]
+                        xs = XS[np.where(XS<ULim_ch_2)[0]]
+                        # lprint('xs',xs,len(xs))
+                        # lprint('lifetime_data',lifetime_data.shape)
+                    
+                    
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
                     ys = np.sum(ys, axis = 0).astype(float)
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
                     if not flim_data_stack.shape[3] % 2 == 0:
-                        ys = ys[np.where(XS<=midle_sep)[0]]
+                        ys = ys[np.where(XS<=ULim_ch_2)[0]]
+                        # lprint('ys',ys,len(ys))
                     else:
-                        ys = ys[np.where(XS<midle_sep)[0]]
+                        ys = ys[np.where(XS<ULim_ch_2)[0]]
+                        # lprint('ys',ys,len(ys))
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_2'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 2')
                         filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,2)
@@ -2760,24 +2781,34 @@ class _PhotExtr_vars_funct:
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
     
                     else:
-                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        background = np.zeros_like(lifetime_data)
                         FWeight = afterpulsing_weight = None
-                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(np.zeros_like(xs), axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
                         pass
             else:
                 NT_channels = flim_data_stack.shape[3]
-    
+                # self.ntchannels = flim_data_stack.shape[3]
+                # lprint(NT_channels)
+                # lprint(self.ntchannels)
                 tau = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)*self.tau_resolution
                 XS = np.linspace(0,self.ntchannels,self.ntchannels, dtype = int)
     
-    
+                if ULim_ch_1<NT_channels:
+                    
+                    ULim_ch_1 = NT_channels
+                else:
+                    pass
                 if channels[channel] == 0:
-    
+                    # lprint('LLim_ch_1:ULim_ch_1',LLim_ch_1,ULim_ch_1)
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                    # lprint(lifetime_data.shape)
                     xs=XS
+                    # lprint(len(xs))
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
                     ys = np.sum(ys, axis = 0).astype(float)
@@ -2802,12 +2833,14 @@ class _PhotExtr_vars_funct:
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
     
                     else:
-                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        background = np.zeros_like(lifetime_data)
                         FWeight = afterpulsing_weight = None
-                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(np.zeros_like(xs), axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
                         pass
     
                 else:
@@ -2838,12 +2871,14 @@ class _PhotExtr_vars_funct:
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
     
                     else:
-                        background = filtered_taus = np.zeros_like(lifetime_data)
+                        background = np.zeros_like(lifetime_data)
                         FWeight = afterpulsing_weight = None
-                        filtered_taus = np.sum(filtered_taus, axis=0)
+                        filtered_taus = np.sum(np.zeros_like(xs), axis=0)
                         filtered_taus = np.sum(filtered_taus, axis = 0).astype(float)
+                        filtered_taus = np.atleast_1d(filtered_taus)
                         pass
     
             taus = pd.DataFrame(xs,columns = ['Tau'])
@@ -2852,8 +2887,27 @@ class _PhotExtr_vars_funct:
     
             taus['Intensity'] = ys
             fulltaus['Intensity'] = fYS
+            # lprint('channel',channels[channel])
+            # lprint(len(xs))
+            # lprint(len(filtered_taus))
+
+            if len(xs) != len(filtered_taus):
+                # lprint(f"⚠️ Length mismatch: xs={len(xs)}, filtered_taus={len(filtered_taus)}")
+            
+                if len(xs) > len(filtered_taus):
+                    # lprint("   Trimming xs (cutting from end)")
+                    xs = xs[:len(filtered_taus)]
+                else:
+                    # lprint("   Trimming filtered_taus (cutting from end)")
+                    filtered_taus = filtered_taus[:len(xs)]
+            
+            filtered_taus_DF = pd.DataFrame(xs, columns=['Tau'])
+            filtered_taus_DF['Intensity'] = filtered_taus
             
             filtered_taus_DF = pd.DataFrame(xs,columns = ['Tau'])
+            # lprint(filtered_taus_DF.head())
+            # lprint(filtered_taus_DF.tail())
+            # lprint(len(filtered_taus))
             filtered_taus_DF['Intensity'] = filtered_taus
     
     
@@ -2931,8 +2985,8 @@ class _PhotExtr_vars_funct:
             json_pickle_all['bgrnd_'+str(channels[channel]+1)]=bgrnd
             json_pickle_all['filter_weight_'+str(channels[channel]+1)]= FWeight
             json_pickle_all['filter_afterpulsing_weight_'+str(channels[channel]+1)] = afterpulsing_weight
-            json_pickle_all['special_markers'] = special_markers
-            json_pickle_all['filtered_taus'] = filtered_taus_DF
+            json_pickle_all['special_markers_'+str(channels[channel]+1)] = special_markers
+            json_pickle_all['filtered_taus_'+str(channels[channel]+1)] = filtered_taus_DF
            
             
             
@@ -3230,7 +3284,7 @@ class _PhotExtr_vars_funct:
                 adjusted = self.adjust_curves(df, pd.Series(XS).to_frame())
                 curve=adjusted.ydata.values
                 CURVES[curv]=curve
-                lprint(curv)
+                # lprint(curv)
             if if_afterpulse:
                 afterpulse = 1/np.unique(xs).size
                 afterpulse = np.array([afterpulse for i in CURVES[cname]])

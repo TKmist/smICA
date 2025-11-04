@@ -1756,8 +1756,8 @@ with dpg.file_dialog(directory_selector=False,
                      modal=False):
     '''Dialog window for exporting the results of the fitting.'''
     dpg.add_file_extension("", color=(150, 255, 150, 255))
-    dpg.add_file_extension("{.xlsx,.csv,.dat}")
-    dpg.add_file_extension(".xlsx", color=(255, 0, 255, 255), custom_text="[Excel]")
+    dpg.add_file_extension("{.csv,.dat}")
+    
     dpg.add_file_extension(".dat", color=(255, 255, 0, 255), custom_text="[DAT]")
     dpg.add_file_extension(".csv", color=(0, 255, 0, 255), custom_text="[CSV]")
     dpg.add_file_extension(".pickle", color=(0, 255, 255, 255), custom_text="[Pandas]")

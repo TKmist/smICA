@@ -20,6 +20,13 @@
             "TCSPC_channels": 3127,
             "Description": "",
             "npy_path": "res/Lib/npy/fitc-dextran.npy"
+        },
+        "(Ch1) Dex_100nM_40_uW_PD_15.12us_PXS_100.3nm1.ptu": {
+            "EXC-wavelength": "tritc-dextran155k",
+            "TCSPC_resolution": "8",
+            "TCSPC_channels": 3127,
+            "Description": "",
+            "npy_path": "res/Lib/npy/(Ch1) Dex_100nM_40_uW_PD_15.12us_PXS_100.3nm1.ptu.npy"
         }
     },
     "Channel 2": {

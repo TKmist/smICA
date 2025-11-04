@@ -110,7 +110,7 @@ with dpg.theme(tag="Error_window_theme"):
                            )
     with dpg.theme_component(dpg.mvButton):
         dpg.add_theme_color(dpg.mvThemeCol_Button,
-                            (56,5,15,255)
+                            (116,7,29,255)
                            )
         
 with dpg.theme(tag="Inactive_checkbox"):
@@ -143,3 +143,32 @@ with dpg.theme(tag='transparent_theme'):
         dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,
                             BACKGROUND_COLOUR
                            )
+with dpg.theme(tag="menu_update_available"):
+    with dpg.theme_component(dpg.mvMenu):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (246, 115, 10))
+    with dpg.theme_component(dpg.mvMenuItem,enabled_state=False):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (246, 136, 10))
+    with dpg.theme_component(dpg.mvMenuItem):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (246, 115, 10))
+
+
+with dpg.theme(tag="menu_update_available_new"):
+    with dpg.theme_component(dpg.mvMenu):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (246, 115, 10))
+    with dpg.theme_component(dpg.mvMenuItem,enabled_state=False):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (62, 190, 15))
+    with dpg.theme_component(dpg.mvMenuItem):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (62, 190, 15))
+
+with dpg.theme(tag="menu_normal"):
+    with dpg.theme_component(dpg.mvMenu):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
+    with dpg.theme_component(dpg.mvMenuItem):
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
+        
+
+# with dpg.theme(tag="menu_item_theme"):
+#     with dpg.theme_component(dpg.mvMenuItem):  # Uwaga: typ to mvMenuItem
+#         dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 0))           # kolor tekstu
+#         dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (80, 80, 200))  # kolor hovera
+#         dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (120, 120, 250)) # kolor kliknięcia

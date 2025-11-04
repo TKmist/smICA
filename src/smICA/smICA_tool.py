@@ -64,12 +64,16 @@ def callback_none():
     pass
 
 basf = inits._basicF()
+updt = inits._updater(basf._hsv_to_rgb,VERSION)
+
+
+
 
 inV=inits._init_varaibles()
 
     
 viewport = inV.VIEWPORT_prop
-menu = inits._init_Menu(VERSION=VERSION)
+menu = inits._init_Menu(updt.updater_state,VERSION=VERSION)
 
 lprint=basf.lnprint
 
@@ -96,6 +100,7 @@ inf_w, inf_h = get_monitors()[0].width, get_monitors()[0].height
 dpg.create_context()
 execfile('Required/Themes.py')             # Load the themes definitions.
 execfile('Required/Fonts.py') 
+# dpg.show_font_manager()
 execfile('Required/Handlers.py')
 
 
@@ -109,6 +114,14 @@ VP_w = dpg.get_viewport_width()            # get initial width of the viewport
 VP_h = dpg.get_viewport_height()           # get initial height of the viewport
  
 menu.mount_main_Menu_bar()
+
+try:
+   
+    updt.run_updater()
+    print('updt.updater_state =', updt.updater_state)
+    
+except:
+    basf.some_fail()
 
 inV.METHODS = basf.search_for_methods()
 

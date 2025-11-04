@@ -112,9 +112,10 @@ class _Phot2conc_init:
                                # 'subtract many dark spots'
                                ]
 
-        bf.remove_font_from_registry()
-        bf.add_font_to_registry(self.font_size)
-
+        # bf.remove_font_from_registry()
+        # bf.add_font_to_registry(self.font_size)
+        dpg.set_global_font_scale(self.fnt_ratio)
+        # print(len(dpg.get_aliases()))
         self.img_border = 60
 
         self.PTU_DATA_window = {'name': 'PTU_DATA_window',
@@ -811,9 +812,9 @@ class _Phot2conc_vars_funct:
             fnam = app_data['file_name']
             filtr = '.' + fnam.split('.')[1]
 
-        if filtr == '.xlsx':
-            path = app_data['file_path_name']
-            self.Sing_Results_DF.to_excel(path, index=False)
+        # if filtr == '.xlsx':
+        #     path = app_data['file_path_name']
+        #     self.Sing_Results_DF.to_excel(path, index=False)
 
         elif filtr == '.dat':
             path = app_data['file_path_name']
@@ -1302,9 +1303,10 @@ class _Phot2conc_vars_funct:
         folder_path = os.path.join(self.PTU_directory,'ROI')
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-            print(f"Utworzono folder: {folder_path}")
+            # print(f"Utworzono folder: {folder_path}")
         else:
-            print(f"Folder już istnieje: {folder_path}")
+            pass
+            # print(f"Folder już istnieje: {folder_path}")
         # os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_1.csv')    
         roiname= dpg.get_value('ROI_name_tag').replace('ROI_','')
         
