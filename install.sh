@@ -107,7 +107,7 @@ mkdir -p "$DESKTOP_ENTRY_DIR"
 # Generate the .desktop file
 cat <<EOL > "$DESKTOP_ENTRY"
 [Desktop Entry]
-Version=1.1.0
+Version=1.2.0
 Type=Application
 Name=smICA
 Comment=Run smICA application
@@ -139,7 +139,7 @@ fi
 # Step 2: Move all files in the main directory (except install.sh and setup.py) to the smICA directory
 echo "Moving files to smICA directory..."
 for file in *; do
-    if [[ "$file" != "install.sh" && "$file" != "setup.py" && "$file" != "run_smICA" && "$file" != "smICA" && "$file" != "v_smICA_env" && "$file" != "python_embedded" && "$file" != "REWRITE_ROI" ]]; then
+    if [[ "$file" != "install.sh" && "$file" != "setup.py" && "$file" != "run_smICA" && "$file" != "smICA" && "$file" != "v_smICA_env" && "$file" != "python_embedded" && "$file" != "REWRITE_ROI"  && "$file" != "Docs" ]]; then
         mv "$file" smICA/
         if [ $? -ne 0 ]; then
             echo "Failed to move file $file to smICA directory. Exiting."

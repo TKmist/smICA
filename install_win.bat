@@ -133,7 +133,7 @@ if %errorlevel% neq 0 (
 :: Move files to the smICA directory
 echo Moving files to smICA directory...
 for %%f in (*) do (
-    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI" (
+    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI" if not "%%f" == "Docs" (
         move "%%f" smICA\
         if %errorlevel% neq 0 (
             echo Failed to move file %%f to FcsIT directory. Exiting.
