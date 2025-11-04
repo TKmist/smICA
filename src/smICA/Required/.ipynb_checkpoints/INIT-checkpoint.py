@@ -187,7 +187,7 @@ class _updater:
         dpg.delete_item('proceed_to_update_window')
 
     def proceed_window_OK(self):
-        print('proceed_window_OK')
+        # print('proceed_window_OK')
         window_size = dpg.get_item_rect_size("proceed_to_update_window")
         
         
@@ -217,7 +217,7 @@ class _updater:
         
         self.Copying_new_files()
         # time.sleep(0.5)
-        for i in range(5, -1, -1):
+        for i in range(3, -1, -1):
             
             dpg.set_item_label('progress_button','Finished. smICA closes in: '+str(i)+ ' sec.')
             time.sleep(1)
@@ -232,9 +232,9 @@ class _updater:
         
     def backup_old_files(self):
         current_dir = os.path.abspath(os.getcwd())
-        print(f"[Updater] Aktualny katalog: {current_dir}")
+        # print(f"[Updater] Aktualny katalog: {current_dir}")
         bckp_dir = os.path.join(current_dir,'..' ,"old_backup")
-        print(f"[Updater] Aktualny katalog: {bckp_dir}")
+        # print(f"[Updater] Aktualny katalog: {bckp_dir}")
         if os.path.exists(bckp_dir):
                 print("[Updater] Usuwam stary katalog backup...")
                 dpg.set_item_label('progress_button','Removing old backup files')
@@ -276,40 +276,40 @@ class _updater:
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(tmp_dir)
         except zipfile.BadZipFile:
-            print("[Updater] Błąd: uszkodzone archiwum ZIP.")
+            # print("[Updater] Błąd: uszkodzone archiwum ZIP.")
             return None
         subfolders = [d for d in os.listdir(tmp_dir) if os.path.isdir(os.path.join(tmp_dir,d))]
         print(subfolders)
         
         if not subfolders:
-            print("[Updater] Brak rozpakowanego katalogu w archiwum!")
+            # print("[Updater] Brak rozpakowanego katalogu w archiwum!")
             return None
         
         extracted_dir = subfolders[0]
         updt_dir = os.path.join(tmp_dir,extracted_dir)
-        print(f"[Updater] Aktualizacja pobrana do: {updt_dir}")
+        # print(f"[Updater] Aktualizacja pobrana do: {updt_dir}")
         metafiles = ['LICENSE','README.md','VERSION']
         for f in metafiles:
             print("[Updater] Usuwam stary katalog backup...")
             dpg.set_item_label('progress_button','Updating meta files')
             source = os.path.join(updt_dir,f)
             target = os.path.join(current_dir ,'..' ,f)
-            print(source)
-            print(target)
-            # shutil.copy(source,target)
+            # print(source)
+            # print(target)
+            shutil.copy(source,target)
         FoldersToBackup = ['REWRITE_ROI','smICA']
         for d in FoldersToBackup:
             dpg.set_item_label('progress_button','Updating software directories')
             source = os.path.join(updt_dir,'src' ,d)
             target = os.path.join(current_dir,'..' ,d)
-            print(source)
-            print(target)
-            # shutil.copytree(
-            #     source,
-            #     target,
-            #     dirs_exist_ok=True,
-            #     ignore=shutil.ignore_patterns("*updt_tmp", "__pycache__",'.ipynb_checkpoints')
-            #     )
+            # print(source)
+            # print(target)
+            shutil.copytree(
+                source,
+                target,
+                dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns("*updt_tmp", "__pycache__",'.ipynb_checkpoints')
+                )
         dpg.set_item_label('progress_button','Removing temporary files')
         shutil.rmtree(tmp_dir, ignore_errors=True)
         
@@ -338,12 +338,12 @@ class _updater:
     
             # 1️⃣ Bieżąca ścieżka programu
             current_dir = os.path.abspath(os.getcwd())
-            print(f"[Updater] Aktualny katalog: {current_dir}")
+            # print(f"[Updater] Aktualny katalog: {current_dir}")
     
             # 2️⃣ Katalog tymczasowy
             tmp_dir = os.path.join(current_dir,'..', "updt_tmp")
             if os.path.exists(tmp_dir):
-                print("[Updater] Usuwam stary katalog tymczasowy...")
+                # print("[Updater] Usuwam stary katalog tymczasowy...")
                 shutil.rmtree(tmp_dir, ignore_errors=True)
             os.makedirs(tmp_dir, exist_ok=True)
     
@@ -354,7 +354,7 @@ class _updater:
                 headers["Authorization"] = f"token {token}"
     
             zip_path = os.path.join(tmp_dir, f"{repo}-{branch}.zip")
-            print(f"[Updater] Pobieram ZIP z {zip_url} -> {zip_path}")
+            # print(f"[Updater] Pobieram ZIP z {zip_url} -> {zip_path}")
     
             try:
                 with requests.get(zip_url, headers=headers, timeout=timeout, stream=True) as r:
@@ -363,7 +363,7 @@ class _updater:
                         for chunk in r.iter_content(chunk_size=8192):
                             f.write(chunk)
             except requests.RequestException as e:
-                print(f"[Updater] Błąd pobierania: {e}")
+                # print(f"[Updater] Błąd pobierania: {e}")
                 return None
     
 
@@ -381,7 +381,7 @@ class _updater:
         
         if is_newer:
             self.updater_state = True
-            print(f"🟢 Dostępna nowa wersja: {remote} (lokalna: {self.version})")
+            # print(f"🟢 Dostępna nowa wersja: {remote} (lokalna: {self.version})")
 
             
             
@@ -429,7 +429,7 @@ class _updater:
             
         else:
             self.updater_state = False
-            print(f"🔵 Brak aktualizacji. Najnowsza wersja to {remote}.")
+            # print(f"🔵 Brak aktualizacji. Najnowsza wersja to {remote}.")
     
 
 
