@@ -11,7 +11,7 @@ with open(version_path, 'r') as file:
 
 win_packages = ['pywin32']
 basic_packages = [
-"dearpygui==2.1.0",
+"dearpygui<2.0.0",
         "pandas==2.2.3",
         "numpy==1.26.4",
         "decorator==5.2.1",
