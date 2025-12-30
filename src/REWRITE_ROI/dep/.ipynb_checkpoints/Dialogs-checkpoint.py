@@ -26,21 +26,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
+global _pathm
+dpg.add_file_dialog(directory_selector=True,
+                    label = 'Select source ROI folder',
+                    width =400,
+                    height=300,
+                    default_path = _path,
+                    show=False,
+                    file_count=5,
 
-def add_font_to_registry(font_size):
-    font_path = os.path.join('res','Fonts','DejaVuSansCondensed.ttf')
-    with dpg.font_registry(tag='Font_registry'):
-        '''Add a font registry.'''
-        
-        with dpg.font(font_path, font_size,tag='DejaVu') as font_18:
-            dpg.add_font_range(0x0300, 0x03ff)
-            dpg.add_font_range(0x0200, 0x02ff)
-            dpg.add_font_range(0x2080, 0x209C)
-            default_font = font_18
-        dpg.bind_font(default_font)
-
-add_font_to_registry(init_font_size)
-
-
+                    callback=callback_open_source_folder,
+                    cancel_callback=callback_empty,
+                    tag="Source_file_dialog",
+                    modal=False
+                   )
 
 
+dpg.add_file_dialog(directory_selector=True,
+                    label = 'Select target ROI folder',
+                    show=False,
+                    width =400,
+                    height=300,
+                    default_path = _path,
+                    file_count=5,
+
+                    callback=callback_open_target_folder,
+                    cancel_callback=callback_empty,
+                    tag="Target_file_dialog",
+                    modal=False
+                   )

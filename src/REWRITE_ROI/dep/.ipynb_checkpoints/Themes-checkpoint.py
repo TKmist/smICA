@@ -27,20 +27,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
-def add_font_to_registry(font_size):
-    font_path = os.path.join('res','Fonts','DejaVuSansCondensed.ttf')
-    with dpg.font_registry(tag='Font_registry'):
-        '''Add a font registry.'''
-        
-        with dpg.font(font_path, font_size,tag='DejaVu') as font_18:
-            dpg.add_font_range(0x0300, 0x03ff)
-            dpg.add_font_range(0x0200, 0x02ff)
-            dpg.add_font_range(0x2080, 0x209C)
-            default_font = font_18
-        dpg.bind_font(default_font)
-
-add_font_to_registry(init_font_size)
-
-
-
-
+with dpg.theme(tag="Error_window_theme"):
+    '''Theme for Error windows'''
+    with dpg.theme_component(dpg.mvWindowAppItem):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg,
+                            (139,16,16,255)
+                           )
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive,
+                            (83,23,23,255)
+                           )
+    with dpg.theme_component(dpg.mvButton):
+        dpg.add_theme_color(dpg.mvThemeCol_Button,
+                            (56,5,15,255)
+                           )

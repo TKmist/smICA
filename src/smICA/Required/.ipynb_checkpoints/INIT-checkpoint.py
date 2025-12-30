@@ -29,7 +29,7 @@ SOFTWARE.
 
 import os
 import numpy as np
-from numpy import log10#, sqrt, exp, log, pi
+from numpy import log10
 import dearpygui.dearpygui as dpg
 import json
 import webbrowser
@@ -55,12 +55,12 @@ class _updater:
         self.updater_state = False
         self.hsv = hsv
 
-        self.owner="TKmist"          # np. "psf"
-        self.repo="smICA"         # np. "requests"
-        self.branch="many_cells_auto_roi"      # dowolna gałąź
+        self.owner="TKmist"        
+        self.repo="smICA"         
+        self.branch="many_cells_auto_roi"  
         self.path="VERSION" 
 
-    # --- Prywatne metody pomocnicze ---
+    
 
     def _parse_version(self, ver: str):
         """
@@ -78,17 +78,16 @@ class _updater:
             s = suffix.lower()
             if not ('a' <= s <= 'z'):
                 raise ValueError(f"Niedozwolony sufiks wersji: {suffix!r}")
-            # a > b > ... => 'a' ma najwyższy priorytet
+            
             suffix_rank = 26 - (ord(s) - ord('a'))
         else:
-            suffix_rank = 0  # brak litery = najniższy priorytet
+            suffix_rank = 0  
 
         return (major, minor, patch, suffix_rank)
 
     def _raw_version_url(self, owner: str, repo: str, branch: str, path: str = "VERSION") -> str:
         return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
 
-    # --- Publiczna metoda ---
 
     def check_remote_version(
         self,
@@ -149,7 +148,6 @@ class _updater:
                             no_move=True,
                             no_close=False,
                             no_title_bar=False,
-                            # no_resize=True,
                             show=True,
                             modal=True,
                             autosize=True,
@@ -208,7 +206,7 @@ class _updater:
                                    parent = 'proceed_to_update_window',
                        width = window_size[0]
                                    )
-        # print(dpg.get_item_width('tag_load_ind_update'))
+        
         dpg.bind_item_theme('progress_button', 'transparent_theme')
         dpg.set_item_label('progress_button','Downloading files')
         
@@ -216,7 +214,7 @@ class _updater:
         self.backup_old_files()
         
         self.Copying_new_files()
-        # time.sleep(0.5)
+        
         for i in range(3, -1, -1):
             
             dpg.set_item_label('progress_button','Finished. smICA closes in: '+str(i)+ ' sec.')
@@ -232,9 +230,9 @@ class _updater:
         
     def backup_old_files(self):
         current_dir = os.path.abspath(os.getcwd())
-        # print(f"[Updater] Aktualny katalog: {current_dir}")
+        
         bckp_dir = os.path.join(current_dir,'..' ,"old_backup")
-        # print(f"[Updater] Aktualny katalog: {bckp_dir}")
+        
         if os.path.exists(bckp_dir):
                 print("[Updater] Usuwam stary katalog backup...")
                 dpg.set_item_label('progress_button','Removing old backup files')
@@ -242,22 +240,18 @@ class _updater:
         os.makedirs(bckp_dir, exist_ok=True)
         metafiles = ['LICENSE','README.md','VERSION']
         FoldersToBackup = ['REWRITE_ROI','smICA']
-        # time.sleep(1.5)
+        
         for f in metafiles:
             print("[Updater] Usuwam stary katalog backup...")
             dpg.set_item_label('progress_button','Backing up meta files')
             source = os.path.join(current_dir,'..' ,f)
             target = os.path.join(bckp_dir ,f)
-            # print(source)
-            # print(target)
             shutil.copy2(source,target)
-        # time.sleep(1.5)
+        
         for d in FoldersToBackup:
             dpg.set_item_label('progress_button','Backing up software directories')
             source = os.path.join(current_dir,'..' ,d)
             target = os.path.join(bckp_dir ,d)
-            # print(source)
-            # print(target)
             shutil.copytree(
                 source,
                 target,
@@ -276,34 +270,26 @@ class _updater:
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(tmp_dir)
         except zipfile.BadZipFile:
-            # print("[Updater] Błąd: uszkodzone archiwum ZIP.")
             return None
         subfolders = [d for d in os.listdir(tmp_dir) if os.path.isdir(os.path.join(tmp_dir,d))]
-        print(subfolders)
         
         if not subfolders:
-            # print("[Updater] Brak rozpakowanego katalogu w archiwum!")
             return None
         
         extracted_dir = subfolders[0]
         updt_dir = os.path.join(tmp_dir,extracted_dir)
-        # print(f"[Updater] Aktualizacja pobrana do: {updt_dir}")
         metafiles = ['LICENSE','README.md','VERSION']
         for f in metafiles:
             print("[Updater] Usuwam stary katalog backup...")
             dpg.set_item_label('progress_button','Updating meta files')
             source = os.path.join(updt_dir,f)
             target = os.path.join(current_dir ,'..' ,f)
-            # print(source)
-            # print(target)
             shutil.copy(source,target)
         FoldersToBackup = ['REWRITE_ROI','smICA']
         for d in FoldersToBackup:
             dpg.set_item_label('progress_button','Updating software directories')
             source = os.path.join(updt_dir,'src' ,d)
             target = os.path.join(current_dir,'..' ,d)
-            # print(source)
-            # print(target)
             shutil.copytree(
                 source,
                 target,
@@ -336,25 +322,22 @@ class _updater:
             :return: ścieżka do katalogu tymczasowego z rozpakowanymi plikami, lub None jeśli błąd
             """
     
-            # 1️⃣ Bieżąca ścieżka programu
+            
             current_dir = os.path.abspath(os.getcwd())
-            # print(f"[Updater] Aktualny katalog: {current_dir}")
-    
-            # 2️⃣ Katalog tymczasowy
+            
             tmp_dir = os.path.join(current_dir,'..', "updt_tmp")
             if os.path.exists(tmp_dir):
-                # print("[Updater] Usuwam stary katalog tymczasowy...")
                 shutil.rmtree(tmp_dir, ignore_errors=True)
             os.makedirs(tmp_dir, exist_ok=True)
     
-            # 3️⃣ Pobranie archiwum ZIP
+            
             zip_url = f"https://github.com/{owner}/{repo}/archive/refs/heads/{branch}.zip"
             headers = {}
             if token:
                 headers["Authorization"] = f"token {token}"
     
             zip_path = os.path.join(tmp_dir, f"{repo}-{branch}.zip")
-            # print(f"[Updater] Pobieram ZIP z {zip_url} -> {zip_path}")
+            
     
             try:
                 with requests.get(zip_url, headers=headers, timeout=timeout, stream=True) as r:
@@ -363,7 +346,7 @@ class _updater:
                         for chunk in r.iter_content(chunk_size=8192):
                             f.write(chunk)
             except requests.RequestException as e:
-                # print(f"[Updater] Błąd pobierania: {e}")
+                
                 return None
     
 
@@ -371,41 +354,27 @@ class _updater:
     def run_updater(self):
         
         is_newer, remote = self.check_remote_version(
-            owner=self.owner,          # np. "psf"
-            repo=self.repo,          # np. "requests"
-            branch=self.branch,      # dowolna gałąź
-            path=self.path         # nazwa pliku w repo
+            owner=self.owner,          
+            repo=self.repo,          
+            branch=self.branch,      
+            path=self.path         
         )
         theme_tag = dpg.get_item_theme('menu_about_dropout')
-        # print('theme:',theme_tag)
+        
         
         if is_newer:
             self.updater_state = True
-            # print(f"🟢 Dostępna nowa wersja: {remote} (lokalna: {self.version})")
-
-            
-            
             dpg.bind_item_theme("menu_about_dropout", "menu_update_available")
             children = dpg.get_item_children("menu_about_dropout", 1)  # slot 1 = normalne dzieci
-            # print(children)
-
-            
+                        
             for child in children:
-                # print(child)
                 if str(child).isdigit():
-                    # print(dpg.get_item_alias(child))
                     child = dpg.get_item_alias(child)
                 else:
                     pass
-                # print()
+                
                 if child == "menu_Version_dropout_item":
-                    # print(child,'menu_update_available')
                     dpg.bind_item_theme(child, "menu_update_available")
-                    
-                    # dpg.add_menu_item(label='Version: '+self.VERSION,enabled=False,tag=child)
-                    # dpg.add_menu_item(label='Version: '+self.VERSION,enabled=False,tag=child)
-                    
-                    # print(child)
                     dpg.set_item_label(child,label='Current version: '+self.VERSION+' !')
                     dpg.bind_item_font(child,'DejaVu_bold')
                     dpg.add_menu_item(label='New version: '+remote+ ' available, click to update now',
@@ -417,20 +386,11 @@ class _updater:
                     dpg.bind_item_font('menu_Version_dropout_item_new','DejaVu_bold')
                     
                 else:
-                    print(child,'menu_normal')
-                    dpg.bind_item_theme(child, "menu_normal")
-                    # dpg.bind_item_font(child,'DejaVu')
                     
-            # dpg.bind_item_theme("menu_License_dropout_item", 'update_available')
-            # print("Menu theme:", dpg.get_item_alias(dpg.get_item_theme("menu_about_dropout")))
-            # print("License theme:", dpg.get_item_alias(dpg.get_item_theme("menu_License_dropout_item")))
-            # print("Version theme:", dpg.get_item_alias(dpg.get_item_theme("menu_Version_dropout_item")))
-
+                    dpg.bind_item_theme(child, "menu_normal")
             
         else:
             self.updater_state = False
-            # print(f"🔵 Brak aktualizacji. Najnowsza wersja to {remote}.")
-    
 
 
 class _basicF:
@@ -442,22 +402,22 @@ class _basicF:
     
     
     def lnprint(self,*args, **kwargs):
-     # Get the current frame's caller information (go one level up)
+     
         caller_frame = inspect.currentframe().f_back
         line_number = caller_frame.f_lineno
-        # Get the filename of the script
+        
         file_name = caller_frame.f_code.co_filename
         function_name = caller_frame.f_code.co_name
-        # Print the line number and filename first
+        
         print(f"File {file_name}, Function '{function_name}', Line {line_number}: ", end="\n")
 
-        # Pass all arguments and keyword arguments to the built-in print function
+        
         print(*args, **kwargs)
     @staticmethod
     def some_fail():
         caller_frame = inspect.currentframe().f_back
         line_number = caller_frame.f_lineno
-        # Get the filename of the script
+        
         file_name = caller_frame.f_code.co_filename
         function_name = caller_frame.f_code.co_name
         print('Coś się zdupcyło \U0001F633','\n',end='\n')
@@ -481,7 +441,7 @@ class _basicF:
                 dpg.add_font_range(0x0200, 0x02ff)
                 dpg.add_font_range(0x2080, 0x209C)
                 dpg.add_font_range(0x2190, 0x2193)
-                # default_font = font_18
+                
             dpg.bind_font(default_font)
         
 
@@ -493,7 +453,7 @@ class _basicF:
     def _hsv_to_rgb(self,h, s, v):
         '''Funtion converts HSV color notation to the RGB values'''
         if s == 0.0: return (v, v, v)
-        i = int(h*6.) # XXX assume int() truncates!
+        i = int(h*6.) 
         f = (h*6.)-i; p,q,t = v*(1.-s), v*(1.-s*f), v*(1.-s*(1.-f)); i%=6
         if i == 0: return (255*v, 255*t, 255*p)
         if i == 1: return (255*q, 255*v, 255*p)
@@ -529,9 +489,7 @@ class _basicF:
             
         
         met_files = [ self.ifso(f) for f in met_files]
-        # print(met_files)
         met_files = [f for f in met_files if f.endswith('_config.json')]
-        # print(met_files,met_files[0],type(met_files[0]))
         met_file = met_files[0]
         path = os.path.join(method_dir,met_file)
 
@@ -542,17 +500,10 @@ class _basicF:
 
     def method_config_dict(self,method_dir):
         met_files = os.listdir(method_dir)
-        
-            
-            
-        
         met_files = [ self.ifso(f) for f in met_files]
         met_files = [str(f) for f in met_files if str(f).endswith('_config.json')]
-        # print(met_files)
         met_file = met_files[0]
-        # print('met_file',met_file)
         path = os.path.join(method_dir,met_file)
-        # print('path',path)
         with open(path) as json_settings:
             method_tree = json.load(json_settings)
 
@@ -560,22 +511,15 @@ class _basicF:
     
     
     def path_to_method_anal_layout(self,method_dir):
-        # print('method_dir',method_dir)
-        met_files = os.listdir(method_dir)
-        # print(met_files)
         
+        met_files = os.listdir(method_dir)
             
             
         
         met_files = [ self.ifso(f) for f in met_files]
-        # print(met_files,met_files[0],type(met_files[0]))
         met_files = [f for f in met_files if f.endswith('_config.json')]
-        # print(met_files)
-        # print(met_files,met_files[0],type(met_files[0]))
         met_file = met_files[0]
-        # print('met_file',met_file)
         path = os.path.join(method_dir,met_file)
-        # print('path',path)
         with open(path) as json_settings:
             method_tree = json.load(json_settings)
 
@@ -602,12 +546,10 @@ class _basicF:
     def callback_init_buttons(self,sender,app_data):
         
         if sender == 'EXTRACT_FROM_PTU_INIT_BUTTON':
-            # print('EXTRACT_FROM_PTU_INIT_BUTTON')
             self.PE_manu_F.callback_PHOTEXTR_menu()  
-            # 
+             
 
         elif sender == 'Phot_2_Conc_INIT_BUTTON':
-            # print('Phot_2_Conc_INIT_BUTTON')
             self.P2C_manu_F.callback_PHOT2CONC_menu()  
         
         self.unmount_inint_buttons()
@@ -730,8 +672,7 @@ class _init_varaibles:
             
         else:
             ico_path=os.path.join('res','icons','smICA.ico')
-            #self.init_bottom_indent = 2*11
-            #self.init_right_indent = 2*11
+            
         return ico_path
 
 class _init_Menu:
@@ -802,14 +743,11 @@ class _init_Menu:
             with dpg.menu(label="Mode",tag='menu_analysis_method_dropout'):
                 pass
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
-            # with dpg.menu(label="Settings",tag='menu_settings_dropout'):
-                
-            #     dpg.add_menu_item(label="Full Screen (F11)",tag='fullscreenclick',callback=self.callback_full_screen)
-
             with dpg.menu(label="About",tag='menu_about_dropout'):
-                # dpg.add_menu_item(label="Help (F1)",tag='helpclick',callback=self.callback_help)
                 dpg.add_menu_item(label="Help",tag='helpclick',callback=self.callback_help)
-                dpg.add_menu_item(label='License',callback = self.callback_license,tag='menu_License_dropout_item')
+                dpg.add_menu_item(label='License',
+                                  callback = self.callback_license,
+                                  tag='menu_License_dropout_item')
                
                 dpg.add_menu_item(label='Version: '+self.VERSION,enabled=False,tag='menu_Version_dropout_item')
                     

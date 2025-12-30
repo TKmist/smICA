@@ -28,6 +28,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 '''
+import platform
+import os
+from decorator import decorator 
+import dearpygui.dearpygui as dpg
+import datetime
+import numpy as np
+import warnings
+import Required.INIT as inits
+from screeninfo import get_monitors
 
 
 with open('../LICENSE', 'r') as file:
@@ -45,20 +54,9 @@ def execfile(filepath, globals=globals(), locals=None):
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), globals, locals)
 
-
-
-import platform
-import os
 if platform.system().upper() == "LINUX":
     os.environ["__GLVND_DISALLOW_PATCHING"] = "1"
-from decorator import decorator 
-import dearpygui.dearpygui as dpg
-# import os
-import datetime
-import numpy as np
-import warnings
-import Required.INIT as inits
-from screeninfo import get_monitors
+
 warnings.filterwarnings('ignore')
 def callback_none():
     pass
@@ -66,22 +64,12 @@ def callback_none():
 basf = inits._basicF()
 updt = inits._updater(basf._hsv_to_rgb,VERSION)
 
-
-
-
 inV=inits._init_varaibles()
-
     
 viewport = inV.VIEWPORT_prop
 menu = inits._init_Menu(updt.updater_state,VERSION=VERSION)
 
 lprint=basf.lnprint
-
-
-
-
-
-
 
 print(line)
 print(line,end='\n\n')
@@ -91,16 +79,11 @@ print('VERSION = ',VERSION,end='\n')
 print(line)
 print(line,end='\n\n')
 
-
-# execfile('Required/Required.py')           # Import required python packages
-
-# inf_w,inf_h=pyautogui.size()[0],pyautogui.size()[1]
 inf_w, inf_h = get_monitors()[0].width, get_monitors()[0].height
 
 dpg.create_context()
 execfile('Required/Themes.py')             # Load the themes definitions.
 execfile('Required/Fonts.py') 
-# dpg.show_font_manager()
 execfile('Required/Handlers.py')
 
 
@@ -125,24 +108,15 @@ except:
 
 inV.METHODS = basf.search_for_methods()
 
-
 for method in inV.METHODS:
-    # lprint(method)
+
     path =os.path.join(method,basf.path_to_method_anal_menu_item(method))
-    # lprint(path)
     execfile(path)
+    
 basf.P2C_manu_F = P2C_manu_F
 basf.PE_manu_F = PE_manu_F
 dpg.set_viewport_resize_callback(basf.basic_resizer)
 basf.mount_inint_buttons()
-
-
-
-
-# print(P2C_manu_F,PE_manu_F)
-# print(vars(menu))
-
-
 
 dpg.start_dearpygui()
 dpg.destroy_context()

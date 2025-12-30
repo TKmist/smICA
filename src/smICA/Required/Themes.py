@@ -166,9 +166,3 @@ with dpg.theme(tag="menu_normal"):
     with dpg.theme_component(dpg.mvMenuItem):
         dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
         
-
-# with dpg.theme(tag="menu_item_theme"):
-#     with dpg.theme_component(dpg.mvMenuItem):  # Uwaga: typ to mvMenuItem
-#         dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 0))           # kolor tekstu
-#         dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (80, 80, 200))  # kolor hovera
-#         dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (120, 120, 250)) # kolor kliknięcia

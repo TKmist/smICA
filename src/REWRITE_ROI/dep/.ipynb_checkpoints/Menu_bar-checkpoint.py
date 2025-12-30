@@ -26,21 +26,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-
-def add_font_to_registry(font_size):
-    font_path = os.path.join('res','Fonts','DejaVuSansCondensed.ttf')
-    with dpg.font_registry(tag='Font_registry'):
-        '''Add a font registry.'''
+with dpg.viewport_menu_bar(tag="vieport's_menubar"):
+    with dpg.menu(label="Menu"):
         
-        with dpg.font(font_path, font_size,tag='DejaVu') as font_18:
-            dpg.add_font_range(0x0300, 0x03ff)
-            dpg.add_font_range(0x0200, 0x02ff)
-            dpg.add_font_range(0x2080, 0x209C)
-            default_font = font_18
-        dpg.bind_font(default_font)
-
-add_font_to_registry(init_font_size)
-
-
-
-
+        dpg.add_menu_item(label="Exit",callback=lambda:dpg.stop_dearpygui())
+    with dpg.menu(label="About"):
+        dpg.add_menu_item(label='License',callback = callback_licence)
+        dpg.add_menu_item(label='Version: '+VERSION,enabled=False)
