@@ -39,24 +39,11 @@ import cv2
 from Required.automated_roi import ImageROIProcessor
 from scipy.stats import median_abs_deviation
 import pickle
-# from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-# from matplotlib.figure import Figure
-# import matplotlib.gridspec as gridspec
-# from matplotlib.transforms import Bbox
-# import matplotlib.pyplot as plt
-
-# from sympy.parsing.sympy_parser import parse_expr
-# from sympy import latex
-# from io import BytesIO
-# from PIL import Image
-
-# from lmfit import Model, Parameters
-# import ast
-
+from scipy import constants
 import Required.INIT as inits
 
 bf = inits._basicF()
-# inV=inits._init_varaibles()
+
 lprint = bf.lnprint
 globalITEMS = inits._common_VARIABLES()
 ###############################################################################
@@ -98,7 +85,6 @@ class _Phot2conc_init:
         self.im_scaller = int(32)  # 1.1
         self.files = []
 
-        # print(self.right_indent,self.bottom_indent)
         self.NO_IMAGE_INTENSITY = np.load(os.path.join('res', 'img', 'NO_image_INT.npy'))
 
         self.ROI_mode_items = ['',
@@ -108,16 +94,9 @@ class _Phot2conc_init:
                                'subtract bright',
                                'find many bright spots',
                                'subtract many bright spots'
-                               # 'find many dark spots',
-                               # 'subtract many dark spots'
                                ]
-
-        # bf.remove_font_from_registry()
-        # bf.add_font_to_registry(self.font_size)
         dpg.set_global_font_scale(self.fnt_ratio)
-        # print(len(dpg.get_aliases()))
         self.img_border = 60
-
         self.PTU_DATA_window = {'name': 'PTU_DATA_window',
                                 'width': int(380 * self.size_ratio['width']),
                                 'height': int(175 * self.size_ratio['height']),
@@ -153,17 +132,13 @@ class _Phot2conc_init:
             pass
         else:
             dpg.add_texture_registry(show=False, tag='texture_reg')
-
             self.GI.extend(['texture_reg'])
-
             self.processor_1 = ImageROIProcessor()
             self.processor_1.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
             self.processor_2 = ImageROIProcessor()
             self.processor_2.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
-
             self.rgba_image_1 = self.im_to_rgbim(self.processor_1.image)
             self.rgba_image_2 = self.im_to_rgbim(self.processor_2.image)
-
             self.rgba_image_1 = cv2.resize(self.rgba_image_1,
                                            (int(self.image_window_ch1['width'] - self.im_scaller),
                                             int(self.image_window_ch1['width'] - self.im_scaller)),
@@ -172,10 +147,8 @@ class _Phot2conc_init:
                                            (int(self.image_window_ch2['width'] - self.im_scaller),
                                             int(self.image_window_ch2['width'] - self.im_scaller)),
                                            interpolation=cv2.INTER_LINEAR)
-
             dpg_image_1 = (self.rgba_image_1.astype(np.float64) / np.max(self.rgba_image_1)).flatten().tolist()
             dpg_image_2 = (self.rgba_image_2.astype(np.float64) / np.max(self.rgba_image_2)).flatten().tolist()
-
             dpg.add_dynamic_texture(width=int(self.image_window_ch1['width'] - self.im_scaller),
                                     height=int(self.image_window_ch1['width'] - self.im_scaller),
                                     default_value=dpg_image_1,
@@ -187,46 +160,30 @@ class _Phot2conc_init:
                                     tag=self.tex_2_name,
                                     parent='texture_reg')
 
-        # if self.size_ratio['width']>=1:
-        #     self.shift=int((self.image_window_ch1['width']/self.size_ratio['width']-dpg.get_item_width(self.tex_1_name))/4)
-        # else:
-        #     self.shift=int((self.image_window_ch1['width']-dpg.get_item_width(self.tex_1_name))/4)
         self.shift = 8
-        # lprint(self.size_ratio['width'],self.shift)
         self.hist_window_ch1 = {'name': 'hist_window_ch1',
-                                # 'width':dpg.get_item_width(self.tex_1_name)+int(1.5*self.internal_indent),
                                 'width': self.image_window_ch1['width'],
-                                # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
                                 'height': dpg.get_viewport_height() - (
                                         self.image_window_ch1['pos'][1] + self.image_window_ch1[
                                     'height'] + self.internal_indent + self.bottom_indent),
-                                # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width'],
-                                #        2*self.top_indent+dpg.get_item_height(self.tex_1_name)*self.hist_scaller+int(4.5*self.internal_indent))
                                 'pos': (self.image_window_ch1['pos'][0],
                                         self.image_window_ch1['pos'][1] + self.image_window_ch1[
                                             'height'] + self.internal_indent)
                                 }
 
         self.hist_window_ch2 = {'name': 'hist_window_ch2',
-                                # 'width':dpg.get_item_width(self.tex_2_name)+int(1.5*self.internal_indent),
                                 'width': self.image_window_ch2['width'],
-                                # 'height':dpg.get_viewport_height()-(2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent)+self.bottom_indent),
-                                # 'pos':(self.left_indent+self.internal_indent+self.PTU_DATA_window['width']+dpg.get_item_width(self.tex_1_name)+2*self.internal_indent,
-                                #        2*self.top_indent+dpg.get_item_height(self.tex_2_name)*self.hist_scaller+int(4.5*self.internal_indent))
                                 'height': dpg.get_viewport_height() - (
                                         self.image_window_ch2['pos'][1] + self.image_window_ch2[
                                     'height'] + self.internal_indent + self.bottom_indent),
-
                                 'pos': (self.image_window_ch2['pos'][0],
                                         self.image_window_ch2['pos'][1] + self.image_window_ch2[
                                             'height'] + self.internal_indent)
                                 }
 
         self.FCS_window = {'name': 'FCS_window',
-                           # 'width':int(380*self.size_ratio['width']),
                            'width': dpg.get_viewport_width() - (self.image_window_ch2['pos'][0] + self.image_window_ch2[
                                'width'] + self.internal_indent + self.right_indent),
-
                            'height': int(406 * self.size_ratio['height']),
                            'pos': (self.left_indent + self.PTU_DATA_window['width'] + self.internal_indent +
                                    self.image_window_ch1['width'] + int(self.internal_indent) + self.image_window_ch2[
@@ -244,7 +201,6 @@ class _Phot2conc_init:
         self.Resolution_output = {'name': 'Resolution_output',
                                   'width': -1
                                   }
-
         self.Pixel_size_output = {'name': 'Pixel_size_output',
                                   'width': -1
                                   }
@@ -318,19 +274,6 @@ class _Phot2conc_init:
                                   'width': -1
 
                                   }
-
-        # self.img_win_1_table_col1 = {'name':'img_win_1_table_col1',
-        #                     'width':int(self.image_window_ch1['width']/4)
-        #                          }
-        # self.img_win_1_table_col2 = {'name':'img_win_1_table_col2',
-        #                     'width':int(self.image_window_ch1['width']/4)
-        #                          }
-        # self.img_win_1_table_col3 = {'name':'img_win_1_table_col3',
-        #                     'width':int(self.image_window_ch1['width']/4)
-        #                          }
-        # self.img_win_1_table_col4 = {'name':'img_win_1_table_col4',
-        #                     'width':int(self.image_window_ch1['width']/4)
-        #                          }
         self.cell_thres_ratio_1 = {'name': 'cell_thres_ratio_1',
                                    'width': -1
 
@@ -361,18 +304,6 @@ class _Phot2conc_init:
                                 'width': -1
 
                                 }
-        # self.img_win_2_table_col1 = {'name':'img_win_2_table_col1',
-        #                     'width':int(self.image_window_ch2['width']/4)
-        #                          }
-        # self.img_win_2_table_col2 = {'name':'img_win_2_table_col2',
-        #                     'width':int(self.image_window_ch2['width']/4)
-        #                          }
-        # self.img_win_2_table_col3 = {'name':'img_win_2_table_col3',
-        #                     'width':int(self.image_window_ch2['width']/4)
-        #                             }
-        # self.img_win_2_table_col4 = {'name':'img_win_2_table_col4',
-        #                     'width':int(self.image_window_ch2['width']/4)
-        #                             }
         self.cell_thres_ratio_2 = {'name': 'cell_thres_ratio_2',
                                    'width': -1
 
@@ -634,13 +565,9 @@ class _Phot2conc_init:
         return rgba_image
 
 
-###############################################################################
-###############################################################################
-''' Variables'''
-
-
-###############################################################################
-###############################################################################
+####################################################################
+################### end of _Phot2conc_init class ###################
+#################################################################### 
 
 class _Phot2conc_vars_funct:
     def __init__(self,
@@ -658,7 +585,6 @@ class _Phot2conc_vars_funct:
         self.anal_file = ''
         self.tex_1_name = self.mode_init.tex_1_name
         self.tex_2_name = self.mode_init.tex_2_name
-
         self.pck_list = []
         self.Channels = ''
         self.mean_Molecules_ch_1 = None
@@ -683,15 +609,12 @@ class _Phot2conc_vars_funct:
         self.mean_Concentration_err_ch_2 = None
         self.mean_Photons_ch_2 = None
         self.mean_Photons_err_ch_2 = None
-
         self.FCS_results_ch_1 = pd.DataFrame()
         self.FCS_results_ch_2 = pd.DataFrame()
-
         self.mean_brightness_err_ch_1 = 1
         self.mean_brightness_err_ch_2 = 1
         self.mean_brightness_ch_1 = 1
         self.mean_brightness_ch_2 = 1
-
         self.files = []
         self.pck_files = []
         self.PTU_directory = ''
@@ -700,37 +623,27 @@ class _Phot2conc_vars_funct:
         self.sync_rate = None
         self.pixel_dwell = None
         self.number_of_frames = None
-
         self.DF = pd.DataFrame()
         self.DF2 = pd.DataFrame()
-
         self.PTU_N_frames = None
         self.PTU_Px_dwell = None
         self.PTU_Resolution = None
         self.PTU_Px_size = None
         self.image_1_times_roi = None
         self.image_2_times_roi = None
-
         self.pkl = None
-
         self.roi_1 = None
         self.roi_2 = None
-
         self.img_height_shift = {'name': 'img_height_shift',
                                  'shift': int(24 * self.size_ratio['height'])
-
                                  }
-
         self.NO_IMAGE_INTENSITY = self.mode_init.NO_IMAGE_INTENSITY
         self.processor_1 = self.mode_init.processor_1
         self.processor_2 = self.mode_init.processor_2
         self.Current_image_1 = self.processor_1.image
         self.Current_image_2 = self.processor_2.image
-
         self.pkl_data = None
-
         self.im_to_rgbim = self.mode_init.im_to_rgbim
-
         self.ROIS_state = {'File roi': False,
                            'Auto roi': {
                                'state': False,
@@ -763,10 +676,8 @@ class _Phot2conc_vars_funct:
                                }
                            }
                            }
-        # lprint(self.ROIS_state)
 
     def set_roi_state(self):
-        # lprint(self.ROIS_state)
         dpg.set_value('FILE_ROI_checkbox', self.ROIS_state['File roi'])
         dpg.set_value('Auto_ROI_checkbox', self.ROIS_state['Auto roi']['state'])
         for key in self.ROIS_state['Auto roi']['subs'].keys():
@@ -777,45 +688,29 @@ class _Phot2conc_vars_funct:
         dpg.configure_item('Open_PTU_menu_item', callback=lambda: dpg.show_item("PTU_file_dialog_id"))
         dpg.configure_item('Open_ROI_menu_item', callback=lambda: dpg.show_item("ROI_folder_dialog_id"))
         dpg.configure_item('Reset_results_menu_item', callback=self.callback_reset_results_DF)
-        # dpg.configure_item('Export_settings_menu_item',callback=self.callback_exportsettings)
 
-    # def callback_reset_results_DF(self):
-    #     pass
-    # def callback_exportsettings(self):
-    #     pass
+    
     def VEFF(self, w, k, w_err, k_err):
-
         V = (pi ** (3 / 2)) * (w ** 3) * k
         V_err = sqrt(9 * (k ** 2) * (pi ** 3) * (w ** 4) * (w_err ** 2) + (k_err ** 2) * (pi ** 3) * (w ** 6))
         return V, V_err
 
     def CONC(self, N, V, N_err, V_err):
-
-        Na = 6.022e23
+        Na = constants.N_A
         C = N / (Na * V)
         C_err = sqrt(((N ** 2) * (V_err ** 2)) / ((Na ** 2) * (V ** 4)) + (N_err ** 2) / ((Na ** 2) * (V ** 2)))
         return C, C_err
 
     def Export_result_dataframe_to_file(self, sender, app_data):
-        # global directory, new_directory,last_directory
-
         self.directory = app_data['current_path']
         self.new_directory = self.directory
         self.last_directory = self.directory
         self.update_dialogs_default_directory(self.last_directory)
-
-        # global Sing_Results_DF
-
         filtr = app_data['current_filter']
-
         if filtr == '':
             fnam = app_data['file_name']
             filtr = '.' + fnam.split('.')[1]
-
-        # if filtr == '.xlsx':
-        #     path = app_data['file_path_name']
-        #     self.Sing_Results_DF.to_excel(path, index=False)
-
+            
         elif filtr == '.dat':
             path = app_data['file_path_name']
             self.Sing_Results_DF.to_csv(path, sep='\t', index=False)
@@ -833,8 +728,6 @@ class _Phot2conc_vars_funct:
         print('Exception in function ' + str(function_name) + ' while trying: ' + tried)
 
     def Load_Save_Calib_file(self, sender, app_data, user_data):
-        # global directory, new_directory,last_directory,calib_directory
-
         self.directory = app_data['current_path']
         self.new_directory = self.directory
         self.last_directory = self.directory
@@ -874,18 +767,11 @@ class _Phot2conc_vars_funct:
                     if k0 == 'Channel_1':
                         dpg.set_value('omega_input_ch_1', data[k0]['omega'][0])
                         dpg.set_value('omega_err_input_ch_1', data[k0]['omega'][1])
-
                         dpg.set_value('kappa_input_ch_1', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_1', data[k0]['kappa'][1])
-
                         Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
-
-
-                        
                         dpg.set_value('focal_vol_input_ch_1', Vf[0])
                         dpg.set_value('focal_vol_err_input_ch_1', Vf[1])
-                        
-        
                         dpg.set_value('Brightness_input_ch_1', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_1', data[k0]['Mol.Brightness'][1])
 
@@ -893,17 +779,11 @@ class _Phot2conc_vars_funct:
 
                         dpg.set_value('omega_input_ch_2', data[k0]['omega'][0])
                         dpg.set_value('omega_err_input_ch_2', data[k0]['omega'][1])
-
                         dpg.set_value('kappa_input_ch_2', data[k0]['kappa'][0])
                         dpg.set_value('kappa_err_input_ch_2', data[k0]['kappa'][1])
-
                         Vf = self.VEFF(data[k0]['omega'][0], data[k0]['kappa'][0], data[k0]['omega'][1], data[k0]['kappa'][1])
-
-
-                        
                         dpg.set_value('focal_vol_input_ch_2', Vf[0])
                         dpg.set_value('focal_vol_err_input_ch_2', Vf[1])
-
                         dpg.set_value('Brightness_input_ch_2', data[k0]['Mol.Brightness'][0])
                         dpg.set_value('Brightness_err_input_ch_2', data[k0]['Mol.Brightness'][1])
 
@@ -922,12 +802,10 @@ class _Phot2conc_vars_funct:
             kappa_1 = [dpg.get_value('kappa_input_ch_1'), dpg.get_value('kappa_err_input_ch_1')]
             V0_1 = [dpg.get_value('focal_vol_input_ch_1'), dpg.get_value('focal_vol_err_input_ch_1')]
             bright_1 = [dpg.get_value('Brightness_input_ch_1'), dpg.get_value('Brightness_err_input_ch_1')]
-
             omega_2 = [dpg.get_value('omega_input_ch_2'), dpg.get_value('omega_err_input_ch_2')]
             kappa_2 = [dpg.get_value('kappa_input_ch_2'), dpg.get_value('kappa_err_input_ch_2')]
             V0_2 = [dpg.get_value('focal_vol_input_ch_2'), dpg.get_value('focal_vol_err_input_ch_2')]
             bright_2 = [dpg.get_value('Brightness_input_ch_2'), dpg.get_value('Brightness_err_input_ch_2')]
-
             output_dict = {'Channel_1': {'omega': omega_1,
                                          'kappa': kappa_1,
                                          'V0': V0_1,
@@ -944,14 +822,6 @@ class _Phot2conc_vars_funct:
                 json.dump(output_dict, f, indent=4, sort_keys=False)
 
     def add_single_result_to_DF(self, sender, app_data):
-
-        # stored_results = self.Sing_Results_DF.File.values
-        # if self.anal_file in stored_results:
-        #     self.Sing_Results_DF.File = self.Sing_Results_DF.File.where(self.Sing_Results_DF.File != self.anal_file)
-        #     self.Sing_Results_DF.dropna(inplace=True)
-        # else:
-        #     pass
-
         stored_results = self.Sing_Results_DF.File.values
         if self.anal_file in stored_results:
             for index, row in self.Sing_Results_DF.iterrows():
@@ -1026,7 +896,6 @@ class _Phot2conc_vars_funct:
 
         self.Sing_Results_DF = pd.concat([self.Sing_Results_DF,
                                           self.Sing_Results_DF_tmp]).reset_index(drop=True)
-
         self._pkl_file()
 
     def calc_molecules(self, DF, PTU_Px_dwell, PTU_N_frames, brightness, brightness_err):
@@ -1275,8 +1144,7 @@ class _Phot2conc_vars_funct:
             self.anal_file = filenames[0]
             dpg.configure_item('file_box', default_value=self.anal_file)
             self.callback_listbox('file_box', self.anal_file)
-            # load_PTU_images(anal_file)
-
+            
         else:
             self.show_error_no_files('No .pck files found. Run the EXTRACT_AND_FILTER_PTU.py script and try again.')
 
@@ -1294,25 +1162,18 @@ class _Phot2conc_vars_funct:
         dpg.configure_item("Select_ROI_dialog", user_data=sender)
         dpg.show_item("Select_ROI_dialog")
 
-    # def callback_auto_adjust(self,sender,app_data):
-
-    #     self.callback_windows_size(sender,app_data)
-    #     self.callback_font_size(sender,app_data)
-
     def export_auto_roi(self,channel,ROI_array):
         folder_path = os.path.join(self.PTU_directory,'ROI')
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-            # print(f"Utworzono folder: {folder_path}")
+            
         else:
             pass
-            # print(f"Folder już istnieje: {folder_path}")
-        # os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_1.csv')    
+        
         roiname= dpg.get_value('ROI_name_tag').replace('ROI_','')
         
         fname = self.anal_file+'_roi'+roiname+'_ch_'+channel+'.tmp'
         df=pd.DataFrame(ROI_array)
-      # lprint(fname,'\n',df)
         df = df.where(df!=0,'-')
         df.to_csv(os.path.join(folder_path,fname), index=False, sep='\t', header=None)
         output_roi_fname = os.path.join(folder_path,fname.replace('.tmp','.dat'))
@@ -1332,7 +1193,6 @@ class _Phot2conc_vars_funct:
         for tmp in tmp_files:
             os.remove(os.path.join(folder_path,tmp))
 
-
     def callback_calculate(self, sender, app_data):
         cmap = 'afmhot'
         rect = 0.1, 0.1, 0.85, 0.9
@@ -1343,9 +1203,7 @@ class _Phot2conc_vars_funct:
                 brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1')
                 Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
                 Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
-                # DF = Current_image_1
                 if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                    # lprint('in if1')
                     ROI = self.processor_1.all_masks[0].astype(np.uint8)
                     self.export_auto_roi(self.Channels[0],ROI)
                     roi = np.where(ROI == 0, np.nan, 1)
@@ -1354,9 +1212,7 @@ class _Phot2conc_vars_funct:
                 else:
                     self.DF = self.image_1_times_roi
                 Photons_1 = pd.DataFrame(self.DF)
-
                 n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
-                
                 Molecules_ch_1 = self.calc_molecules(self.DF,
                                                      self.PTU_Px_dwell,
                                                      self.PTU_N_frames,
@@ -1389,86 +1245,65 @@ class _Phot2conc_vars_funct:
                 else:
                     self.mean_Concentration_err_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(
                         drop=True).dropna().std() / sqrt(n_pixels_1)
-
                 self.median_C_ch_1 = pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().median()
                 self.median_err_C_ch_1 = median_abs_deviation(
                     pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna())
-
                 dpg.set_value('sinle_phot_output_ch_1', self.mean_Photons_ch_1)
-
                 dpg.set_value('sinle_phot_err_output_ch_1', self.mean_Photons_err_ch_1)
                 dpg.set_value('sinle_mols_output_ch_1', self.mean_Molecules_ch_1)
-
                 dpg.set_value('sinle_mols_err_output_ch_1', self.mean_Molecules_err_ch_1)
                 dpg.set_value('single_conc_output_ch_1', self.mean_Concentration_ch_1)
-
                 dpg.set_value('single_conc_err_output_ch_1', self.mean_Concentration_err_ch_1)
                 Molecules_ch_1 = pd.DataFrame(Molecules_ch_1)
                 Concentration_ch_1 = pd.DataFrame(Concentration_ch_1)
-
                 Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1)
                 Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1)
                 Phot_hist_ch_1, Phot_bins_ch_1 = np.histogram(Photons_1.stack().reset_index(drop=True).dropna().values,
                                                               density=True, bins='auto')
                 Phot_bins_ch_1 = Phot_bins_ch_1[:-1]
                 median_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().median()
-
                 Mols_hist_ch_1, Mols_bins_ch_1 = np.histogram(
                     pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().values
                     , density=True, bins='auto')
                 Mols_bins_ch_1 = Mols_bins_ch_1[:-1]
                 median_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().median()
-
                 Conc_hist_ch_1, Conc_bins_ch_1 = np.histogram(
                     pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().values
                     , density=True, bins='auto')
                 Conc_bins_ch_1 = Conc_bins_ch_1[:-1]
-
                 ind = np.where(Conc_hist_ch_1 != 0)[0]
-
                 Conc_hist_ch_1 = Conc_hist_ch_1[ind]
                 Conc_bins_ch_1 = Conc_bins_ch_1[ind]
-
                 ind = np.where(Mols_hist_ch_1 != 0)[0]
-
                 Mols_hist_ch_1 = Mols_hist_ch_1[ind]
                 Mols_bins_ch_1 = Mols_bins_ch_1[ind]
-
                 ind = np.where(Phot_hist_ch_1 != 0)[0]
-
                 Phot_hist_ch_1 = Phot_hist_ch_1[ind]
                 Phot_bins_ch_1 = Phot_bins_ch_1[ind]
-
                 dpg.set_value('c_dist_ser_ch_1', (Conc_bins_ch_1, Conc_hist_ch_1))
                 dpg.set_value('c_mean_ser_ch_1',
                               (np.array([self.mean_Concentration_ch_1]), np.array([max(Conc_hist_ch_1)])))
                 dpg.set_value('c_med_ser_ch_1', (np.array([self.median_C_ch_1]), np.array([max(Conc_hist_ch_1)])))
                 dpg.set_axis_limits('hist_xc_axis_ch1', min(Conc_bins_ch_1), max(Conc_bins_ch_1))
                 dpg.set_axis_limits('hist_yc_axis_ch1', 0, max(Conc_hist_ch_1))
-
                 dpg.set_value('np_dist_ser_ch_1', (Mols_bins_ch_1, Mols_hist_ch_1))
                 dpg.set_value('np_mean_ser_ch_1',
                               (np.array([self.mean_Molecules_ch_1]), np.array([max(Mols_hist_ch_1)])))
                 dpg.set_value('np_med_ser_ch_1', (np.array([median_Molecules_ch_1]), np.array([max(Mols_hist_ch_1)])))
                 dpg.set_axis_limits('hist_xnp_axis_ch1', min(Mols_bins_ch_1), max(Mols_bins_ch_1))
                 dpg.set_axis_limits('hist_ynp_axis_ch1', 0, max(Mols_hist_ch_1))
-
                 dpg.set_value('phot_dist_ser_ch_1', (Phot_bins_ch_1, Phot_hist_ch_1))
                 dpg.set_value('phot_mean_ser_ch_1',
                               (np.array([self.mean_Photons_ch_1]), np.array([max(Phot_hist_ch_1)])))
                 dpg.set_value('phot_med_ser_ch_1', (np.array([median_Photons_ch_1]), np.array([max(Phot_hist_ch_1)])))
                 dpg.set_axis_limits('hist_xphot_axis_ch1', min(Phot_bins_ch_1), max(Phot_bins_ch_1))
                 dpg.set_axis_limits('hist_yphot_axis_ch1', 0, max(Phot_hist_ch_1))
-
                 dpg.configure_item('c_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Concentration_ch_1, 4)))
                 dpg.configure_item('c_med_ser_ch_1', label='Median = ' + str(np.round(self.median_C_ch_1, 4)))
-
                 dpg.configure_item('np_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Molecules_ch_1, 2)))
                 dpg.configure_item('np_med_ser_ch_1', label='Median = ' + str(np.round(median_Molecules_ch_1, 2)))
-
                 dpg.configure_item('phot_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Photons_ch_1, 1)))
                 dpg.configure_item('phot_med_ser_ch_1', label='Median = ' + str(np.round(median_Photons_ch_1, 1)))
-
                 try:
                     dpg.show_item('hist_conc_plot_ch1')
                 except:
@@ -1486,16 +1321,13 @@ class _Phot2conc_vars_funct:
 
                 if dpg.get_value('Photons_array_checkbox'):
                     phot_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_1.csv')
-
                     Photons_1.to_csv(phot_array_path_ch_1, index=False, sep=',', header=None)
                 else:
                     pass
 
                 if dpg.get_value('Np_array_checkbox'):
                     Np_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_ch_1.csv')
-
                     Molecules_ch_1.to_csv(Np_array_path_ch_1, index=False, sep=',', header=None)
-
                     Np_err_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_err_ch_1.csv')
                     Molecules_err_ch_1.to_csv(Np_err_array_path_ch_1, index=False, sep=',', header=None)
 
@@ -1503,9 +1335,7 @@ class _Phot2conc_vars_funct:
                     pass
                 if dpg.get_value('C_array_checkbox'):
                     Conc_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_conc_ch_1.csv')
-
                     Concentration_ch_1.to_csv(Conc_array_path_ch_1, index=False, sep=',', header=None)
-
                     Conc_err_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_conc_err_ch_1.csv')
                     Concentration_err_ch_1.to_csv(Conc_err_array_path_ch_1, index=False, sep=',', header=None)
 
@@ -1514,13 +1344,10 @@ class _Phot2conc_vars_funct:
 
                 if dpg.get_value('Photons_Hmaps_checkbox'):
                     phot_hmap_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_HM_ch_1.png')
-
                     fig = Figure(facecolor='white')
-
                     ax = fig.add_axes(rect)
                     norm = mpl.colors.Normalize(vmin=Photons_1.min().min(), vmax=Photons_1.max().max())
                     ax.imshow(Photons_1, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(phot_hmap_path_ch_1)
@@ -1530,13 +1357,10 @@ class _Phot2conc_vars_funct:
 
                 if dpg.get_value('Np_Hmaps_checkbox'):
                     Np_hmap_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_HM_ch_1.png')
-
                     fig = Figure(facecolor='white')
-
                     ax = fig.add_axes(rect)
                     norm = mpl.colors.Normalize(vmin=Molecules_ch_1.min().min(), vmax=Molecules_ch_1.max().max())
                     ax.imshow(Molecules_ch_1, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(Np_hmap_path_ch_1)
@@ -1551,7 +1375,6 @@ class _Phot2conc_vars_funct:
                     norm = mpl.colors.Normalize(vmin=Concentration_ch_1.min().min(),
                                                 vmax=Concentration_ch_1.max().max())
                     ax.imshow(Concentration_ch_1, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(C_hmap_path_ch_1)
@@ -1564,10 +1387,7 @@ class _Phot2conc_vars_funct:
                 brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2')
                 Veff_ch_2 = 1e-15 * dpg.get_value('focal_vol_input_ch_2')
                 Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
-                # DF2 = Current_image_2
-
                 if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                    # lprint('in if2')
                     ROI = self.processor_2.all_masks[0].astype(np.uint8)
                     self.export_auto_roi(self.Channels[0],ROI)
                     roi = np.where(ROI == 0, np.nan, 1)
@@ -1577,10 +1397,8 @@ class _Phot2conc_vars_funct:
                 else:
                     self.DF2 = self.image_2_times_roi
 
-                # self.DF2 = self.image_2_times_roi
                 Photons_2 = pd.DataFrame(self.DF2)
                 n_pixels_2 = Photons_2.stack().reset_index(drop=True).dropna().count()
-
                 self.mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
                 self.mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(
                     drop=True).dropna().std() / sqrt(n_pixels_2)
@@ -1598,7 +1416,6 @@ class _Phot2conc_vars_funct:
                 Concentration_ch_2 = 1e9 * self.CONC(Molecules_ch_2, Veff_ch_2, Molecules_err_ch_2, Veff_err_ch_2)[0]
                 Concentration_err_ch_2 = 1e9 * self.CONC(Molecules_ch_2, Veff_ch_2, Molecules_err_ch_2, Veff_err_ch_2)[
                     1]
-
                 self.mean_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().mean()
                 if not dpg.get_value('Error_type_checkbox'):
                     self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2).stack().reset_index(
@@ -1620,77 +1437,59 @@ class _Phot2conc_vars_funct:
                 self.median_err_C_ch_2 = median_abs_deviation(
                     pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna())
                 dpg.set_value('sinle_phot_output_ch_2', self.mean_Photons_ch_2)
-
                 dpg.set_value('sinle_phot_err_output_ch_2', self.mean_Photons_err_ch_2)
                 dpg.set_value('sinle_mols_output_ch_2', self.mean_Molecules_ch_2)
-
                 dpg.set_value('sinle_mols_err_output_ch_2', self.mean_Molecules_err_ch_2)
                 dpg.set_value('single_conc_output_ch_2', self.mean_Concentration_ch_2)
-
                 dpg.set_value('single_conc_err_output_ch_2', self.mean_Concentration_err_ch_2)
                 Molecules_ch_2 = pd.DataFrame(Molecules_ch_2)
                 Concentration_ch_2 = pd.DataFrame(Concentration_ch_2)
-
                 Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2)
                 Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2)
                 Phot_hist_ch_2, Phot_bins_ch_2 = np.histogram(Photons_2.stack().reset_index(drop=True).dropna().values,
                                                               density=True, bins='auto')
                 Phot_bins_ch_2 = Phot_bins_ch_2[:-1]
                 median_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().median()
-
                 Mols_hist_ch_2, Mols_bins_ch_2 = np.histogram(
                     pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().values
                     , density=True, bins='auto')
                 Mols_bins_ch_2 = Mols_bins_ch_2[:-1]
                 median_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().median()
-
                 Conc_hist_ch_2, Conc_bins_ch_2 = np.histogram(
                     pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().values
                     , density=True, bins='auto')
                 Conc_bins_ch_2 = Conc_bins_ch_2[:-1]
-
                 ind = np.where(Conc_hist_ch_2 != 0)[0]
-
                 Conc_hist_ch_2 = Conc_hist_ch_2[ind]
                 Conc_bins_ch_2 = Conc_bins_ch_2[ind]
-
                 ind = np.where(Mols_hist_ch_2 != 0)[0]
-
                 Mols_hist_ch_2 = Mols_hist_ch_2[ind]
                 Mols_bins_ch_2 = Mols_bins_ch_2[ind]
-
                 ind = np.where(Phot_hist_ch_2 != 0)[0]
-
                 Phot_hist_ch_2 = Phot_hist_ch_2[ind]
                 Phot_bins_ch_2 = Phot_bins_ch_2[ind]
-
                 dpg.set_value('c_dist_ser_ch_2', (Conc_bins_ch_2, Conc_hist_ch_2))
                 dpg.set_value('c_mean_ser_ch_2',
                               (np.array([self.mean_Concentration_ch_2]), np.array([max(Conc_hist_ch_2)])))
                 dpg.set_value('c_med_ser_ch_2', (np.array([self.median_C_ch_2]), np.array([max(Conc_hist_ch_2)])))
                 dpg.set_axis_limits('hist_xc_axis_ch2', min(Conc_bins_ch_2), max(Conc_bins_ch_2))
                 dpg.set_axis_limits('hist_yc_axis_ch2', 0, max(Conc_hist_ch_2))
-
                 dpg.set_value('np_dist_ser_ch_2', (Mols_bins_ch_2, Mols_hist_ch_2))
                 dpg.set_value('np_mean_ser_ch_2',
                               (np.array([self.mean_Molecules_ch_2]), np.array([max(Mols_hist_ch_2)])))
                 dpg.set_value('np_med_ser_ch_2', (np.array([median_Molecules_ch_2]), np.array([max(Mols_hist_ch_2)])))
                 dpg.set_axis_limits('hist_xnp_axis_ch2', min(Mols_bins_ch_2), max(Mols_bins_ch_2))
                 dpg.set_axis_limits('hist_ynp_axis_ch2', 0, max(Mols_hist_ch_2))
-
                 dpg.set_value('phot_dist_ser_ch_2', (Phot_bins_ch_2, Phot_hist_ch_2))
                 dpg.set_value('phot_mean_ser_ch_2',
                               (np.array([self.mean_Photons_ch_2]), np.array([max(Phot_hist_ch_2)])))
                 dpg.set_value('phot_med_ser_ch_2', (np.array([median_Photons_ch_2]), np.array([max(Phot_hist_ch_2)])))
                 dpg.set_axis_limits('hist_xphot_axis_ch2', min(Phot_bins_ch_2), max(Phot_bins_ch_2))
                 dpg.set_axis_limits('hist_yphot_axis_ch2', 0, max(Phot_hist_ch_2))
-
                 dpg.configure_item('c_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Concentration_ch_2, 4)))
                 dpg.configure_item('c_med_ser_ch_2', label='Median = ' + str(np.round(self.median_C_ch_2, 4)))
-
                 dpg.configure_item('np_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Molecules_ch_2, 2)))
                 dpg.configure_item('np_med_ser_ch_2', label='Median = ' + str(np.round(median_Molecules_ch_2, 2)))
-
                 dpg.configure_item('phot_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Photons_ch_2, 1)))
                 dpg.configure_item('phot_med_ser_ch_2', label='Median = ' + str(np.round(median_Photons_ch_2, 1)))
 
@@ -1711,41 +1510,32 @@ class _Phot2conc_vars_funct:
 
                 if dpg.get_value('Photons_array_checkbox'):
                     phot_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_2.csv')
-
                     Photons_2.to_csv(phot_array_path_ch_2, index=False, sep=',', header=None)
                 else:
                     pass
 
                 if dpg.get_value('Np_array_checkbox'):
                     Np_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_ch_2.csv')
-
                     Molecules_ch_2.to_csv(Np_array_path_ch_2, index=False, sep=',', header=None)
-
                     Np_err_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_err_ch_2.csv')
                     Molecules_err_ch_2.to_csv(Np_err_array_path_ch_2, index=False, sep=',', header=None)
                 else:
                     pass
                 if dpg.get_value('C_array_checkbox'):
                     Conc_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_conc_ch_2.csv')
-
                     Concentration_ch_2.to_csv(Conc_array_path_ch_2, index=False, sep=',', header=None)
-
                     Conc_err_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_conc_err_ch_2.csv')
                     Concentration_err_ch_2.to_csv(Conc_err_array_path_ch_2, index=False, sep=',', header=None)
-
 
                 else:
                     pass
 
                 if dpg.get_value('Photons_Hmaps_checkbox'):
                     phot_hmap_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_HM_ch_2.png')
-
                     fig = Figure(facecolor='white')
-
                     ax = fig.add_axes(rect)
                     norm = mpl.colors.Normalize(vmin=Photons_2.min().min(), vmax=Photons_2.max().max())
                     ax.imshow(Photons_2, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(phot_hmap_path_ch_2)
@@ -1755,13 +1545,10 @@ class _Phot2conc_vars_funct:
 
                 if dpg.get_value('Np_Hmaps_checkbox'):
                     Np_hmap_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_HM_ch_2.png')
-
                     fig = Figure(facecolor='white')
-
                     ax = fig.add_axes(rect)
                     norm = mpl.colors.Normalize(vmin=Molecules_ch_2.min().min(), vmax=Molecules_ch_2.max().max())
                     ax.imshow(Molecules_ch_2, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(Np_hmap_path_ch_2)
@@ -1776,7 +1563,6 @@ class _Phot2conc_vars_funct:
                     norm = mpl.colors.Normalize(vmin=Concentration_ch_2.min().min(),
                                                 vmax=Concentration_ch_2.max().max())
                     ax.imshow(Concentration_ch_2, cmap=cmap)
-
                     ax.axis('off')
                     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                     FigureCanvas(fig).print_png(C_hmap_path_ch_2)
@@ -1792,9 +1578,7 @@ class _Phot2conc_vars_funct:
             brightness_err_ch_1 = dpg.get_value('Brightness_err_input_ch_1')
             Veff_ch_1 = 1e-15 * dpg.get_value('focal_vol_input_ch_1')
             Veff_err_ch_1 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_1')
-            # DF = Current_image_1
             if self.processor_1.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                # lprint('in if1')
                 ROI = self.processor_1.all_masks[0].astype(np.uint8)
                 self.export_auto_roi(self.Channels[0],ROI)
                 roi = np.where(ROI == 0, np.nan, 1)
@@ -1802,15 +1586,9 @@ class _Phot2conc_vars_funct:
                 self.DF = img * roi
             else:
                 self.DF = self.image_1_times_roi
-            # self.DF = self.image_1_times_roi
+            
             Photons_1 = pd.DataFrame(self.DF)
             n_pixels_1 = Photons_1.stack().reset_index(drop=True).dropna().count()
-
-            # Photons_1t = pd.DataFrame(np.nan_to_num(image_1_times_roi, nan=0))
-            # n_pixels_1test =  Photons_1t.stack().reset_index(drop=True).dropna().count()
-
-            # lnprint('N pixel test', n_pixels_1,n_pixels_1test)
-          # lprint(self.PTU_Px_dwell,self.PTU_N_frames,brightness_ch_1)
             Molecules_ch_1 = self.calc_molecules(self.DF,
                                                  self.PTU_Px_dwell,
                                                  self.PTU_N_frames,
@@ -1823,7 +1601,6 @@ class _Phot2conc_vars_funct:
                                                      brightness_err_ch_1)[1]
             Concentration_ch_1 = 1e9 * self.CONC(Molecules_ch_1, Veff_ch_1, Molecules_err_ch_1, Veff_err_ch_1)[0]
             Concentration_err_ch_1 = 1e9 * self.CONC(Molecules_ch_1, Veff_ch_1, Molecules_err_ch_1, Veff_err_ch_1)[1]
-
             self.mean_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().mean()
             self.mean_Photons_err_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().std() / sqrt(
                 n_pixels_1)
@@ -1848,76 +1625,57 @@ class _Phot2conc_vars_funct:
             self.median_err_C_ch_1 = median_abs_deviation(
                 pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna())
             dpg.set_value('sinle_phot_output_ch_1', self.mean_Photons_ch_1)
-
             dpg.set_value('sinle_phot_err_output_ch_1', self.mean_Photons_err_ch_1)
             dpg.set_value('sinle_mols_output_ch_1', self.mean_Molecules_ch_1)
-
             dpg.set_value('sinle_mols_err_output_ch_1', self.mean_Molecules_err_ch_1)
             dpg.set_value('single_conc_output_ch_1', self.mean_Concentration_ch_1)
-
             dpg.set_value('single_conc_err_output_ch_1', self.mean_Concentration_err_ch_1)
             Molecules_ch_1 = pd.DataFrame(Molecules_ch_1)
             Concentration_ch_1 = pd.DataFrame(Concentration_ch_1)
-
             Molecules_err_ch_1 = pd.DataFrame(Molecules_err_ch_1)
             Concentration_err_ch_1 = pd.DataFrame(Concentration_err_ch_1)
-
             Phot_hist_ch_1, Phot_bins_ch_1 = np.histogram(Photons_1.stack().reset_index(drop=True).dropna().values,
                                                           density=True, bins='auto')
             Phot_bins_ch_1 = Phot_bins_ch_1[:-1]
             median_Photons_ch_1 = pd.DataFrame(Photons_1).stack().reset_index(drop=True).dropna().median()
-
             Mols_hist_ch_1, Mols_bins_ch_1 = np.histogram(
                 pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().values
                 , density=True, bins='auto')
             Mols_bins_ch_1 = Mols_bins_ch_1[:-1]
             median_Molecules_ch_1 = pd.DataFrame(Molecules_ch_1).stack().reset_index(drop=True).dropna().median()
-
             Conc_hist_ch_1, Conc_bins_ch_1 = np.histogram(
                 pd.DataFrame(Concentration_ch_1).stack().reset_index(drop=True).dropna().values
                 , density=True, bins='auto')
             Conc_bins_ch_1 = Conc_bins_ch_1[:-1]
-
             ind = np.where(Conc_hist_ch_1 != 0)[0]
-
             Conc_hist_ch_1 = Conc_hist_ch_1[ind]
             Conc_bins_ch_1 = Conc_bins_ch_1[ind]
-
             ind = np.where(Mols_hist_ch_1 != 0)[0]
-
             Mols_hist_ch_1 = Mols_hist_ch_1[ind]
             Mols_bins_ch_1 = Mols_bins_ch_1[ind]
-
             ind = np.where(Phot_hist_ch_1 != 0)[0]
-
             Phot_hist_ch_1 = Phot_hist_ch_1[ind]
             Phot_bins_ch_1 = Phot_bins_ch_1[ind]
-
             dpg.set_value('c_dist_ser_ch_1', (Conc_bins_ch_1, Conc_hist_ch_1))
             dpg.set_value('c_mean_ser_ch_1',
                           (np.array([self.mean_Concentration_ch_1]), np.array([max(Conc_hist_ch_1)])))
             dpg.set_value('c_med_ser_ch_1', (np.array([self.median_C_ch_1]), np.array([max(Conc_hist_ch_1)])))
             dpg.set_axis_limits('hist_xc_axis_ch1', min(Conc_bins_ch_1), max(Conc_bins_ch_1))
             dpg.set_axis_limits('hist_yc_axis_ch1', 0, max(Conc_hist_ch_1))
-
             dpg.set_value('np_dist_ser_ch_1', (Mols_bins_ch_1, Mols_hist_ch_1))
             dpg.set_value('np_mean_ser_ch_1', (np.array([self.mean_Molecules_ch_1]), np.array([max(Mols_hist_ch_1)])))
             dpg.set_value('np_med_ser_ch_1', (np.array([median_Molecules_ch_1]), np.array([max(Mols_hist_ch_1)])))
             dpg.set_axis_limits('hist_xnp_axis_ch1', min(Mols_bins_ch_1), max(Mols_bins_ch_1))
             dpg.set_axis_limits('hist_ynp_axis_ch1', 0, max(Mols_hist_ch_1))
-
             dpg.set_value('phot_dist_ser_ch_1', (Phot_bins_ch_1, Phot_hist_ch_1))
             dpg.set_value('phot_mean_ser_ch_1', (np.array([self.mean_Photons_ch_1]), np.array([max(Phot_hist_ch_1)])))
             dpg.set_value('phot_med_ser_ch_1', (np.array([median_Photons_ch_1]), np.array([max(Phot_hist_ch_1)])))
             dpg.set_axis_limits('hist_xphot_axis_ch1', min(Phot_bins_ch_1), max(Phot_bins_ch_1))
             dpg.set_axis_limits('hist_yphot_axis_ch1', 0, max(Phot_hist_ch_1))
-
             dpg.configure_item('c_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Concentration_ch_1, 4)))
             dpg.configure_item('c_med_ser_ch_1', label='Median = ' + str(np.round(self.median_C_ch_1, 4)))
-
             dpg.configure_item('np_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Molecules_ch_1, 2)))
             dpg.configure_item('np_med_ser_ch_1', label='Median = ' + str(np.round(median_Molecules_ch_1, 2)))
-
             dpg.configure_item('phot_mean_ser_ch_1', label='Mean = ' + str(np.round(self.mean_Photons_ch_1, 1)))
             dpg.configure_item('phot_med_ser_ch_1', label='Median = ' + str(np.round(median_Photons_ch_1, 1)))
 
@@ -1938,16 +1696,13 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Photons_array_checkbox'):
                 phot_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_1.csv')
-
                 Photons_1.to_csv(phot_array_path_ch_1, index=False, sep=',', header=None)
             else:
                 pass
 
             if dpg.get_value('Np_array_checkbox'):
                 Np_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_ch_1.csv')
-
                 Molecules_ch_1.to_csv(Np_array_path_ch_1, index=False, sep=',', header=None)
-
                 Np_err_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_err_ch_1.csv')
                 Molecules_err_ch_1.to_csv(Np_err_array_path_ch_1, index=False, sep=',', header=None)
 
@@ -1955,9 +1710,7 @@ class _Phot2conc_vars_funct:
                 pass
             if dpg.get_value('C_array_checkbox'):
                 Conc_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_conc_ch_1.csv')
-
                 Concentration_ch_1.to_csv(Conc_array_path_ch_1, index=False, sep=',', header=None)
-
                 Conc_err_array_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_conc_err_ch_1.csv')
                 Concentration_err_ch_1.to_csv(Conc_err_array_path_ch_1, index=False, sep=',', header=None)
 
@@ -1966,13 +1719,10 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Photons_Hmaps_checkbox'):
                 phot_hmap_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_HM_ch_1.png')
-
                 fig = Figure(facecolor='white')
-
                 ax = fig.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Photons_1.min().min(), vmax=Photons_1.max().max())
                 ax.imshow(Photons_1, cmap=cmap)
-
                 ax.axis('off')
                 fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig).print_png(phot_hmap_path_ch_1)
@@ -1982,13 +1732,10 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Np_Hmaps_checkbox'):
                 Np_hmap_path_ch_1 = os.path.join(self.PTU_directory, self.anal_file + '_Np_HM_ch_1.png')
-
                 fig1 = Figure(facecolor='white')
-
                 ax = fig1.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Molecules_ch_1.min().min(), vmax=Molecules_ch_1.max().max())
                 ax.imshow(Molecules_ch_1, cmap=cmap)
-
                 ax.axis('off')
                 fig1.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig1).print_png(Np_hmap_path_ch_1)
@@ -2002,7 +1749,6 @@ class _Phot2conc_vars_funct:
                 ax = fig1.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Concentration_ch_1.min().min(), vmax=Concentration_ch_1.max().max())
                 ax.imshow(Concentration_ch_1, cmap=cmap)
-
                 ax.axis('off')
                 fig1.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig1).print_png(C_hmap_path_ch_1)
@@ -2014,9 +1760,7 @@ class _Phot2conc_vars_funct:
             brightness_err_ch_2 = dpg.get_value('Brightness_err_input_ch_2')
             Veff_ch_2 = 1e-15 * dpg.get_value('focal_vol_input_ch_2')
             Veff_err_ch_2 = 1e-15 * dpg.get_value('focal_vol_err_input_ch_2')
-            # DF2 = Current_image_2
             if self.processor_2.all_masks is not None and dpg.get_value('Auto_ROI_checkbox'):
-                # lprint('in if2')
                 ROI = self.processor_2.all_masks[0].astype(np.uint8)
                 self.export_auto_roi(self.Channels[1],ROI)
                 roi = np.where(ROI == 0, np.nan, 1)
@@ -2024,10 +1768,9 @@ class _Phot2conc_vars_funct:
                 self.DF2 = img * roi
             else:
                 self.DF2 = self.image_2_times_roi
-            # self.DF2 = self.image_2_times_roi
+            
             Photons_2 = pd.DataFrame(self.DF2)
             n_pixels_2 = Photons_2.stack().reset_index(drop=True).dropna().count()
-
             self.mean_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().mean()
             self.mean_Photons_err_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().std() / sqrt(
                 n_pixels_2)
@@ -2044,7 +1787,6 @@ class _Phot2conc_vars_funct:
 
             Concentration_ch_2 = 1e9 * self.CONC(Molecules_ch_2, Veff_ch_2, Molecules_err_ch_2, Veff_err_ch_2)[0]
             Concentration_err_ch_2 = 1e9 * self.CONC(Molecules_ch_2, Veff_ch_2, Molecules_err_ch_2, Veff_err_ch_2)[1]
-
             self.mean_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().mean()
             if not dpg.get_value('Error_type_checkbox'):
                 self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2).stack().reset_index(
@@ -2052,7 +1794,6 @@ class _Phot2conc_vars_funct:
             else:
                 self.mean_Molecules_err_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(
                     drop=True).dropna().std() / sqrt(n_pixels_2)
-
             self.mean_Concentration_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(
                 drop=True).dropna().mean()
             if not dpg.get_value('Error_type_checkbox'):
@@ -2061,80 +1802,61 @@ class _Phot2conc_vars_funct:
             else:
                 self.mean_Concentration_err_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(
                     drop=True).dropna().std() / sqrt(n_pixels_2)
-
             self.median_C_ch_2 = pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().median()
             self.median_err_C_ch_2 = median_abs_deviation(
                 pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna())
             dpg.set_value('sinle_phot_output_ch_2', self.mean_Photons_ch_2)
-
             dpg.set_value('sinle_phot_err_output_ch_2', self.mean_Photons_err_ch_2)
             dpg.set_value('sinle_mols_output_ch_2', self.mean_Molecules_ch_2)
-
             dpg.set_value('sinle_mols_err_output_ch_2', self.mean_Molecules_err_ch_2)
             dpg.set_value('single_conc_output_ch_2', self.mean_Concentration_ch_2)
-
             dpg.set_value('single_conc_err_output_ch_2', self.mean_Concentration_err_ch_2)
             Molecules_ch_2 = pd.DataFrame(Molecules_ch_2)
             Concentration_ch_2 = pd.DataFrame(Concentration_ch_2)
-
             Molecules_err_ch_2 = pd.DataFrame(Molecules_err_ch_2)
             Concentration_err_ch_2 = pd.DataFrame(Concentration_err_ch_2)
             Phot_hist_ch_2, Phot_bins_ch_2 = np.histogram(Photons_2.stack().reset_index(drop=True).dropna().values,
                                                           density=True, bins='auto')
             Phot_bins_ch_2 = Phot_bins_ch_2[:-1]
             median_Photons_ch_2 = pd.DataFrame(Photons_2).stack().reset_index(drop=True).dropna().median()
-
             Mols_hist_ch_2, Mols_bins_ch_2 = np.histogram(
                 pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().values
                 , density=True, bins='auto')
             Mols_bins_ch_2 = Mols_bins_ch_2[:-1]
             median_Molecules_ch_2 = pd.DataFrame(Molecules_ch_2).stack().reset_index(drop=True).dropna().median()
-
             Conc_hist_ch_2, Conc_bins_ch_2 = np.histogram(
                 pd.DataFrame(Concentration_ch_2).stack().reset_index(drop=True).dropna().values
                 , density=True, bins='auto')
             Conc_bins_ch_2 = Conc_bins_ch_2[:-1]
-
             ind = np.where(Conc_hist_ch_2 != 0)[0]
-
             Conc_hist_ch_2 = Conc_hist_ch_2[ind]
             Conc_bins_ch_2 = Conc_bins_ch_2[ind]
-
             ind = np.where(Mols_hist_ch_2 != 0)[0]
-
             Mols_hist_ch_2 = Mols_hist_ch_2[ind]
             Mols_bins_ch_2 = Mols_bins_ch_2[ind]
-
             ind = np.where(Phot_hist_ch_2 != 0)[0]
-
             Phot_hist_ch_2 = Phot_hist_ch_2[ind]
             Phot_bins_ch_2 = Phot_bins_ch_2[ind]
-
             dpg.set_value('c_dist_ser_ch_2', (Conc_bins_ch_2, Conc_hist_ch_2))
             dpg.set_value('c_mean_ser_ch_2',
                           (np.array([self.mean_Concentration_ch_2]), np.array([max(Conc_hist_ch_2)])))
             dpg.set_value('c_med_ser_ch_2', (np.array([self.median_C_ch_2]), np.array([max(Conc_hist_ch_2)])))
             dpg.set_axis_limits('hist_xc_axis_ch2', min(Conc_bins_ch_2), max(Conc_bins_ch_2))
             dpg.set_axis_limits('hist_yc_axis_ch2', 0, max(Conc_hist_ch_2))
-
             dpg.set_value('np_dist_ser_ch_2', (Mols_bins_ch_2, Mols_hist_ch_2))
             dpg.set_value('np_mean_ser_ch_2', (np.array([self.mean_Molecules_ch_2]), np.array([max(Mols_hist_ch_2)])))
             dpg.set_value('np_med_ser_ch_2', (np.array([median_Molecules_ch_2]), np.array([max(Mols_hist_ch_2)])))
             dpg.set_axis_limits('hist_xnp_axis_ch2', min(Mols_bins_ch_2), max(Mols_bins_ch_2))
             dpg.set_axis_limits('hist_ynp_axis_ch2', 0, max(Mols_hist_ch_2))
-
             dpg.set_value('phot_dist_ser_ch_2', (Phot_bins_ch_2, Phot_hist_ch_2))
             dpg.set_value('phot_mean_ser_ch_2', (np.array([self.mean_Photons_ch_2]), np.array([max(Phot_hist_ch_2)])))
             dpg.set_value('phot_med_ser_ch_2', (np.array([median_Photons_ch_2]), np.array([max(Phot_hist_ch_2)])))
             dpg.set_axis_limits('hist_xphot_axis_ch2', min(Phot_bins_ch_2), max(Phot_bins_ch_2))
             dpg.set_axis_limits('hist_yphot_axis_ch2', 0, max(Phot_hist_ch_2))
-
             dpg.configure_item('c_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Concentration_ch_2, 4)))
             dpg.configure_item('c_med_ser_ch_2', label='Median = ' + str(np.round(self.median_C_ch_2, 4)))
-
             dpg.configure_item('np_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Molecules_ch_2, 2)))
             dpg.configure_item('np_med_ser_ch_2', label='Median = ' + str(np.round(median_Molecules_ch_2, 2)))
-
             dpg.configure_item('phot_mean_ser_ch_2', label='Mean = ' + str(np.round(self.mean_Photons_ch_2, 1)))
             dpg.configure_item('phot_med_ser_ch_2', label='Median = ' + str(np.round(median_Photons_ch_2, 1)))
 
@@ -2155,25 +1877,20 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Photons_array_checkbox'):
                 phot_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_ch_2.csv')
-
                 Photons_2.to_csv(phot_array_path_ch_2, index=False, sep=',', header=None)
             else:
                 pass
 
             if dpg.get_value('Np_array_checkbox'):
                 Np_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_ch_2.csv')
-
                 Molecules_ch_2.to_csv(Np_array_path_ch_2, index=False, sep=',', header=None)
-
                 Np_err_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_err_ch_2.csv')
                 Molecules_err_ch_2.to_csv(Np_err_array_path_ch_2, index=False, sep=',', header=None)
             else:
                 pass
             if dpg.get_value('C_array_checkbox'):
                 Conc_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_conc_ch_2.csv')
-
                 Concentration_ch_2.to_csv(Conc_array_path_ch_2, index=False, sep=',', header=None)
-
                 Conc_err_array_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_conc_err_ch_2.csv')
                 Concentration_err_ch_2.to_csv(Conc_err_array_path_ch_2, index=False, sep=',', header=None)
             else:
@@ -2181,13 +1898,10 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Photons_Hmaps_checkbox'):
                 phot_hmap_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Phot_HM_ch_2.png')
-
                 fig = Figure(facecolor='white')
-
                 ax = fig.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Photons_2.min().min(), vmax=Photons_2.max().max())
                 ax.imshow(Photons_2, cmap=cmap)
-
                 ax.axis('off')
                 fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig).print_png(phot_hmap_path_ch_2)
@@ -2197,13 +1911,10 @@ class _Phot2conc_vars_funct:
 
             if dpg.get_value('Np_Hmaps_checkbox'):
                 Np_hmap_path_ch_2 = os.path.join(self.PTU_directory, self.anal_file + '_Np_HM_ch_2.png')
-
                 fig2 = Figure(facecolor='white')
-
                 ax = fig2.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Molecules_ch_2.min().min(), vmax=Molecules_ch_2.max().max())
                 ax.imshow(Molecules_ch_2, cmap=cmap)
-
                 ax.axis('off')
                 fig2.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig2).print_png(Np_hmap_path_ch_2)
@@ -2217,7 +1928,6 @@ class _Phot2conc_vars_funct:
                 ax = fig2.add_axes(rect)
                 norm = mpl.colors.Normalize(vmin=Concentration_ch_2.min().min(), vmax=Concentration_ch_2.max().max())
                 ax.imshow(Concentration_ch_2, cmap=cmap)
-
                 ax.axis('off')
                 fig2.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
                 FigureCanvas(fig2).print_png(C_hmap_path_ch_2)
@@ -2230,21 +1940,13 @@ class _Phot2conc_vars_funct:
 
     def callback_calculate_all(self, sender, app_data):
         self.initialize_res_df()
-        # print(self.files)
         filenames = [f.replace('.ptu', '') for f in self.files]
-        # print(filenames)
         if dpg.get_value('Auto_ROI_checkbox') or (
                 not dpg.get_value('Auto_ROI_checkbox') and not dpg.get_value('FILE_ROI_checkbox')):
             roiname = dpg.get_value('ROI_name_tag')
             for cnt, an_file in enumerate(filenames):
-                # print(cnt,an_file)
                 self.anal_file = an_file
-
                 dpg.configure_item('file_box', default_value=an_file)
-
-                # self.load_PTU_images(an_file)
-                # self.callback_calculate(sender,app_data)
-
                 self.callback_listbox('file_box', self.anal_file)
                 if len(self.Channels) == 1:
                     if '1' in self.Channels[0]:
@@ -2306,26 +2008,15 @@ class _Phot2conc_vars_funct:
                 self._pkl_file()
         elif dpg.get_value('FILE_ROI_checkbox'):
             for cnt, an_file in enumerate(filenames):
-                # print(cnt,an_file)
                 self.anal_file = an_file
-
                 dpg.configure_item('file_box', default_value=an_file)
-
-                # self.load_PTU_images(an_file)
-                # self.callback_calculate(sender,app_data)
-
-                # self.callback_listbox('file_box',self.anal_file)
-
                 ROIS = dpg.get_item_configuration('ROI_names_combo_tag')['items']
-
                 self.callback_listbox('file_box', self.anal_file)
-
                 for ROI in ROIS:
                     self.callback_ROI_names_combo('ROI_names_combo_tag', ROI)
                     roiname = ROI
                     if len(self.Channels) == 1:
                         if '1' in self.Channels[0]:
-
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
                                                                  roiname,
                                                                  1,
@@ -2338,7 +2029,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_1,
                                                                  self.median_err_C_ch_1]],
                                                                columns=self.Sing_Results_DF.columns)
-                          # lprint(Sing_Results_DF_tmp)
+                          
 
                         elif '2' in self.Channels[0]:
                             Sing_Results_DF_tmp = pd.DataFrame([[self.anal_file,
@@ -2353,7 +2044,7 @@ class _Phot2conc_vars_funct:
                                                                  self.median_C_ch_2,
                                                                  self.median_err_C_ch_2]],
                                                                columns=self.Sing_Results_DF.columns)
-                          # lprint(Sing_Results_DF_tmp)
+                          
                         else:
                             pass
 
@@ -2381,8 +2072,7 @@ class _Phot2conc_vars_funct:
                                                              self.median_C_ch_2,
                                                              self.median_err_C_ch_2]],
                                                            columns=self.Sing_Results_DF.columns)
-                      # lprint(Sing_Results_DF_tmp)
-
+                      
                     self.Sing_Results_DF = pd.concat([self.Sing_Results_DF, Sing_Results_DF_tmp]).reset_index(drop=True)
                 self._pkl_file()
 
@@ -2394,12 +2084,10 @@ class _Phot2conc_vars_funct:
         self.last_directory = self.directory
         self.update_dialogs_default_directory(self.last_directory)
         self.files = tuple(np.sort([f for f in os.listdir(self.directory) if f.endswith('.ptu')]))
-
         if len(files) == 0:
             show_error_no_files('No PTU files found.')
         else:
             self.update_flist(self.files)
-
         self.anal_file = files[0]
         dpg.configure_item('file_box', default_value=self.anal_file)
 
@@ -2450,9 +2138,7 @@ class _Phot2conc_vars_funct:
 
         pkl_file = self.anal_file + '.rpk'
         pkl_path = os.path.join(self.PTU_directory, pkl_file)
-        # lnprint(pkl_file)
         if os.path.exists(pkl_path):
-            # lnprint('loading_pkl')
             self.pkl = self._load_pkl_file(pkl_path)
 
         else:
@@ -2515,9 +2201,7 @@ class _Phot2conc_vars_funct:
 
             self.FCS_results_ch_1.drop(self.FCS_results_ch_1.index[ind_result_to_remove], inplace=True)
             self.FCS_results_ch_1.reset_index(drop=True, inplace=True)
-
             self.mean_bright_input_ch_1()
-
             for alias in dpg.get_aliases():
                 if alias.startswith('ch_1_results_show_'):
                     try:
@@ -2554,9 +2238,7 @@ class _Phot2conc_vars_funct:
                     ind_result_to_remove.append(i)
             self.FCS_results_ch_2.drop(self.FCS_results_ch_2.index[ind_result_to_remove], inplace=True)
             self.FCS_results_ch_2.reset_index(drop=True, inplace=True)
-
             self.mean_bright_input_ch_2()
-
             for alias in dpg.get_aliases():
                 if alias.startswith('ch_2_results_show_'):
                     try:
@@ -2589,7 +2271,6 @@ class _Phot2conc_vars_funct:
 
     def callback_reset_results_DF(self):
         self.initialize_res_df()
-
         files = os.listdir(self.PTU_directory)
         files = [f for f in files if f.endswith('.rpk')]
         for f in files:
@@ -2605,16 +2286,7 @@ class _Phot2conc_vars_funct:
             dpg.hide_item('ROI_name_tag')
             dpg.show_item('ROI_names_combo_tag')
             self.callback_select_autoroi('Auto_ROI_checkbox', False)
-            # dpg.configure_item('cell_thres_ratio_1',enabled=False)
-            # dpg.configure_item('nucleus_search_1',enabled=False)
-            # dpg.configure_item('nucl_thres_ratio_1',enabled=False)
-            # dpg.configure_item('cell_thres_ratio_2',enabled=False)
-            # dpg.configure_item('nucleus_search_2',enabled=False)
-            # dpg.configure_item('nucl_thres_ratio_2',enabled=False)
-            # dpg.configure_item('cp_roi_1',enabled=False)
-            # dpg.configure_item('cp_roi_2',enabled=False)
             if self.ROI_directory != None and len(self.ROI_directory) != 0:
-
                 try:
                     self.load_PTU_images(self.anal_file)
                 except:
@@ -2639,40 +2311,33 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('nucl_thres_ratio_1', enabled=True)
             dpg.configure_item('ROI_mode_1', enabled=True)
             dpg.configure_item('cp_roi_1', enabled=True)
-
             dpg.configure_item('cell_thres_ratio_2', enabled=True)
             dpg.configure_item('nucl_thres_ratio_2', enabled=True)
             dpg.configure_item('ROI_mode_2', enabled=True)
             dpg.configure_item('cp_roi_2', enabled=True)
             self.mode_init.file_box['num_items'] = 8
             self.mode_init.PTU_DATA_window['height'] = int(315 * self.mode_init.size_ratio['height'])
-
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,
                                                  self.mode_init.top_indent + self.mode_init.PTU_DATA_window[
                                                      'height'] + self.mode_init.internal_indent)
-
             dpg.configure_item('file_box', num_items=self.mode_init.file_box['num_items'])
             dpg.configure_item('PTU_DATA_window', height=self.mode_init.PTU_DATA_window['height'])
             dpg.configure_item('file_window',
                                pos=self.mode_init.file_window['pos'])
-            # lprint(dpg.get_item_height('PTU_DATA_window'))
-
             self.mode_init.file_window['height'] = dpg.get_viewport_height() - (
                     self.mode_init.top_indent + dpg.get_item_height(
                 'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
             dpg.configure_item('file_window',
                                height=self.mode_init.file_window['height'])
-            # self.load_PTU_images(self.anal_file)
 
 
         else:
-            # lprint(sender, dpg.get_value(sender))
+            
             dpg.hide_item('auto_ROI_ch_table')
             dpg.configure_item('cell_thres_ratio_1', enabled=False)
             dpg.configure_item('nucl_thres_ratio_1', enabled=False)
             dpg.configure_item('ROI_mode_1', enabled=False)
             dpg.configure_item('cp_roi_1', enabled=False)
-
             dpg.configure_item('cell_thres_ratio_2', enabled=False)
             dpg.configure_item('nucl_thres_ratio_2', enabled=False)
             dpg.configure_item('ROI_mode_2', enabled=False)
@@ -2682,11 +2347,9 @@ class _Phot2conc_vars_funct:
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,
                                                  self.mode_init.top_indent + self.mode_init.PTU_DATA_window[
                                                      'height'] + self.mode_init.internal_indent)
-
             dpg.configure_item('file_box', num_items=self.mode_init.file_box['num_items'])
             dpg.configure_item('PTU_DATA_window', height=self.mode_init.PTU_DATA_window['height'])
             dpg.configure_item('file_window', pos=self.mode_init.file_window['pos'])
-            # lprint(dpg.get_item_height('PTU_DATA_window'))
             self.mode_init.file_window['height'] = dpg.get_viewport_height() - (
                     self.mode_init.top_indent + dpg.get_item_height(
                 'PTU_DATA_window') + self.mode_init.internal_indent + self.mode_init.bottom_indent)
@@ -2725,7 +2388,6 @@ class _Phot2conc_vars_funct:
         dpg.hide_item('hist_conc_plot_ch1')
         dpg.hide_item('hist_np_plot_ch1')
         dpg.hide_item('hist_phot_plot_ch1')
-
         dpg.set_value('c_dist_ser_ch_2', (np.empty(2), np.empty(2)))
         dpg.set_value('c_mean_ser_ch_2', (np.empty(2), np.empty(2)))
         dpg.set_value('c_med_ser_ch_2', (np.empty(2), np.empty(2)))
@@ -2747,21 +2409,14 @@ class _Phot2conc_vars_funct:
 
     def import_ROI(self, sender, app_data, user_data):
 
-        # global DF, DF2,pck_list,roi_1,roi_2
-
-        # global directory, new_directory,last_directory
         self.directory = app_data['file_path_name']
         self.new_directory = self.directory
         self.last_directory = self.directory
         self.update_dialogs_default_directory(self.last_directory)
-
-        # # lnprint('import_ROI')
         roi = self.load_ROI(app_data['file_path_name'])
-
         if user_data == 'Add_ROI_1_button':
             try:
                 self.roi_1 = roi.to_numpy()
-
                 self.DF = self.DF * self.roi_1
                 chan = 1
 
@@ -2777,13 +2432,10 @@ class _Phot2conc_vars_funct:
 
         if len(self.pck_list) == 2:
             chan = 'both'
-            # self.display_images([self.DF,self.DF2],chan)
             self.display_images(chan)
         else:
-            # self.display_images([self.DF],chan)
             self.display_images(chan)
 
-    #
     def check_for_roi_files(self, path_to_search, anfile):
         try:
             roi_files = os.listdir(path_to_search)
@@ -2793,22 +2445,19 @@ class _Phot2conc_vars_funct:
         roi_files = [f for f in roi_files if anfile in f]
         roi_files = [f for f in roi_files if '_roi' in f]
         rois = []
-      # lprint(roi_files)
         for f in roi_files:
             roi_n = f.split('_')
-
             roi_n = [r for r in roi_n if r.startswith('roi')]
             roicnt = roi_n[0].replace('roi', '')
             if len(roicnt) != 0:
                 roin = 'ROI_' + roicnt
             else:
                 roin = 'ROI_' + str(0)
-            # print(roin)
+            
             rois.append(roin)
-            # print(roin)
+            
         roiset = list(set(rois))
         roiset.sort()
-        # lprint(roiset)
         output = {k: {} for k in roiset}
         for rs in roiset:
             rn = rs[-1]
@@ -2817,23 +2466,16 @@ class _Phot2conc_vars_funct:
                 if 'roi' + rn in f:
                     ch = f.split('_ch_')
                     ch = [r for r in ch if r.endswith('.dat')][0][0]
-                    # print(ch)
-                    # chns.append(ch)
-                    # for ch in chns:
                     output[rs]['ch_' + ch] = f
-
-        # lprint(rois)
 
         return output
 
     def callback_ROI_names_combo(self, sender, app_data):
         ROIn = app_data
         roin = ROIn.replace('ROI_', '')
-      # lprint(roin)
         if len(self.Channels) == 1:
             if '1' in self.Channels[0]:
                 roi_1_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_1.dat')
-              # lprint(roi_1_path)
                 if os.path.exists(roi_1_path):
                     pass
                 else:
@@ -2861,7 +2503,6 @@ class _Phot2conc_vars_funct:
             self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
             self.processor_1.roi_image = self.roi_1
             self.image_1_times_roi = self.Current_image_1
-
             roi_2_path = os.path.join(self.ROI_directory, self.anal_file + '_roi' + roin + '_ch_2.dat')
             if os.path.exists(roi_2_path):
                 pass
@@ -2870,18 +2511,16 @@ class _Phot2conc_vars_funct:
             self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
             self.processor_2.roi_image = self.roi_2
             self.image_2_times_roi = self.Current_image_2
-
             self.display_images('both')
 
     def load_PTU_images(self, an_file):
         self.pkl_data = {}
         dpg.set_value('ROI_name_tag', 'ROI_0')
         pickle_file = os.path.join(self.PTU_directory, an_file + '.pkl')
-        # lprint(pickle_file)
         with open(pickle_file, 'rb') as pcklf:
             pklf = pickle.load(pcklf)
 
-        ptu_meta = pklf['File info']  # json.load(f)
+        ptu_meta = pklf['File info']
         try:
             self.DF = self.DF2 = []
         except:
@@ -2891,13 +2530,10 @@ class _Phot2conc_vars_funct:
         self.PTU_Px_size = ptu_meta['Pixels size']
         self.PTU_N_frames = ptu_meta['Number of frames']
         self.PTU_Px_dwell = ptu_meta['Pixel dwell']
-        # tau_resolution = ptu_meta['Lifetime resolution']
-
         dpg.set_value('Resolution_output', 'Resolution: ' + self.PTU_Resolution)
         dpg.set_value('Pixel_size_output', self.PTU_Px_size)
         dpg.set_value('Nframes_output', self.PTU_N_frames)
         dpg.set_value('Pixel_dwell_output', self.PTU_Px_dwell)
-
         dpg.set_value('sinle_phot_output_ch_1', 0)
         dpg.set_value('sinle_phot_err_output_ch_1', 0)
         dpg.set_value('sinle_mols_output_ch_1', 0)
@@ -2910,22 +2546,14 @@ class _Phot2conc_vars_funct:
         dpg.set_value('sinle_mols_err_output_ch_2', 0)
         dpg.set_value('single_conc_output_ch_2', 0)
         dpg.set_value('single_conc_err_output_ch_2', 0)
-
-        # dpg.set_value('cell_thres_ratio_1',1.0)
-        # dpg.set_value('cell_thres_ratio_2',1.0)
-        # dpg.set_value('nucl_thres_ratio_1',1.5)
-        # dpg.set_value('nucl_thres_ratio_2',1.5)
-
         if self.PTU_N_frames > 1:
             self.PTU_N_frames = self.PTU_N_frames - 1
         else:
             pass
         ptu_files = list(np.sort([f for f in os.listdir(self.PTU_directory) if f.endswith('.ptu')]))
-
         self.Channels = list(pklf.keys())
         self.Channels = [f for f in self.Channels if f.startswith('export_df')]
         self.Channels = [ch[-1] for ch in self.Channels]
-
         if dpg.get_value('FILE_ROI_checkbox'):
             Existing_Rois = self.check_for_roi_files(self.ROI_directory, an_file)
             dpg.configure_item('ROI_names_combo_tag', items=list(Existing_Rois.keys()))
@@ -2938,10 +2566,6 @@ class _Phot2conc_vars_funct:
                     Intensity_1 = Intensity_1
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
-
-                    # except:
-                    #     self.show_error_no_files('Seems there is no ROI folder selected. Try again.')
-
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
                     if os.path.exists(roi_1_path):
                         pass
@@ -2952,25 +2576,19 @@ class _Phot2conc_vars_funct:
                     self.processor_1.roi_image = self.roi_1
                     Intensity_1 = Intensity_1
                     channel = 'both'
-                    # channel = 1
-
                     self.Current_image_1 = Intensity_1 / np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
 
                 elif '2' in self.Channels[0]:
                     Intensity_2 = pklf['intensity_2']
                     Intensity_2 = Intensity_2
-
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image = Intensity_2.astype(np.uint16)
-
                     roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
-
                     if os.path.exists(roi_2_path):
                         pass
                     else:
@@ -2979,28 +2597,23 @@ class _Phot2conc_vars_funct:
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                     self.processor_2.roi_image = self.roi_2
                     channel = 'both'
-                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
                     self.image_2_times_roi = self.Current_image_2
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
                 else:
                     pass
 
             elif len(self.Channels) == 2:
-
                 Intensity_1 = pklf['intensity_1']
                 Intensity_2 = pklf['intensity_2']
-
                 self.processor_1 = ImageROIProcessor()
                 self.processor_1.image = Intensity_1.astype(np.uint16)
                 self.processor_2 = ImageROIProcessor()
                 self.processor_2.image = Intensity_2.astype(np.uint16)
                 roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
-
                 if os.path.exists(roi_1_path):
                     pass
                 else:
@@ -3008,7 +2621,6 @@ class _Phot2conc_vars_funct:
 
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
-
                 if os.path.exists(roi_2_path):
                     pass
                 else:
@@ -3022,7 +2634,6 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                 self.display_images(channel)
 
         elif dpg.get_value('Auto_ROI_checkbox'):
@@ -3037,13 +2648,11 @@ class _Phot2conc_vars_funct:
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
                     channel = 'both'
-                    # channel = 1
                     self.Current_image_1 = Intensity_1 / np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
 
                 elif '2' in self.Channels[0]:
@@ -3051,13 +2660,11 @@ class _Phot2conc_vars_funct:
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image = Intensity_2.astype(np.uint16)
                     channel = 'both'
-                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
                     self.image_2_times_roi = self.Current_image_2
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
 
                 else:
@@ -3077,7 +2684,6 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                 self.display_images(channel)
 
         else:
@@ -3089,13 +2695,11 @@ class _Phot2conc_vars_funct:
                     self.processor_1.image = Intensity_1.astype(np.uint16)
                     self.roi_1 = np.zeros(self.Current_image_1.shape)
                     channel = 'both'
-                    # channel = 1
                     self.Current_image_1 = Intensity_1 / np.max(Intensity_1)
                     self.image_1_times_roi = self.Current_image_1
                     self.processor_2 = ImageROIProcessor()
                     self.processor_2.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_2 = self.NO_IMAGE_INTENSITY
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
 
                 elif '2' in self.Channels[0]:
@@ -3105,12 +2709,10 @@ class _Phot2conc_vars_funct:
                     self.roi_2 = np.zeros(self.Current_image_2.shape)
                     self.image_2_times_roi = self.Current_image_2
                     channel = 'both'
-                    # channel = 2
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = np.clip((self.NO_IMAGE_INTENSITY), 0, 1).astype(np.float64)
                     self.Current_image_1 = self.NO_IMAGE_INTENSITY
                     self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
-                    # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                     self.display_images(channel)
 
                 else:
@@ -3131,7 +2733,6 @@ class _Phot2conc_vars_funct:
                 self.Current_image_2 = Intensity_2 / np.max(Intensity_2)
                 self.image_1_times_roi = self.Current_image_1
                 self.image_2_times_roi = self.Current_image_2
-                # self.display_images([self.Current_image_1,self.Current_image_2],channel)
                 self.display_images(channel)
 
     def overlayrgba(self, im, rgba_image, mask_image, full_mask, ovrl):
@@ -3152,7 +2753,6 @@ class _Phot2conc_vars_funct:
             rgba_image[..., i] = (rgba_image[..., i] * (1 - alpha_normalized) + mask_image[..., i] * alpha_normalized)
 
         rgba_image[..., 3] = np.maximum(rgba_image[..., 3], mask_image[..., 3])
-
         rgba_image = np.clip(rgba_image, 0, 1)
 
         return rgba_image
@@ -3169,8 +2769,6 @@ class _Phot2conc_vars_funct:
     def onHover(self, sender, app_data, user_data):
 
         dpg.focus_item(user_data)
-
-        pass
 
     def get_ui_state(self, channel):
         """Get UI state parameters for a specific channel"""
@@ -3194,17 +2792,12 @@ class _Phot2conc_vars_funct:
 
     def _process_file_roi(self, channel, disp, ui_state):
         if dpg.get_value('FILE_ROI_checkbox'):
-
             processor = getattr(self, f'processor_{channel}')
             img = processor.image
             roi = processor.roi_image
-
             full_mask = np.nan_to_num(roi * 255, nan=0)
-
             setattr(self, f'image_{channel}_times_roi', img * roi)
-
             setattr(processor, 'all_masks', [full_mask])
-
             self._update_texture(channel, disp, ui_state)
 
         else:
@@ -3216,7 +2809,6 @@ class _Phot2conc_vars_funct:
 
         processor = ui_state['processor']
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-
         if ui_state['auto_roi']:
             if len(self.Channels) == 1:
                 if channel == self.Channels[0]:
@@ -3235,30 +2827,12 @@ class _Phot2conc_vars_funct:
                 self._process_file_roi(channel, disp, ui_state)
         else:
             self._process_no_roi(channel, disp, ui_state)
-        # processor = ui_state['processor']
-        # disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-        #
-        # is_single_channel = len(self.Channels) == 1
-        # is_target_channel = (channel == self.Channels[0]) if is_single_channel else True
-        #
-        # if not is_target_channel:
-        #     pass  # Skip processing if not the selected single channel
-        #
-        # if ui_state['auto_roi']:
-        #     self._process_auto_roi(channel, disp, ui_state)
-        # elif ui_state['file_roi']:
-        #     self._process_file_roi(channel, disp, ui_state)
-        # else:
-        #     self._process_no_roi(channel, disp, ui_state)
 
     def _update_textures_both_roi(self, sender, app_data):
-        """Handle texture updates with proper state management"""
-        # lprint(self.Channels)
-        # Determine which channels to update
+        
         if sender.endswith(('1', '2')):
 
             channel = sender[-1]
-
             self.process_channel(channel, self.get_ui_state(channel))
         else:
 
@@ -3270,13 +2844,9 @@ class _Phot2conc_vars_funct:
     def _image_buttons_controller(self, sender):
 
         channel = sender[-1]
-
         ui_state = self.get_ui_state(channel)
-
         processor = ui_state['processor']
-
         disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
-
         self._update_texture(channel, disp, ui_state)
 
     def copy_roi_from_channel(self, sender):
@@ -3291,15 +2861,11 @@ class _Phot2conc_vars_funct:
 
             copy_from_processor = getattr(self, f'processor_{copy_from_channel}')
             copy_to_processor = getattr(self, f'processor_{copy_to_channel}')
-
             setattr(copy_to_processor, 'all_cells_masks', copy_from_processor.all_masks.copy())
             setattr(copy_to_processor, 'all_masks', copy_from_processor.all_masks.copy())
             setattr(copy_to_processor, 'all_contours', copy_from_processor.all_contours.copy())
-
             disp = np.clip(copy_to_processor.image / np.max(copy_to_processor.image), 0, 1).astype(np.float64)
-
             dpg.configure_item(f'cell_thres_ratio_{copy_to_channel}', enabled=False)
-
             self._update_texture(copy_to_channel, disp, self.get_ui_state(copy_to_channel))
 
 
@@ -3313,18 +2879,14 @@ class _Phot2conc_vars_funct:
     def _process_auto_roi(self, channel, disp, ui_state):
         """Handle auto ROI processing using UI state"""
         processor = ui_state['processor']
-
         froi = np.clip(processor.image, 0, 255).astype(np.uint8)
-
         self._get_cell_roi(channel, froi, ui_state)
-
         self._update_texture(channel, disp, ui_state)
 
     def _get_cell_roi(self, channel, froi, ui_state):
         """Get cell ROI using parameters from UI state"""
 
         processor = ui_state['processor']
-
         processor.detect_cell_roi(froi, ui_state['cell_thres_ratio'])
 
         if not ui_state['multiple_cells_checkbox']:
@@ -3337,15 +2899,10 @@ class _Phot2conc_vars_funct:
     def _roi_mode(self, sender, app_data, user_data):
 
         channel = sender[-1]
-
         ui_state = self.get_ui_state(channel)
-
         processor = ui_state['processor']
-
         option_choosen = dpg.get_value(f'ROI_mode_{channel}')
-
         drag_float_value = dpg.get_value(f'nucl_thres_ratio_{channel}')
-
         option_actions = {
             'subtract dark': {'params': {'mode': 'dark', 'many': False, 'subtract': True}},
             'find dark': {'params': {'mode': 'dark', 'many': False, 'subtract': False}},
@@ -3377,7 +2934,6 @@ class _Phot2conc_vars_funct:
         adjusted_rgb = np.clip(rgba_image[..., :3] * ui_state['contrast'] + ui_state['brightness'], 0, 1)
         rgba_image[..., :3] = adjusted_rgb
 
-        # Use contours from processor
         if hasattr(processor, 'all_masks') and processor.all_masks is not None:
 
             for cell_mask in processor.all_masks:
@@ -3403,38 +2959,29 @@ class _Phot2conc_vars_funct:
         channel = '1' if image_tag.endswith('_1') else '2'
         ui_state = self.get_ui_state(channel)
         processor = self.get_ui_state(channel)['processor']
-
-        # Calculate positions and scaling
         displayed_w, displayed_h = dpg.get_item_width(image_tag), dpg.get_item_height(image_tag)
         original_h, original_w = processor.image.shape[:2]
         indent = dpg.get_item_configuration(image_tag)['indent']
         image_pos = (image_pos[0] + indent, image_pos[1] - self.img_height_shift['shift'])
-
-        # Convert mouse coordinates to image space
         scale = (original_w / displayed_w, original_h / displayed_h)
         x, y = (int((mouse_pos[i] - image_pos[i]) * scale[i]) for i in (0, 1))
-
-        # Check contours
         if hasattr(processor, 'all_contours') and processor.all_contours:
             for i, contour in enumerate(processor.all_contours):
                 if cv2.pointPolygonTest(contour, (x, y), False) >= 0:
                     processor.all_contours = [contour]
                     processor.all_masks = [processor.all_masks[i]]
-
                     processor.all_cells_contours = [contour]
                     processor.all_cells_masks = processor.all_masks
-
                     dpg.set_value('ROI_name_tag', f'ROI_{i}')
                     dpg.set_value(f'multiple_cells_checkbox_{channel}', False)
                     break
 
-            # Update display
             disp = np.clip(processor.image / np.max(processor.image), 0, 1).astype(np.float64)
             self._update_texture(channel, disp, ui_state)
             self.callback_calculate(sender, None)
 
     def load_ROI(self, path):
-      # lprint(path)
+
         df = pd.read_csv(path, sep='\t', header=None, skiprows=3, encoding='latin1')
         df = df.replace('-', -1.)
         try:
@@ -3445,17 +2992,14 @@ class _Phot2conc_vars_funct:
                     df.at[i, 0] = float(df.at[i, 0])
 
                 except:
-
                     ind = i
                     break
             df = df[df.index < ind]
             df = df.astype(int)
 
         dfs = df[0].to_frame().applymap(np.isreal)
-
         if len(dfs.mask(dfs).dropna()) != 0:
             ind = int(dfs.mask(dfs).dropna().head(1).index.values)
-
             df = df[df.index < ind]
             df = df.astype(float)
             df = df.mask(df != -1, 1)
@@ -3486,7 +3030,6 @@ class _Phot2conc_vars_funct:
             with dpg.window(pos=(400, 150),
                             label='Error!',
                             tag='No_data_files',
-
                             no_move=True,
                             no_close=False,
                             no_title_bar=False,
@@ -3495,21 +3038,17 @@ class _Phot2conc_vars_funct:
                             modal=True
                             ):
                 dpg.add_text(error_text, tag='no_files_error_text')
-
                 dpg.add_button(label='Close',
                                tag='no_files_error_butt',
                                show=True,
                                callback=self.callback_no_files_dialog_close_only
                                )
-
                 dpg.bind_item_theme('No_data_files', 'Error_window_theme')
         except:
             dpg.show_item('No_data_files')
 
     def update_dialogs_default_directory(self, last_directory):
 
-        # dpg.configure_item('TT_file_dialog_id_ch_2',default_path=last_directory)
-        # dpg.configure_item('TT_file_dialog_id_ch_1',default_path=last_directory)
         self._GI.last_directory = last_directory
         dpg.configure_item('ROI_folder_dialog_id', default_path=last_directory)
         dpg.configure_item('file_dialog_id', default_path=last_directory)
@@ -3532,7 +3071,6 @@ class _Phot2conc_vars_funct:
             dpg.configure_item("file_box", items=())
             dpg.configure_item("file_box", default_value='')
 
-            # def wdt_hgt_pos(self,item,wdth,hght,pos):
 
     def callback_exportsettings(self, sender, app_data):
         setts = {
@@ -3571,7 +3109,7 @@ class _Phot2conc_vars_funct:
 
         }
 
-        # lnprint(setts)
+
         if self.PTU_directory != None:
             path_to_json_file = os.path.join(self.PTU_directory, 'workspace_info.json')
             with open(path_to_json_file, 'w') as f:
@@ -3615,7 +3153,7 @@ class _Phot2conc_vars_funct:
             }
 
         }
-        # lnprint(pkl)
+
         pkl_path = os.path.join(self.PTU_directory, self.anal_file + '.rpk')
         with open(pkl_path, 'wb') as f:
             pickle.dump(pkl, f)
@@ -3623,7 +3161,6 @@ class _Phot2conc_vars_funct:
     def _load_pkl_file(self, path):
         with open(path, 'rb') as file:
             pkl = pickle.load(file)
-        # lnprint(pkl)
 
         dpg.set_value('omega_input_ch_1', pkl['FCS_data']['omega_1'])
         dpg.set_value('omega_input_ch_2', pkl['FCS_data']['omega_2'])
@@ -3643,7 +3180,6 @@ class _Phot2conc_vars_funct:
         dpg.set_value('Brightness_input_ch_2', pkl['FCS_data']['Br_2'])
         dpg.set_value('Brightness_err_input_ch_1', pkl['FCS_data']['Br_err_1'])
         dpg.set_value('Brightness_err_input_ch_2', pkl['FCS_data']['Br_err_2'])
-
         dpg.set_value('cell_thres_ratio_1', pkl['autoroi_thres']['cell_1'])
         dpg.set_value('cell_thres_ratio_2', pkl['autoroi_thres']['cell_2'])
         dpg.set_value('nucl_thres_ratio_1', pkl['autoroi_thres']['nucl_1'])
@@ -3652,7 +3188,6 @@ class _Phot2conc_vars_funct:
         dpg.set_value('ROI_mode_2', pkl['autoroi_thres']['ROI_mode_2'])
         dpg.set_value('cp_roi_1', pkl['autoroi_thres']['cp_roi_1'])
         dpg.set_value('cp_roi_2', pkl['autoroi_thres']['cp_roi_2'])
-
         dpg.set_value('FILE_ROI_checkbox', pkl['ROI_mode'][0])
         dpg.set_value('Auto_ROI_checkbox', pkl['ROI_mode'][1])
         if pkl['ROI_mode'][1]:
@@ -3661,7 +3196,11 @@ class _Phot2conc_vars_funct:
 
         else:
             self.set_roi_state()
-            # self.callback_select_autoroi('Auto_ROI_checkbox',pkl['ROI_mode'][1])
             self.callback_select_roi('FILE_ROI_checkbox', pkl['ROI_mode'][0])
 
         return pkl
+
+        
+####################################################################
+################ end of _Phot2conc_vars_funct class ################
+#################################################################### 

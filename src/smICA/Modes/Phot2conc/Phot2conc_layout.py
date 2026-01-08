@@ -66,14 +66,12 @@ def Phot2conc_resizer(sender, app_data):
     temp_inits = mode_init.__init__.__code__.co_varnames
     print(temp_inits)
     temp_inits = [v for v in temp_inits if v not in forbiden_list]
-
     temp_inits_values = {}
     for v in temp_inits:
         temp_inits_values[v] = eval('mode_init.' + v)
 
     current_image_1 = mode_init.processor_1.image
     current_image_2 = mode_init.processor_2.image
-
     mode_init.__init__(inV.init_size_ratio,
                        inV.init_left_indent,
                        inV.init_internal_indent,
@@ -87,10 +85,8 @@ def Phot2conc_resizer(sender, app_data):
 
     mode_init.processor_1.image = current_image_1
     mode_init.processor_2.image = current_image_2
-
     mode_init.rgba_image_1 = mode_init.im_to_rgbim(mode_init.processor_1.image)
     mode_init.rgba_image_2 = mode_init.im_to_rgbim(mode_init.processor_2.image)
-
     mode_init.rgba_image_1 = cv2.resize(mode_init.rgba_image_1,
                                         (mode_init.image_window_ch1['width'] - mode_init.im_scaller,
                                          mode_init.image_window_ch1['width'] - mode_init.im_scaller),
@@ -104,7 +100,6 @@ def Phot2conc_resizer(sender, app_data):
 
     if mode_init.tex_1_name in dpg.get_aliases():
         dpg.delete_item(mode_init.tex_1_name)
-        # print(print(dpg.get_alias_id(mode_init.tex_1_name)))
         dpg.remove_alias(mode_init.tex_1_name)
         dpg.delete_item('texture_CH_1')
 
@@ -119,12 +114,9 @@ def Phot2conc_resizer(sender, app_data):
                             default_value=dpg_image_1,
                             tag=mode_init.tex_1_name,
                             parent='texture_reg')
-
     dpg.add_image(mode_init.tex_1_name, parent='image_window_ch1'
                   , uv_min=(0, 0), uv_max=(1, 1), tag='texture_CH_1', indent=mode_init.shift)
-
     dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
-
     dpg.add_dynamic_texture(width=mode_init.image_window_ch2['width'] - mode_init.im_scaller,
                             height=mode_init.image_window_ch2['width'] - mode_init.im_scaller,
                             default_value=dpg_image_2,
@@ -135,13 +127,11 @@ def Phot2conc_resizer(sender, app_data):
                   , uv_min=(0, 0), uv_max=(1, 1), tag='texture_CH_2', indent=mode_init.shift)
 
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
-
     mode_cmn.img_height_shift['shift'] = int(np.round(24 * mode_init.size_ratio['height']))
 
     for item in init_resizable_items:
-        # lprint(item)
+        
         props = eval('mode_init.' + item)
-
         if 'width' in props.keys():
             dpg.configure_item(item, width=props['width'])
         if 'height' in props.keys():
@@ -169,7 +159,6 @@ mode_cmn = _Phot2conc_vars_funct(mode_init,
                                  basf,
                       globalITEMS
                                  )
-# method_cmn.mount_fcs_handlers()
 
 # #########################################################################
 # '''Main windows of the method'''
@@ -295,8 +284,7 @@ with dpg.window(label='',
             dpg.add_text("Many cells:", tag='auto_ROI_ch_table_row1_text_1')
             dpg.add_checkbox(label='', tag='multiple_cells_checkbox_1', default_value=False, callback=mode_cmn._update_textures_both_roi)
             dpg.add_checkbox(label='', tag='multiple_cells_checkbox_2', default_value=False, callback=mode_cmn._update_textures_both_roi)
-            # dpg.add_text("ROI channel 1", tag='auto_ROI_ch_table_row1_text_2')
-            # dpg.add_text("ROI channel 2", tag='auto_ROI_ch_table_row1_text_3')
+            
         with dpg.table_row(tag='auto_ROI_ch_table_row2'):
             dpg.add_text("Detect cell:", tag='auto_ROI_ch_table_row2_text_1')
             dpg.add_drag_float(tag='cell_thres_ratio_1',
@@ -332,17 +320,13 @@ with dpg.window(label='',
                              tag='cp_roi_1',
                              default_value=False,
                              enabled=False,
-                             # width=-1,
                              callback=mode_cmn.copy_roi_from_channel,
-                             # parent='image_window_1'
                              )
             dpg.add_checkbox(label='Channel 1 \u2192 2',
                              tag='cp_roi_2',
                              default_value=False,
                              enabled=False,
-                             # width=-1,
                              callback=mode_cmn.copy_roi_from_channel,
-                             # parent='image_window_1'
                              )
         with dpg.table_row(tag='auto_ROI_ch_table_row4'):
             dpg.add_text("Selection:", tag='auto_ROI_ch_table_row4_text_1')
@@ -385,7 +369,6 @@ with dpg.window(label='',
                                enabled=False,
                                format='%.3f',
                                callback=mode_cmn._roi_mode
-                               #callback=mode_cnm._nucleus_thres_ratio
                                )
             with dpg.tooltip('nucl_thres_ratio_2', tag='nucl_thres_ratio_2_tooltip'):
                 dpg.add_text("Set threshold for selection.", tag='nucl_thres_ratio_2_tooltip_text')
@@ -462,7 +445,7 @@ globalITEMS.windows.extend(['PTU_DATA_window',
                             'multiple_cells_checkbox_2'
 
                             ])
-# lprint(globalITEMS.windows)
+
 
 '''Files window items'''
 with dpg.window(label='',
@@ -483,11 +466,8 @@ with dpg.window(label='',
                                callback=mode_cmn.callback_listbox
                                )
     dpg.add_separator(tag='sep_left_6', show=True)
-
     dpg.add_text(default_value='CALCULATE', show=True, tag='single_calc')
-
     dpg.add_separator(tag='FILES_mid_sep_1', show=True)
-
     dpg.add_button(label="Calculate single",
                    callback=mode_cmn.callback_calculate,
                    width=mode_init.Calculate_button['width'],
@@ -509,9 +489,7 @@ with dpg.window(label='',
         dpg.add_text("Press to add current calculation to dataframe.", tag='add_to_res_single_button_tooltip_text')
 
     dpg.add_text(default_value='CALCULATE ALL', show=True, tag='All_calc')
-
     dpg.add_separator(tag='FILES_mid_sep_2', show=True)
-
     dpg.add_button(label="Calculate all",
                    callback=mode_cmn.callback_calculate_all,
                    width=mode_init.Calculate_all_button['width'],
@@ -523,11 +501,8 @@ with dpg.window(label='',
         dpg.add_text("Press to make calculation on all files.", tag='Calculate_all_button_tooltip_text')
 
     dpg.add_text(default_value='EXPORT', show=True, tag='export_text')
-
     dpg.add_separator(tag='FILES_mid_sep_3', show=True)
-
     dpg.add_text(default_value='Export Images as arrays', show=True, tag='exp_data_to_img_csv')
-
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -615,11 +590,7 @@ with dpg.window(label='Channel 1',
                 no_bring_to_front_on_focus=True,
                 show=True
                 ):
-    pass
-
     dpg.add_separator(tag='IMAGE_CH1_top_sep', show=True)
-
-
     with dpg.table(header_row=False, width=-1, borders_innerH=False,
                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                    no_pad_innerX=False, no_pad_outerX=True, no_host_extendX=True,
@@ -661,48 +632,21 @@ with dpg.window(label='Channel 1',
                              callback=mode_cmn._image_buttons_controller
                              )
     dpg.add_separator(tag='IMAGE_CH1_top_sep_2', show=True, parent='image_window_ch1', before='texture_CH_1')
-
-
     dpg.add_image(mode_init.tex_1_name,
                   uv_min=(0, 0),
                   uv_max=(1, 1),
                   tag='texture_CH_1', indent=mode_init.shift)
-
     dpg.add_item_hover_handler(tag='img1_hover_hand', callback=mode_cmn.onHover, user_data="texture_CH_1",
                                parent='handler_image_1')
-
     dpg.add_item_clicked_handler(tag='img1_click_hand', callback=mode_cmn.on_image_click,
                                  user_data=('texture_CH_1', None), parent='handler_image_1')
-
     dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
-    # shift=(dpg.get_item_width('image_window_ch1')-dpg.get_item_width(mode_init.tex_1_name))
-
-
-
-
-
-
-# lprint(dpg.get_item_width('image_window_ch1'),dpg.get_item_width(mode_init.tex_1_name),shift)
 
 
 globalITEMS.windows.extend(['image_window_ch1',
                             'IMAGE_CH1_top_sep',
                             'texture_CH_1',
                             'IMAGE_CH1_top_sep_2',
-                            # 'img_win_1_table',
-                            # 'img_win_1_table_col1',
-                            # 'img_win_1_table_col2',
-                            # 'img_win_1_table_col3',
-                            # 'img_win_1_table_col4',
-                            # 'img_win_1_table_row1',
-                            # 'cell_thres_ratio_1',
-                            # 'cell_thres_ratio_1_tooltip',
-                            # 'cell_thres_ratio_1_tooltip_text',
-                            # 'nucleus_search_1',
-                            # 'cp_roi_1',
-                            # 'nucl_thres_ratio_1',
-                            # 'nucl_thres_ratio_1_tooltip',
-                            # 'nucl_thres_ratio_1_tooltip_text',
                             'img_win_1_table_2',
                             'img_win_1_table_2_col1',
                             'img_win_1_table_2_col1',
@@ -729,14 +673,11 @@ with dpg.window(label='Channel 2',
                 no_bring_to_front_on_focus=True,
                 show=True
                 ):
-    pass
     dpg.add_separator(tag='IMAGE_CH2_top_sep', show=True)
-
     with dpg.table(header_row=False, width=-1, borders_innerH=False,
                    borders_outerH=False, borders_innerV=False, borders_outerV=False,
                    no_pad_innerX=False, no_pad_outerX=True, no_host_extendX=True,
                    no_clip=True, tag='img_win_2_table_2_2', parent='image_window_ch2'):
-        # Add headers
         dpg.add_table_column(label="", tag='img_win_2_table_2_col1', width=mode_init.img_win_2_table_2_col1['width'])
         dpg.add_table_column(label="", tag='img_win_2_table_2_col2', width=mode_init.img_win_2_table_2_col2['width'])
         dpg.add_table_column(label="", tag='img_win_2_table_2_col3', width=mode_init.img_win_2_table_2_col3['width'])
@@ -748,13 +689,9 @@ with dpg.window(label='Channel 2',
                                min_value=0.1,
                                speed=0.01,
                                enabled=True,
-
                                width=mode_init.img_contrast_2['width'],
                                callback=mode_cmn._image_buttons_controller
                                )
-
-            #     dpg.add_text('',tag='img_contrast_text_1')
-
             dpg.add_drag_float(tag='img_Brightness_2',
                                # label="Brightness",
                                format='Brightness: %.1f',
@@ -782,12 +719,9 @@ with dpg.window(label='Channel 2',
                   uv_min=(0, 0),
                   uv_max=(1, 1),
                   tag='texture_CH_2', indent=mode_init.shift
-                  # before='img_win_2_table'
                   )
-
     dpg.add_item_hover_handler(tag='img2_hover_hand', callback=mode_cmn.onHover, user_data="texture_CH_2",
                                parent='handler_image_2')
-
     dpg.add_item_clicked_handler(tag='img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
@@ -795,19 +729,6 @@ globalITEMS.windows.extend(['image_window_ch2',
                             'IMAGE_CH2_top_sep',
                             'texture_CH_2',
                             'IMAGE_CH2_top_sep_2',
-                            # 'img_win_2_table',
-                            # 'img_win_2_table_col1',
-                            # 'img_win_2_table_col2',
-                            # 'img_win_2_table_col3',
-                            # 'img_win_2_table_row1',
-                            # 'cell_thres_ratio_2',
-                            # 'cell_thres_ratio_2_tooltip',
-                            # 'cell_thres_ratio_2_tooltip_text',
-                            # 'nucleus_search_2',
-                            # 'cp_roi_2',
-                            # 'nucl_thres_ratio_2',
-                            # 'nucl_thres_ratio_2_tooltip',
-                            # 'nucl_thres_ratio_2_tooltip_text',
                             'img_win_2_table_2',
                             'img_win_2_table_2_col1',
                             'img_win_2_table_2_col1',
@@ -1031,9 +952,7 @@ with dpg.window(label='',
                 show=True
                 ):
     dpg.add_text(default_value='FCS CALLIBRATION DATA', show=True, tag='FCS_CALLIB')
-
     dpg.add_separator(tag='FCS_top_sep', show=True)
-
     dpg.add_button(label="Load callibration data",
                    callback=lambda: dpg.configure_item("Calib_file_dialog_id", show=True,
                                                        user_data='Load_calib_button'),
@@ -1051,9 +970,7 @@ with dpg.window(label='',
                    )
     dpg.bind_item_theme('Save_calib_button', 'fit_button_theme')
     dpg.add_separator(tag='FCS_mid_sep_1', show=True)
-
     dpg.add_text(default_value='Channel 1', show=True, tag='FCS_pm_ch_1')
-
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -1067,21 +984,16 @@ with dpg.window(label='',
                    policy=dpg.mvTable_SizingFixedFit,
                    tag='FCS_win_CH1_table',
                    parent='FCS_window'):
-        # Add headers
         dpg.add_table_column(label="",
                              tag='FCS_win_CH1_table_col1',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.FCS_win_CH1_table_col1['width'],
-                             # width = table_col[mode_init.FCS_win_CH1_table_col1['width']
+                             init_width_or_weight=mode_init.FCS_win_CH1_table_col1['width']
                              )
         dpg.add_table_column(label="",
                              tag='FCS_win_CH1_table_col2',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.FCS_win_CH1_table_col2['width'],
-                             # width = mode_init.FCS_win_CH1_table_col2['width']
+                             init_width_or_weight=mode_init.FCS_win_CH1_table_col2['width']
                              )
-
-        # Add rows and columns
         with dpg.table_row(tag='FCS_win_CH1_table_row1'):
             dpg.add_drag_float(label='',
                                tag='omega_input_ch_1',
@@ -1203,9 +1115,7 @@ with dpg.window(label='',
                     "Standard deviation value of the molecular brightness. Optionally input your own known value.",
                     tag='Brightness_err_input_ch_1_tooltip_text')
     dpg.add_separator(tag='FCS_mid_sep_2', show=True)
-
     dpg.add_text(default_value='Channel 2', show=True, tag='FCS_pm_ch_2')
-
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -1219,21 +1129,17 @@ with dpg.window(label='',
                    policy=dpg.mvTable_SizingFixedFit,
                    tag='FCS_win_CH2_table',
                    parent='FCS_window'):
-        # Add headers
         dpg.add_table_column(label="",
                              tag='FCS_win_CH2_table_col1',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.FCS_win_CH2_table_col1['width'],
-                             # width = mode_init.FCS_win_table_col1['width']
+                             init_width_or_weight=mode_init.FCS_win_CH2_table_col1['width']
                              )
         dpg.add_table_column(label="",
                              tag='FCS_win_CH2_table_col2',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.FCS_win_CH2_table_col2['width'],
-                             # width = mode_init.FCS_win_table_col2['width']
+                             init_width_or_weight=mode_init.FCS_win_CH2_table_col2['width']
                              )
 
-        # Add rows and columns
         with dpg.table_row(tag='FCS_win_CH2_table_row1'):
             dpg.add_drag_float(label='',
                                tag='omega_input_ch_2',
@@ -1435,11 +1341,8 @@ with dpg.window(label='',
                 show=True
                 ):
     dpg.add_text(default_value='RESULTS', show=True, tag='RES_pm')
-
     dpg.add_separator(tag='RESULTS_top_sep', show=True)
-
     dpg.add_text(default_value='Channel 1', show=True, tag='RES_pm_ch_1')
-
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -1453,21 +1356,17 @@ with dpg.window(label='',
                    policy=dpg.mvTable_SizingFixedFit,
                    tag='RES_win_CH1_table',
                    parent='results_window'):
-        # Add headers
         dpg.add_table_column(label="",
                              tag='RES_win_CH1_table_col1',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.RES_win_CH1_table_col1['width'],
-                             # width = mode_init.FCS_win_table_col1['width']
+                             init_width_or_weight=mode_init.RES_win_CH1_table_col1['width']
                              )
         dpg.add_table_column(label="",
                              tag='RES_win_CH1_table_col2',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.RES_win_CH1_table_col1['width'],
-                             # width = mode_init.RES_win_table_col2['width']
+                             init_width_or_weight=mode_init.RES_win_CH1_table_col1['width']
                              )
 
-        # Add rows and columns
         with dpg.table_row(tag='RES_win_CH1_table_row1'):
             dpg.add_drag_float(label='',
                                tag='sinle_phot_output_ch_1',
@@ -1531,9 +1430,7 @@ with dpg.window(label='',
                              tag='single_conc_err_output_ch_1_tooltip_text')
 
     dpg.add_separator(tag='RESULTS_mid_sep_1', show=True)
-
     dpg.add_text(default_value='Channel 2', show=True, tag='Bright_pm_ch_2')
-
     with dpg.table(header_row=False,
                    width=-1,
                    borders_innerH=False,
@@ -1547,21 +1444,17 @@ with dpg.window(label='',
                    policy=dpg.mvTable_SizingFixedFit,
                    tag='RES_win_CH2_table',
                    parent='results_window'):
-        # Add headers
         dpg.add_table_column(label="",
                              tag='RES_win_CH2_table_col1',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.RES_win_CH2_table_col1['width'],
-                             # width = mode_init.FCS_win_table_col1['width']
+                             init_width_or_weight=mode_init.RES_win_CH2_table_col1['width']
                              )
         dpg.add_table_column(label="",
                              tag='RES_win_CH2_table_col2',
                              width_stretch=True,
-                             init_width_or_weight=mode_init.RES_win_CH2_table_col2['width'],
-                             # width = mode_init.RES_win_table_col2['width']
+                             init_width_or_weight=mode_init.RES_win_CH2_table_col2['width']
                              )
 
-        # Add rows and columns
         with dpg.table_row(tag='RES_win_CH2_table_row1'):
             dpg.add_drag_float(label='',
                                tag='sinle_phot_output_ch_2',
@@ -1656,10 +1549,8 @@ globalITEMS.windows.extend(['results_window',
                             'single_conc_err_output_ch_1',
                             'single_conc_err_output_ch_1_tooltip',
                             'single_conc_err_output_ch_1_tooltip_text',
-
                             'RESULTS_mid_sep_1',
                             'Bright_pm_ch_2',
-
                             'RES_win_CH2_table',
                             'RES_win_CH2_table_col1',
                             'RES_win_CH2_table_col2',
@@ -1757,7 +1648,6 @@ with dpg.file_dialog(directory_selector=False,
     '''Dialog window for exporting the results of the fitting.'''
     dpg.add_file_extension("", color=(150, 255, 150, 255))
     dpg.add_file_extension("{.csv,.dat}")
-    
     dpg.add_file_extension(".dat", color=(255, 255, 0, 255), custom_text="[DAT]")
     dpg.add_file_extension(".csv", color=(0, 255, 0, 255), custom_text="[CSV]")
     dpg.add_file_extension(".pickle", color=(0, 255, 255, 255), custom_text="[Pandas]")

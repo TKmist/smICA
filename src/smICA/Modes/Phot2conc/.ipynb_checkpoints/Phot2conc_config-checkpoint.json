@@ -1,0 +1,6 @@
+{
+    "LAYOUT":"Phot2conc_layout.py",
+    "INIT":"Phot2conc_init.py",
+    "ANAL_MENU_ITEM":"Phot2conc_anal_menu_item.py",
+    "menu_class_func":"P2C_manu_F"
+}

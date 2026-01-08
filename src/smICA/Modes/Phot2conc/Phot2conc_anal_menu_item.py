@@ -35,13 +35,9 @@ class _PHOT2CONC_mounting_functions:
     def unmount_me(self,fcs_items):
         
         for item in reversed(fcs_items):
-            # print(item)
-            # if item =='texture_tag_chan_1':
-            #     print('\t\t IMG')
             dpg.delete_item(item)
-            # print(item)
+
         dpg.delete_item('texture_reg')
-        # dpg.delete_item('keyword_handler_Phot2conc')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
         inV.mounted_method = None        
@@ -64,23 +60,16 @@ class _PHOT2CONC_mounting_functions:
                   parent = 'menu_file_dropout',
                   before = 'menu_item_exit',
                          )
-
-        # dpg.add_menu_item(label="Export settings",
-        #           tag='Export_settings_menu_item',
-        #           parent = 'menu_file_dropout',
-        #           before = 'menu_item_exit',
-        #                  )
-    
-
-
             
         globalITEMS.windows.extend(['Open_PTU_menu_item',
                                     'Open_ROI_menu_item',
                                     'File_menu_sep_1',
-                                    'Reset_results_menu_item',
-                                    # 'Export_settings_menu_item'
+                                    'Reset_results_menu_item'
                                    ])
-        
+
+####################################################################
+############ end of _PHOT2CONC_mounting_functions class ############
+####################################################################        
         
 class _PHOT2CONC_menu_functions:
     
@@ -91,18 +80,13 @@ class _PHOT2CONC_menu_functions:
     
     def unmnt_evthn(self,items,MTHD_conf):
         for item in reversed(items):
-            # print(item)
             dpg.delete_item(item)
         
-        # dpg.delete_item(MTHD_conf['keyword_handler_tag'])
+        
         exec(MTHD_conf['menu_class_func']+'.is_mounted = False')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
         inV.mounted_method = None
-        # print(mode_init.last_directory)
-        # print(globalITEMS.last_directory)
-        # globalITEMS.last_directory = mode_init.last_directory
-        # print(mode_init.last_directory)
         print(globalITEMS.last_directory)
         globalITEMS.windows=[]
         
@@ -111,7 +95,6 @@ class _PHOT2CONC_menu_functions:
         if self.is_mounted:
             self.mnt.unmount_me(globalITEMS.windows)
             globalITEMS.windows=[]
-            # print(dpg.get_aliases())
         else:
             if inV.mounted_method != None:
                 
@@ -124,31 +107,12 @@ class _PHOT2CONC_menu_functions:
         
         self.is_mounted = True
         inV.mounted_method = 'Modes/Phot2conc'
-        # print('SIZE_RATIO:',method_init.size_ratio)
-    
-        
         path_to_layout = os.path.join('Modes/Phot2conc',basf.path_to_method_anal_layout('Modes/Phot2conc'))
         execfile(path_to_layout)
-        # mode_cmn.load_json()
         mode_cmn.define_file_menu_callbacks()
         
-    
-            
-        
-        
-        
-        
-        
-        
+####################################################################
+############## end of _PHOT2CONC_menu_functions class ##############
+####################################################################
         
 P2C_manu_F = _PHOT2CONC_menu_functions()
-
-# dpg.add_menu_item(label="Phot2Conc",
-#                           parent ='menu_analysis_method_dropout' ,
-#                           tag='Analysis_submenu_item_Phot2conc',
-#                           callback=P2C_manu_F.callback_PHOT2CONC_menu)
-
-
-
-
-# P2C_manu_F.callback_PHOT2CONC_menu()
