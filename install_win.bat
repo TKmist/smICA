@@ -2,7 +2,7 @@
 
 :: Define paths
 set PYTHON_DIR=python_embedded
-set PYTHON_EXE=%PYTHON_DIR%\pythonw.exe
+set PYTHON_EXE=%PYTHON_DIR%\python.exe
 set PIP_EXE=%PYTHON_DIR%\Scripts\pip.exe
 set GET_PIP=%PYTHON_DIR%\get-pip.py
 set VENV_DIR=v_smICA_env
