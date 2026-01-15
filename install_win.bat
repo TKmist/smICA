@@ -1,18 +1,132 @@
 @echo off
+setlocal EnableExtensions EnableDelayedExpansion
+
+:: ------------------------------------------------------------
+:: Configuration
+:: ------------------------------------------------------------
 
 :: Define paths
-set PYTHON_DIR=python_embedded
-set PYTHON_EXE=%PYTHON_DIR%\python.exe
-set PIP_EXE=%PYTHON_DIR%\Scripts\pip.exe
-set GET_PIP=%PYTHON_DIR%\get-pip.py
-set VENV_DIR=v_smICA_env
-set LAUNCHER_BAT="%~dp0smICA.bat"
+set "PYTHON_DIR=python_embedded"
+set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
+set "PIP_EXE=%PYTHON_DIR%\Scripts\pip.exe"
+set "GET_PIP=%PYTHON_DIR%\get-pip.py"
+set "VENV_DIR=v_smICA_env"
+set "LAUNCHER_BAT=%~dp0smICA.bat"
+
+:: External third-party resource(s) fetched during installation
+set "THIRD_PARTY_URL=https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
+set "THIRD_PARTY_LICENSE_HINT=Licensing information is typically provided in the upstream repository (e.g., LICENSE file and/or README). Please review it before accepting."
+
+:: ------------------------------------------------------------
+:: Helper labels (functions)
+:: ------------------------------------------------------------
+
+:AbortInstall
+echo.
+echo Installation aborted.
+exit /b 1
+
+:RequireYesNo
+:: Usage:
+::   call :RequireYesNo "Question text here" VAR_NAME
+:: On return:
+::   VAR_NAME will be set to YES or NO
+set "Q_TEXT=%~1"
+set "OUTVAR=%~2"
+set "REPLY="
+
+:RequireYesNoLoop
+set "REPLY="
+set /p "REPLY=%Q_TEXT% [y/N]: "
+if /I "%REPLY%"=="Y"  set "REPLY=YES"
+if /I "%REPLY%"=="YES" set "REPLY=YES"
+if /I "%REPLY%"=="N"  set "REPLY=NO"
+if /I "%REPLY%"=="NO" set "REPLY=NO"
+if "%REPLY%"=="" set "REPLY=NO"
+
+if /I "%REPLY%"=="YES" (
+  set "%OUTVAR%=YES"
+  exit /b 0
+) else if /I "%REPLY%"=="NO" (
+  set "%OUTVAR%=NO"
+  exit /b 0
+) else (
+  echo Please answer 'y' or 'n'.
+  goto :RequireYesNoLoop
+)
+
+:ShowLicenseAndRequireAcceptance
+:: Display the LICENSE file and require user acceptance.
+if not exist "LICENSE" (
+  echo ERROR: LICENSE file not found in the current directory.
+  echo Please run this installer from the project root where LICENSE exists.
+  call :AbortInstall
+)
+
+echo ========================================
+echo               LICENSE
+echo ========================================
+echo.
+
+:: Prefer paging through MORE so the user can scroll.
+:: If MORE is unavailable, fall back to TYPE.
+where more >nul 2>&1
+if %errorlevel%==0 (
+  type "LICENSE" | more
+) else (
+  type "LICENSE"
+)
+
+echo.
+echo ========================================
+echo.
+
+call :RequireYesNo "Do you accept the terms of the LICENSE agreement?" LICENSE_ACCEPTED
+if /I not "%LICENSE_ACCEPTED%"=="YES" (
+  echo You did not accept the LICENSE terms.
+  call :AbortInstall
+)
+exit /b 0
+
+:InformThirdPartyAndRequireAcceptance
+:: Inform the user about third-party downloads and require acceptance.
+echo.
+echo ========================================
+echo         THIRD-PARTY COMPONENTS
+echo ========================================
+echo.
+echo This installer will download and use third-party scripts/libraries from external sources.
+echo Example resource:
+echo   - %THIRD_PARTY_URL%
+echo.
+echo %THIRD_PARTY_LICENSE_HINT%
+echo By continuing, you confirm you understand and accept that third-party components may have their own licenses and terms.
+echo.
+
+call :RequireYesNo "Do you agree to proceed with installation including third-party components?" THIRD_PARTY_ACCEPTED
+if /I not "%THIRD_PARTY_ACCEPTED%"=="YES" (
+  echo You did not agree to install third-party components.
+  call :AbortInstall
+)
+exit /b 0
+
+:: ------------------------------------------------------------
+:: Pre-flight checks
+:: ------------------------------------------------------------
 
 :: Ensure the embedded Python exists
 if not exist "%PYTHON_EXE%" (
-    echo Embedded Python not found at %PYTHON_EXE%. Exiting.
-    exit /b 1
+  echo Embedded Python not found at "%PYTHON_EXE%". Exiting.
+  exit /b 1
 )
+
+:: ------------------------------------------------------------
+:: Required user consents (must happen BEFORE installation steps)
+:: ------------------------------------------------------------
+
+call :ShowLicenseAndRequireAcceptance
+call :InformThirdPartyAndRequireAcceptance
+
 
 :: Ensure pip is installed
 if not exist "%PIP_EXE%" (

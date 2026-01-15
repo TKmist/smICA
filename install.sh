@@ -1,14 +1,95 @@
 #!/bin/bash
 
+# -----------------------------
+# Configuration
+# -----------------------------
+
 # Define the name of the virtual environment directory
 VENV_DIR="v_smICA_env"
 
-# Ensure Python is installed
+# External third-party resource(s) fetched during installation
+THIRD_PARTY_URL="https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
+THIRD_PARTY_LICENSE_HINT="Licensing information is typically provided in the upstream repository (e.g., LICENSE file and/or README). Please review it before accepting."
+
+# -----------------------------
+# Helper functions
+# -----------------------------
+
+abort_install() {
+  # Abort installation with a clear message and non-zero exit code.
+  echo
+  echo "Installation aborted."
+  exit 1
+}
+
+prompt_yes_no() {
+  # Ask a yes/no question in English and require an explicit yes/no answer.
+  # Usage: prompt_yes_no "Your question here"
+  local prompt="$1"
+  local reply=""
+
+  while true; do
+    read -r -p "${prompt} [y/N]: " reply
+    case "${reply}" in
+      [yY]|[yY][eE][sS]) return 0 ;;
+      [nN]|[nN][oO]|"")  return 1 ;;
+      *) echo "Please answer 'y' or 'n'." ;;
+    esac
+  done
+}
+
+show_license_and_require_acceptance() {
+  # Display the LICENSE file and require user acceptance to continue.
+  if [[ ! -f "LICENSE" ]]; then
+    echo "ERROR: LICENSE file not found in the current directory."
+    echo "Please ensure you run this installer from the project root (where LICENSE exists)."
+    abort_install
+  fi
+
+  echo "========================================"
+  echo "               LICENSE                  "
+  echo "========================================"
+  echo
+  cat "LICENSE"
+  echo
+  echo "========================================"
+  echo
+
+  if ! prompt_yes_no "Do you accept the terms of the LICENSE agreement?"; then
+    echo "You did not accept the LICENSE terms."
+    abort_install
+  fi
+}
+
+inform_third_party_and_require_acceptance() {
+  # Inform the user about third-party downloads and require acceptance.
+  echo
+  echo "========================================"
+  echo "         THIRD-PARTY COMPONENTS         "
+  echo "========================================"
+  echo
+  echo "This installer will download and use third-party scripts/libraries from external sources."
+  echo "Example resource:"
+  echo "  - ${THIRD_PARTY_URL}"
+  echo
+  echo "${THIRD_PARTY_LICENSE_HINT}"
+  echo "By continuing, you confirm you understand and accept that third-party components may have their own licenses and terms."
+  echo
+
+  if ! prompt_yes_no "Do you agree to proceed with installation including third-party components?"; then
+    echo "You did not agree to install third-party components."
+    abort_install
+  fi
+}
+
 if ! command -v python3 &> /dev/null; then
-    echo "Python3 is not installed. Please install Python 3.6 or higher and re-run this script."
-    exit 1
+  echo "Python3 is not installed. Please install Python 3.6 or higher and re-run this script."
+  exit 1
 fi
 
+
+show_license_and_require_acceptance
+inform_third_party_and_require_acceptance
 # Check if pip is available or create a virtual environment first
 echo "Checking for pip..."
 if ! python3 -m pip --version &> /dev/null; then
