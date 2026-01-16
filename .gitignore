@@ -3,6 +3,6 @@ src/smICA/Required/readPTU_FLIM.py
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
+.virtual_documents
 
 
