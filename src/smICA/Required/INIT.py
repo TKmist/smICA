@@ -45,49 +45,50 @@ from pathlib import Path
 
 class _updater:
     _VERSION_RE = re.compile(r"^\s*(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
-    
-    def __init__(self, hsv,version: str):
+
+    def __init__(self, hsv, version: str):
         """
-        :param version: lokalna wersja programu, np. '1.1.0' lub '1.1.0a'
+        :param version: local application version, e.g. '1.1.0' or '1.1.0a'
         """
         self.VERSION = version
         self.version = version.strip()
         self.updater_state = False
         self.hsv = hsv
 
-        self.owner="TKmist"        
-        self.repo="smICA"         
-        self.branch="many_cells_auto_roi"  
-        self.path="VERSION" 
-
-    
+        self.owner = "TKmist"
+        self.repo = "smICA"
+        self.branch = "many_cells_auto_roi"
+        self.path = "VERSION"
 
     def _parse_version(self, ver: str):
         """
-        Parsuje wersję w formacie 1.2.3 lub 1.2.3a
-        Litery: a > b > c > ... (czyli 'a' to najnowsza)
+        Parses version strings in the format 1.2.3 or 1.2.3a
+        Suffix ordering: a > b > c > ... (where 'a' is the newest)
         """
         m = self._VERSION_RE.match(ver)
         if not m:
-            raise ValueError(f"Nieprawidłowy format wersji: {ver!r}. Oczekiwano np. '1.2.3' lub '1.2.3a'.")
+            raise ValueError(
+                f"Invalid version format: {ver!r}. Expected e.g. '1.2.3' or '1.2.3a'."
+            )
 
         major, minor, patch = map(int, m.groups()[:3])
         suffix = m.group(4)
 
         if suffix:
             s = suffix.lower()
-            if not ('a' <= s <= 'z'):
-                raise ValueError(f"Niedozwolony sufiks wersji: {suffix!r}")
-            
-            suffix_rank = 26 - (ord(s) - ord('a'))
+            if not ("a" <= s <= "z"):
+                raise ValueError(f"Invalid version suffix: {suffix!r}")
+
+            suffix_rank = 26 - (ord(s) - ord("a"))
         else:
-            suffix_rank = 0  
+            suffix_rank = 0
 
         return (major, minor, patch, suffix_rank)
 
-    def _raw_version_url(self, owner: str, repo: str, branch: str, path: str = "VERSION") -> str:
+    def _raw_version_url(
+        self, owner: str, repo: str, branch: str, path: str = "VERSION"
+    ) -> str:
         return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
-
 
     def check_remote_version(
         self,
@@ -97,18 +98,18 @@ class _updater:
         *,
         path: str = "VERSION",
         token: str | None = None,
-        timeout: float = 10.0
+        timeout: float = 10.0,
     ) -> tuple[bool, str | None]:
         """
-        Sprawdza, czy wersja na GitHubie (w pliku VERSION w danej gałęzi)
-        jest nowsza niż lokalna self.version.
+        Checks whether the version on GitHub (VERSION file on a given branch)
+        is newer than the local self.version.
 
-        :param owner: właściciel repozytorium GitHub
-        :param repo: nazwa repozytorium
-        :param branch: gałąź (np. 'develop', 'release/2.0')
-        :param path: ścieżka do pliku z wersją (domyślnie 'VERSION')
-        :param token: opcjonalny GitHub token dla repo prywatnych
-        :param timeout: limit czasu dla requestu HTTP
+        :param owner: GitHub repository owner
+        :param repo: repository name
+        :param branch: branch name (e.g. 'develop', 'release/2.0')
+        :param path: path to the version file (default: 'VERSION')
+        :param token: optional GitHub token for private repositories
+        :param timeout: HTTP request timeout
         :return: (is_newer, remote_version)
         """
         url = self._raw_version_url(owner, repo, branch, path)
@@ -119,278 +120,298 @@ class _updater:
         try:
             resp = requests.get(url, headers=headers, timeout=timeout)
             if resp.status_code != 200:
-                print(f"[Updater] Błąd pobierania VERSION z {url} ({resp.status_code})")
+                print(f"[Updater] Failed to download VERSION from {url} ({resp.status_code})")
                 return (False, None)
             remote_txt = resp.text.strip()
         except requests.RequestException as e:
-            print(f"[Updater] Błąd sieci: {e}")
+            print(f"[Updater] Network error: {e}")
             return (False, None)
 
         try:
             remote_tuple = self._parse_version(remote_txt)
             local_tuple = self._parse_version(self.version)
         except ValueError as e:
-            print(f"[Updater] Błąd parsowania wersji: {e}")
+            print(f"[Updater] Version parsing error: {e}")
             return (False, remote_txt)
 
         is_newer = remote_tuple > local_tuple
         return (is_newer, remote_txt)
+
     def proceed_update_window(self):
-        window_width,window_height = 400,400
-        viewport_width, viewport_height = dpg.get_viewport_client_width(), dpg.get_viewport_client_height()
+        window_width, window_height = 400, 400
+        viewport_width, viewport_height = (
+            dpg.get_viewport_client_width(),
+            dpg.get_viewport_client_height(),
+        )
         pos_x = (viewport_width - window_width) // 2
         pos_y = (viewport_height - window_height) // 2
         try:
-            with dpg.window(pos=(pos_x, pos_y),
-                            label='Update now?',
-                            tag='proceed_to_update_window',
+            with dpg.window(
+                pos=(pos_x, pos_y),
+                label="Update now?",
+                tag="proceed_to_update_window",
+                no_move=True,
+                no_close=False,
+                no_title_bar=False,
+                show=True,
+                modal=True,
+                autosize=True,
+                no_scrollbar=True,
+            ):
+                dpg.add_text(
+                    "Press OK to install the files and close the program.",
+                    tag="proceed_to_update_window_text",
+                )
+                dpg.bind_item_font("proceed_to_update_window_text", "DejaVu_bold")
+                with dpg.group(tag="proceed_to_update_window_group", horizontal=True):
+                    dpg.add_button(
+                        label="OK",
+                        tag="proceed_to_update_window_ok_butt",
+                        show=True,
+                        callback=self.proceed_window_OK,
+                    )
 
-                            no_move=True,
-                            no_close=False,
-                            no_title_bar=False,
-                            show=True,
-                            modal=True,
-                            autosize=True,
-                            no_scrollbar=True
-                            ):
-                dpg.add_text('Press ok to install the files and close the program.', tag='proceed_to_update_window_text')
-                dpg.bind_item_font('proceed_to_update_window_text','DejaVu_bold')
-                with dpg.group(tag='proceed_to_update_window_group',horizontal=True):
-                    dpg.add_button(label='OK',
-                                   tag='proceed_to_update_window_ok_butt',
-                                   show=True,
-                                   callback=self.proceed_window_OK
-                                   )
-                    
-                    dpg.add_button(label='Close',
-                                   tag='proceed_to_update_window_close_butt',
-                                   show=True,
-                                   callback=self.proceed_window_close
-                                   )
-                
-                dpg.bind_item_theme('proceed_to_update_window_ok_butt', 'fit_button_theme')
-                dpg.bind_item_theme('proceed_to_update_window_close_butt', 'Error_window_theme')
-                
-        except:
-            dpg.show_item('No_data_files')
+                    dpg.add_button(
+                        label="Close",
+                        tag="proceed_to_update_window_close_butt",
+                        show=True,
+                        callback=self.proceed_window_close,
+                    )
 
-    
+                dpg.bind_item_theme("proceed_to_update_window_ok_butt", "fit_button_theme")
+                dpg.bind_item_theme("proceed_to_update_window_close_butt", "Error_window_theme")
+
+        except Exception:
+            dpg.show_item("No_data_files")
 
     def proceed_window_close(self):
-        dpg.configure_item('proceed_to_update_window', show=False)
-        dpg.delete_item('proceed_to_update_window_text')
-        dpg.delete_item('proceed_to_update_window_ok_butt')
-        dpg.delete_item('proceed_to_update_window_close_butt')
-        dpg.delete_item('proceed_to_update_window_group')
-        dpg.delete_item('proceed_to_update_window')
+        dpg.configure_item("proceed_to_update_window", show=False)
+        dpg.delete_item("proceed_to_update_window_text")
+        dpg.delete_item("proceed_to_update_window_ok_butt")
+        dpg.delete_item("proceed_to_update_window_close_butt")
+        dpg.delete_item("proceed_to_update_window_group")
+        dpg.delete_item("proceed_to_update_window")
 
     def proceed_window_OK(self):
-        # print('proceed_window_OK')
+        # print("proceed_window_OK")
         window_size = dpg.get_item_rect_size("proceed_to_update_window")
-        
-        
-        dpg.delete_item('proceed_to_update_window_ok_butt')
-        dpg.delete_item('proceed_to_update_window_close_butt')
-        dpg.delete_item('proceed_to_update_window_group')
-        
-        dpg.add_loading_indicator(parent='proceed_to_update_window',width=50,
-                                  tag = 'tag_load_ind_update',
-                                  pos=(dpg.get_item_width('proceed_to_update_window')/2-(int(dpg.get_global_font_scale()*25)),1*dpg.get_item_height('proceed_to_update_window')-dpg.get_global_font_scale()*25),
-                                 color=self.hsv(2/7.0, 0.6, 0.6),
-                                 secondary_color = self.hsv(0.223, 0.404, 0.846),)
-        dpg.add_button(label='',
-                                   tag='progress_button',
-                                   show=True,
-                                   pos=(0,1*dpg.get_item_height('proceed_to_update_window')+dpg.get_global_font_scale()*50),
-                                   # callback=self.proceed_window_close
-                                   parent = 'proceed_to_update_window',
-                       width = window_size[0]
-                                   )
-        
-        dpg.bind_item_theme('progress_button', 'transparent_theme')
-        dpg.set_item_label('progress_button','Downloading files')
-        
-        self.download_update(owner=self.owner,repo=self.repo, branch=self.branch)
+
+        dpg.delete_item("proceed_to_update_window_ok_butt")
+        dpg.delete_item("proceed_to_update_window_close_butt")
+        dpg.delete_item("proceed_to_update_window_group")
+
+        dpg.add_loading_indicator(
+            parent="proceed_to_update_window",
+            width=50,
+            tag="tag_load_ind_update",
+            pos=(
+                dpg.get_item_width("proceed_to_update_window") / 2
+                - (int(dpg.get_global_font_scale() * 25)),
+                1 * dpg.get_item_height("proceed_to_update_window")
+                - dpg.get_global_font_scale() * 25,
+            ),
+            color=self.hsv(2 / 7.0, 0.6, 0.6),
+            secondary_color=self.hsv(0.223, 0.404, 0.846),
+        )
+        dpg.add_button(
+            label="",
+            tag="progress_button",
+            show=True,
+            pos=(
+                0,
+                1 * dpg.get_item_height("proceed_to_update_window")
+                + dpg.get_global_font_scale() * 50,
+            ),
+            # callback=self.proceed_window_close
+            parent="proceed_to_update_window",
+            width=window_size[0],
+        )
+
+        dpg.bind_item_theme("progress_button", "transparent_theme")
+        dpg.set_item_label("progress_button", "Downloading files")
+
+        self.download_update(owner=self.owner, repo=self.repo, branch=self.branch)
         self.backup_old_files()
-        
+
         self.Copying_new_files()
-        
+
         for i in range(3, -1, -1):
-            
-            dpg.set_item_label('progress_button','Finished. smICA closes in: '+str(i)+ ' sec.')
+            dpg.set_item_label(
+                "progress_button",
+                "Finished. smICA closes in: " + str(i) + " sec.",
+            )
             time.sleep(1)
-        dpg.delete_item('progress_button')
-        dpg.delete_item('tag_load_ind_update')
-        
-        
+
+        dpg.delete_item("progress_button")
+        dpg.delete_item("tag_load_ind_update")
+
         self.proceed_window_close()
-        
-        dpg.delete_item('proceed_to_update_window')
+
+        dpg.delete_item("proceed_to_update_window")
         dpg.stop_dearpygui()
-        
+
     def backup_old_files(self):
         current_dir = os.path.abspath(os.getcwd())
-        
-        bckp_dir = os.path.join(current_dir,'..' ,"old_backup")
-        
+
+        bckp_dir = os.path.join(current_dir, "..", "old_backup")
+
         if os.path.exists(bckp_dir):
-                print("[Updater] Usuwam stary katalog backup...")
-                dpg.set_item_label('progress_button','Removing old backup files')
-                shutil.rmtree(bckp_dir, ignore_errors=True)
+            print("[Updater] Removing old backup directory...")
+            dpg.set_item_label("progress_button", "Removing old backup files")
+            shutil.rmtree(bckp_dir, ignore_errors=True)
+
         os.makedirs(bckp_dir, exist_ok=True)
-        metafiles = ['LICENSE','README.md','VERSION']
-        FoldersToBackup = ['REWRITE_ROI','smICA']
-        
+        metafiles = ["LICENSE", "README.md", "VERSION"]
+        FoldersToBackup = ["REWRITE_ROI", "smICA"]
+
         for f in metafiles:
-            print("[Updater] Usuwam stary katalog backup...")
-            dpg.set_item_label('progress_button','Backing up meta files')
-            source = os.path.join(current_dir,'..' ,f)
-            target = os.path.join(bckp_dir ,f)
-            shutil.copy2(source,target)
-        
+            print("[Updater] Removing old backup directory...")
+            dpg.set_item_label("progress_button", "Backing up meta files")
+            source = os.path.join(current_dir, "..", f)
+            target = os.path.join(bckp_dir, f)
+            shutil.copy2(source, target)
+
         for d in FoldersToBackup:
-            dpg.set_item_label('progress_button','Backing up software directories')
-            source = os.path.join(current_dir,'..' ,d)
-            target = os.path.join(bckp_dir ,d)
+            dpg.set_item_label("progress_button", "Backing up software directories")
+            source = os.path.join(current_dir, "..", d)
+            target = os.path.join(bckp_dir, d)
             shutil.copytree(
                 source,
                 target,
                 dirs_exist_ok=True,
-                ignore=shutil.ignore_patterns("*updt_tmp", "__pycache__",'.ipynb_checkpoints')
-                )
+                ignore=shutil.ignore_patterns(
+                    "*updt_tmp", "__pycache__", ".ipynb_checkpoints"
+                ),
+            )
+
     def Copying_new_files(self):
         current_dir = os.path.abspath(os.getcwd())
-        tmp_dir = os.path.join(current_dir,'..', "updt_tmp")
+        tmp_dir = os.path.join(current_dir, "..", "updt_tmp")
         zip = os.listdir(tmp_dir)
-        zip = [f for f in zip if f.endswith('.zip')][0]
+        zip = [f for f in zip if f.endswith(".zip")][0]
         print(zip)
-        dpg.set_item_label('progress_button','unzipping update')
-        zip_path = os.path.join(tmp_dir,zip)
+        dpg.set_item_label("progress_button", "Unzipping update")
+        zip_path = os.path.join(tmp_dir, zip)
         try:
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(tmp_dir)
         except zipfile.BadZipFile:
             return None
-        subfolders = [d for d in os.listdir(tmp_dir) if os.path.isdir(os.path.join(tmp_dir,d))]
-        
+
+        subfolders = [
+            d for d in os.listdir(tmp_dir)
+            if os.path.isdir(os.path.join(tmp_dir, d))
+        ]
+
         if not subfolders:
             return None
-        
+
         extracted_dir = subfolders[0]
-        updt_dir = os.path.join(tmp_dir,extracted_dir)
-        metafiles = ['LICENSE','README.md','VERSION']
+        updt_dir = os.path.join(tmp_dir, extracted_dir)
+        metafiles = ["LICENSE", "README.md", "VERSION"]
         for f in metafiles:
-            print("[Updater] Usuwam stary katalog backup...")
-            dpg.set_item_label('progress_button','Updating meta files')
-            source = os.path.join(updt_dir,f)
-            target = os.path.join(current_dir ,'..' ,f)
-            shutil.copy(source,target)
-        FoldersToBackup = ['REWRITE_ROI','smICA']
+            print("[Updater] Removing old backup directory...")
+            dpg.set_item_label("progress_button", "Updating meta files")
+            source = os.path.join(updt_dir, f)
+            target = os.path.join(current_dir, "..", f)
+            shutil.copy(source, target)
+
+        FoldersToBackup = ["REWRITE_ROI", "smICA"]
         for d in FoldersToBackup:
-            dpg.set_item_label('progress_button','Updating software directories')
-            source = os.path.join(updt_dir,'src' ,d)
-            target = os.path.join(current_dir,'..' ,d)
+            dpg.set_item_label("progress_button", "Updating software directories")
+            source = os.path.join(updt_dir, "src", d)
+            target = os.path.join(current_dir, "..", d)
             shutil.copytree(
                 source,
                 target,
                 dirs_exist_ok=True,
-                ignore=shutil.ignore_patterns("*updt_tmp", "__pycache__",'.ipynb_checkpoints')
-                )
-        dpg.set_item_label('progress_button','Removing temporary files')
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-        
-        
-        
-    def download_update(
-            self,
-            owner: str,
-            repo: str,
-            branch: str,
-            *,
-            token: str | None = None,
-            timeout: float = 30.0
-        ) -> str | None:
-            """
-            Pobiera aktualne pliki programu w formie ZIP-a z repozytorium GitHub
-            i zapisuje w katalogu tymczasowym 'updt_tmp'.
-    
-            :param owner: właściciel repozytorium GitHub
-            :param repo: nazwa repozytorium
-            :param branch: gałąź (np. 'develop', 'main')
-            :param token: opcjonalny GitHub token (dla repo prywatnych)
-            :param timeout: czas oczekiwania w sekundach
-            :return: ścieżka do katalogu tymczasowego z rozpakowanymi plikami, lub None jeśli błąd
-            """
-    
-            
-            current_dir = os.path.abspath(os.getcwd())
-            
-            tmp_dir = os.path.join(current_dir,'..', "updt_tmp")
-            if os.path.exists(tmp_dir):
-                shutil.rmtree(tmp_dir, ignore_errors=True)
-            os.makedirs(tmp_dir, exist_ok=True)
-    
-            
-            zip_url = f"https://github.com/{owner}/{repo}/archive/refs/heads/{branch}.zip"
-            headers = {}
-            if token:
-                headers["Authorization"] = f"token {token}"
-    
-            zip_path = os.path.join(tmp_dir, f"{repo}-{branch}.zip")
-            
-    
-            try:
-                with requests.get(zip_url, headers=headers, timeout=timeout, stream=True) as r:
-                    r.raise_for_status()
-                    with open(zip_path, "wb") as f:
-                        for chunk in r.iter_content(chunk_size=8192):
-                            f.write(chunk)
-            except requests.RequestException as e:
-                
-                return None
-    
+                ignore=shutil.ignore_patterns(
+                    "*updt_tmp", "__pycache__", ".ipynb_checkpoints"
+                ),
+            )
 
-    
+        dpg.set_item_label("progress_button", "Removing temporary files")
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    def download_update(
+        self,
+        owner: str,
+        repo: str,
+        branch: str,
+        *,
+        token: str | None = None,
+        timeout: float = 30.0,
+    ) -> str | None:
+        """
+        Downloads the current program files as a ZIP archive from the GitHub repository
+        and saves them into the temporary directory 'updt_tmp'.
+
+        :param owner: GitHub repository owner
+        :param repo: repository name
+        :param branch: branch name (e.g. 'develop', 'main')
+        :param token: optional GitHub token (for private repositories)
+        :param timeout: timeout in seconds
+        :return: path to the temporary directory with downloaded/unpacked files, or None on error
+        """
+        current_dir = os.path.abspath(os.getcwd())
+
+        tmp_dir = os.path.join(current_dir, "..", "updt_tmp")
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        os.makedirs(tmp_dir, exist_ok=True)
+
+        zip_url = f"https://github.com/{owner}/{repo}/archive/refs/heads/{branch}.zip"
+        headers = {}
+        if token:
+            headers["Authorization"] = f"token {token}"
+
+        zip_path = os.path.join(tmp_dir, f"{repo}-{branch}.zip")
+
+        try:
+            with requests.get(zip_url, headers=headers, timeout=timeout, stream=True) as r:
+                r.raise_for_status()
+                with open(zip_path, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+        except requests.RequestException:
+            return None
+
     def run_updater(self):
-        
         is_newer, remote = self.check_remote_version(
-            owner=self.owner,          
-            repo=self.repo,          
-            branch=self.branch,      
-            path=self.path         
+            owner=self.owner,
+            repo=self.repo,
+            branch=self.branch,
+            path=self.path,
         )
-        theme_tag = dpg.get_item_theme('menu_about_dropout')
-        
-        
+        theme_tag = dpg.get_item_theme("menu_about_dropout")
+
         if is_newer:
             self.updater_state = True
             dpg.bind_item_theme("menu_about_dropout", "menu_update_available")
-            children = dpg.get_item_children("menu_about_dropout", 1)  # slot 1 = normalne dzieci
-                        
+            children = dpg.get_item_children("menu_about_dropout", 1)  # slot 1 = normal children
+
             for child in children:
                 if str(child).isdigit():
                     child = dpg.get_item_alias(child)
-                else:
-                    pass
-                
+
                 if child == "menu_Version_dropout_item":
                     dpg.bind_item_theme(child, "menu_update_available")
-                    dpg.set_item_label(child,label='Current version: '+self.VERSION+' !')
-                    dpg.bind_item_font(child,'DejaVu_bold')
-                    dpg.add_menu_item(label='New version: '+remote+ ' available, click to update now',
-                                      enabled=True,
-                                      tag='menu_Version_dropout_item_new',
-                                      parent='menu_about_dropout',
-                                      callback = self.proceed_update_window)
-                    dpg.bind_item_theme('menu_Version_dropout_item_new', "menu_update_available_new")
-                    dpg.bind_item_font('menu_Version_dropout_item_new','DejaVu_bold')
-                    
+                    dpg.set_item_label(child, label="Current version: " + self.VERSION + " !")
+                    dpg.bind_item_font(child, "DejaVu_bold")
+                    dpg.add_menu_item(
+                        label="New version: " + remote + " available, click to update now",
+                        enabled=True,
+                        tag="menu_Version_dropout_item_new",
+                        parent="menu_about_dropout",
+                        callback=self.proceed_update_window,
+                    )
+                    dpg.bind_item_theme("menu_Version_dropout_item_new", "menu_update_available_new")
+                    dpg.bind_item_font("menu_Version_dropout_item_new", "DejaVu_bold")
                 else:
-                    
                     dpg.bind_item_theme(child, "menu_normal")
-            
         else:
             self.updater_state = False
+
 
 
 class _basicF:
