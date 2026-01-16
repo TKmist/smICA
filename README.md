@@ -16,17 +16,17 @@ The Software allows the extraction of the information about registered photons f
 
 ## Installation guide
 
-1. Download the _smICA_installation_files.zip_ file and extract in the desired location.
+1. Go to Realese/Latest folder and download the _smICA-install-windows_V?.?.?.zip_, or  _smICA-install-linux_V?.?.?.zip_ file and extract in the desired location.
 
 2. Run the installation script:
 
 
-    1. On Linux, run the _install.sh_, shell script by typing:
+    1. On Linux, run the _install.sh_, shell script by typing (if necessery run: chmod +x install.sh):
    
        ./install.sh
        
     2. On Windows, double-click the _install_win.bat_ executable script. 
-The installation can take a while as all required packages must be downloaded.
+The installation can take a while as all required packages must be downloaded and compilled.
   
 
 ## User guide
