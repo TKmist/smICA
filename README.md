@@ -16,17 +16,17 @@ The Software allows the extraction of the information about registered photons f
 
 ## Installation guide
 
-1. Go to Realese/Latest folder and download the _smICA-install-windows_V?.?.?.zip_, or  _smICA-install-linux_V?.?.?.zip_ file and extract in the desired location.
+1. Currently the scripts works and installs properly on 3.6 >= Python <= 3.12.
+2. Go to _Realese/Latest_ folder and download the _smICA-install-windows_latest.zip_, or  _smICA-install-linux_latest.zip_ file and extract in the desired location.
+3. Run the installation script:
 
-2. Run the installation script:
 
-
-    1. On Linux, run the _install.sh_, shell script by typing (if necessery run: chmod +x install.sh):
+    1. On Linux, run the _install.sh_, shell script by typing:
    
        ./install.sh
        
     2. On Windows, double-click the _install_win.bat_ executable script. 
-The installation can take a while as all required packages must be downloaded and compilled.
+The installation can take a while as all required packages must be downloaded.
   
 
 ## User guide
