@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 Tomasz Kalwarczyk
+Copyright (c) 2024 Tomasz Kalwarczyk (https://github.com/TKmist)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,32 @@ SOFTWARE.
 
 ############################################################################
 
+
+############################################################################
+Additional Information
+############################################################################
+
+During installation, this program downloads and installs the readPTU_FLIM.py
+component from an external repository (readPTU_FLIM project - the NIKON_correction branch).
+
+The readPTU_FLIM.py file is licensed under the MIT License.
+The full MIT License text will be stored within the readPTU_FLIM.py file in the
+src/smICA/Required/Third_party directory.
+
+This software also includes the Python Embedded Distribution for Windows,
+which is licensed under the Python Software Foundation License (PSF).
+License information for Python is provided in the embedded distribution.
+
 This repository also includes a copy of the DejaVu Sans Condensed font (TTF files), 
 which are distributed under their own license.
 Please refer to the font files or the accompanying LICENSE files
 for details on their usage and redistribution terms.
+
+############################################################################
+Citation Request
+############################################################################
+
+If you use this software or any part of it in academic work, citation of
+relevant publications is appreciated and recommended.
+
+Original preprint: https://doi.org/10.48550/arXiv.2410.00532

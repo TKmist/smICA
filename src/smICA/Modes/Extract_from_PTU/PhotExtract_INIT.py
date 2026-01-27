@@ -37,7 +37,7 @@ from numpy import log10, sqrt, exp, log, pi
 import time
 import pickle
 import cv2
-from Required.readPTU_FLIM import PTUreader
+from Required.Third_party.readPTU_FLIM import PTUreader
 from numpy.linalg import inv, det,cond,pinv
 
 
