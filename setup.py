@@ -37,7 +37,14 @@ class runInstall(install):
     def run(self):
         
         install.run(self)
+
+        # Read installer decision from environment
+        flag = os.environ.get("FCSIT_DOWNLOAD_READPTU_FLIM", "").strip().lower()
+        download_enabled = flag in ("1", "true", "yes", "y", "on")
         
+        if not download_enabled:
+            print("Skipping download of readPTU_FLIM.py (FCSIT_DOWNLOAD_READPTU_FLIM=0).")
+            return
         
         url = "https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
         
