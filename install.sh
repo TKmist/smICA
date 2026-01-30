@@ -1,18 +1,13 @@
 #!/bin/bash
 set -e
 
-# ----------------------------
-# Config
-# ----------------------------
 VENV_DIR="v_smICA_env"
 LICENSE_FILE="LICENSE"
 
 THIRD_PARTY_URL="https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
 THIRD_PARTY_TARGET_DIR="src/smICA/Required/Third_party"
 
-# ----------------------------
-# Helpers
-# ----------------------------
+
 PAGER_CMD=""
 if command -v less >/dev/null 2>&1; then
     PAGER_CMD="less"
@@ -21,7 +16,7 @@ elif command -v more >/dev/null 2>&1; then
 fi
 
 prompt_choice() {
-    # Usage: prompt_choice "Question" "valid_chars"
+    
     local question="$1"
     local valid="$2"
     while true; do
@@ -55,17 +50,13 @@ abort_install() {
     exit 1
 }
 
-# ----------------------------
-# Header
-# ----------------------------
+
 echo "------------------------------------------------------------"
 echo "smICA installer"
 echo "------------------------------------------------------------"
 echo
 
-# ----------------------------
-# 1) MIT License – display and require acceptance
-# ----------------------------
+
 if [ ! -f "$LICENSE_FILE" ]; then
     echo "ERROR: LICENSE file not found in the current directory."
     echo "Expected: $PWD/$LICENSE_FILE"
@@ -97,9 +88,7 @@ while true; do
     fi
 done
 
-# ----------------------------
-# 2) Optional third-party component: readPTU_FLIM.py
-# ----------------------------
+
 echo
 echo "------------------------------------------------------------"
 echo "Optional component: PTU_Corr / readPTU_FLIM.py"
@@ -118,7 +107,7 @@ echo "If you choose NO, smICA will still be installed,"
 echo "BUT readPTU_FLIM.py-related functionality (EXTRACT from PTU and FILTER) WILL NOT work correctly and may raise errors."
 echo
 
-# Default: do not download unless explicitly agreed
+
 export SMICA_DOWNLOAD_READPTU_FLIM="0"
 
 prompt_choice "Download readPTU_FLIM.py automatically now? [y/n]:" "yn"
@@ -144,9 +133,7 @@ else
     echo "  You can install the missing component later manually."
 fi
 
-# ----------------------------
-# 3) System prerequisites
-# ----------------------------
+
 echo
 echo "------------------------------------------------------------"
 echo "Checking prerequisites"
@@ -157,9 +144,7 @@ if ! command -v python3 >/dev/null 2>&1; then
     exit 1
 fi
 
-# ----------------------------
-# 4) Virtual environment setup
-# ----------------------------
+
 echo
 echo "------------------------------------------------------------"
 echo "Python environment setup"
@@ -186,9 +171,7 @@ source "$VENV_DIR/bin/activate"
 echo "Upgrading pip in the virtual environment..."
 python -m pip install --upgrade pip
 
-# ----------------------------
-# 5) Install package
-# ----------------------------
+
 echo "Installing dependencies using pip..."
 python -m pip install .
 if [ $? -ne 0 ]; then
@@ -197,9 +180,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# ----------------------------
-# 6) Desktop integration
-# ----------------------------
+
 echo
 echo "------------------------------------------------------------"
 echo "Desktop integration"
@@ -250,9 +231,7 @@ EOL
 
 echo "Desktop entry created at $DESKTOP_ENTRY"
 
-# ----------------------------
-# 7) Cleanup / reorganization
-# ----------------------------
+
 echo
 echo "------------------------------------------------------------"
 echo "Reorganizing project files"

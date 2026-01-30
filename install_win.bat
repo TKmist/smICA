@@ -5,9 +5,7 @@ setlocal EnableExtensions
 :: smICA installer (Windows)
 :: ============================================================
 
-:: ----------------------------
-:: Config
-:: ----------------------------
+
 set "VENV_DIR=v_smICA_env"
 set "LICENSE_FILE=LICENSE"
 
@@ -24,25 +22,19 @@ set "LAUNCHER_BAT=%~dp0smICA.bat"
 :: Default: do not download unless explicitly agreed (setup.py reads this)
 set "SMICA_DOWNLOAD_READPTU_FLIM=0"
 
-:: ----------------------------
-:: Helpers
-:: ----------------------------
+
 :ABORT_INSTALL
 echo.
 echo Installation aborted.
 exit /b 1
 
-:: ----------------------------
-:: Header
-:: ----------------------------
+
 echo ------------------------------------------------------------
 echo smICA installer
 echo ------------------------------------------------------------
 echo.
 
-:: ----------------------------
-:: 1) MIT License – display and require acceptance
-:: ----------------------------
+
 if not exist "%LICENSE_FILE%" (
     echo ERROR: LICENSE file not found in the current directory.
     echo Expected: %CD%\%LICENSE_FILE%
@@ -73,10 +65,7 @@ goto LICENSE_MENU
 :LICENSE_ACCEPT
 echo Continuing installation.
 
-:: ----------------------------
-:: 2) Optional third-party component: readPTU_FLIM.py
-:: (NO download here; setup.py does it based on SMICA_DOWNLOAD_READPTU_FLIM)
-:: ----------------------------
+
 echo.
 echo ------------------------------------------------------------
 echo Optional component: PTU_Corr / readPTU_FLIM.py
@@ -117,9 +106,7 @@ goto AFTER_READPTU
 
 :AFTER_READPTU
 
-:: ----------------------------
-:: 3) System prerequisites
-:: ----------------------------
+
 echo.
 echo ------------------------------------------------------------
 echo Checking prerequisites
@@ -239,9 +226,7 @@ del "%TEMP_VBS%"
 
 echo Shortcut created successfully at "%SHORTCUT_PATH%".
 
-:: ----------------------------
-:: 7) Cleanup / reorganization
-:: ----------------------------
+
 echo.
 echo ------------------------------------------------------------
 echo Reorganizing project files
