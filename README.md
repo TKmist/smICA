@@ -270,21 +270,23 @@ Above the images, the user can adjust the visibility of the images by changing c
 **The adjustment** is applied only to the displayed image (channel 1 or channel 2) and **does not affect the results**.
 
 ##### **Selecting the ROI**<a name="ROI"></a>
-The region of interest is a part of the image that will be considered during the image analysis. It is marked in red on the image. The software has two options for ROI definition: "ROI from files" or "Auto ROI".
-![image info](./docs/img/phot/ROIs.png)
+The region of interest is a part of the image that will be considered during the image analysis. It is marked in red on the image. The software has two options for ROI definition: "ROI from files" or "Auto ROI".    
+
+![image info](./docs/img/phot/ROIs.png)    
+
 The "ROI from files" option requires externally created roi files. Examples of externally generated ROI files (generated with ImageJ) are in the samples/ROI folder. The files should be rewritten with the _REWRITE_ROI.py_   [script](#REWRITEROI) before import. Note that (i) each channel's ROI file is created separately. (ii) the filename of the ROI file should have the same structure as the PTU file with an additional string at the end of the filename, according to the example given below.    
 _file_name.ptu_    
 _file_name_roi0_ch_1.dat_ - (ROI file for channel 1)    
 _file_name_roi0_ch_2.dat_ - (ROI file for channel 2)    
-The ROI files will automatically load the given _.ptu_ file. To import the ROI files, the user must specify the folder containing the files by selecting the path using the "Open ROI directory" option from the File menu. It is possible to have many ROI files per _.ptu_ file. The multiple ROI files are identified by numeration in the _roiX_ part of the ROI's file name.
+The ROI files will automatically load the given _.ptu_ file. To import the ROI files, the user must specify the folder containing the files by selecting the path using the "Open ROI directory" option from the File menu. It is possible to have many ROI files per _.ptu_ file. The multiple ROI files are identified by numeration in the _roiX_ part of the ROI's file name.    
+
 ![image info](./docs/img/phot/ROI_folder.png)
 
-<a name="autoroi"></a>The second option for selecting the region of interest is the automatic mode. Selecting the Auto ROI checkbox displays the ROI control panel for both channels, and the ROI on the image as a red field.
+<a name="autoroi"></a>The second option for selecting the region of interest is the automatic mode. Selecting the Auto ROI checkbox displays the ROI control panel for both channels, and the ROI on the image as a red field.    
+
  ![image info](./docs/img/phot/Phot2Conc_autoroi_control.png)
 
-At this moment, the automatic ROI option offers: automatic detection of a single cell, automatic detection of more than one cell and selection of the ROI of interest (clicking on the image), copying ROI between channels, finding dark or bright areas, subtracting dark or bright areas, and finding and subtracting many bright spots.
- ![image info](./docs/img/phot/Phot2Conc_autoroi_detect_mode.png)
-All modes use the OTSU thresholding method. The user can independently adjust the original OTSU threshold by changing the corresponding sliders in each channel.
+At this moment, the automatic ROI option offers: automatic detection of a single cell, automatic detection of more than one cell and selection of the ROI of interest (clicking on the image), copying ROI between channels, finding dark or bright areas, subtracting dark or bright areas, and finding and subtracting many bright spots. All modes use the OTSU thresholding method. The user can independently adjust the original OTSU threshold by changing the corresponding sliders in each channel.
 
 ROI copying between channels is performed only in the "detect cell" mode. Note that when the checkbox is selected, the thresholding levels can be regulated only in the original channel. For example, selecting "Channel 1->2" will copy the ROI from channel 1 to channel 2. 
 

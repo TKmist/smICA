@@ -1517,9 +1517,9 @@ with dpg.window(label='',
                 dpg.add_text("SD of concentration. Average over entire image/ROI.",
                              tag='single_conc_err_output_ch_2_tooltip_text')
     dpg.add_separator(tag='RESULTS_bott2_sep', show=True)
-    dpg.add_checkbox(label='Errors as SD',
+    dpg.add_checkbox(label='Errors as SEM',
                      tag='Error_type_checkbox',
-                     default_value=False,
+                     default_value=True,
                      callback=mode_cmn.callback_calculate
                      )
 
