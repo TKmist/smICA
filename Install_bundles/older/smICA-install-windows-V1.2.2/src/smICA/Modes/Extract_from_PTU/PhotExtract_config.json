@@ -1,6 +1,0 @@
-{
-    "LAYOUT":"PhotExtract_layout.py",
-    "INIT":"PhotExtract_init.py",
-    "ANAL_MENU_ITEM":"PhotExtract_anal_menu_item.py",
-    "menu_class_func":"PE_manu_F"
-}
