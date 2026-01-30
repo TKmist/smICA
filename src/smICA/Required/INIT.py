@@ -44,13 +44,15 @@ import shutil
 from pathlib import Path
 
 class _updater:
-    # _VERSION_RE = re.compile(r"^\s*(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
-    _VERSION_RE = re.compile(r"^\s*[vV]?(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
+    
+    _VERSION_RE = re.compile(r"^\s*[vV]?(\d+)\.(\d+)\.(\d+)(?:rc(\d+)|([A-Za-z]))?\s*$")
+   
 
     def __init__(self, hsv, version: str):
         """
         :param version: local application version, e.g. '1.1.0' or '1.1.0a'
         """
+        print(version)
         self.VERSION = version
         self.version = version.strip()
         self.updater_state = False
@@ -62,43 +64,30 @@ class _updater:
         self.path = "VERSION"
 
     def _parse_version(self, ver: str):
-        """
-        Supported formats:
-          v1.2.3
-          v1.2.3rc1
-          v1.2.3a
-    
-        Ordering (newest → oldest):
-          final > rcN > a > b > c ...
-        """
+        
         m = self._VERSION_RE.match(ver)
         if not m:
             raise ValueError(
-                f"Invalid version format: {ver!r}. "
-                "Expected e.g. 'v1.2.3', 'v1.2.3rc1', 'v1.2.3a'."
+                f"Invalid version format: {ver!r}. Expected e.g. 'v1.2.3', 'v1.2.3rc1', 'v1.2.3a'."
             )
     
-        major, minor, patch = map(int, m.groups()[:3])
-        rc_num = m.group(4)
-        letter = m.group(5)
+        major, minor, patch = map(int, m.group(1, 2, 3))
+        rc_num = m.group(4)     # digits after 'rc', e.g. '1'
+        letter = m.group(5)     # single letter, e.g. 'a'
     
+        # newest: final > rcN > a > b > ...
         if rc_num is None and letter is None:
-            # final release
-            stage_rank = 3
+            stage_rank = 3   # final
             detail_rank = 0
-    
         elif rc_num is not None:
-            # release candidate
-            stage_rank = 2
+            stage_rank = 2   # rc
             detail_rank = int(rc_num)   # rc2 > rc1
-    
         else:
-            # pre-release: a, b, c...
-            stage_rank = 1
+            stage_rank = 1   # pre-release letter
             s = letter.lower()
             if not ("a" <= s <= "z"):
                 raise ValueError(f"Invalid version suffix: {letter!r}")
-            detail_rank = 26 - (ord(s) - ord("a"))  # a newest
+            detail_rank = 26 - (ord(s) - ord("a"))  # a newest among letters
     
         return (major, minor, patch, stage_rank, detail_rank)
 
@@ -139,19 +128,25 @@ class _updater:
             if resp.status_code != 200:
                 print(f"[Updater] Failed to download VERSION from {url} ({resp.status_code})")
                 return (False, None)
+            
             remote_txt = resp.text.strip()
+            
+
         except requests.RequestException as e:
             print(f"[Updater] Network error: {e}")
             return (False, None)
 
         try:
+            
+
             remote_tuple = self._parse_version(remote_txt)
             local_tuple = self._parse_version(self.version)
         except ValueError as e:
             print(f"[Updater] Version parsing error: {e}")
             return (False, remote_txt)
-
+        
         is_newer = remote_tuple > local_tuple
+        print(remote_tuple,local_tuple,'is_newer',is_newer)
         return (is_newer, remote_txt)
 
     def proceed_update_window(self):
