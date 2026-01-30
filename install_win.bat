@@ -23,12 +23,6 @@ set "LAUNCHER_BAT=%~dp0smICA.bat"
 set "SMICA_DOWNLOAD_READPTU_FLIM=0"
 
 
-:ABORT_INSTALL
-echo.
-echo Installation aborted.
-exit /b 1
-
-
 echo ------------------------------------------------------------
 echo smICA installer
 echo ------------------------------------------------------------
@@ -244,13 +238,13 @@ if %errorlevel% neq 0 (
 
 echo Moving files to smICA directory...
 for %%f in (*) do (
-    if /I not "%%f"=="install_win.bat" ^
-    if /I not "%%f"=="setup.py" ^
-    if /I not "%%f"=="run_smICA" ^
-    if /I not "%%f"=="smICA" ^
-    if /I not "%%f"=="%VENV_DIR%" ^
-    if /I not "%%f"=="python_embedded" ^
-    if /I not "%%f"=="REWRITE_ROI" ^
+    if /I not "%%f"=="install_win.bat"
+    if /I not "%%f"=="setup.py"
+    if /I not "%%f"=="run_smICA"
+    if /I not "%%f"=="smICA"
+    if /I not "%%f"=="%VENV_DIR%"
+    if /I not "%%f"=="python_embedded"
+    if /I not "%%f"=="REWRITE_ROI"
     if /I not "%%f"=="Docs" (
         move "%%f" smICA\ >nul
     )
