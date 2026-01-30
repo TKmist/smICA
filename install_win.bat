@@ -236,19 +236,18 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: Move files to the smICA directory
 echo Moving files to smICA directory...
 for %%f in (*) do (
-    if /I not "%%f"=="install_win.bat" ^
-    if /I not "%%f"=="setup.py" ^
-    if /I not "%%f"=="run_smICA" ^
-    if /I not "%%f"=="smICA" ^
-    if /I not "%%f"=="%VENV_DIR%" ^
-    if /I not "%%f"=="python_embedded" ^
-    if /I not "%%f"=="REWRITE_ROI" ^
-    if /I not "%%f"=="Docs" (
-        move "%%f" smICA\ >nul
+    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI" if not "%%f" == "Docs" (
+        move "%%f" smICA\
+        if %errorlevel% neq 0 (
+            echo Failed to move file %%f to FcsIT directory. Exiting.
+            exit /b 1
+        )
     )
 )
+
 
 echo Removing setup.py and install_win.bat...
 del /f /q setup.py install_win.bat
