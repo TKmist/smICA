@@ -44,7 +44,8 @@ import shutil
 from pathlib import Path
 
 class _updater:
-    _VERSION_RE = re.compile(r"^\s*(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
+    # _VERSION_RE = re.compile(r"^\s*(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
+    _VERSION_RE = re.compile(r"^\s*[vV]?(\d+)\.(\d+)\.(\d+)([A-Za-z])?\s*$")
 
     def __init__(self, hsv, version: str):
         """
@@ -62,28 +63,44 @@ class _updater:
 
     def _parse_version(self, ver: str):
         """
-        Parses version strings in the format 1.2.3 or 1.2.3a
-        Suffix ordering: a > b > c > ... (where 'a' is the newest)
+        Supported formats:
+          v1.2.3
+          v1.2.3rc1
+          v1.2.3a
+    
+        Ordering (newest → oldest):
+          final > rcN > a > b > c ...
         """
         m = self._VERSION_RE.match(ver)
         if not m:
             raise ValueError(
-                f"Invalid version format: {ver!r}. Expected e.g. '1.2.3' or '1.2.3a'."
+                f"Invalid version format: {ver!r}. "
+                "Expected e.g. 'v1.2.3', 'v1.2.3rc1', 'v1.2.3a'."
             )
-
+    
         major, minor, patch = map(int, m.groups()[:3])
-        suffix = m.group(4)
-
-        if suffix:
-            s = suffix.lower()
-            if not ("a" <= s <= "z"):
-                raise ValueError(f"Invalid version suffix: {suffix!r}")
-
-            suffix_rank = 26 - (ord(s) - ord("a"))
+        rc_num = m.group(4)
+        letter = m.group(5)
+    
+        if rc_num is None and letter is None:
+            # final release
+            stage_rank = 3
+            detail_rank = 0
+    
+        elif rc_num is not None:
+            # release candidate
+            stage_rank = 2
+            detail_rank = int(rc_num)   # rc2 > rc1
+    
         else:
-            suffix_rank = 0
-
-        return (major, minor, patch, suffix_rank)
+            # pre-release: a, b, c...
+            stage_rank = 1
+            s = letter.lower()
+            if not ("a" <= s <= "z"):
+                raise ValueError(f"Invalid version suffix: {letter!r}")
+            detail_rank = 26 - (ord(s) - ord("a"))  # a newest
+    
+        return (major, minor, patch, stage_rank, detail_rank)
 
     def _raw_version_url(
         self, owner: str, repo: str, branch: str, path: str = "VERSION"
