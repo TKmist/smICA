@@ -123,7 +123,7 @@ echo Checking for pip...
 if not exist "%PIP_EXE%" (
     echo Pip not found. Installing pip...
     "%PYTHON_EXE%" "%GET_PIP%" --no-warn-script-location
-    if %errorlevel% neq 0 (
+    if errorlevel 1 (
         echo Failed to install pip. Exiting.
         exit /b 1
     )
@@ -133,7 +133,7 @@ if not exist "%PIP_EXE%" (
 
 echo Installing virtualenv...
 "%PYTHON_EXE%" -m pip install virtualenv --no-warn-script-location
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to install virtualenv. Exiting.
     exit /b 1
 )
@@ -150,14 +150,14 @@ if exist "%VENV_DIR%" (
 
 echo Creating virtual environment in %VENV_DIR%...
 "%PYTHON_EXE%" -m virtualenv "%~dp0%VENV_DIR%"
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to create virtual environment. Exiting.
     exit /b 1
 )
 
 echo Activating virtual environment...
 call "%~dp0%VENV_DIR%\Scripts\activate.bat"
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to activate the virtual environment. Exiting.
     exit /b 1
 )
@@ -174,7 +174,7 @@ echo Installing dependencies using pip...
 set "SMICA_DOWNLOAD_READPTU_FLIM=%SMICA_DOWNLOAD_READPTU_FLIM%"
 
 "%~dp0%VENV_DIR%\Scripts\pip.exe" install . --no-warn-script-location --disable-pip-version-check --verbose >install.log 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to install dependencies. Exiting.
     exit /b 1
 )
@@ -211,7 +211,7 @@ echo oLink.Description = "Run smICA application" >> "%TEMP_VBS%"
 echo oLink.Save >> "%TEMP_VBS%"
 
 cscript /nologo "%TEMP_VBS%"
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to create shortcut. Exiting.
     del "%TEMP_VBS%"
     exit /b 1
@@ -231,20 +231,20 @@ call "%~dp0%VENV_DIR%\Scripts\deactivate.bat"
 
 echo Renaming src directory to smICA...
 rename src smICA
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to rename src directory to smICA. Exiting.
     exit /b 1
 )
 
 echo Moving files to smICA directory...
 for %%f in (*) do (
-    if /I not "%%f"=="install_win.bat"
-    if /I not "%%f"=="setup.py"
-    if /I not "%%f"=="run_smICA"
-    if /I not "%%f"=="smICA"
-    if /I not "%%f"=="%VENV_DIR%"
-    if /I not "%%f"=="python_embedded"
-    if /I not "%%f"=="REWRITE_ROI"
+    if /I not "%%f"=="install_win.bat" ^
+    if /I not "%%f"=="setup.py" ^
+    if /I not "%%f"=="run_smICA" ^
+    if /I not "%%f"=="smICA" ^
+    if /I not "%%f"=="%VENV_DIR%" ^
+    if /I not "%%f"=="python_embedded" ^
+    if /I not "%%f"=="REWRITE_ROI" ^
     if /I not "%%f"=="Docs" (
         move "%%f" smICA\ >nul
     )
@@ -252,7 +252,7 @@ for %%f in (*) do (
 
 echo Removing setup.py and install_win.bat...
 del /f /q setup.py install_win.bat
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo Failed to remove setup.py or install_win.bat. Exiting.
     exit /b 1
 )
