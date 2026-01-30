@@ -200,7 +200,7 @@ echo run_smICA script created and made executable.
 echo Creating the Windows shortcut on the Desktop...
 set "SHORTCUT_NAME=smICA.lnk"
 set "SHORTCUT_PATH=%USERPROFILE%\Desktop\%SHORTCUT_NAME%"
-set "ICON_PATH=%~dp0src\smICA\res\icons\smICA.ico"
+set "ICON_PATH=%~dp0smICA\smICA\res\icons\smICA.ico"
 set "TEMP_VBS=%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"
 
 echo Set oWS = WScript.CreateObject("WScript.Shell") > "%TEMP_VBS%"
