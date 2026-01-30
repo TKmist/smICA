@@ -146,7 +146,7 @@ class _updater:
             return (False, remote_txt)
         
         is_newer = remote_tuple > local_tuple
-        print(remote_tuple,local_tuple,'is_newer',is_newer)
+        
         return (is_newer, remote_txt)
 
     def proceed_update_window(self):
