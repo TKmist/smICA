@@ -6,7 +6,7 @@ This file is part of the smICA repository that is distributed under the MIT lice
 
 MIT License
 
-Copyright (c) 2024 Tomasz Kalwarczyk
+Copyright (c) 2026 Tomasz Kalwarczyk
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
