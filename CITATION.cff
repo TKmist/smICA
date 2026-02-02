@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "smICA - single-molecule Image to Concentration Analyser"
+version: 2.0.1
+license: "MIT"
+type: software
+abstract: "This repository provides software for calculating fluorophore concentrations from FLIM images stored in the PTU format (PicoQuant, Germany)."
+message: "If you use this software, please cite it as below."
+authors:
+  - given-names: Tomasz
+    family-names: Kalwarczyk
+    affiliation: Institute of Physical Chemistry, Polish Academy of Sciences
+    orcid: "https://orcid.org/0000-0003-1136-9789"
+contributors:
+  - given-names: Antoni
+    family-names: Lis
+    affiliation: Institute of Physical Chemistry, Polish Academy of Sciences
+    orcid: "https://orcid.org/0000-0003-2589-8227"
+    
+keywords:
+  - single-molecule
+  - fluorescence 
+  - FLIM imaging
