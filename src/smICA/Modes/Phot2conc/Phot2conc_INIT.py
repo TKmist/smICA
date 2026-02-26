@@ -659,6 +659,13 @@ class _Phot2conc_vars_funct:
                                }
                            }
                            }
+        self.DialWinList = []
+        self.up_key = dpg.mvKey_Up
+        self.down_key = dpg.mvKey_Down
+        self.active_keys = [dpg.mvKey_Up,
+                            dpg.mvKey_Down]
+
+        
 
     def get_roi_state(self):
         self.ROIS_state = {'File roi': dpg.get_value('FILE_ROI_checkbox'),
@@ -3204,3 +3211,43 @@ class _Phot2conc_vars_funct:
 ####################################################################
 ################ end of _Phot2conc_vars_funct class ################
 #################################################################### 
+
+
+
+    def mount_fcs_handlers(self):
+        dpg.add_key_press_handler(tag ='keyword_handler_fcs',
+                                  callback=self.callback_PTUConc_Keyword_key,
+                                  parent = 'handlers_registry')
+
+
+
+
+
+    def callback_PTUConc_Keyword_key(self,sender, app_data):
+            dlgs = []
+            for d in self.DialWinList:
+                chck = dpg.is_item_shown(d)
+                dlgs.append(chck)
+            
+            if not any(dlgs):
+                if app_data in self.active_keys:
+                    self.all_items = dpg.get_aliases()
+                    if 'file_box' in self.all_items:
+                        self.file_box_items = dpg.get_item_configuration('file_box')['items']
+                        if len(self.file_box_items)!=0:
+                            def_val = dpg.get_value('file_box')
+                            index = self.file_box_items.index(def_val)
+                            if app_data == self.up_key:
+                                if index!=0:
+                                    index=index-1
+                                    dpg.set_value('file_box',self.file_box_items[index])
+                                    self.callback_listbox('file_box',self.file_box_items[index])
+                                else:
+                                    pass
+                            if app_data == self.down_key:
+                                if index!=len(self.file_box_items)-1:
+                                    index=index+1
+                                    dpg.set_value('file_box',self.file_box_items[index])
+                                    self.callback_listbox('file_box',self.file_box_items[index])
+                                else:
+                                    pass

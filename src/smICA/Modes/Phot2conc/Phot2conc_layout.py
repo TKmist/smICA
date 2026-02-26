@@ -159,7 +159,7 @@ mode_cmn = _Phot2conc_vars_funct(mode_init,
                                  basf,
                       globalITEMS
                                  )
-
+mode_cmn.mount_fcs_handlers()
 # #########################################################################
 # '''Main windows of the method'''
 # #########################################################################
@@ -1667,9 +1667,13 @@ with dpg.file_dialog(directory_selector=False,
                      ):
     dpg.add_file_extension(".json", color=(0, 255, 0, 255), custom_text="[JSON]")
 
-globalITEMS.windows.extend(['ROI_folder_dialog_id',
+mode_cmn.DialWinList = ['ROI_folder_dialog_id',
                             'file_dialog_id',
                             'PTU_file_dialog_id',
                             'Select_ROI_dialog',
                             'file_dialog_export',
-                            'Calib_file_dialog_id'])
+                            'Calib_file_dialog_id']
+
+globalITEMS.windows.extend(mode_cmn.DialWinList)
+
+

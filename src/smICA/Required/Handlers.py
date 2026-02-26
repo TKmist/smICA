@@ -33,3 +33,6 @@ with dpg.item_handler_registry(tag="handler_image_1"):
 
 with dpg.item_handler_registry(tag="handler_image_2"):
     pass
+
+with dpg.handler_registry(tag='handlers_registry'):
+    pass
