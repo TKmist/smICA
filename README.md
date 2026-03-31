@@ -1,5 +1,14 @@
 # smICA - single-molecule Image to Concentration Analyser     
-[![DOI](https://zenodo.org/badge/852814510.svg)](https://doi.org/10.5281/zenodo.18456909)    
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey" />
+  <img src="https://img.shields.io/badge/version-v2.0.2-green" />
+  <img src="https://img.shields.io/badge/license-MIT-blue" />
+  <a href="https://github.com/TKmist/smICA/releases/latest">
+    <img src="https://img.shields.io/github/v/release/TKmist/smICA?label=download" />
+  </a>
+  <a href="https://doi.org/10.5281/zenodo.18456909"><img src="https://zenodo.org/badge/852814510.svg" alt="DOI"></a>
+</p>  
 This repository provides software for calculating fluorophore concentrations from FLIM images stored in the PTU format (PicoQuant, Germany).   
 
 ## About
