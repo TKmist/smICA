@@ -605,8 +605,16 @@ class _basicF:
         dpg.delete_item('EXTRACT_FROM_PTU_INIT_BUTTON')
         dpg.delete_item('initial_window')
         
-    def basic_resizer(self):
+    def basic_resizer(self,sender, app_data):
         self.unmount_inint_buttons()
+
+        ratio = {'width': np.round(app_data[0] / self.viewport['width'], 4),
+             'height': np.round(app_data[1] / self.viewport['height'], 4)}
+
+        fnt_ratio = (ratio['width'] + ratio['height']) / 2
+        font_scale = np.round(fnt_ratio, 3)
+        dpg.set_global_font_scale(font_scale)
+        
         self.mount_inint_buttons()
         
     
@@ -767,6 +775,123 @@ class _init_Menu:
     def callback_help(self,sender,app_data):
         url = os.path.join('Docs','README.html')
         webbrowser.open(url,new=2)
+
+
+    def mount_rewriteROI(self):
+        win_width = 600
+        with dpg.window(label='Rewrite ROI',
+                        width=win_width,
+                        height=dpg.get_viewport_height()/2,
+                        pos = ((dpg.get_viewport_width()-win_width)/2,
+                               dpg.get_viewport_height()/4),
+                        no_move=False,
+                        no_close=False,
+                        no_title_bar=False,
+                        no_resize=False,
+                        tag='rewrite_window',
+                        autosize=False,
+                        show=True
+                        ):
+            dpg.add_button(label='Open ROI folder',
+                           tag='open_roi_folder',
+                           width=win_width,
+                           callback=lambda: dpg.show_item('ROISource_file_dialog')
+                          )
+            dpg.bind_item_theme('open_roi_folder', 'fit_button_theme')
+            dpg.add_text('',tag='tag_source_path',wrap=win_width)
+            with dpg.group(tag='resolution_group', horizontal=True):
+                dpg.add_input_text(tag='add_text_width',width=288)
+                dpg.add_text('x',tag='tag_x')
+                dpg.add_input_text(tag='add_text_height',width=289)
+            dpg.add_button(label='Target ROI folder',
+                           tag='target_roi_folder',
+                           width=win_width,
+                           callback=lambda: dpg.show_item('ROITarget_file_dialog')
+                          )
+            dpg.bind_item_theme('target_roi_folder', 'fit_button_theme')
+            dpg.add_text('',tag='tag_target_path',wrap=win_width)
+           
+            dpg.add_listbox(items=[],
+                            width=win_width,
+                            tag='ROIfile_box'
+                           )
+            
+            dpg.add_button(label='Proceded',tag='ROIRun_script',width=win_width,callback=self.callback_proceed_ROI)
+            dpg.bind_item_theme('ROIRun_script', 'fit_button_theme')
+
+        dpg.add_file_dialog(directory_selector=True,
+                            label = 'Select source ROI folder',
+                            width =400,
+                            height=300,
+                            default_path = _path,
+                            show=False,
+                            file_count=5,
+        
+                            callback=callback_open_source_folder,
+                            cancel_callback=callback_empty,
+                            tag="ROISource_file_dialog",
+                            modal=False
+                           )
+        
+        
+        dpg.add_file_dialog(directory_selector=True,
+                            label = 'Select target ROI folder',
+                            show=False,
+                            width =400,
+                            height=300,
+                            default_path = _path,
+                            file_count=5,
+        
+                            callback=callback_open_target_folder,
+                            cancel_callback=callback_empty,
+                            tag="ROITarget_file_dialog",
+                            modal=False
+                           )
+    def callback_proceed_ROI(self):
+        pass
+    
+    def rewrite_tool(self,sender,app_data):
+        rwrt_win = 'rewrite_window'
+        if dpg.does_item_exist(rwrt_win):
+            print('exist')
+            print(dpg.get_viewport_width()/2,
+                  dpg.get_viewport_height()/2,
+                  (dpg.get_viewport_width()/4,dpg.get_viewport_height()/4))
+            dpg.configure_item(rwrt_win,width=dpg.get_viewport_width()/2,
+                        height=dpg.get_viewport_height()/2,
+                        pos = (dpg.get_viewport_width()/4,
+                               dpg.get_viewport_height()/4))
+            dpg.show_item(rwrt_win)
+            
+        else:
+            print('mount')
+            print(dpg.get_viewport_width()/2,
+                  dpg.get_viewport_height()/2,
+                  (dpg.get_viewport_width()/4,dpg.get_viewport_height()/4))
+            self.mount_rewriteROI()
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
@@ -775,6 +900,9 @@ class _init_Menu:
             dpg.bind_item_theme('menu_file_dropout', "menu_normal")
             with dpg.menu(label="Mode",tag='menu_analysis_method_dropout'):
                 pass
+            dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
+            with dpg.menu(label="Tools",tag='menu_analysis_tool_dropout'):
+                dpg.add_menu_item(label="Rewrite ROI",tag='Rewrite_ROI',callback=self.rewrite_tool)
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
             with dpg.menu(label="About",tag='menu_about_dropout'):
                 dpg.add_menu_item(label="Help",tag='helpclick',callback=self.callback_help)

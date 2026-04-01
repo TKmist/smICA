@@ -6,3 +6,38 @@ src/smICA/Required/readPTU_FLIM.py
 .virtual_documents
 
 
+/.scripts/
+/.build/
+/.github/
+/release/
+/poligon/
+
+
+
+
+docs/_build/
+docs/**/_build/
+docs/_execute/
+docs/_site/
+docs/**/_execute/
+docs/**/_site/
+
+
+
+# =========================
+
+# Node / frontend (theme)
+
+# =========================
+
+node_modules/
+docs/**/node_modules/
+docs/**/build/
+docs/**/.cache/
+docs/**/.next/
+docs/**/dist/
+
+
+
+docs/templates/**/build/
+docs/templates/**/node_modules/

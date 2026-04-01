@@ -6,6 +6,9 @@ project:
   toc:
     - file: Main_title.ipynb
     - file: Release_notes.ipynb
+    - file: Installation.ipynb
+    - file: Usage.ipynb
+      children:
     - file: Credits.ipynb
     
 

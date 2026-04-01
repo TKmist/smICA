@@ -115,6 +115,7 @@ for method in inV.METHODS:
     
 basf.P2C_manu_F = P2C_manu_F
 basf.PE_manu_F = PE_manu_F
+basf.viewport = viewport
 dpg.set_viewport_resize_callback(basf.basic_resizer)
 basf.mount_inint_buttons()
 
