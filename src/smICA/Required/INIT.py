@@ -719,7 +719,7 @@ class _init_varaibles:
 class _init_Menu:
     def __init__(self,upd_st,VERSION):
         self.VERSION = VERSION
-
+        self.rwroiItems=[]
         self.upd_st = upd_st
     def callback_license(self,sender,app_data):
         if not 'License_title' in dpg.get_aliases():
@@ -776,7 +776,12 @@ class _init_Menu:
         url = os.path.join('Docs','README.html')
         webbrowser.open(url,new=2)
 
-
+    def unmount_rewriteROI(self):
+        for item in reversed(self.rwroiItems):
+            dpg.delete_item(item)
+        
+        
+        
     def mount_rewriteROI(self):
         win_width = 600
         with dpg.window(label='Rewrite ROI',
@@ -789,7 +794,7 @@ class _init_Menu:
                         no_title_bar=False,
                         no_resize=False,
                         tag='rewrite_window',
-                        autosize=False,
+                        autosize=True,
                         show=True
                         ):
             dpg.add_button(label='Open ROI folder',
@@ -847,6 +852,20 @@ class _init_Menu:
                             tag="ROITarget_file_dialog",
                             modal=False
                            )
+        self.rwroiItems = ['rewrite_window',
+                           'open_roi_folder',
+                           'tag_source_path',
+                           'add_text_height',
+                           'tag_x',
+                           'add_text_width',
+                           'resolution_group',
+                           'target_roi_folder',
+                           'tag_target_path',
+                           'ROIfile_box',
+                           'ROIRun_script',
+                           'ROISource_file_dialog',
+                           'ROITarget_file_dialog']
+        
     def callback_proceed_ROI(self):
         pass
     
@@ -854,14 +873,8 @@ class _init_Menu:
         rwrt_win = 'rewrite_window'
         if dpg.does_item_exist(rwrt_win):
             print('exist')
-            print(dpg.get_viewport_width()/2,
-                  dpg.get_viewport_height()/2,
-                  (dpg.get_viewport_width()/4,dpg.get_viewport_height()/4))
-            dpg.configure_item(rwrt_win,width=dpg.get_viewport_width()/2,
-                        height=dpg.get_viewport_height()/2,
-                        pos = (dpg.get_viewport_width()/4,
-                               dpg.get_viewport_height()/4))
-            dpg.show_item(rwrt_win)
+            self.unmount_rewriteROI()
+            self.mount_rewriteROI()
             
         else:
             print('mount')
