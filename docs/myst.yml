@@ -9,6 +9,9 @@ project:
     - file: Installation.ipynb
     - file: Usage.ipynb
       children:
+         - file: PTUExtract.ipynb
+         - file: Phot2conc.ipynb
+         - file: RwROI.ipynb
     - file: Credits.ipynb
     
 

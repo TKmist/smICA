@@ -97,7 +97,7 @@ VP_w = dpg.get_viewport_width()            # get initial width of the viewport
 VP_h = dpg.get_viewport_height()           # get initial height of the viewport
  
 menu.mount_main_Menu_bar()
-
+rwroi = inits.rewrite_roi(viewport)
 try:
    
     updt.run_updater()
