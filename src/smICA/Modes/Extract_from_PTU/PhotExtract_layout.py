@@ -431,6 +431,7 @@ with dpg.window(label="Options",
                 no_move=True,
                 no_close=True,
                 no_collapse=True,
+                no_scrollbar=True,
                 # no_title_bar=True,
                 no_resize=True,
                 show=True):

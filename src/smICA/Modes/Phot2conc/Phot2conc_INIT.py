@@ -247,7 +247,7 @@ class _Phot2conc_init:
                            }
         self.file_box = {'name': 'file_box',
                          'width': -1,
-                         'num_items': 17,
+                         'num_items': 15,
                          'items': self.files
 
                          }
@@ -2323,7 +2323,7 @@ class _Phot2conc_vars_funct:
             dpg.configure_item('ROI_mode_2', enabled=True)
             dpg.configure_item('cp_roi_2', enabled=True)
             self.mode_init.file_box['num_items'] = 8
-            self.mode_init.PTU_DATA_window['height'] = int(315 * self.mode_init.size_ratio['height'])
+            self.mode_init.PTU_DATA_window['height'] = int(350 * self.mode_init.size_ratio['height'])
             self.mode_init.file_window['pos'] = (self.mode_init.left_indent,
                                                  self.mode_init.top_indent + self.mode_init.PTU_DATA_window[
                                                      'height'] + self.mode_init.internal_indent)

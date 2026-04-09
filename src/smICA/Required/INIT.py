@@ -784,7 +784,10 @@ class _init_Menu:
                 pass
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
             
+            with dpg.menu(label="Settings",tag='menu_settings_dropout'):
+                dpg.add_menu_item(label="Theme",tag='themeclick',callback=self.callback_theme)
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
+            
             with dpg.menu(label="About",tag='menu_about_dropout'):
                 dpg.add_menu_item(label="Help",tag='helpclick',callback=self.callback_help)
                 dpg.add_menu_item(label='License',
@@ -796,6 +799,8 @@ class _init_Menu:
                 
             dpg.bind_item_theme('menu_about_dropout', "menu_normal")
 
+    def callback_theme(self):
+        pass
 
 class _common_VARIABLES:
     def __init__(self):
@@ -929,7 +934,7 @@ class rewrite_roi:
         with dpg.menu(label="Tools",
                       tag='menu_analysis_tool_dropout',
                       parent="vieport's_menubar",
-                      before='menu_about_dropout'):
+                      before='menu_settings_dropout'):
             dpg.add_menu_item(label="Rewrite ROI",tag='Rewrite_ROI',callback=self.rewrite_tool)
 
     def callbac_rw_win_closed(self):

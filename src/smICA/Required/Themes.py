@@ -80,83 +80,127 @@ DARK = {
     "checkbox_active":  (0, 119, 200, 153),
     "checkbox_disabled":(194, 194, 194, 45),
 
-    # przycisk "fit"
-    "button":           (100, 153, 61, 255),
-    "button_hovered":   (117, 178, 71, 255),
-    "button_active":    (134, 204, 81, 255),
-    "button_disabled":  (77, 92, 61, 255),
+    # zwykłe buttony
+    # zwykłe buttony
+    "button":           (66, 66, 70, 255),
+    "button_hovered":   (86, 86, 92, 255),
+    "button_active":    (98, 98, 106, 255),
+    "button_disabled":  (55, 55, 58, 255),
 
-    "button_inactive":  (122, 153, 92, 255),
+    # action buttony
+    "action_button":           (100, 153, 61, 255),
+    "action_button_hovered":   (117, 178, 71, 255),
+    "action_button_active":    (134, 204, 81, 255),
+    "action_button_disabled":  (77, 92, 61, 255),
+    "action_button_inactive":  (122, 153, 92, 255),
 
     # ploty
     "plot_line":        (31, 255, 0, 255),
     "plot_fill":        (62, 122, 56, 64),
     "plot_fill_line":   (62, 122, 56, 90),
     "plot_filter":      (12, 172, 182, 255),
+
+        # border / outlines
+    "border":              (110, 110, 115, 255),
+    "border_shadow":       (0, 0, 0, 0),
+
+    # scrollbars
+    "scrollbar_bg":        (43, 43, 46, 255),
+    "scrollbar_grab":      (95, 120, 100, 255),
+    "scrollbar_grab_hovered": (110, 140, 115, 255),
+    "scrollbar_grab_active":  (125, 155, 130, 255),
+
+    # tabs
+    "tab":                 (58, 62, 60, 255),
+    "tab_hovered":         (78, 96, 82, 255),
+    "tab_active":          (95, 120, 100, 255),
+    "tab_unfocused":       (50, 52, 54, 255),
+    "tab_unfocused_active":(72, 88, 76, 255),
 }
 
 LIGHT = {
-    # baza okien
-    "viewport_bg":      (242, 244, 243, 255),
-    "window_bg":        (242, 244, 243, 255),
-    "child_bg":         (249, 250, 249, 255),
+    # baza okien (bardziej jasna)
+    "viewport_bg":      (246, 247, 246, 255),
+    "window_bg":        (246, 247, 246, 255),
+    "child_bg":         (252, 253, 252, 255),
     "popup_bg":         (255, 255, 255, 255),
 
-    # tekst
-    "text":             (28, 30, 28, 255),
-    "text_disabled":    (135, 140, 135, 255),
+    # tekst (lekko złagodzony)
+    "text":             (40, 42, 40, 255),
+    "text_disabled":    (150, 155, 150, 255),
 
-    # pola / inputy
-    "frame_bg":         (235, 238, 236, 255),
-    "frame_bg_hovered": (222, 226, 223, 255),
-    "frame_bg_active":  (210, 214, 210, 255),
+    # pola / inputy (jaśniejsze!)
+    "frame_bg":         (225, 227, 225, 255),
+    "frame_bg_hovered": (232, 235, 232, 255),
+    "frame_bg_active":  (224, 228, 224, 255),
 
-    # 🔹 AKCENT (muted green)
-    "button":           (80, 130, 100, 255),
-    "button_hovered":   (95, 150, 115, 255),
-    "button_active":    (65, 110, 85, 255),
-    "button_disabled":  (180, 200, 190, 255),
+    # zwykłe buttony
+    "button":           (226, 230, 226, 255),
+    "button_hovered":   (214, 220, 214, 255),
+    "button_active":    (202, 210, 202, 255),
+    "button_disabled":  (235, 238, 235, 255),
 
-    "button_inactive":  (150, 175, 160, 255),
+    # action buttony
+    "action_button":           (150, 175, 140, 255),
+    "action_button_hovered":   (165, 190, 155, 255),
+    "action_button_active":    (135, 160, 125, 255),
+    "action_button_disabled":  (210, 220, 205, 255),
+    "action_button_inactive":  (190, 205, 185, 255),
 
-    # sekcje
-    "header":           (222, 226, 223, 255),
-    "header_hovered":   (208, 214, 210, 255),
-    "header_active":    (195, 200, 196, 255),
+    # sekcje (bardzo subtelne różnice)
+    "header":           (236, 239, 236, 255),
+    "header_hovered":   (228, 232, 228, 255),
+    "header_active":    (220, 225, 220, 255),
 
     # title / menu
-    "title_bg":         (232, 235, 233, 255),
-    "title_bg_active":  (215, 220, 217, 255),
-    "menu_bar_bg":      (236, 239, 237, 255),
+    "title_bg":         (240, 243, 240, 255),
+    "title_bg_active":  (230, 235, 230, 255),
+    "menu_bar_bg":      (242, 245, 242, 255),
 
     # detale
-    "check_mark":       (70, 120, 95, 220),
-    "separator":        (180, 185, 182, 255),
-    "modal_dim":        (0, 0, 0, 90),
+    "check_mark":       (110, 150, 120, 220),
+    "separator":        (200, 205, 200, 255),
+    "modal_dim":        (0, 0, 0, 70),
 
-    # statusy (spójne z akcentem)
-    "menu_text":        (28, 30, 28, 255),
-    "menu_warn":        (120, 140, 90, 255),   # lekko oliwkowy (lepszy niż czerwony/green clash)
-    "menu_ok":          (80, 130, 100, 255),
+    # statusy
+    "menu_text":        (40, 42, 40, 255),
+    "menu_warn":        (170, 180, 120, 255),  # oliwkowy — spokojniejszy niż czerwony
+    "menu_ok":          (150, 175, 140, 255),
 
-    # error window (lekko złagodzone)
-    "error_window_bg":  (255, 240, 240, 255),
-    "error_title_bg":   (215, 100, 100, 255),
-    "error_button":     (190, 85, 85, 255),
+    # error window (też złagodzony)
+    "error_window_bg":  (255, 245, 245, 255),
+    "error_title_bg":   (220, 120, 120, 255),
+    "error_button":     (200, 100, 100, 255),
 
     # checkboxy
-    "checkbox_active":  (70, 120, 95, 180),
-    "checkbox_disabled":(170, 175, 170, 90),
+    "checkbox_active":  (110, 150, 120, 180),
+    "checkbox_disabled":(190, 195, 190, 90),
 
-    # ploty (spójne z akcentem)
-    "plot_line":        (80, 130, 100, 255),
-    "plot_fill":        (80, 130, 100, 48),
-    "plot_fill_line":   (80, 130, 100, 90),
+    # ploty (pastelowe, nie agresywne)
+    "plot_line":        (140, 170, 135, 255),
+    "plot_fill":        (140, 170, 135, 48),
+    "plot_fill_line":   (140, 170, 135, 90),
 
-    # kontrastowy kolor pomocniczy (zostawiam teal — bardzo dobry kontrast)
-    "plot_filter":      (0, 140, 150, 255),
+    # kontrast pomocniczy
+    "plot_filter":      (120, 160, 170, 255),
+
+        # border / outlines
+    "border":              (185, 190, 185, 255),
+    "border_shadow":       (0, 0, 0, 0),
+
+    # scrollbars
+    "scrollbar_bg":        (236, 239, 236, 255),
+    "scrollbar_grab":      (170, 188, 165, 255),
+    "scrollbar_grab_hovered": (150, 175, 140, 255),
+    "scrollbar_grab_active":  (130, 160, 125, 255),
+
+    # tabs
+    "tab":                 (205, 212, 205, 255),
+    "tab_hovered":         (180, 200, 175, 255),
+    "tab_active":          (150, 175, 140, 255),
+    "tab_unfocused":       (215, 220, 215, 255),
+    "tab_unfocused_active":(185, 198, 182, 255),
 }
-
 
 def create_global_theme(p):
     with dpg.theme(tag="global_theme"):
@@ -189,27 +233,42 @@ def create_global_theme(p):
             dpg.add_theme_color(dpg.mvThemeCol_ModalWindowDimBg, p["modal_dim"],        category=dpg.mvThemeCat_Core)
 
 
+            dpg.add_theme_color(dpg.mvThemeCol_Border,             p["border"],             category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_BorderShadow,       p["border_shadow"],      category=dpg.mvThemeCat_Core)
+
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg,        p["scrollbar_bg"],       category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab,      p["scrollbar_grab"],     category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, p["scrollbar_grab_hovered"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive,  p["scrollbar_grab_active"],  category=dpg.mvThemeCat_Core)
+
+            dpg.add_theme_color(dpg.mvThemeCol_Tab,                p["tab"],                category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TabHovered,         p["tab_hovered"],        category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TabActive,          p["tab_active"],         category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TabUnfocused,       p["tab_unfocused"],      category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TabUnfocusedActive, p["tab_unfocused_active"], category=dpg.mvThemeCat_Core)
+
+
 
 
 
 def create_button_theme(p):
     with dpg.theme(tag="button_theme"):
         with dpg.theme_component(dpg.mvButton):
-            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["button"],          category=dpg.mvThemeCat_Core)
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive,   p["button_active"],   category=dpg.mvThemeCat_Core)
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["button_hovered"],  category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["action_button"],          category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive,   p["action_button_active"],   category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["action_button_hovered"],  category=dpg.mvThemeCat_Core)
 
         with dpg.theme_component(dpg.mvButton, enabled_state=False):
-            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["button_disabled"], category=dpg.mvThemeCat_Core)
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive,   p["button_disabled"], category=dpg.mvThemeCat_Core)
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["button_disabled"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["action_button_disabled"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive,   p["action_button_disabled"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["action_button_disabled"], category=dpg.mvThemeCat_Core)
 
 
 def create_button_theme_inactive(p):
     with dpg.theme(tag="button_theme_inactive"):
         with dpg.theme_component(dpg.mvButton):
-            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["button_inactive"], category=dpg.mvThemeCat_Core)
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["button_hovered"],  category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_Button,         p["action_button_inactive"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered,  p["action_button_hovered"],  category=dpg.mvThemeCat_Core)
 
 
 def create_error_window_theme(p):
@@ -304,5 +363,8 @@ def build_themes(mode: str):
     dpg.bind_theme("global_theme")
     apply_viewport_color(p)
 
-build_themes('light')
-# build_themes('dark')
+
+THEME = 'dark'
+THEME = 'light'
+# build_themes(THEME)
+build_themes(THEME)
