@@ -189,7 +189,7 @@ class _updater:
                         callback=self.proceed_window_close,
                     )
 
-                dpg.bind_item_theme("proceed_to_update_window_ok_butt", "fit_button_theme")
+                dpg.bind_item_theme("proceed_to_update_window_ok_butt", "button_theme")
                 dpg.bind_item_theme("proceed_to_update_window_close_butt", "Error_window_theme")
 
         except Exception:
@@ -658,7 +658,7 @@ class _basicF:
                        tag='EXTRACT_FROM_PTU_INIT_BUTTON',
                        show=True,enabled=True
                       )
-            dpg.bind_item_theme('EXTRACT_FROM_PTU_INIT_BUTTON', 'fit_button_theme')
+            dpg.bind_item_theme('EXTRACT_FROM_PTU_INIT_BUTTON', 'button_theme')
             dpg.add_button(label="Phot 2 Conc",
                        callback=self.callback_init_buttons,
                        width = Phot_2_Conc_INIT_BUTTON['width'],
@@ -666,7 +666,7 @@ class _basicF:
                        tag='Phot_2_Conc_INIT_BUTTON',
                        show=True,enabled=True
                       )
-            dpg.bind_item_theme('Phot_2_Conc_INIT_BUTTON', 'fit_button_theme')
+            dpg.bind_item_theme('Phot_2_Conc_INIT_BUTTON', 'button_theme')
         
     
     
@@ -850,7 +850,7 @@ class rewrite_roi:
                            width=win_width,
                            callback=lambda: dpg.show_item('ROISource_file_dialog')
                           )
-            dpg.bind_item_theme('open_roi_folder', 'fit_button_theme')
+            dpg.bind_item_theme('open_roi_folder', 'button_theme')
             dpg.add_text('',tag='tag_source_path',wrap=win_width)
             with dpg.group(tag='resolution_group', horizontal=True):
                 dpg.add_input_text(tag='add_text_width',width=int(288*size_ratio['width']))
@@ -861,7 +861,7 @@ class rewrite_roi:
                            width=win_width,
                            callback=lambda: dpg.show_item('ROITarget_file_dialog')
                           )
-            dpg.bind_item_theme('target_roi_folder', 'fit_button_theme')
+            dpg.bind_item_theme('target_roi_folder', 'button_theme')
             dpg.add_text('',tag='tag_target_path',wrap=win_width)
            
             dpg.add_listbox(items=[],
@@ -870,7 +870,7 @@ class rewrite_roi:
                            )
             
             dpg.add_button(label='Proceded',tag='ROIRun_script',width=win_width,callback=self.callback_proceed_ROI)
-            dpg.bind_item_theme('ROIRun_script', 'fit_button_theme')
+            dpg.bind_item_theme('ROIRun_script', 'button_theme')
 
         dpg.add_file_dialog(directory_selector=True,
                             label = 'Select source ROI folder',
