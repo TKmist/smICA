@@ -64,7 +64,7 @@ def Phot2conc_resizer(sender, app_data):
                      'dpg_image_2'
                      ]
     temp_inits = mode_init.__init__.__code__.co_varnames
-    print(temp_inits)
+    # print(temp_inits)
     temp_inits = [v for v in temp_inits if v not in forbiden_list]
     temp_inits_values = {}
     for v in temp_inits:

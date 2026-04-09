@@ -3215,39 +3215,47 @@ class _Phot2conc_vars_funct:
 
 
     def mount_fcs_handlers(self):
-        dpg.add_key_press_handler(tag ='keyword_handler_fcs',
-                                  callback=self.callback_PTUConc_Keyword_key,
-                                  parent = 'handlers_registry')
-
-
-
-
-
-    def callback_PTUConc_Keyword_key(self,sender, app_data):
-            dlgs = []
-            for d in self.DialWinList:
-                chck = dpg.is_item_shown(d)
-                dlgs.append(chck)
-            
-            if not any(dlgs):
-                if app_data in self.active_keys:
-                    self.all_items = dpg.get_aliases()
-                    if 'file_box' in self.all_items:
-                        self.file_box_items = dpg.get_item_configuration('file_box')['items']
-                        if len(self.file_box_items)!=0:
-                            def_val = dpg.get_value('file_box')
-                            index = self.file_box_items.index(def_val)
-                            if app_data == self.up_key:
-                                if index!=0:
-                                    index=index-1
-                                    dpg.set_value('file_box',self.file_box_items[index])
-                                    self.callback_listbox('file_box',self.file_box_items[index])
-                                else:
-                                    pass
-                            if app_data == self.down_key:
-                                if index!=len(self.file_box_items)-1:
-                                    index=index+1
-                                    dpg.set_value('file_box',self.file_box_items[index])
-                                    self.callback_listbox('file_box',self.file_box_items[index])
-                                else:
-                                    pass
+        if not dpg.does_item_exist('keyword_handler_fcs_up'):
+            dpg.add_key_press_handler(
+                key=self.up_key,
+                tag='keyword_handler_fcs_up',
+                callback=self.callback_PTUConc_Keyword_key,
+                parent='handlers_registry'
+            )
+        if not dpg.does_item_exist('keyword_handler_fcs_down'):
+            dpg.add_key_press_handler(
+                key=self.down_key,
+                tag='keyword_handler_fcs_down',
+                callback=self.callback_PTUConc_Keyword_key,
+                parent='handlers_registry'
+            )
+        # globalITEMS.windows.extend(['keyword_handler_fcs_up','keyword_handler_fcs_up'])
+    
+    def callback_PTUConc_Keyword_key(self, sender, app_data):
+        dlgs = [dpg.is_item_shown(d) for d in self.DialWinList]
+    
+        if any(dlgs):
+            return
+    
+        if 'file_box' not in dpg.get_aliases():
+            return
+    
+        file_box_items = dpg.get_item_configuration('file_box')['items']
+        if not file_box_items:
+            return
+    
+        def_val = dpg.get_value('file_box')
+        if def_val not in file_box_items:
+            return
+    
+        index = file_box_items.index(def_val)
+    
+        if app_data == self.up_key and index > 0:
+            index -= 1
+            dpg.set_value('file_box', file_box_items[index])
+            self.callback_listbox('file_box', file_box_items[index])
+    
+        elif app_data == self.down_key and index < len(file_box_items) - 1:
+            index += 1
+            dpg.set_value('file_box', file_box_items[index])
+            self.callback_listbox('file_box', file_box_items[index])

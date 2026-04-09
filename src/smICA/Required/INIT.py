@@ -990,19 +990,30 @@ class rewrite_roi:
         dpg.delete_item('No_data_files')
     
     def show_error_no_files(self,error_text):
+
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        win_width = 200*size_ratio['width'] 
+        win_height = 80*size_ratio['height'] 
+        win_pos = (int(dpg.get_item_pos('rewrite_window')[0])+int(dpg.get_item_width('rewrite_window')/2)-int(win_width/2),
+                   int(dpg.get_item_pos('rewrite_window')[1])+int(dpg.get_item_height('rewrite_window')/2)-int(win_height/2))
+        
         try:
-            with dpg.window(pos=(400,150),
-                           label='Error!',
-                               tag='No_data_files',
-    
-                               no_move=True,
-                                no_close=False,
-                                no_title_bar=False,
-                                no_resize=True,
-                                on_close=self.callback_no_files_dialog_close_only,
-                               show=True,
-                               modal=True
-                              ):
+            with dpg.window(
+                            label='Error!',
+                            tag='No_data_files',
+                            width=win_width,
+                            height=win_height,
+                            pos = win_pos,
+                            no_move=False,
+                            no_close=False,
+                            no_title_bar=False,
+                            no_scrollbar=True,
+                            no_resize=False,
+                            on_close=self.callback_no_files_dialog_close_only,
+                            show=True,
+                            modal=True
+                            ):
                 dpg.add_text(error_text,tag='no_files_error_text')
                 
     
@@ -1018,19 +1029,30 @@ class rewrite_roi:
     
     
     def show_done(self,error_text):
+
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        win_width = 50*size_ratio['width'] 
+        win_height = 80*size_ratio['height'] 
+        win_pos = (int(dpg.get_item_pos('rewrite_window')[0])+int(dpg.get_item_width('rewrite_window')/2)-int(win_width/2),
+                   int(dpg.get_item_pos('rewrite_window')[1])+int(dpg.get_item_height('rewrite_window')/2)-int(win_height/2))
+        
         try:
-            with dpg.window(pos=(400,150),
-                           label='',
-                               tag='No_data_files',
-    
-                               no_move=True,
-                                no_close=False,
-                                no_title_bar=False,
-                                no_resize=True,
-                                on_close = self.callback_no_files_dialog_close_only,
-                               show=True,
-                               modal=True
-                              ):
+            with dpg.window(
+                            label='',
+                            tag='No_data_files',
+                            width=win_width,
+                            height=win_height,
+                            pos = win_pos,
+                            no_move=False,
+                            no_close=False,
+                            no_title_bar=False,
+                            no_scrollbar=True,
+                            no_resize=False,
+                            on_close = self.callback_no_files_dialog_close_only,
+                            show=True,
+                            modal=True
+                            ):
                 dpg.add_text(error_text,tag='no_files_error_text')
                 
     
