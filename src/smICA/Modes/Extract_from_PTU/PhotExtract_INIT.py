@@ -432,6 +432,7 @@ class _PhotExtr_vars_funct:
                         autosize=False,
                         no_title_bar=True,
                         no_move=True,
+                        no_resize=True,
                         no_background=True,
                         modal=True,
                         show=True

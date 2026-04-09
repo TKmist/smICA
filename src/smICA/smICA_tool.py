@@ -35,6 +35,7 @@ import dearpygui.dearpygui as dpg
 import datetime
 import numpy as np
 import warnings
+import json
 import Required.INIT as inits
 from screeninfo import get_monitors
 
@@ -60,7 +61,8 @@ if platform.system().upper() == "LINUX":
 warnings.filterwarnings('ignore')
 def callback_none():
     pass
-
+with open(os.path.join('res','settings.json')) as settings:
+    SETTINGS = json.load(settings)
 basf = inits._basicF()
 updt = inits._updater(basf._hsv_to_rgb,VERSION)
 
@@ -85,19 +87,21 @@ dpg.create_context()
 # execfile('Required/Themes.py')             # Load the themes definitions.
 execfile('Required/Fonts.py') 
 execfile('Required/Handlers.py')
+execfile('Required/Themes.py')
 
 
 dpg.create_viewport(title='smICA',small_icon = inV.icopath(),width=viewport['width'], height=viewport['height'],x_pos=viewport['pos'][0],y_pos  =viewport['pos'][1]) 
 dpg.setup_dearpygui()
 dpg.show_viewport()
-execfile('Required/Themes.py')
+
 globalITEMS = inits._common_VARIABLES()
-  
+
 
 VP_w = dpg.get_viewport_width()            # get initial width of the viewport
 VP_h = dpg.get_viewport_height()           # get initial height of the viewport
  
 menu.mount_main_Menu_bar()
+
 rwroi = inits.rewrite_roi(viewport)
 try:
    
@@ -119,6 +123,7 @@ basf.PE_manu_F = PE_manu_F
 basf.viewport = viewport
 dpg.set_viewport_resize_callback(basf.basic_resizer)
 basf.mount_inint_buttons()
-
+THEME = SETTINGS['Settings']['Theme']
+build_themes(THEME)
 dpg.start_dearpygui()
 dpg.destroy_context()

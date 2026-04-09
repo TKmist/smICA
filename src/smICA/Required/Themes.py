@@ -160,7 +160,7 @@ LIGHT = {
     # detale
     "check_mark":       (110, 150, 120, 220),
     "separator":        (200, 205, 200, 255),
-    "modal_dim":        (0, 0, 0, 70),
+    "modal_dim":        (250, 250, 250, 220),
 
     # statusy
     "menu_text":        (40, 42, 40, 255),
@@ -348,9 +348,39 @@ def create_plot_themes(p):
 def apply_viewport_color(p):
     dpg.set_viewport_clear_color(p["viewport_bg"])
 
+def delete_theme_if_exists(tag):
+    print(tag,end='\t')
+    if dpg.does_item_exist(tag):
+        
+        dpg.delete_item(tag)
+        print('deleted', dpg.does_item_exist(tag))
+    else:
+        print('not deleted')
+
+def delete_all_themes():
+    THEME_TAGS = [
+        "global_theme",
+        "button_theme",
+        "button_theme_inactive",
+        "plot_theme",
+        "plot_bg_filter_theme",
+        "Error_window_theme",
+        "Inactive_checkbox",
+        "Active_checkbox",
+        "transparent_theme",
+        "menu_normal",
+        "menu_update_available",
+        "menu_update_available_new",
+    ]
+    for tag in THEME_TAGS:
+        
+        delete_theme_if_exists(tag)
+
 def build_themes(mode: str):
     p = DARK if mode == "dark" else LIGHT
 
+    
+    # delete_all_themes()
     create_global_theme(p)
     create_button_theme(p)
     create_button_theme_inactive(p)
@@ -364,7 +394,23 @@ def build_themes(mode: str):
     apply_viewport_color(p)
 
 
-THEME = 'dark'
-THEME = 'light'
-# build_themes(THEME)
-build_themes(THEME)
+
+def callback_theme(sender,app_data):
+    
+    theme = dpg.get_item_label(sender)
+    print(theme)
+    if theme == 'Dark theme':
+        THEME = 'dark'
+        print(THEME)
+        dpg.set_item_label(sender, 'Light theme')
+        build_themes(THEME)
+        
+    elif theme == 'Light theme':
+        THEME = 'light'
+        dpg.set_item_label(sender, 'Dark theme')
+        build_themes(THEME)
+    else:
+        pass
+
+
+
