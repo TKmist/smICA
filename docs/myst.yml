@@ -1,0 +1,42 @@
+version: 1
+project:
+  title: smICA Manual
+  authors:
+      - name: Tomasz Kalwarczyk
+  toc:
+    - file: Main_title.ipynb
+    - file: Release_notes.ipynb
+    - file: Installation.ipynb
+    - file: Usage.ipynb
+      children:
+         - file: PTUExtract.ipynb
+         - file: Phot2conc.ipynb
+         - file: RwROI.ipynb
+    - file: Credits.ipynb
+    
+
+  bibliography:
+    - references.bib
+site:
+
+  options:
+    base_url: ${BASE_URL}
+    folders: false
+    hide_title_block: true
+    hide_search: true
+    hide_toc: false
+    hide_footer_links: true
+    hide_outline: false
+    logo_text: 'smICA'
+    style: custom.css
+  template: book-theme
+  
+
+  parts:
+     primary_sidebar_footer: |
+          <div style="font-size:0.8em;">
+          smICA manual  
+          © 2026
+          </div>
+    
+

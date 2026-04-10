@@ -32,15 +32,16 @@ import dearpygui.dearpygui as dpg
     
 class _PHOT2CONC_mounting_functions:
     
-    def unmount_me(self,fcs_items):
-        
-        for item in reversed(fcs_items):
+    def unmount_me(self,items):
+        # print(items)
+        for item in reversed(items):
             dpg.delete_item(item)
 
         dpg.delete_item('texture_reg')
         dpg.set_viewport_resize_callback(callback_none)
         self.is_mounted = False
-        inV.mounted_method = None        
+        inV.mounted_method = None 
+        
     def mount_me(self):
         dpg.add_menu_item(label="Open PTU directory",
                   tag='Open_PTU_menu_item',
@@ -94,6 +95,7 @@ class _PHOT2CONC_menu_functions:
 
         if self.is_mounted:
             self.mnt.unmount_me(globalITEMS.windows)
+            # print(globalITEMS.windows)
             globalITEMS.windows=[]
         else:
             if inV.mounted_method != None:

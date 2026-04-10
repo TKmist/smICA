@@ -29,6 +29,7 @@ SOFTWARE.
 
 import os
 import numpy as np
+import pandas as pd
 from numpy import log10
 import dearpygui.dearpygui as dpg
 import json
@@ -41,6 +42,9 @@ import tempfile
 import zipfile
 import shutil
 
+import http.server
+import socketserver
+import threading
 from pathlib import Path
 
 class _updater:
@@ -52,7 +56,6 @@ class _updater:
         """
         :param version: local application version, e.g. '1.1.0' or '1.1.0a'
         """
-        print(version)
         self.VERSION = version
         self.version = version.strip()
         self.updater_state = False
@@ -75,7 +78,6 @@ class _updater:
         rc_num = m.group(4)     # digits after 'rc', e.g. '1'
         letter = m.group(5)     # single letter, e.g. 'a'
     
-        # newest: final > rcN > a > b > ...
         if rc_num is None and letter is None:
             stage_rank = 3   # final
             detail_rank = 0
@@ -190,7 +192,7 @@ class _updater:
                         callback=self.proceed_window_close,
                     )
 
-                dpg.bind_item_theme("proceed_to_update_window_ok_butt", "fit_button_theme")
+                dpg.bind_item_theme("proceed_to_update_window_ok_butt", "button_theme")
                 dpg.bind_item_theme("proceed_to_update_window_close_butt", "Error_window_theme")
 
         except Exception:
@@ -234,7 +236,6 @@ class _updater:
                 1 * dpg.get_item_height("proceed_to_update_window")
                 + dpg.get_global_font_scale() * 50,
             ),
-            # callback=self.proceed_window_close
             parent="proceed_to_update_window",
             width=window_size[0],
         )
@@ -268,7 +269,7 @@ class _updater:
         bckp_dir = os.path.join(current_dir, "..", "old_backup")
 
         if os.path.exists(bckp_dir):
-            print("[Updater] Removing old backup directory...")
+            # print("[Updater] Removing old backup directory...")
             dpg.set_item_label("progress_button", "Removing old backup files")
             shutil.rmtree(bckp_dir, ignore_errors=True)
 
@@ -277,7 +278,7 @@ class _updater:
         FoldersToBackup = ["REWRITE_ROI", "smICA"]
 
         for f in metafiles:
-            print("[Updater] Removing old backup directory...")
+            # print("[Updater] Removing old backup directory...")
             dpg.set_item_label("progress_button", "Backing up meta files")
             source = os.path.join(current_dir, "..", f)
             target = os.path.join(bckp_dir, f)
@@ -301,7 +302,6 @@ class _updater:
         tmp_dir = os.path.join(current_dir, "..", "updt_tmp")
         zip = os.listdir(tmp_dir)
         zip = [f for f in zip if f.endswith(".zip")][0]
-        print(zip)
         dpg.set_item_label("progress_button", "Unzipping update")
         zip_path = os.path.join(tmp_dir, zip)
         try:
@@ -605,8 +605,16 @@ class _basicF:
         dpg.delete_item('EXTRACT_FROM_PTU_INIT_BUTTON')
         dpg.delete_item('initial_window')
         
-    def basic_resizer(self):
+    def basic_resizer(self,sender, app_data):
         self.unmount_inint_buttons()
+
+        ratio = {'width': np.round(app_data[0] / self.viewport['width'], 4),
+             'height': np.round(app_data[1] / self.viewport['height'], 4)}
+
+        fnt_ratio = (ratio['width'] + ratio['height']) / 2
+        font_scale = np.round(fnt_ratio, 3)
+        dpg.set_global_font_scale(font_scale)
+        
         self.mount_inint_buttons()
         
     
@@ -653,7 +661,7 @@ class _basicF:
                        tag='EXTRACT_FROM_PTU_INIT_BUTTON',
                        show=True,enabled=True
                       )
-            dpg.bind_item_theme('EXTRACT_FROM_PTU_INIT_BUTTON', 'fit_button_theme')
+            dpg.bind_item_theme('EXTRACT_FROM_PTU_INIT_BUTTON', 'button_theme')
             dpg.add_button(label="Phot 2 Conc",
                        callback=self.callback_init_buttons,
                        width = Phot_2_Conc_INIT_BUTTON['width'],
@@ -661,7 +669,7 @@ class _basicF:
                        tag='Phot_2_Conc_INIT_BUTTON',
                        show=True,enabled=True
                       )
-            dpg.bind_item_theme('Phot_2_Conc_INIT_BUTTON', 'fit_button_theme')
+            dpg.bind_item_theme('Phot_2_Conc_INIT_BUTTON', 'button_theme')
         
     
     
@@ -709,9 +717,12 @@ class _init_varaibles:
         return ico_path
 
 class _init_Menu:
-    def __init__(self,upd_st,VERSION):
+    def __init__(self,upd_st,VERSION, docs_dir, docs_server):
         self.VERSION = VERSION
-
+        self.theme = 'dark'
+        self.docs_dir = docs_dir
+        self.docs_server = docs_server
+        
         self.upd_st = upd_st
     def callback_license(self,sender,app_data):
         if not 'License_title' in dpg.get_aliases():
@@ -764,9 +775,20 @@ class _init_Menu:
                              default_value = License,
                              wrap = int(0.95*(dpg.get_viewport_width()/2)))
 
-    def callback_help(self,sender,app_data):
-        url = os.path.join('Docs','README.html')
-        webbrowser.open(url,new=2)
+    def callback_help(self, sender, app_data):
+        self.show_docs_callback()
+
+    def show_docs_callback(self):
+        try:
+            url = self.docs_server.start()
+            print(f"[DOCS] Documentation opened: {url}")
+        except Exception as exc:
+            print(f"[DOCS] Failed to open documentation: {exc}")
+
+    def on_exit(self):
+        self.docs_server.stop()
+
+        
     def mount_main_Menu_bar(self):
     
         with dpg.viewport_menu_bar(tag="vieport's_menubar"):
@@ -776,6 +798,8 @@ class _init_Menu:
             with dpg.menu(label="Mode",tag='menu_analysis_method_dropout'):
                 pass
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
+            
+            
             with dpg.menu(label="About",tag='menu_about_dropout'):
                 dpg.add_menu_item(label="Help",tag='helpclick',callback=self.callback_help)
                 dpg.add_menu_item(label='License',
@@ -787,10 +811,462 @@ class _init_Menu:
                 
             dpg.bind_item_theme('menu_about_dropout', "menu_normal")
 
-
 class _common_VARIABLES:
     def __init__(self):
         self.windows = []
         self.items = []
-        self.last_directory = 'samples'
+        self.last_directory = ''
         self.directory = ''
+        
+
+
+class rewrite_roi:
+    def __init__(self,viewport):
+        self.rwroiItems=[]
+        self.load_RWroi_into_menu()
+        self.source_type = None
+        self.viewport = viewport
+        self.data_files = None
+        self._path = ''
+    
+    def unmount_rewriteROI(self):
+        for item in reversed(self.rwroiItems):
+            dpg.delete_item(item)
+        self.rwroiItems = []
+        
+        
+    def mount_rewriteROI(self):
+        
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        win_width = 600*size_ratio['width'] 
+        win_height = 700*size_ratio['height'] 
+        win_pos = (int(dpg.get_viewport_width()/2-int(600*size_ratio['width'])/2),
+                   int(dpg.get_viewport_height()/2-int(700*size_ratio['height'])/2))
+
+        with dpg.window(label='Rewrite ROI',
+                        width=win_width,
+                        height=win_height,
+                        pos = win_pos,
+                        no_move=False,
+                        no_close=False,
+                        no_title_bar=False,
+                        no_scrollbar=True,
+                        no_resize=False,
+                        no_collapse=True,
+                        tag='rewrite_window',
+                        autosize=True,
+                        show=True,
+                        on_close = self.callbac_rw_win_closed
+                        ):
+            dpg.add_button(label='Open ROI folder',
+                           tag='open_roi_folder',
+                           width=win_width,
+                           callback=lambda: dpg.show_item('ROISource_file_dialog')
+                          )
+            dpg.bind_item_theme('open_roi_folder', 'button_theme')
+            dpg.add_text('',tag='tag_source_path',wrap=win_width)
+            with dpg.group(tag='resolution_group', horizontal=True):
+                dpg.add_input_text(tag='add_text_width',width=int(288*size_ratio['width']))
+                dpg.add_text('x',tag='tag_x')
+                dpg.add_input_text(tag='add_text_height',width=int(289*size_ratio['width']))
+            dpg.add_button(label='Target ROI folder',
+                           tag='target_roi_folder',
+                           width=win_width,
+                           callback=lambda: dpg.show_item('ROITarget_file_dialog')
+                          )
+            dpg.bind_item_theme('target_roi_folder', 'button_theme')
+            dpg.add_text('',tag='tag_target_path',wrap=win_width)
+           
+            dpg.add_listbox(items=[],
+                            width=win_width,
+                            tag='ROIfile_box'
+                           )
+            
+            dpg.add_button(label='Proceded',tag='ROIRun_script',width=win_width,callback=self.callback_proceed_ROI)
+            dpg.bind_item_theme('ROIRun_script', 'button_theme')
+
+        dpg.add_file_dialog(directory_selector=True,
+                            label = 'Select source ROI folder',
+                            width =win_width*2,
+                            height=win_height,
+                            default_path = self._path,
+                            show=False,
+                            file_count=5,
+        
+                            callback=self.callback_open_source_folder,
+                            cancel_callback=self.callback_empty,
+                            tag="ROISource_file_dialog",
+                            modal=False
+                           )
+        
+        
+        dpg.add_file_dialog(directory_selector=True,
+                            label = 'Select target ROI folder',
+                            show=False,
+                            width =win_width*2,
+                            height=win_height,
+                            default_path = self._path,
+                            file_count=5,
+        
+                            callback=self.callback_open_target_folder,
+                            cancel_callback=self.callback_empty,
+                            tag="ROITarget_file_dialog",
+                            modal=False
+                           )
+        self.rwroiItems.extend(['rewrite_window',
+                           'open_roi_folder',
+                           'tag_source_path',
+                           'add_text_height',
+                           'tag_x',
+                           'add_text_width',
+                           'resolution_group',
+                           'target_roi_folder',
+                           'tag_target_path',
+                           'ROIfile_box',
+                           'ROIRun_script',
+                           'ROISource_file_dialog',
+                           'ROITarget_file_dialog'])
+        
+    
+    
+    def rewrite_tool(self,sender,app_data):
+        rwrt_win = 'rewrite_window'
+        if dpg.does_item_exist(rwrt_win):
+            
+            self.mount_rewriteROI()
+            
+        else:
+            self.mount_rewriteROI()
+
+    def load_RWroi_into_menu(self):
+        with dpg.menu(label="Tools",
+                      tag='menu_analysis_tool_dropout',
+                      parent="vieport's_menubar",
+                      before='menu_about_dropout'):
+            dpg.add_menu_item(label="Rewrite ROI",tag='Rewrite_ROI',callback=self.rewrite_tool)
+
+    def callbac_rw_win_closed(self):
+        # print('closed')
+        self.unmount_rewriteROI()
+        rwrt_win = 'rewrite_window'
+
+
+
+    def callback_open_source_folder(self,sender,app_data):
+    
+        # global source_type, _path
+        source_type = None
+        path = app_data['file_path_name']
+        self._path = path
+        dpg.set_value('tag_source_path',path)
+        
+        files = os.listdir(path)
+        csv_files = [f for f in files if f.endswith('.csv')]
+        dat_files = [f for f in files if f.endswith('.txt')]
+        
+        
+        if len(csv_files)!=0:
+            self.data_files = csv_files
+            dpg.configure_item('ROIfile_box',items=self.data_files)
+            self.source_type = 'csv'
+    
+    
+                
+    
+        elif len(dat_files)!=0:
+            self.data_files = dat_files
+            dpg.configure_item('ROIfile_box',items=self.data_files)
+            self.source_type = 'txt'
+    
+    
+    
+        else:
+            pass
+        
+        dpg.configure_item('ROITarget_file_dialog',default_path=self._path)
+        
+    def callback_open_target_folder(self,sender,app_data):
+        
+        path = app_data['file_path_name']
+        
+        dpg.set_value('tag_target_path',app_data['file_path_name'])
+        
+
+    def callback_empty(self,sender,app_data):
+        '''Empty function. Do nothing.'''
+        pass
+
+    def callback_no_files_dialog_close_only(self,sender,app_data):
+        dpg.configure_item('No_data_files',show=False)
+        dpg.delete_item('no_files_error_text')
+        dpg.delete_item('no_files_error_butt')
+        dpg.delete_item('No_data_files')
+    
+    def show_error_no_files(self,error_text):
+
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        win_width = 200*size_ratio['width'] 
+        win_height = 80*size_ratio['height'] 
+        win_pos = (int(dpg.get_item_pos('rewrite_window')[0])+int(dpg.get_item_width('rewrite_window')/2)-int(win_width/2),
+                   int(dpg.get_item_pos('rewrite_window')[1])+int(dpg.get_item_height('rewrite_window')/2)-int(win_height/2))
+        
+        try:
+            with dpg.window(
+                            label='Error!',
+                            tag='No_data_files',
+                            width=win_width,
+                            height=win_height,
+                            pos = win_pos,
+                            no_move=False,
+                            no_close=False,
+                            no_title_bar=False,
+                            no_scrollbar=True,
+                            no_resize=False,
+                            on_close=self.callback_no_files_dialog_close_only,
+                            show=True,
+                            modal=True
+                            ):
+                dpg.add_text(error_text,tag='no_files_error_text')
+                
+    
+                dpg.add_button(label='Close',
+                               tag='no_files_error_butt',
+                               show=True,
+                               callback=self.callback_no_files_dialog_close_only
+                              )
+                
+                dpg.bind_item_theme('No_data_files', 'Error_window_theme')
+        except:
+            dpg.show_item('No_data_files')
+    
+    
+    def show_done(self,error_text):
+
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        win_width = 50*size_ratio['width'] 
+        win_height = 80*size_ratio['height'] 
+        win_pos = (int(dpg.get_item_pos('rewrite_window')[0])+int(dpg.get_item_width('rewrite_window')/2)-int(win_width/2),
+                   int(dpg.get_item_pos('rewrite_window')[1])+int(dpg.get_item_height('rewrite_window')/2)-int(win_height/2))
+        
+        try:
+            with dpg.window(
+                            label='',
+                            tag='No_data_files',
+                            width=win_width,
+                            height=win_height,
+                            pos = win_pos,
+                            no_move=False,
+                            no_close=False,
+                            no_title_bar=False,
+                            no_scrollbar=True,
+                            no_resize=False,
+                            on_close = self.callback_no_files_dialog_close_only,
+                            show=True,
+                            modal=True
+                            ):
+                dpg.add_text(error_text,tag='no_files_error_text')
+                
+    
+                dpg.add_button(label='Close',
+                               tag='no_files_error_butt',
+                               show=True,
+                               callback=self.callback_no_files_dialog_close_only
+                              )
+                
+                dpg.bind_item_theme('No_data_files', 'Error_window_theme')
+        except:
+            dpg.show_item('No_data_files')
+
+
+    def callback_proceed_ROI(self,sender,app_data):
+        
+        
+        
+        try:
+            width = int(dpg.get_value('add_text_width'))
+        except:
+            width = 'dupa'
+        try:
+            height = int(dpg.get_value('add_text_height'))
+        except:
+            height = 'dupa'
+        if isinstance(width, int) and isinstance(height, int):
+            
+            resolution = (int(dpg.get_value('add_text_width')),int(dpg.get_value('add_text_height')))
+            if len(self.data_files) == 0:
+                self.show_error_no_files('No files selected')
+            else:
+                input_folder = dpg.get_value('tag_source_path')
+                ROI_folder = dpg.get_value('tag_target_path')
+                if input_folder != '':
+                    if ROI_folder != '':
+                        error = False
+                        for file in self.data_files:
+    
+                            dpg.configure_item('ROIfile_box',default_value=file)
+        
+        
+                            if self.source_type == 'csv':
+                                self.rewrtie_roi_csv(file,input_folder,ROI_folder,resolution)
+    
+                            elif self.source_type == 'txt':
+                                self.rewrtie_roi_txt(file,input_folder,ROI_folder,resolution)
+                            else:
+                                
+                                error = True
+                        if error == True:
+                            self.show_error_no_files('Something gone wrong!')
+                        else:
+                            self.show_done('DONE')
+                    else:
+                        self.show_error_no_files('Select target folder!')
+                else:
+                    self.show_error_no_files('Select source folder!')
+                    
+            
+            
+        else:
+            self.show_error_no_files('Wrong resolution')
+
+
+
+    def rewrtie_roi_csv(self,file,input_folder,output_roi_path,shape):
+        infile = os.path.join(input_folder,file)
+        df = pd.read_csv(infile)
+        
+        new_file = file.replace('.csv','.tmp')
+        final_roi = new_file.split('/')[-1]
+        zeros = np.zeros(shape)
+        zeros = pd.DataFrame(zeros)
+        if df.columns[1].startswith('X'): 
+            for col in df.columns:
+                if col.startswith('X'):
+                    zero_column = int(col.replace('X',''))
+                    for i in df.index:
+                        zero_row = int(df.at[i,' '].replace('Y',''))
+                        zero_value = df.at[i,col]
+                        if zero_value !=0: 
+                            zero_value=(zero_value/zero_value)*255
+                        else:
+                            pass
+                        zeros.at[zero_row,zero_column]=zero_value
+        else:
+            for col in df.columns:
+                if col.startswith('X'):
+                    zero_column = int(col.replace('X',''))
+                    for i in df.index:
+                        zero_row = int(df.at[i,' .1'].replace('Y',''))
+                        zero_value = df.at[i,col]
+                        if zero_value !=0: 
+                            zero_value=(zero_value/zero_value)*255
+                        else:
+                            pass
+                        zeros.at[zero_row,zero_column]=zero_value
+        zeros=zeros.astype(int)
+        zeros = zeros.where(zeros!=0,'-')
+        zeros.to_csv(new_file, sep = '\t',index=False,header=False)        
+        
+        roi_file = final_roi
+        
+        nf = file.replace('.csv', '.dat')
+        output_roi_file = os.path.join(output_roi_path,nf)
+        f = open(output_roi_file, "w")
+        f.write("Events[Cnts]\n")
+        f.write("(x0 | y0) = (0.000[ m] | 0.000[ m])\n")
+        f.write("(x1 | y1) = (51.200[ m] | 51.200[ m])\n")
+        f.close()
+        with open(new_file) as reader:
+            red_file = reader.read()
+            reader.close()
+        f = open(output_roi_file, "a")
+        f.write(red_file)
+        f.close()
+        tmp_files = os.listdir()
+        tmp_files = [f for f in tmp_files if f.endswith('.tmp')]
+        for tmp in tmp_files:
+            os.remove(tmp)
+        
+        
+    def rewrtie_roi_txt(self,file,input_folder,output_roi_path,shape):
+        infile = os.path.join(input_folder,file)
+        df = pd.read_csv(infile,sep='\t',header=None)
+        new_file = file.replace('.txt','.tmp')
+        df=df.astype(int)
+        df = df.where(df!=0,'-')
+        df.to_csv(new_file, sep = '\t',index=False,header=False)
+        nf = file.replace('.txt', '.dat')
+        output_roi_file = os.path.join(output_roi_path,nf)
+        f = open(output_roi_file, "w")
+        f.write("Events[Cnts]\n")
+        f.write("(x0 | y0) = (0.000[ m] | 0.000[ m])\n")
+        f.write("(x1 | y1) = (51.200[ m] | 51.200[ m])\n")
+        f.close()
+        with open(new_file) as reader:
+            red_file = reader.read()
+            reader.close()
+        f = open(output_roi_file, "a")
+        f.write(red_file)
+        f.close()
+        tmp_files = os.listdir()
+        tmp_files = [f for f in tmp_files if f.endswith('.tmp')]
+        for tmp in tmp_files:
+            os.remove(tmp)
+
+
+
+class SPARequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, directory=None, **kwargs):
+        super().__init__(*args, directory=directory, **kwargs)
+
+    def do_GET(self):
+        path = Path(self.directory) / self.path.lstrip("/")
+
+        if path.exists():
+            return super().do_GET()
+
+        self.path = "/index.html"
+        return super().do_GET()
+
+class LocalDocsServer:
+    """
+    Lightweight local HTTP server for static HTML documentation.
+    """
+
+    def __init__(self, root_dir, host="127.0.0.1", port=0):
+        self.root_dir = Path(root_dir).resolve()
+        self.host = host
+        self.port = port
+        self.httpd = None
+        self.thread = None
+        self.url = None
+
+    def start(self):
+        handler = lambda *args, **kwargs: SPARequestHandler(
+            *args,
+            directory=str(self.root_dir),
+            **kwargs
+        )
+
+        if self.httpd:
+            webbrowser.open(self.url)
+            return self.url
+        
+        self.httpd = socketserver.TCPServer((self.host, self.port), handler)
+        port = self.httpd.server_address[1]
+        self.url = f"http://{self.host}:{port}"
+
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        self.thread.start()
+
+        print(f"Server running at: {self.url}")
+        webbrowser.open(self.url)
+       
+        return self.url
+
+    def stop(self):
+        if self.httpd:
+            self.httpd.shutdown()
+            self.httpd.server_close()

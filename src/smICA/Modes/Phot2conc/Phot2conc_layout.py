@@ -64,7 +64,7 @@ def Phot2conc_resizer(sender, app_data):
                      'dpg_image_2'
                      ]
     temp_inits = mode_init.__init__.__code__.co_varnames
-    print(temp_inits)
+    # print(temp_inits)
     temp_inits = [v for v in temp_inits if v not in forbiden_list]
     temp_inits_values = {}
     for v in temp_inits:
@@ -474,7 +474,7 @@ with dpg.window(label='',
                    tag='Calculate_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('Calculate_button', 'fit_button_theme')
+    dpg.bind_item_theme('Calculate_button', 'button_theme')
     with dpg.tooltip('Calculate_button', tag='Calculate_button_tooltip'):
         dpg.add_text("Press to make calculation on single file.", tag='Calculate_button_tooltip_text')
 
@@ -484,7 +484,7 @@ with dpg.window(label='',
                    tag='add_to_res_single_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('add_to_res_single_button', 'fit_button_theme')
+    dpg.bind_item_theme('add_to_res_single_button', 'button_theme')
     with dpg.tooltip('add_to_res_single_button', tag='add_to_res_single_button_tooltip'):
         dpg.add_text("Press to add current calculation to dataframe.", tag='add_to_res_single_button_tooltip_text')
 
@@ -496,7 +496,7 @@ with dpg.window(label='',
                    tag='Calculate_all_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('Calculate_all_button', 'fit_button_theme')
+    dpg.bind_item_theme('Calculate_all_button', 'button_theme')
     with dpg.tooltip('Calculate_all_button', tag='Calculate_all_button_tooltip'):
         dpg.add_text("Press to make calculation on all files.", tag='Calculate_all_button_tooltip_text')
 
@@ -532,7 +532,7 @@ with dpg.window(label='',
                    tag='Export_all_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('Export_all_button', 'fit_button_theme')
+    dpg.bind_item_theme('Export_all_button', 'button_theme')
     with dpg.tooltip('Export_all_button', tag='Export_all_button_tooltip'):
         dpg.add_text("Press to make calculation on all files.", tag='Export_all_button_tooltip_text')
 
@@ -960,7 +960,7 @@ with dpg.window(label='',
                    tag='Load_calib_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('Load_calib_button', 'fit_button_theme')
+    dpg.bind_item_theme('Load_calib_button', 'button_theme')
     dpg.add_button(label="Save callibration data",
                    callback=lambda: dpg.configure_item("Calib_file_dialog_id", show=True,
                                                        user_data='Save_calib_button'),
@@ -968,7 +968,7 @@ with dpg.window(label='',
                    tag='Save_calib_button',
                    show=True, enabled=True
                    )
-    dpg.bind_item_theme('Save_calib_button', 'fit_button_theme')
+    dpg.bind_item_theme('Save_calib_button', 'button_theme')
     dpg.add_separator(tag='FCS_mid_sep_1', show=True)
     dpg.add_text(default_value='Channel 1', show=True, tag='FCS_pm_ch_1')
     with dpg.table(header_row=False,

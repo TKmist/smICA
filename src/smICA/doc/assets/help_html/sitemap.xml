@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://localhost:3003/sitemap_style.xsl" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://localhost:3003</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/release-notes</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/installation</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/usage</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/ptuextract</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/phot2conc</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/rwroi</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3003/credits</loc>
+  </url>
+</urlset>

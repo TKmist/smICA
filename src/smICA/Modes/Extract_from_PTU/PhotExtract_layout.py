@@ -212,7 +212,7 @@ with dpg.window(label="Lifetime Channel 1",
                            callback = mode_cmn.callback_reset_range,
                            enabled = False
                            )
-            dpg.bind_item_theme('reset_button_ch1', 'fit_button_theme')
+            dpg.bind_item_theme('reset_button_ch1', 'button_theme')
             with dpg.tooltip('reset_button_ch1',tag='reset_button_ch1_tooltip'):
                 dpg.add_text("Reset range.",tag='reset_button_ch1_tooltip_text')
         
@@ -231,7 +231,7 @@ with dpg.window(label="Lifetime Channel 1",
                    enabled = False,
                    show=False
                   )
-    dpg.bind_item_theme('Remove_bgd_butt_ch_1', 'fit_button_theme')
+    dpg.bind_item_theme('Remove_bgd_butt_ch_1', 'button_theme')
     with dpg.table(header_row=True,
                       width=mode_init.filters_ch_1_tab_list_tag['width'],#init_widths['List_of_filters_ch1'],
                       height=mode_init.filters_ch_1_tab_list_tag['height'],
@@ -358,7 +358,7 @@ with dpg.window(label="Lifetime Channel 2",
                            callback = mode_cmn.callback_reset_range,
                            enabled = False
                            )
-            dpg.bind_item_theme('reset_button_ch2', 'fit_button_theme')
+            dpg.bind_item_theme('reset_button_ch2', 'button_theme')
             with dpg.tooltip('reset_button_ch2',tag='reset_button_ch2_tooltip'):
                 dpg.add_text("Reset range.",tag='reset_button_ch2_tooltip_text')
         
@@ -377,7 +377,7 @@ with dpg.window(label="Lifetime Channel 2",
                    enabled = False,
                    show=False
                   )
-    dpg.bind_item_theme('Remove_bgd_butt_ch_2', 'fit_button_theme')
+    dpg.bind_item_theme('Remove_bgd_butt_ch_2', 'button_theme')
     with dpg.table(header_row=True,
                       width=mode_init.filters_ch_2_tab_list_tag['width'],#init_widths['List_of_filters_ch1'],
                       height=mode_init.filters_ch_2_tab_list_tag['height'],
@@ -431,6 +431,7 @@ with dpg.window(label="Options",
                 no_move=True,
                 no_close=True,
                 no_collapse=True,
+                no_scrollbar=True,
                 # no_title_bar=True,
                 no_resize=True,
                 show=True):
@@ -480,14 +481,14 @@ with dpg.window(label="Files",
                    user_data = dpg.get_value('file_box'),
                    enabled = False
                         )
-    dpg.bind_item_theme('apply_to_file', 'fit_button_theme')
+    dpg.bind_item_theme('apply_to_file', 'button_theme')
     dpg.add_button(label='Apply to extract from all PTU files',
                    tag='apply_to_all',
                    width = mode_init.apply_to_all['width'],
                    callback = mode_cmn.callback_apply_to_all_ptus,
                    enabled = False
                    )
-    dpg.bind_item_theme('apply_to_all', 'fit_button_theme')
+    dpg.bind_item_theme('apply_to_all', 'button_theme')
     dpg.add_separator(tag ='FW_sep_1',show=True)
 
 globalITEMS.windows.extend(['Files_window',
@@ -583,7 +584,7 @@ with dpg.window(label="Lifetime background filtering",
                                callback = mode_cmn.callback_add_decay_to_lib,
                                enabled = False
                                )
-                dpg.bind_item_theme('Add_decay_to_lib', 'fit_button_theme')
+                dpg.bind_item_theme('Add_decay_to_lib', 'button_theme')
                 
                 dpg.add_button(label='From library',
                                tag='Add_decay_from_lib',
@@ -591,7 +592,7 @@ with dpg.window(label="Lifetime background filtering",
                                callback = mode_cmn.callback_import_from_library,
                                enabled = True
                                )
-                dpg.bind_item_theme('Add_decay_from_lib', 'fit_button_theme')
+                dpg.bind_item_theme('Add_decay_from_lib', 'button_theme')
                 
             with dpg.group(tag='fl_bg_win_filtering_routine_group'):
                 dpg.add_checkbox(tag='remove_afterpulsing_chkbx',
@@ -606,7 +607,7 @@ with dpg.window(label="Lifetime background filtering",
                                callback = mode_cmn.callback_Calculate_filters,
                                enabled = True
                                )
-                dpg.bind_item_theme('Calculate_filters', 'fit_button_theme')
+                dpg.bind_item_theme('Calculate_filters', 'button_theme')
 
         
         with dpg.group(tag='fl_bg_plt_group1'):
@@ -688,7 +689,7 @@ with dpg.window(label="Lifetime background filtering",
                                    show =True,
                                    enabled = True
                                    )
-                    dpg.bind_item_theme('Decline_filters', 'fit_button_theme')
+                    dpg.bind_item_theme('Decline_filters', 'button_theme')
                     dpg.add_button(label='Accept',
                                   tag='Accept_filters',
                                   width = mode_init.Accept_filters['width'],
@@ -696,7 +697,7 @@ with dpg.window(label="Lifetime background filtering",
                                    show =True,
                                    enabled = True
                                    )
-                    dpg.bind_item_theme('Accept_filters', 'fit_button_theme')
+                    dpg.bind_item_theme('Accept_filters', 'button_theme')
 
     
     with dpg.group(tag='fl_bg_win_group_2',
@@ -729,7 +730,7 @@ with dpg.window(label="Lifetime background filtering",
                                show =False,
                                enabled = True
                                )
-                dpg.bind_item_theme('Cancel_decay_submission', 'fit_button_theme')
+                dpg.bind_item_theme('Cancel_decay_submission', 'button_theme')
                 dpg.add_button(label='Submit',
                                tag='Proceed_decay_submission',
                                width = mode_init.Proceed_decay_submission['width'],
@@ -737,7 +738,7 @@ with dpg.window(label="Lifetime background filtering",
                                show =False,
                                enabled = True
                                )
-                dpg.bind_item_theme('Proceed_decay_submission', 'fit_button_theme')
+                dpg.bind_item_theme('Proceed_decay_submission', 'button_theme')
         dpg.add_input_text(default_value = 'Type descrption here (opitonal)',
                            multiline=True,
                            width=mode_init.get_decay_description['width'],
@@ -798,7 +799,7 @@ with dpg.window(label="Lifetime background filtering",
                            show =False,
                            enabled = True
                            )
-            dpg.bind_item_theme('Cancel_library_import', 'fit_button_theme')
+            dpg.bind_item_theme('Cancel_library_import', 'button_theme')
             dpg.add_button(label='Import',
                            tag='Proceed_library_import',
                            width = mode_init.Proceed_library_import['width'],
@@ -806,7 +807,7 @@ with dpg.window(label="Lifetime background filtering",
                            show =False,
                            enabled = True
                            )
-            dpg.bind_item_theme('Proceed_library_import', 'fit_button_theme')
+            dpg.bind_item_theme('Proceed_library_import', 'button_theme')
         
     with dpg.group(tag='fl_bg_win_group_4',show=False):
         dpg.add_text('There is no curves to calculate. Try to set the background level or add decay from library. ',
@@ -820,7 +821,7 @@ with dpg.window(label="Lifetime background filtering",
                        show =False,
                        enabled = True
                        )
-        dpg.bind_item_theme('OK_button', 'fit_button_theme')
+        dpg.bind_item_theme('OK_button', 'button_theme')
 
 globalITEMS.windows.extend(['BG_removal_window',
                             'fl_bg_win_group',

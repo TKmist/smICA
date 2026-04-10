@@ -35,9 +35,16 @@ import dearpygui.dearpygui as dpg
 import datetime
 import numpy as np
 import warnings
+import json
 import Required.INIT as inits
 from screeninfo import get_monitors
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+
+DOCS_DIR = os.path.join(BASE_DIR , "doc" , "assets" , "help_html")
+
+print(DOCS_DIR)
 
 with open('../LICENSE', 'r') as file:
     Licence = file.read()
@@ -60,14 +67,20 @@ if platform.system().upper() == "LINUX":
 warnings.filterwarnings('ignore')
 def callback_none():
     pass
+with open(os.path.join('res','settings.json')) as settings:
+    SETTINGS = json.load(settings)
 
+docs_server = inits.LocalDocsServer(DOCS_DIR)
 basf = inits._basicF()
 updt = inits._updater(basf._hsv_to_rgb,VERSION)
 
 inV=inits._init_varaibles()
     
 viewport = inV.VIEWPORT_prop
-menu = inits._init_Menu(updt.updater_state,VERSION=VERSION)
+menu = inits._init_Menu(updt.updater_state,
+                        VERSION=VERSION,
+                        docs_dir=DOCS_DIR,
+                        docs_server=docs_server)
 
 lprint=basf.lnprint
 
@@ -82,22 +95,25 @@ print(line,end='\n\n')
 inf_w, inf_h = get_monitors()[0].width, get_monitors()[0].height
 
 dpg.create_context()
-execfile('Required/Themes.py')             # Load the themes definitions.
+# execfile('Required/Themes.py')             # Load the themes definitions.
 execfile('Required/Fonts.py') 
 execfile('Required/Handlers.py')
+execfile('Required/Themes.py')
 
 
 dpg.create_viewport(title='smICA',small_icon = inV.icopath(),width=viewport['width'], height=viewport['height'],x_pos=viewport['pos'][0],y_pos  =viewport['pos'][1]) 
 dpg.setup_dearpygui()
 dpg.show_viewport()
+
 globalITEMS = inits._common_VARIABLES()
-  
+
 
 VP_w = dpg.get_viewport_width()            # get initial width of the viewport
 VP_h = dpg.get_viewport_height()           # get initial height of the viewport
  
 menu.mount_main_Menu_bar()
 
+rwroi = inits.rewrite_roi(viewport)
 try:
    
     updt.run_updater()
@@ -115,8 +131,10 @@ for method in inV.METHODS:
     
 basf.P2C_manu_F = P2C_manu_F
 basf.PE_manu_F = PE_manu_F
+basf.viewport = viewport
 dpg.set_viewport_resize_callback(basf.basic_resizer)
 basf.mount_inint_buttons()
-
+THEME = SETTINGS['Settings']['Theme']
+build_themes(THEME)
 dpg.start_dearpygui()
 dpg.destroy_context()

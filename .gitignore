@@ -5,4 +5,41 @@ src/smICA/Required/readPTU_FLIM.py
 .ipynb_checkpoints
 .virtual_documents
 
+python_embeded/
 
+
+/.scripts/
+/.build/
+#/.github/
+/release/
+/poligon/
+
+
+
+
+docs/_build/
+docs/**/_build/
+docs/_execute/
+docs/_site/
+docs/**/_execute/
+docs/**/_site/
+
+
+
+# =========================
+
+# Node / frontend (theme)
+
+# =========================
+
+node_modules/
+docs/**/node_modules/
+docs/**/build/
+docs/**/.cache/
+docs/**/.next/
+docs/**/dist/
+
+
+
+docs/templates/**/build/
+docs/templates/**/node_modules/
