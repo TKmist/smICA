@@ -55,6 +55,7 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: ./docs/_build/html
+          overwrite: true
 
   deploy:
     needs: build
