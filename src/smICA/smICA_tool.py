@@ -38,7 +38,13 @@ import warnings
 import json
 import Required.INIT as inits
 from screeninfo import get_monitors
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+
+DOCS_DIR = os.path.join(BASE_DIR , "doc" , "assets" , "help_html")
+
+print(DOCS_DIR)
 
 with open('../LICENSE', 'r') as file:
     Licence = file.read()
@@ -63,13 +69,18 @@ def callback_none():
     pass
 with open(os.path.join('res','settings.json')) as settings:
     SETTINGS = json.load(settings)
+
+docs_server = inits.LocalDocsServer(DOCS_DIR)
 basf = inits._basicF()
 updt = inits._updater(basf._hsv_to_rgb,VERSION)
 
 inV=inits._init_varaibles()
     
 viewport = inV.VIEWPORT_prop
-menu = inits._init_Menu(updt.updater_state,VERSION=VERSION)
+menu = inits._init_Menu(updt.updater_state,
+                        VERSION=VERSION,
+                        docs_dir=DOCS_DIR,
+                        docs_server=docs_server)
 
 lprint=basf.lnprint
 

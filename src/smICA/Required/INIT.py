@@ -42,6 +42,9 @@ import tempfile
 import zipfile
 import shutil
 
+import http.server
+import socketserver
+import threading
 from pathlib import Path
 
 class _updater:
@@ -714,9 +717,11 @@ class _init_varaibles:
         return ico_path
 
 class _init_Menu:
-    def __init__(self,upd_st,VERSION):
+    def __init__(self,upd_st,VERSION, docs_dir, docs_server):
         self.VERSION = VERSION
         self.theme = 'dark'
+        self.docs_dir = docs_dir
+        self.docs_server = docs_server
         
         self.upd_st = upd_st
     def callback_license(self,sender,app_data):
@@ -770,9 +775,18 @@ class _init_Menu:
                              default_value = License,
                              wrap = int(0.95*(dpg.get_viewport_width()/2)))
 
-    def callback_help(self,sender,app_data):
-        url = os.path.join('Docs','README.html')
-        webbrowser.open(url,new=2)
+    def callback_help(self, sender, app_data):
+        self.show_docs_callback()
+
+    def show_docs_callback(self):
+        try:
+            url = self.docs_server.start()
+            print(f"[DOCS] Documentation opened: {url}")
+        except Exception as exc:
+            print(f"[DOCS] Failed to open documentation: {exc}")
+
+    def on_exit(self):
+        self.docs_server.stop()
 
         
     def mount_main_Menu_bar(self):
@@ -1200,3 +1214,59 @@ class rewrite_roi:
         tmp_files = [f for f in tmp_files if f.endswith('.tmp')]
         for tmp in tmp_files:
             os.remove(tmp)
+
+
+
+class SPARequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, directory=None, **kwargs):
+        super().__init__(*args, directory=directory, **kwargs)
+
+    def do_GET(self):
+        path = Path(self.directory) / self.path.lstrip("/")
+
+        if path.exists():
+            return super().do_GET()
+
+        self.path = "/index.html"
+        return super().do_GET()
+
+class LocalDocsServer:
+    """
+    Lightweight local HTTP server for static HTML documentation.
+    """
+
+    def __init__(self, root_dir, host="127.0.0.1", port=0):
+        self.root_dir = Path(root_dir).resolve()
+        self.host = host
+        self.port = port
+        self.httpd = None
+        self.thread = None
+        self.url = None
+
+    def start(self):
+        handler = lambda *args, **kwargs: SPARequestHandler(
+            *args,
+            directory=str(self.root_dir),
+            **kwargs
+        )
+
+        if self.httpd:
+            webbrowser.open(self.url)
+            return self.url
+        
+        self.httpd = socketserver.TCPServer((self.host, self.port), handler)
+        port = self.httpd.server_address[1]
+        self.url = f"http://{self.host}:{port}"
+
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        self.thread.start()
+
+        print(f"Server running at: {self.url}")
+        webbrowser.open(self.url)
+       
+        return self.url
+
+    def stop(self):
+        if self.httpd:
+            self.httpd.shutdown()
+            self.httpd.server_close()
