@@ -4,12 +4,13 @@
 
 <h1></h1>
 
-<p style="text-align:center; margin:0; line-height:1;">
+<p align="center">
   <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   <img src="https://img.shields.io/badge/license-MIT-blue" style="display:inline-block; margin:0 2px; vertical-align:middle;">
 
-  <br style="line-height:0.6;">
+  </p>
+<p align="center">
 
   <img src="https://img.shields.io/badge/version-v2.1.0-green" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   <a href="https://github.com/TKmist/smICA/releases/latest">
