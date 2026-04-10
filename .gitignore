@@ -10,7 +10,7 @@ python_embeded/
 
 /.scripts/
 /.build/
-/.github/
+#/.github/
 /release/
 /poligon/
 
