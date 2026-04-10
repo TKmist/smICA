@@ -148,9 +148,9 @@ LIGHT = {
     "action_button_inactive":  (190, 205, 185, 255),
 
     # sekcje (bardzo subtelne różnice)
-    "header":           (236, 239, 236, 255),
-    "header_hovered":   (228, 232, 228, 255),
-    "header_active":    (220, 225, 220, 255),
+    "header":           (206, 209, 206, 255),
+    "header_hovered":   (200, 202, 200, 255),
+    "header_active":    (200, 205, 200, 255),
 
     # title / menu
     "title_bg":         (240, 243, 240, 255),
