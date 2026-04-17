@@ -12,7 +12,7 @@
   </p>
 <p align="center">
 
-  <img src="https://img.shields.io/badge/version-v2.1.0-green" style="display:inline-block; margin:0 2px; vertical-align:middle;">
+  <img src="https://img.shields.io/badge/version-v2.1.1-green" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   <a href="https://github.com/TKmist/smICA/releases/latest">
     <img src="https://img.shields.io/github/v/release/TKmist/smICA?label=download" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   </a>
@@ -55,7 +55,9 @@ By default, smICA uses dark theme. The light theme can be activated by modifying
 
 
 ## Release notes
-
+#### V2.1.1
+ - Added _Settings_ item in the menu bar to simplify theme changes
+ - Added the ROI mixer tool.
 #### V2.1.0
  - Updated built-in help
  - Light theme added.

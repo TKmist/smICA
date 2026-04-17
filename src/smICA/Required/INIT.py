@@ -47,6 +47,8 @@ import socketserver
 import threading
 from pathlib import Path
 
+import cv2
+
 class _updater:
     
     _VERSION_RE = re.compile(r"^\s*[vV]?(\d+)\.(\d+)\.(\d+)(?:rc(\d+)|([A-Za-z]))?\s*$")
@@ -787,7 +789,8 @@ class _init_Menu:
 
     def on_exit(self):
         self.docs_server.stop()
-
+    def callback_full_screen(self,sender,app_data):
+        dpg.toggle_viewport_fullscreen()
         
     def mount_main_Menu_bar(self):
     
@@ -798,8 +801,22 @@ class _init_Menu:
             with dpg.menu(label="Mode",tag='menu_analysis_method_dropout'):
                 pass
             dpg.bind_item_theme('menu_analysis_method_dropout', "menu_normal")
-            
-            
+
+            with dpg.menu(label="Tools",
+                      tag='menu_analysis_tool_dropout',
+                      parent="vieport's_menubar",
+                      before='menu_about_dropout'):
+                pass
+            dpg.bind_item_theme('menu_analysis_tool_dropout', "menu_normal")
+
+            with dpg.menu(label="Settings",tag='menu_settings_dropout'):
+                dpg.add_menu_item(label="Full Screen",tag='fullscreenclick',callback=self.callback_full_screen)
+                dpg.add_menu_item(label="Settings",
+                                  # callback=lambda: dpg.show_item("Settings_window"),
+                                  parent = 'menu_settings_dropout',
+                                  before='fullscreenclick',
+                                  tag='sett_menu_item')
+            dpg.bind_item_theme('menu_settings_dropout', "menu_normal")
             with dpg.menu(label="About",tag='menu_about_dropout'):
                 dpg.add_menu_item(label="Help",tag='helpclick',callback=self.callback_help)
                 dpg.add_menu_item(label='License',
@@ -940,11 +957,11 @@ class rewrite_roi:
             self.mount_rewriteROI()
 
     def load_RWroi_into_menu(self):
-        with dpg.menu(label="Tools",
-                      tag='menu_analysis_tool_dropout',
-                      parent="vieport's_menubar",
-                      before='menu_about_dropout'):
-            dpg.add_menu_item(label="Rewrite ROI",tag='Rewrite_ROI',callback=self.rewrite_tool)
+        # with dpg.menu(label="Tools",
+        #               tag='menu_analysis_tool_dropout',
+        #               parent="vieport's_menubar",
+        #               before='menu_about_dropout'):
+        dpg.add_menu_item(label="Rewrite ROI",tag='Rewrite_ROI',parent='menu_analysis_tool_dropout',callback=self.rewrite_tool)
 
     def callbac_rw_win_closed(self):
         # print('closed')
@@ -1270,3 +1287,783 @@ class LocalDocsServer:
         if self.httpd:
             self.httpd.shutdown()
             self.httpd.server_close()
+
+
+
+
+
+class Roi_mixer:
+    def __init__(self,viewport,GI):
+        self.mxroiItems=[]
+        self.theme=None
+        self.EXT_COLORS = {
+            "dark": (220, 220, 220, 255),
+            "light": (40, 42, 40, 255)
+            }
+        self.load_MXroi_into_menu()
+        # self.source_type = None
+        self.viewport = viewport
+        # self.data_files = None
+        self.last_directory = GI.last_directory
+
+        self.combo_items = ['Product','Sum','Subtract']
+
+        self.img_size = 300
+        self.texture_tags = ["mx_tex_1", "mx_tex_2", "mx_tex_3"]
+        self.image_tags = ["mx_img_1", "mx_img_2", "mx_img_3"]
+
+        self.roi1_path = self.last_directory
+        self.roi2_path = self.last_directory
+        self.roi3_path = self.last_directory
+        self.roi_1 = pd.DataFrame(np.zeros((300,300)))
+        self.roi_2 = pd.DataFrame(np.zeros((300,300)))
+        self.roi_3 = pd.DataFrame(np.zeros((300,300)))
+        self.file_1 = ''
+        self.file_2 = ''
+        self.file_3 = ''
+
+        
+    def unmount_MXROI(self):
+        for item in reversed(self.mxroiItems):
+            dpg.delete_item(item)
+        self.mxroiItems = []
+
+    def load_MXroi_into_menu(self):
+        
+        dpg.add_menu_item(label="ROI mixer",tag='MIX_ROI',parent="menu_analysis_tool_dropout",callback=self.MXroi_tool)
+
+    def MXroi_tool(self,sender,app_data):
+        mx_win = 'MX_window'
+        if dpg.does_item_exist(mx_win):
+            
+            self.mount_MXROI()
+            
+        else:
+            self.mount_MXROI()
+
+    def callbac_MX_win_closed(self):
+        # print('closed')
+        self.unmount_MXROI()
+        # mx_win = 'MX_window'
+
+
+    def binimg_to_rgba_texture(self, img_bin: np.ndarray, out_size: int = 300):
+        """
+        img_bin: kwadratowa macierz numpy 0/1
+        zwraca dane tekstury RGBA jako float32 w zakresie 0..1
+        """
+        if not isinstance(img_bin, np.ndarray):
+            raise TypeError("img_bin musi być numpy.ndarray")
+
+        if img_bin.ndim != 2:
+            raise ValueError("Obraz musi być macierzą 2D")
+
+        h, w = img_bin.shape
+        if h != w:
+            raise ValueError("Obraz musi być kwadratowy")
+
+        # zamiana 0/1 -> 0/255
+        img_u8 = (img_bin > 0).astype(np.uint8) * 255
+
+        # skalowanie do 300x300
+        # INTER_NEAREST zachowuje charakter obrazu binarnego
+        img_resized = cv2.resize(
+            img_u8,
+            (out_size, out_size),
+            interpolation=cv2.INTER_NEAREST
+        )
+
+        # grayscale -> RGBA
+        rgba = np.zeros((out_size, out_size, 4), dtype=np.float32)
+        gray = img_resized.astype(np.float32) / 255.0
+
+        rgba[:, :, 0] = gray  # R
+        rgba[:, :, 1] = gray  # G
+        rgba[:, :, 2] = gray  # B
+        rgba[:, :, 3] = 1.0   # A
+
+        return rgba.flatten()
+
+    def callback_mx_button(self, sender, app_data, user_data):
+        print(sender)
+        if sender == 'mx_btn_1':
+            
+        
+            dpg.show_item('MXROISource_file_1_dialog')
+
+        elif sender == 'mx_btn_2':
+            dpg.show_item('MXROISource_file_2_dialog')
+
+    def callback_third_button(self, sender, app_data, user_data):
+        dpg.show_item('MXROITarget_file_dialog')
+    
+    def create_empty_texture(self, size=300):
+        rgba = np.zeros((size, size, 4), dtype=np.float32)
+        rgba[:, :, 3] = 1.0
+        return rgba.flatten()
+
+
+    def callback_empty(self,sender,app_data):
+        '''Empty function. Do nothing.'''
+        pass
+
+    def callback_selct_mxroi_file(self,sender,app_data):
+        # print(sender,app_data)
+
+        if sender == 'MXROISource_file_1_dialog':
+            path = app_data['current_path']
+            dpg.configure_item('MXROISource_file_2_dialog',default_path=path)
+            # dpg.configure_item('MXROITarget_file_dialog',default_path=path)
+            self.file_1 =  self.file_3 = app_data['file_name']
+            self.roi1_path = os.path.join(path,self.file_1)
+            self.roi_1 = self.load_ROI(self.roi1_path)
+            self.update_texture_from_numpy(self.texture_tags[0], self.nantozero(self.roi_1).to_numpy())
+            self.update_result_roi()
+            
+        elif sender == 'MXROISource_file_2_dialog':
+            path = app_data['current_path']
+            dpg.configure_item('MXROISource_file_1_dialog',default_path=path)
+            # dpg.configure_item('MXROITarget_file_dialog',default_path=path)
+            self.file_2  = app_data['file_name']
+            self.roi2_path = os.path.join(path, self.file_2)
+            self.roi_2 = self.load_ROI(self.roi2_path)
+            self.update_texture_from_numpy(self.texture_tags[1], self.nantozero(self.roi_2).to_numpy())
+            self.update_result_roi()
+        # dpg.show_item(MXROISource_file_dialog)
+
+    def callback_selct_mxroi_targetfolder(self,sender,app_data):
+        # print(sender,app_data)
+        if self.file_3 != '': 
+            dpg.configure_item('mx_proceed_btn',enabled=True)
+
+            self.roi3_path = app_data['current_path']
+            # dpg.configure_item('MXROISource_file_1_dialog',default_path=path)
+            # dpg.configure_item('MXROISource_file_2_dialog',default_path=path)
+            # self.file_2  = app_data['file_name']
+            # self.roi3_path = os.path.join(path, self.file_3)
+            
+        # dpg.show_item(MXROITarget_file_dialog)
+    
+    def mount_MXROI(self):
+        
+        size_ratio = {'width':dpg.get_viewport_width()/self.viewport['width'],
+                      'height':dpg.get_viewport_height()/self.viewport['height']}
+        init_winwidth =950
+        init_winheight =400
+        init_texture_width = 300
+        init_texture_height = 300
+        init_button_width = 320
+        init_button_height = 35
+        init_childwin_width = 320
+        init_childwin_height = 320
+        init_bottom_butt_width = 120
+        init_bottom_butt_height = 40
+        init_spacer_width = 15
+        init_bottom_margin = 10
+        init_side_margin = 10
+        init_combo_width = 200
+        
+
+        winwidth = int(init_winwidth*size_ratio['width']) 
+        winheight = int(init_winheight*size_ratio['height']) 
+        texture_width = int(init_texture_width*size_ratio['width'])
+        texture_height = texture_width
+        button_width = int(init_button_width*size_ratio['width'])
+        button_height = int(init_button_height*size_ratio['height'])
+        childwin_width = int(init_childwin_width*size_ratio['width'])
+        childwin_height = int(init_childwin_height*size_ratio['height'])
+        bottom_butt_width = int(init_bottom_butt_width*size_ratio['width'])
+        bottom_butt_height = int(init_bottom_butt_height*size_ratio['height'])
+
+        bottom_margin = int(init_bottom_margin*size_ratio['width']) 
+        side_margin = int(init_side_margin*size_ratio['height'])
+        spacer_width = int(init_spacer_width*size_ratio['width']) 
+
+        combo_width = int(init_combo_width*size_ratio['width']) 
+
+        self.img_size = texture_width
+        
+        win_width = init_winwidth*size_ratio['width'] 
+        win_height = init_winheight*size_ratio['height'] 
+        win_pos = (int(dpg.get_viewport_width()/2-int(init_winwidth*size_ratio['width'])/2),
+                   int(dpg.get_viewport_height()/2-int(init_winheight*size_ratio['height'])/2))
+
+        with dpg.texture_registry(show=False,tag='mxroi_tex_reg'):
+            self.mxroiItems.extend(['mxroi_tex_reg'])
+            for tex_tag in self.texture_tags:
+                dpg.add_dynamic_texture(
+                    width=self.img_size,
+                    height=self.img_size,
+                    default_value=self.create_empty_texture(self.img_size),
+                    tag=tex_tag
+                )
+                self.mxroiItems.extend([tex_tag])
+
+        with dpg.window(label='Mix ROI',
+                        width=win_width,
+                        height=win_height,
+                        pos = win_pos,
+                        no_move=False,
+                        no_close=False,
+                        no_title_bar=False,
+                        no_scrollbar=True,
+                        no_resize=False,
+                        no_collapse=True,
+                        tag='MX_window',
+                        autosize=True,
+                        show=True,
+                        on_close = self.callbac_MX_win_closed
+                        ):
+            self.mxroiItems.append('MX_window')
+            with dpg.group(horizontal=True,tag='texture_horizontal_group'):
+                self.mxroiItems.append('texture_horizontal_group')
+                for i in range(3):
+    
+                    with dpg.group(horizontal=False):
+                        if i<2:
+                            dpg.add_button(
+                                label=f'ROI {i+1}',
+                                width=button_width,
+                                height=button_height,
+                                tag=f'mx_btn_{i+1}',
+                                callback=self.callback_mx_button,
+                                user_data=i
+                            )
+                        else:
+                            dpg.add_button(
+                                label=f'ROI {i+1}',
+                                width=button_width,
+                                height=button_height,
+                                tag=f'mx_btn_{i+1}',
+                                callback=self.callback_third_button,
+                                user_data=i
+                            )
+                            
+                        dpg.bind_item_theme(f'mx_btn_{i+1}', 'button_theme')
+                        self.mxroiItems.append(f'mx_btn_{i+1}')
+    
+                        with dpg.child_window(
+                            width=childwin_width,
+                            height=childwin_width,
+                            border=True,
+                            tag=f'mx_child_{i+1}'
+                        ):
+                            self.mxroiItems.append(f'mx_child_{i+1}')
+                            dpg.add_image(
+                                self.texture_tags[i],
+                                width=texture_width,
+                                height=texture_height,
+                                tag=self.image_tags[i]
+                            )
+                            self.mxroiItems.append(self.image_tags[i])
+    
+                    if i < 2:
+                        dpg.add_spacer(width=spacer_width,tag=f'mx_spacer_{i+1}')
+                        self.mxroiItems.append(f'mx_spacer_{i+1}')
+
+            dpg.add_separator(tag='bottom_buttons_separator_tag')
+            self.mxroiItems.append('bottom_buttons_separator_tag')
+
+
+            # dolny margines i boczne marginesy
+            
+            
+            # wspólne Y dla obu przycisków
+            
+            # lewy przycisk
+            dpg.add_button(
+                label="Proceed",
+                width=bottom_butt_width,
+                height=bottom_butt_height,
+                tag="mx_proceed_btn",
+                pos=[side_margin, winheight+side_margin],
+                callback=self.call_back_mx_proceed,
+                enabled=False
+            )
+            dpg.bind_item_theme('mx_proceed_btn', 'button_theme')
+            self.mxroiItems.append('mx_proceed_btn')
+            # print(dpg.get_item_pos(f'mx_child_{2+1}'))
+            # prawy przycisk
+            
+            dpg.add_button(
+                label="Close",
+                width=bottom_butt_width,
+                height=bottom_butt_height,
+                tag="mx_close_btn",
+                pos=[int(3*childwin_width+3*spacer_width+2*side_margin-bottom_butt_width), dpg.get_item_pos('mx_proceed_btn')[1]],
+                callback=self.callbac_MX_win_closed
+            )
+            dpg.bind_item_theme('mx_close_btn', 'button_theme')
+            self.mxroiItems.append('mx_close_btn')
+
+            dpg.add_combo(items=self.combo_items,
+                          default_value = self.combo_items[0],
+                          tag='mx_combo',
+                          width=combo_width,
+                          pos = (int((dpg.get_item_pos('mx_close_btn')[0] - dpg.get_item_pos('mx_proceed_btn')[0]+bottom_butt_width)/2-combo_width/2),dpg.get_item_pos('mx_proceed_btn')[1]),
+                          callback = self.callback_mx_combo
+                          
+                         )
+            self.mxroiItems.append('mx_combo')
+
+
+            with dpg.file_dialog(directory_selector=False,
+                            label = 'Select ROI file 1',
+                            width =win_width,
+                            height=win_height,
+                            default_path = self.last_directory,
+                            show=False,
+                            file_count=5,
+        
+                            callback=self.callback_selct_mxroi_file,
+                            cancel_callback=self.callback_empty,
+                            tag="MXROISource_file_1_dialog",
+                            modal=False
+                           ):
+                dpg.add_file_extension(".dat", color=self.EXT_COLORS[self.theme],tag='mxroixt1_tag')  # pokaż wszystko
+                self.mxroiItems.append('mxroixt1_tag')
+            self.mxroiItems.append('MXROISource_file_1_dialog')
+
+            with dpg.file_dialog(directory_selector=False,
+                            label = 'Select ROI file 2',
+                            width =win_width,
+                            height=win_height,
+                            default_path = self.last_directory,
+                            show=False,
+                            file_count=5,
+        
+                            callback=self.callback_selct_mxroi_file,
+                            cancel_callback=self.callback_empty,
+                            tag="MXROISource_file_2_dialog",
+                            modal=False
+                           ):
+                dpg.add_file_extension(".dat", color=self.EXT_COLORS[self.theme],tag='mxroixt2_tag')  # pokaż wszystko
+                self.mxroiItems.append('mxroixt2_tag')
+            self.mxroiItems.append('MXROISource_file_1_dialog')
+            dpg.add_file_dialog(directory_selector=True,
+                                label = 'Select target ROI folder',
+                                show=False,
+                                width =win_width,
+                                height=win_height,
+                                default_path = self.last_directory,
+                                file_count=5,
+            
+                                callback=self.callback_selct_mxroi_targetfolder,
+                                cancel_callback=self.callback_empty,
+                                tag="MXROITarget_file_dialog",
+                                modal=False
+                               )
+            self.mxroiItems.append('MXROITarget_file_dialog')
+
+
+
+    def nantozero(self,df):
+        df=df.where(pd.isna(df),1)
+        df=df.where(df==1,0)
+        return df
+    def zerotonan(self,df):
+        df = df.where(df!=0,np.nan)
+        return df
+
+
+    def product(self,ro1,ro2):
+        ro1 = self.nantozero(ro1)
+        ro2 = self.nantozero(ro2)
+        prod = ro1*ro2
+        prod = prod.clip(0, 1)
+        return self.zerotonan(prod)
+
+    def sum(self,ro1,ro2):
+        ro1 = self.nantozero(ro1)
+        ro2 = self.nantozero(ro2)
+        suma = ro1+ro2
+        
+        suma = suma.clip(0, 1)
+        return self.zerotonan(suma)
+    def subtract(self,ro1,ro2):
+        ro1 = self.nantozero(ro1)
+        ro2 = self.nantozero(ro2)
+        subtr = ro1-ro2
+        
+        subtr = subtr.clip(0, 1)
+        return self.zerotonan(subtr)
+
+    def export_ROI(self,df,input_file,output_roi_path):
+        df=df.where(~pd.isna(df),-1)
+        df=df.astype(int)
+        
+        df = df.where(df>=0,'-')
+        
+
+
+        new_file = input_file.replace('.dat','.tmp')
+        final_roi = new_file.split('/')[-1]
+        newfile = os.path.join(output_roi_path,final_roi)
+        print(newfile)
+        df.to_csv(newfile, sep = '\t',index=False,header=False)
+        
+        nf = final_roi
+        print(nf)
+        nf = nf.replace('.tmp','.dat')
+        print(nf)
+        output_roi_file = os.path.join(output_roi_path,nf)
+        f = open(output_roi_file, "w")
+        f.write("Events[Cnts]\n")
+        f.write("(x0 | y0) = (0.000[ m] | 0.000[ m])\n")
+        f.write("(x1 | y1) = (51.200[ m] | 51.200[ m])\n")
+        f.close()
+        with open(newfile) as reader:
+            red_file = reader.read()
+            reader.close()
+        f = open(output_roi_file, "a")
+        f.write(red_file)
+        f.close()
+        tmp_files = os.listdir(output_roi_path)
+        tmp_files = [f for f in tmp_files if f.endswith('.tmp')]
+        for tmp in tmp_files:
+            os.remove(os.path.join(output_roi_path,tmp))
+
+
+    def load_ROI(self, path):
+    
+        df = pd.read_csv(path, sep='\t', header=None, skiprows=3, encoding='latin1')
+        with pd.option_context("future.no_silent_downcasting", True):
+            df = df.replace('-', -1.)
+        
+        df = df.infer_objects(copy=False)
+        try:
+            df = df.astype(float)
+        except:
+            for i in df.index:
+                try:
+                    df.at[i, 0] = float(df.at[i, 0])
+
+                except:
+                    ind = i
+                    break
+            df = df[df.index < ind]
+            df = df.astype(int)
+        # print(df)
+        dfs = df[0].to_frame().map(np.isreal)
+        if len(dfs.mask(dfs).dropna()) != 0:
+            ind = int(dfs.mask(dfs).dropna().head(1).index.values)
+            df = df[df.index < ind]
+            df = df.astype(float)
+            df = df.mask(df != -1, 1)
+            df = df.where(df != -1, np.nan)
+
+        else:
+            df = df.astype(float)
+            df = df.mask(df != -1, 1)
+            df = df.where(df != -1, np.nan)
+
+        return df
+
+    def numpy_to_texture_data(self, img: np.ndarray, out_size: int):
+        """
+        img: 2D numpy array
+             może być binarny 0/1 albo np. uint8
+        out_size: docelowy rozmiar tekstury, np. 300
+        """
+    
+        if not isinstance(img, np.ndarray):
+            raise TypeError("img musi być numpy.ndarray")
+    
+        if img.ndim != 2:
+            raise ValueError("img musi być macierzą 2D")
+    
+        h, w = img.shape
+        if h != w:
+            raise ValueError("obraz musi być kwadratowy")
+    
+        # normalizacja do 0..255
+        if img.dtype == np.bool_:
+            img_u8 = img.astype(np.uint8) * 255
+        else:
+            img = img.astype(np.float32)
+            if img.max() <= 1.0:
+                img_u8 = (img * 255).astype(np.uint8)
+            else:
+                img_u8 = np.clip(img, 0, 255).astype(np.uint8)
+    
+        # dla binarnych / masek najlepszy nearest
+        img_resized = cv2.resize(
+            img_u8,
+            (out_size, out_size),
+            interpolation=cv2.INTER_NEAREST
+        )
+    
+        gray = img_resized.astype(np.float32) / 255.0
+    
+        rgba = np.zeros((out_size, out_size, 4), dtype=np.float32)
+        rgba[:, :, 0] = gray
+        rgba[:, :, 1] = gray
+        rgba[:, :, 2] = gray
+        rgba[:, :, 3] = 1.0
+    
+        return rgba.flatten()
+
+
+    def update_texture_from_numpy(self, texture_tag: str, img: np.ndarray):
+        tex_data = self.numpy_to_texture_data(img, self.img_size)
+        dpg.set_value(texture_tag, tex_data)
+
+
+
+    def callback_mx_combo(self):
+        self.update_result_roi()
+
+    def update_result_roi(self):
+        procedure = dpg.get_value('mx_combo')
+        print(procedure)
+        if procedure == self.combo_items[0]:
+            self.roi_3 = self.product(self.roi_1,self.roi_2)
+            self.update_texture_from_numpy(self.texture_tags[2], self.nantozero(self.roi_3).to_numpy())
+        elif procedure == self.combo_items[1]:
+            self.roi_3 = self.sum(self.roi_1,self.roi_2)
+            self.update_texture_from_numpy(self.texture_tags[2], self.nantozero(self.roi_3).to_numpy())
+        elif procedure == self.combo_items[2]:
+            self.roi_3 = self.subtract(self.roi_1,self.roi_2)
+            self.update_texture_from_numpy(self.texture_tags[2], self.nantozero(self.roi_3).to_numpy())
+
+    def call_back_mx_proceed(self):
+        
+        self.export_ROI(self.roi_3,self.file_3,self.roi3_path)
+
+
+
+class sett_window:
+    def __init__(self,init_VP_size,left_indent,internal_indent,right_indent,bottom_indent,top_indent,group_spacer):
+        self.init_VP_size = init_VP_size
+
+    
+        
+        
+        self.size_ratio = {'width': np.round(dpg.get_viewport_width()/self.init_VP_size['width'],4),
+             'height': np.round(dpg.get_viewport_height()/self.init_VP_size['height'],4)} 
+
+        self.left_indent = int(left_indent*self.size_ratio['width'])
+        self.internal_indent = int(internal_indent*self.size_ratio['width'])
+        self.right_indent = int(right_indent*self.size_ratio['width'])
+        self.bottom_indent = int(bottom_indent*self.size_ratio['width'])
+        self.top_indent = int(top_indent*self.size_ratio['width'])
+        self.group_spacer = int(group_spacer*self.size_ratio['width'])
+        
+        self.Settings_window = {'width':int(600*self.size_ratio['width']),
+                              'height':int(700*self.size_ratio['height']),
+                              'pos':(int(300*self.size_ratio['width']),int(200*self.size_ratio['height']))
+                                }
+        self.Setts_save_defaults = int(150*self.size_ratio['width'])
+        self.Setts_cancel = int(150*self.size_ratio['width'])
+
+        # self.default_quick_export_filename = int(200*self.size_ratio['width'])
+        # self.default_quick_stst_filename = int(200*self.size_ratio['width'])
+        
+        self.settings_items = []
+
+        dpg.configure_item('sett_menu_item',callback=self.show_set_win)
+        self.OPTIONS = {}
+        self.MountSettingsWindow()
+        self.load_default_settings()
+
+        
+    def load_default_settings(self):
+        path = os.path.join('res','settings.json')
+
+        with open(path) as json_settings:
+            self.OPTIONS = json.load(json_settings)
+
+        for item in self.OPTIONS.keys():
+            dpg.set_value(item,self.OPTIONS[item])
+    def show_set_win(self):
+        print('show')
+
+        self.size_ratio = {'width': np.round(dpg.get_viewport_width()/self.init_VP_size['width'],4),
+             'height': np.round(dpg.get_viewport_height()/self.init_VP_size['height'],4)} 
+
+        left_indent = int(self.left_indent*self.size_ratio['width'])
+        internal_indent = int(self.internal_indent*self.size_ratio['width'])
+        right_indent = int(self.right_indent*self.size_ratio['width'])
+        bottom_indent = int(self.bottom_indent*self.size_ratio['width'])
+        top_indent = int(self.top_indent*self.size_ratio['width'])
+        group_spacer = int(self.group_spacer*self.size_ratio['width'])
+        
+        Settings_window = {'width':int(600*self.size_ratio['width']),
+                              'height':int(700*self.size_ratio['height']),
+                              'pos':(int(300*self.size_ratio['width']),int(200*self.size_ratio['height']))
+                                }
+
+        Setts_save_defaults_width = int(150*self.size_ratio['width'])
+        Setts_cancel_width = int(150*self.size_ratio['width'])
+
+    #     default_quick_export_filename_width = int(200*self.size_ratio['width'])
+    #     default_quick_stst_filename_width = int(200*self.size_ratio['width'])
+        
+        
+        dpg.configure_item('Settings_window',
+                           width = Settings_window['width'],
+                           height = Settings_window['height'],
+                           pos = Settings_window['pos']
+                          )
+    #     # print(dpg.get_item_width('Settings_window'),dpg.get_item_height('Settings_window'))
+        button_pos = (left_indent,dpg.get_item_height('Settings_window')-24-bottom_indent)
+    #     # print(button_pos)
+        dpg.configure_item('default_theme_group',
+                           horizontal_spacing = group_spacer
+                          )
+
+        dpg.configure_item('theme_choose',
+                           width = int(Settings_window['width']/3),
+                          )
+
+    #     dpg.configure_item('default_quick_res_exp_group',
+    #                        horizontal_spacing = group_spacer
+    #                       )
+
+    #     dpg.configure_item('default_quick_res_stat_group',
+    #                        horizontal_spacing = group_spacer
+    #                       )
+
+    #     dpg.configure_item('default_quick_stst_filename',
+    #                        width = default_quick_export_filename_width,
+    #                       )
+
+        dpg.configure_item('Setts_buttons_group',
+                           horizontal_spacing = group_spacer,
+                           # pos = (left_indent,dpg.get_item_height('Settings_window')-24-bottom_indent)
+                          )
+
+        dpg.configure_item('Setts_save_defaults',
+                           width = Setts_save_defaults_width
+                          )
+
+        dpg.configure_item('Setts_cancel',
+                           width = Setts_cancel_width
+                          )
+                           
+
+        
+        dpg.show_item('Settings_window')
+
+    def hide_set_win(self):
+        dpg.hide_item('Settings_window')
+    def callback_save_as_def(self,sender,app_data):
+        items = [
+                 'theme_choose']
+        
+        self.OPTIONS = {}
+        
+        for item in items:
+            
+            self.OPTIONS[item]=dpg.get_value(item)
+
+        
+        path = os.path.join('res','settings.json')
+        with open(path, 'w') as f:
+            json.dump(self.OPTIONS, f, indent=4, sort_keys=False)
+        dpg.configure_item(sender,enabled=False)   
+        self.hide_set_win()
+    # def callback_settings_data_stats(self,sender,app_data):   
+    #     items = ['Sett_export_stats_to_csv','Sett_export_stats_to_xlsx',]
+    #     dpg.configure_item('Setts_save_defaults',enabled=True)
+    #     if app_data:
+    #         for item in items:
+    #             dpg.configure_item(item, enabled = True)
+    #     else:
+    #         for item in items:
+
+    #             dpg.configure_item(item, enabled = False)
+    # def callback_settings_data_export_each(self,sender,app_data): 
+    #     items = ['Sett_export_to_excel','Sett_export_to_csv','Sett_export_to_pickle']
+    #     dpg.configure_item('Setts_save_defaults',enabled=True)
+    #     if app_data:
+    #         for item in items:
+    #             dpg.configure_item(item, enabled = True)
+    #     else:
+    #         for item in items:
+    #             dpg.configure_item(item, enabled = False)
+
+    
+
+    def UnMountSettingsWindow(self):
+        # print('Unmounting')
+        # print(self.settings_items)
+        for item in self.settings_items:
+            # print(item)
+            dpg.delete_item(item)
+    def MountSettingsWindow(self):
+        with dpg.window(label='Settings',
+                    tag="Settings_window",
+                    width=self.Settings_window['width'],
+                    height=self.Settings_window['height'],
+                    pos=self.Settings_window['pos'],
+                    no_resize=True,
+                    show=False,
+                    modal = True,
+                    autosize=True,
+                    on_close = self.hide_set_win
+                   ):
+            self.settings_items.append('Settings_window')
+            dpg.add_text('General settings',
+                         tag='General_settings_text')
+            self.settings_items.append('General_settings_text')
+            dpg.add_separator(tag ='Settings_sep1',show=True)  
+            self.settings_items.append('Settings_sep1')
+            with dpg.group(tag='default_theme_group',
+                       horizontal=True,
+                       horizontal_spacing=self.group_spacer,
+                              before = 'Settings_sep2'
+                      ):
+                self.settings_items.append('default_theme_group')
+                dpg.add_text('Theme: ',tag = 'sett_theme_group_text_01')
+                self.settings_items.append('sett_theme_group_text_01')
+                dpg.add_combo(['dark','light'],
+                          label="",
+                          width=int(self.Settings_window['width']/3),
+                          height_mode=dpg.mvComboHeight_Large,
+                          tag='theme_choose',
+                          default_value='dark',
+                          callback=None,
+                          enabled=True
+                          )
+                self.settings_items.append('theme_choose')
+                with dpg.tooltip('theme_choose',tag='theme_choose_tooltip'):
+                    self.settings_items.append('theme_choose_tooltip')
+                    dpg.add_text('The change will be visible after restarting the FcsIT.',
+                                         tag='theme_choose_tooltip_text')
+                    self.settings_items.append('theme_choose_tooltip_text')
+        
+                
+                    
+                
+                
+            with dpg.group(tag='Setts_buttons_group',
+                           horizontal=True,
+                           horizontal_spacing=self.group_spacer
+                           # ,pos = (self.left_indent,dpg.get_item_height('Settings_window')-24-self.bottom_indent)
+                               ):
+                self.settings_items.append('Setts_buttons_group')
+                dpg.add_button(label='Save as defaults',
+                                       tag='Setts_save_defaults',
+                                       show=True,
+                                       width = self.Setts_save_defaults,
+                                       callback=self.callback_save_as_def
+                                      )
+                dpg.bind_item_theme('Setts_save_defaults', 'button_theme')
+                self.settings_items.append('Setts_save_defaults')
+                # dpg.bind_item_theme('Setts_save_defaults', 'fit_button_theme')
+                
+                dpg.add_button(label='Close',
+                                       tag='Setts_cancel',
+                                       show=True,
+                                       
+                                       width = self.Setts_cancel,
+                                       callback=self.hide_set_win
+                                      )
+                dpg.bind_item_theme('Setts_cancel', 'button_theme')
+                self.settings_items.append('Setts_cancel')
+                
+        # dpg.bind_item_theme('Settings_window', 'Inactive_checkbox') 
+        
+        
+    

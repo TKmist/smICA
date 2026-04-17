@@ -4,7 +4,7 @@ src/smICA/Required/readPTU_FLIM.py
 # Jupyter Notebook
 .ipynb_checkpoints
 .virtual_documents
-
+testing_things.ipynb
 python_embeded/
 
 
@@ -13,7 +13,7 @@ python_embeded/
 #/.github/
 /release/
 /poligon/
-
+/
 
 
 

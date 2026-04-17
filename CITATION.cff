@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "smICA - single-molecule Image to Concentration Analyser"
-version: 2.0.1
+version: v2.1.1
 license: "MIT"
 type: software
 abstract: "This repository provides software for calculating fluorophore concentrations from FLIM images stored in the PTU format (PicoQuant, Germany)."
