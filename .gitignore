@@ -5,7 +5,7 @@ src/smICA/Required/readPTU_FLIM.py
 .ipynb_checkpoints
 .virtual_documents
 testing_things.ipynb
-python_embedded/
+/python_embedded/
 
 
 /.scripts/
