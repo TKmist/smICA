@@ -120,4 +120,4 @@ Please refer to the font files or accompanying license information for details.
 If you use the FcsIT software or any part of it in your academic work, citation of the relevant publications listed below is appreciated. 
 
 1. Kalwarczyk, T., Bubak, G., Michalski, J., Lis, A., Kwapiszewska, K., Pilz, M., Mamot, A., Perzanowska, O., Kowalska, J., Jemielity, J., & Hołyst, R. (2024). smICA: Open-Source Software for Quantitative, Lifetime-Resolved Mapping of Absolute Fluorophore Concentrations in Living Cells. arXiv. 10.48550/ARXIV.2410.00532
-2. Kalwarczyk, T. (2026). smICA - single-molecule Image to Concentration Analyser. Zenodo. 10.5281/ZENODO.18456909
+2. Kalwarczyk, T. (2026). smICA - single-molecule Image to Concentration Analyser. Zenodo. 10.5281/ZENODO.20134967
