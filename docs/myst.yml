@@ -12,6 +12,7 @@ project:
          - file: PTUExtract.ipynb
          - file: Phot2conc.ipynb
          - file: RwROI.ipynb
+         - file: MXROI.ipynb
     - file: Credits.ipynb
     
 

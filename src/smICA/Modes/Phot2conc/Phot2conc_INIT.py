@@ -2142,7 +2142,7 @@ class _Phot2conc_vars_funct:
 
     def callback_listbox(self, sender, app_data):
         self.anal_file = app_data
-
+        # print(app_data)
         pkl_file = self.anal_file + '.rpk'
         pkl_path = os.path.join(self.PTU_directory, pkl_file)
         if os.path.exists(pkl_path):
@@ -2569,15 +2569,19 @@ class _Phot2conc_vars_funct:
             if len(self.Channels) == 1:
                 if '1' in self.Channels[0]:
                     Intensity_1 = pklf['intensity_1']
+                    Lifetime_1 = pklf['lifetimes_1']
 
                     Intensity_1 = Intensity_1
                     self.processor_1 = ImageROIProcessor()
                     self.processor_1.image = Intensity_1.astype(np.uint16)
+                    
                     roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_1.dat')
                     if os.path.exists(roi_1_path):
                         pass
                     else:
-                        roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
+                        ROIn = dpg.get_value('ROI_names_combo_tag')
+                        roin = ROIn.replace('ROI_', '')
+                        roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi'+roin+'_ch_1.dat')
 
                     self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                     self.processor_1.roi_image = self.roi_1
@@ -2599,7 +2603,9 @@ class _Phot2conc_vars_funct:
                     if os.path.exists(roi_2_path):
                         pass
                     else:
-                        roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
+                        ROIn = dpg.get_value('ROI_names_combo_tag')
+                        roin = ROIn.replace('ROI_', '')
+                        roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi'+roin+'_ch_2.dat')
 
                     self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                     self.processor_2.roi_image = self.roi_2
@@ -2624,14 +2630,18 @@ class _Phot2conc_vars_funct:
                 if os.path.exists(roi_1_path):
                     pass
                 else:
-                    roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_1.dat')
+                    ROIn = dpg.get_value('ROI_names_combo_tag')
+                    roin = ROIn.replace('ROI_', '')
+                    roi_1_path = os.path.join(self.ROI_directory, an_file + '_roi'+roin+'_ch_1.dat')
 
                 self.roi_1 = self.load_ROI(roi_1_path).to_numpy()
                 roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi_ch_2.dat')
                 if os.path.exists(roi_2_path):
                     pass
                 else:
-                    roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi0_ch_2.dat')
+                    OIn = dpg.get_value('ROI_names_combo_tag')
+                    roin = ROIn.replace('ROI_', '')
+                    roi_2_path = os.path.join(self.ROI_directory, an_file + '_roi'+roin+'_ch_2.dat')
 
                 self.roi_2 = self.load_ROI(roi_2_path).to_numpy()
                 self.processor_1.roi_image = self.roi_1

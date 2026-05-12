@@ -28,7 +28,10 @@ SOFTWARE.
 '''
 
 
-
+EXT_COLORS = {
+    "dark": (220, 220, 220, 255),
+    "light": (40, 42, 40, 255)
+}
 
 DARK = {
     # baza okien
@@ -40,6 +43,7 @@ DARK = {
     # tekst
     "text":             (235, 235, 235, 255),
     "text_disabled":    (150, 150, 150, 255),
+    "text_selected_bg": (235, 235, 235, 255),
 
     # pola / inputy
     "frame_bg":         (51, 51, 55, 255),
@@ -116,6 +120,13 @@ DARK = {
     "tab_active":          (95, 120, 100, 255),
     "tab_unfocused":       (50, 52, 54, 255),
     "tab_unfocused_active":(72, 88, 76, 255),
+
+    
+    "table_header":        (60, 60, 65, 255),
+    "table_border_strong": (90, 90, 95, 255),
+    "table_border_light":  (60, 60, 65, 255),
+    "table_row":           (0, 0, 0, 0),
+    "table_row_alt":       (255, 255, 255, 5),
 }
 
 LIGHT = {
@@ -127,7 +138,8 @@ LIGHT = {
 
     # tekst (lekko złagodzony)
     "text":             (40, 42, 40, 255),
-    "text_disabled":    (150, 155, 150, 255),
+    "text_disabled":    (50, 55, 50, 255),
+    "text_selected_bg": (120, 140, 120, 80),
 
     # pola / inputy (jaśniejsze!)
     "frame_bg":         (225, 227, 225, 255),
@@ -164,7 +176,7 @@ LIGHT = {
 
     # statusy
     "menu_text":        (40, 42, 40, 255),
-    "menu_warn":        (170, 180, 120, 255),  # oliwkowy — spokojniejszy niż czerwony
+    "menu_warn":        (70, 80, 20, 255),  # oliwkowy — spokojniejszy niż czerwony
     "menu_ok":          (150, 175, 140, 255),
 
     # error window (też złagodzony)
@@ -200,6 +212,13 @@ LIGHT = {
     "tab_active":          (150, 175, 140, 255),
     "tab_unfocused":       (215, 220, 215, 255),
     "tab_unfocused_active":(185, 198, 182, 255),
+    
+    "table_header":        (210, 215, 210, 255),
+    "table_border_strong": (185, 190, 185, 255),
+    "table_border_light":  (210, 215, 210, 255),
+    "table_row":           (0, 0, 0, 0),
+    "table_row_alt":       (120, 140, 120, 20),
+
 }
 
 def create_global_theme(p):
@@ -211,6 +230,7 @@ def create_global_theme(p):
 
             dpg.add_theme_color(dpg.mvThemeCol_Text,             p["text"],             category=dpg.mvThemeCat_Core)
             dpg.add_theme_color(dpg.mvThemeCol_TextDisabled,     p["text_disabled"],    category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TextSelectedBg, p["text_selected_bg"], category=dpg.mvThemeCat_Core)
 
             dpg.add_theme_color(dpg.mvThemeCol_FrameBg,          p["frame_bg"],         category=dpg.mvThemeCat_Core)
             dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered,   p["frame_bg_hovered"], category=dpg.mvThemeCat_Core)
@@ -246,6 +266,13 @@ def create_global_theme(p):
             dpg.add_theme_color(dpg.mvThemeCol_TabActive,          p["tab_active"],         category=dpg.mvThemeCat_Core)
             dpg.add_theme_color(dpg.mvThemeCol_TabUnfocused,       p["tab_unfocused"],      category=dpg.mvThemeCat_Core)
             dpg.add_theme_color(dpg.mvThemeCol_TabUnfocusedActive, p["tab_unfocused_active"], category=dpg.mvThemeCat_Core)
+
+            dpg.add_theme_color(dpg.mvThemeCol_TableHeaderBg,        p["table_header"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TableBorderStrong,    p["table_border_strong"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TableBorderLight,     p["table_border_light"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TableRowBg,           p["table_row"], category=dpg.mvThemeCat_Core)
+            dpg.add_theme_color(dpg.mvThemeCol_TableRowBgAlt,        p["table_row_alt"], category=dpg.mvThemeCat_Core)
+
 
 
 

@@ -114,6 +114,17 @@ VP_h = dpg.get_viewport_height()           # get initial height of the viewport
 menu.mount_main_Menu_bar()
 
 rwroi = inits.rewrite_roi(viewport)
+mxroi = inits.Roi_mixer(viewport,globalITEMS)
+
+settwin = inits.sett_window(viewport,inV.init_left_indent,
+                             inV.init_internal_indent,
+                             inV.init_right_indent,
+                             inV.init_bottom_indent,
+                             inV.init_top_indent,
+                             inV.init_group_spacer)
+
+
+
 try:
    
     updt.run_updater()
@@ -133,8 +144,11 @@ basf.P2C_manu_F = P2C_manu_F
 basf.PE_manu_F = PE_manu_F
 basf.viewport = viewport
 dpg.set_viewport_resize_callback(basf.basic_resizer)
-basf.mount_inint_buttons()
-THEME = SETTINGS['Settings']['Theme']
+
+THEME = settwin.OPTIONS['theme_choose']
+# SETTINGS['Settings']['Theme']
 build_themes(THEME)
+basf.mount_inint_buttons()
+mxroi.theme = THEME
 dpg.start_dearpygui()
 dpg.destroy_context()
