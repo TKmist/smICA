@@ -2482,9 +2482,11 @@ class _PhotExtr_vars_funct:
                 if channels[channel] == 0:
                     if not flim_data_stack.shape[3] % 2 == 0:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
+                        # raw_lifetime_data = lifetime_data.copy()
                         xs = XS[np.where(XS>LLim_ch_1)[0]]
                     else:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                        # raw_lifetime_data = lifetime_data.copy()
                         
                         xs = XS[np.where(XS>=LLim_ch_1)[0]]
                         
@@ -2515,6 +2517,7 @@ class _PhotExtr_vars_funct:
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_1[j]
                             afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
+                        # raw_lifetime_data = lifetime_data.copy()
                         background = afterpulsing_data
 
                         
@@ -2541,9 +2544,11 @@ class _PhotExtr_vars_funct:
                     if not flim_data_stack.shape[3] % 2 == 0:
                         
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2+1]
+                        # raw_lifetime_data = lifetime_data.copy()
                         xs = XS[np.where(XS<=ULim_ch_2)[0]]
                     else:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                        # raw_lifetime_data = lifetime_data.copy()
                         xs = XS[np.where(XS<ULim_ch_2)[0]]
                     
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
@@ -2571,6 +2576,7 @@ class _PhotExtr_vars_funct:
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_2[j]
                             afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
+                        # raw_lifetime_data = lifetime_data.copy()
                         background = afterpulsing_data
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
@@ -2598,6 +2604,7 @@ class _PhotExtr_vars_funct:
                 if channels[channel] == 0:
     
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                    # raw_lifetime_data = lifetime_data.copy()
                     xs=XS
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     ys = np.sum(ys, axis = 0).astype(float)
@@ -2618,6 +2625,7 @@ class _PhotExtr_vars_funct:
                             filtered_image_data[:,:,j] = lifetime_data[:,:,j]*filter_weight_ch_1[j]
                             afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
                         lifetime_data = filtered_image_data
+                        # raw_lifetime_data = lifetime_data.copy()
                         background = afterpulsing_data
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
@@ -2634,6 +2642,7 @@ class _PhotExtr_vars_funct:
     
                 else:
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                    # raw_lifetime_data = lifetime_data.copy()
                     xs=XS
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
     
@@ -2656,6 +2665,7 @@ class _PhotExtr_vars_funct:
                             afterpulsing_data[:,:,j] = lifetime_data[:,:,j]*afterpulsing_weight[j]
     
                         lifetime_data = filtered_image_data
+                        # raw_lifetime_data = lifetime_data.copy()
                         background = afterpulsing_data
 
                         filtered_taus = np.sum(lifetime_data, axis=0)
@@ -2757,12 +2767,23 @@ class _PhotExtr_vars_funct:
             json_pickle_all['taus_'+str(channels[channel]+1)]=taus
             json_pickle_all['fulltaus_'+str(channels[channel]+1)]=fulltaus
             json_pickle_all['lifetimes_'+str(channels[channel]+1)]=lifetimes
+            # json_pickle_all['photon_hist_'+str(channels[channel]+1)] = # raw_lifetime_data
+            # json_pickle_all['tau_axis_'+str(channels[channel]+1)] = (
+            #     np.arange(# raw_lifetime_data.shape[2]) * self.tau_resolution
+            # )
             json_pickle_all['intensity_'+str(channels[channel]+1)]=intensity
             json_pickle_all['bgrnd_'+str(channels[channel]+1)]=bgrnd
             json_pickle_all['filter_weight_'+str(channels[channel]+1)]= FWeight
             json_pickle_all['filter_afterpulsing_weight_'+str(channels[channel]+1)] = afterpulsing_weight
             json_pickle_all['special_markers_'+str(channels[channel]+1)] = special_markers
             json_pickle_all['filtered_taus_'+str(channels[channel]+1)] = filtered_taus_DF
+            json_pickle_all['_meta'] = {
+                'format': 'pickle',
+                'version': 1,
+                'numpy': np.__version__,
+                'pandas': pd.__version__
+                
+            }
            
             
             

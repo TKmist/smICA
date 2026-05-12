@@ -43,6 +43,7 @@ class ImageROIProcessor:
         # self.output_path = output_path
         # self.find_nucleus = find_nucleus
         self.image = None
+        self.LT_image = None
         self.roi_image = None
         self.all_cells_contours = None
         self.all_cells_masks = None

@@ -1576,7 +1576,7 @@ class Roi_mixer:
                 width=bottom_butt_width,
                 height=bottom_butt_height,
                 tag="mx_proceed_btn",
-                pos=[side_margin, winheight+side_margin],
+                pos=[side_margin, winheight+side_margin+button_height],
                 callback=self.call_back_mx_proceed,
                 enabled=False
             )
@@ -1639,7 +1639,7 @@ class Roi_mixer:
                            ):
                 dpg.add_file_extension(".dat", color=self.EXT_COLORS[self.theme],tag='mxroixt2_tag')  # pokaż wszystko
                 self.mxroiItems.append('mxroixt2_tag')
-            self.mxroiItems.append('MXROISource_file_1_dialog')
+            self.mxroiItems.append('MXROISource_file_2_dialog')
             dpg.add_file_dialog(directory_selector=True,
                                 label = 'Select target ROI folder',
                                 show=False,
