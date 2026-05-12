@@ -16,8 +16,8 @@
   <a href="https://github.com/TKmist/smICA/releases/latest">
     <img src="https://img.shields.io/github/v/release/TKmist/smICA?label=download" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   </a>
-  <a href="https://zenodo.org/records/18456909">
-    <img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.18456909-blue" style="display:inline-block; margin:0 2px; vertical-align:middle;">
+  <a href="https://zenodo.org/records/20134967">
+    <img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20134967-blue" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   </a>
 </p>
 
