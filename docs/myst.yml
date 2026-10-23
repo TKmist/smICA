@@ -13,6 +13,11 @@ project:
          - file: Phot2conc.ipynb
          - file: RwROI.ipynb
          - file: MXROI.ipynb
+    - file: Automation_server.ipynb
+      children:
+         - file: Automation_commands.ipynb
+         - file: Automation_design_and_coverage.ipynb
+    - file: For_developers.ipynb
     - file: Credits.ipynb
     
 
@@ -40,4 +45,3 @@ site:
           © 2026
           </div>
     
-

@@ -101,7 +101,11 @@ class ImageROIProcessor:
             mask = np.where(labels > 0, 255, 0).astype(np.uint8)
         else:
             inside_mask, _ = self._process_contours_pipeline(image_to_process, threshold)
-            mask = inside_mask[0]
+            if inside_mask:
+                mask = inside_mask[0]
+            else:
+                # No detected object is a valid result for the selected threshold.
+                mask = np.zeros_like(roi_mask, dtype=np.uint8)
 
         if subtract:
             self.all_masks = [self.all_cells_masks[0] - mask]

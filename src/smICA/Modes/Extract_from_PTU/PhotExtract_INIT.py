@@ -37,7 +37,7 @@ from numpy import log10, sqrt, exp, log, pi
 import time
 import pickle
 import cv2
-from Required.Third_party.readPTU_FLIM import PTUreader
+from Modes.Extract_from_PTU.include import RoutedPtuReader
 from numpy.linalg import inv, det,cond,pinv
 
 
@@ -478,6 +478,16 @@ class _PhotExtr_vars_funct:
         '''Reads the .PTU file'''
         
         self.mount_loading_status_window()
+        # Loading a PTU through the file dialog starts a new GUI configuration.
+        # Reset both filter checkboxes before detecting the channels present in
+        # the new file, otherwise a hidden channel can retain the state of the
+        # previously loaded two-channel measurement.
+        for channel in (1, 2):
+            dpg.set_value(
+                'use_as_statistical_filters_chkbx_ch_'+str(channel),
+                False,
+            )
+            self.unmount_filter_list_table(channel)
         self.sindatax1 = np.empty(10)
         self.sindatay1 = np.empty(10)
         self.sindatax2 = np.empty(10)
@@ -524,16 +534,18 @@ class _PhotExtr_vars_funct:
         dpg.configure_item('U_dline_ch2',show=False)
         dpg.hide_item('use_as_statistical_filters_chkbx_ch_1')
         dpg.hide_item('use_as_statistical_filters_chkbx_ch_2')
-        ptu_image  = PTUreader(file_path, print_header_data = False)
+        ptu_image = RoutedPtuReader(file_path, print_header_data=False)
         
         self.tau_resolution = ptu_image.head["MeasDesc_Resolution"]*1e9  
         sync_rate = ptu_image.head['TTResult_SyncRate']
         
         if not dpg.get_value('skip_lines_check'):
     
-            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack()
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.reconstruct()
         else:
-            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.reconstruct(
+                rows_to_skip=dpg.get_value('skip_lines_drag')
+            )
         
         self.ntchannels = flim_data_stack.shape[3]
         self.MODE = ptu_image.head['UsrPulseCfg']
@@ -1203,7 +1215,7 @@ class _PhotExtr_vars_funct:
             the_channel = 'Channel 1'
             self.filtering_routine[the_channel] = {}
             self.fl_bg_curves_dict[the_channel] = {self.anal_file:{
-                                                 'name':'(Ch1) '+self.anal_file.split('/')[-1],
+                                                 'name':'(Ch1) '+os.path.basename(self.anal_file),
                                                  'file_path':self.anal_file,
                                                 'TCSPC_resolution':int(np.round(self.tau_resolution*1e-9*1e12)),
                                                 'TCSPC_channels':self.ntchannels,
@@ -1256,7 +1268,7 @@ class _PhotExtr_vars_funct:
             the_channel = 'Channel 2'
             self.filtering_routine[the_channel] = {}
             self.fl_bg_curves_dict[the_channel] = {self.anal_file:{
-                                             'name':'(Ch2) '+self.anal_file.split('/')[-1],
+                                             'name':'(Ch2) '+os.path.basename(self.anal_file),
                                              'file_path':self.anal_file,
                                             'TCSPC_resolution':int(np.round(self.tau_resolution*1e-9*1e12)),
                                             'TCSPC_channels':self.ntchannels,
@@ -1599,7 +1611,7 @@ class _PhotExtr_vars_funct:
         return FILTERS_dict
 
 
-    def callback_Accept_filters(self):
+    def callback_Accept_filters(self, sender=None, app_data=None, user_data=None):
         channel = None
         if self.bg_channel_marker == None:
             pass
@@ -1685,7 +1697,7 @@ class _PhotExtr_vars_funct:
         for marked_decay in to_import_list:
             dpg.set_value(marked_decay,False)
 
-    def callback_Decline_filters(self):
+    def callback_Decline_filters(self, sender=None, app_data=None, user_data=None):
         channel = None
         if self.bg_channel_marker == None:
             pass
@@ -1738,10 +1750,7 @@ class _PhotExtr_vars_funct:
         for i in to_import_indexes:
             name = dpg.get_value('decays_lib_tab_row_'+str(i)+'_cell a_text')
             decay_npy_data = np.load(jsn_dict[channel][name]['npy_path'] )
-            if not name in self.curve_list:
-                self.curve_list.append(name)
-            else:
-                pass
+            self._append_library_decay_name(self.curve_list, name)
         self.unmount_decay_table()
         self.mount_decay_table(self.curve_list)
         for marked_decay in to_import_list:
@@ -1763,6 +1772,12 @@ class _PhotExtr_vars_funct:
             else:
                 pass
         self.callback_Cancel_library_import('Cancel_library_import',None)
+
+    @staticmethod
+    def _append_library_decay_name(curve_list, name):
+        """Keep the current decay and an identically named library decay separate."""
+        if name not in curve_list[1:]:
+            curve_list.append(name)
         
     def callback_Set_background_level(self,sender,app_data):
         channel = None
@@ -1895,24 +1910,42 @@ class _PhotExtr_vars_funct:
         dpg.show_item('Cancel_decay_submission')
         dpg.show_item('Proceed_decay_submission')
 
-    def callback_apply_to_all_ptus(self):
-        
+    def callback_apply_to_all_ptus(self, sender=None, app_data=None, user_data=None,
+                                   refresh_progress=False):
+        # Keep per-file telemetry separate from the scientific result.  The
+        # automation layer exposes it for reproducibility reports, while a
+        # normal GUI run simply ignores this attribute.
+        self.last_batch_file_timings = []
         self.mount_status_modal()
-        for i,an_file in enumerate(self.files):
-            perc = int(np.round(i/len(self.files)*100))
-        
-            dpg.configure_item('loading_butt',label=an_file)
-            dpg.configure_item('loading_cnt_butt',label=str(perc)+'%')
-            self.extract_from_ptu(self.last_directory,
-                                  an_file,
-                                  self.B_limit_ch_1,
-                                  self.U_limit_ch_1,
-                                  self.B_limit_ch_2,
-                                  self.U_limit_ch_2)
-   
-    
-        dpg.configure_item('loading_cnt_butt',label=str(100)+'%')
-        self.unmount_status_modal()
+        try:
+            if refresh_progress:
+                dpg.render_dearpygui_frame()
+            for i,an_file in enumerate(self.files):
+                file_started = time.perf_counter()
+                perc = int(np.round(i/len(self.files)*100))
+
+                dpg.configure_item('loading_butt',label=an_file)
+                dpg.configure_item('loading_cnt_butt',label=str(perc)+'%')
+                if refresh_progress:
+                    dpg.render_dearpygui_frame()
+                self.extract_from_ptu(self.last_directory,
+                                      an_file,
+                                      self.B_limit_ch_1,
+                                      self.U_limit_ch_1,
+                                      self.B_limit_ch_2,
+                                      self.U_limit_ch_2)
+                ptu_path = os.path.join(self.last_directory, an_file)
+                self.last_batch_file_timings.append({
+                    'filename': an_file,
+                    'size_bytes': os.path.getsize(ptu_path),
+                    'wall_time_seconds': time.perf_counter() - file_started,
+                })
+
+            dpg.configure_item('loading_cnt_butt',label=str(100)+'%')
+            if refresh_progress:
+                dpg.render_dearpygui_frame()
+        finally:
+            self.unmount_status_modal()
     
 
 
@@ -1922,22 +1955,27 @@ class _PhotExtr_vars_funct:
         dpg.configure_item('PTU_dir_dialog',show=True)
     
         
-    def callback_apply_to_single_ptus(self):
+    def callback_apply_to_single_ptus(self, sender=None, app_data=None, user_data=None,
+                                      refresh_progress=False):
         
-        an_file = self.anal_file.split('/')[-1]   
+        an_file = os.path.basename(self.anal_file)
         self.mount_status_modal()
-        dpg.configure_item('loading_butt',label=an_file)
-        self.extract_from_ptu(self.last_directory,
-                              an_file,
-                              self.B_limit_ch_1,
-                              self.U_limit_ch_1,
-                              self.B_limit_ch_2,
-                              self.U_limit_ch_2)
-        
-    
-        dpg.configure_item('loading_cnt_butt',label=str(100)+'%')
-    
-        self.unmount_status_modal()
+        try:
+            dpg.configure_item('loading_butt',label=an_file)
+            if refresh_progress:
+                dpg.render_dearpygui_frame()
+            self.extract_from_ptu(self.last_directory,
+                                  an_file,
+                                  self.B_limit_ch_1,
+                                  self.U_limit_ch_1,
+                                  self.B_limit_ch_2,
+                                  self.U_limit_ch_2)
+
+            dpg.configure_item('loading_cnt_butt',label=str(100)+'%')
+            if refresh_progress:
+                dpg.render_dearpygui_frame()
+        finally:
+            self.unmount_status_modal()
     
     
     def callback_cancel_submission(self,sender,app_data):
@@ -2180,8 +2218,14 @@ class _PhotExtr_vars_funct:
         self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchanx'+str(channel)]=subtr['xs'].values
         self.fl_bg_curves_dict['Channel '+str(channel)][self.anal_file]['subtract_bg']['tchany'+str(channel)]=subtr.smth.values*np.sum(ys)
     
-        minimum = min(subtr.smth.where(subtr.smth!=0).dropna())/2
-        dpg.set_axis_limits("yaxis_tltr", minimum ,subtr.smth.max()*2)
+        positive_values = subtr.smth.where(subtr.smth > 0).dropna()
+        if positive_values.empty:
+            minimum = np.finfo(np.float64).eps
+            maximum = 1.0
+        else:
+            minimum = float(positive_values.min()) / 2
+            maximum = max(float(positive_values.max()) * 2, minimum * 10)
+        dpg.set_axis_limits("yaxis_tltr", minimum, maximum)
 
     def callback_drag_Background_level_line(self,sender,app_data):
         
@@ -2378,13 +2422,28 @@ class _PhotExtr_vars_funct:
         
         return weight
 
+    @staticmethod
+    def _weighted_lifetime_map(weighted_time_sum, intensity):
+        """Calculate a weighted mean time without truncating fractional weights."""
+        weighted_time_sum = np.asarray(weighted_time_sum, dtype=np.float64)
+        intensity = np.asarray(intensity, dtype=np.float64)
+        lifetimes = np.full(intensity.shape, np.nan, dtype=np.float64)
+        valid_intensity = np.isfinite(intensity) & (intensity > 0)
+        np.divide(
+            weighted_time_sum,
+            intensity,
+            out=lifetimes,
+            where=valid_intensity,
+        )
+        return lifetimes
+
     def extract_from_ptu(self,folder,ptu_file,LLim_ch_1,ULim_ch_1,LLim_ch_2,ULim_ch_2):
         dpg.configure_item('loading_status',label='Loading')
     
         np.seterr(divide='ignore')
         file=ptu_file.replace('.ptu','')
         path_to_file = os.path.join(folder,ptu_file)
-        ptu_image  = PTUreader(path_to_file, print_header_data = False)
+        ptu_image = RoutedPtuReader(path_to_file, print_header_data=False)
         mode = ptu_image.head['UsrPulseCfg']
         self.tau_resolution = ptu_image.head["MeasDesc_Resolution"]*1e9
         tcspc_reolution = int(np.round(self.tau_resolution*1e-9*1e12))
@@ -2410,12 +2469,15 @@ class _PhotExtr_vars_funct:
     
         if not dpg.get_value('skip_lines_check'):
     
-            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack()
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.reconstruct()
         else:
     
-            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.get_flim_data_stack_omit(dpg.get_value('skip_lines_drag'))
+            flim_data_stack, intensity_image_all_channels,special,sync,im_channels,tcspc = ptu_image.reconstruct(
+                rows_to_skip=dpg.get_value('skip_lines_drag')
+            )
     
-        number_of_frames = int(pd.Series(special).where(pd.Series(special)==4).dropna().count())
+        reader_metadata = ptu_image.processing_metadata(special)
+        number_of_frames = reader_metadata['Frame markers']
     
     
         line_width = ptu_image.head['ImgHdr_PixX']
@@ -2451,6 +2513,7 @@ class _PhotExtr_vars_funct:
                     'Number of frames': int(number_of_frames),
                     'Pixel dwell':float(pixel_dwell),
                     'Lifetime resolution':float(self.tau_resolution)}
+        info_dict.update(reader_metadata)
         infoname = file+'.info'
     
         self.ntchannels = flim_data_stack.shape[3]
@@ -2459,6 +2522,8 @@ class _PhotExtr_vars_funct:
     
     
         for channel in range(number_of_channels):
+
+            frame_microtime_bins = None
     
     
             tau_pickle_name = file+'_taus_ch_'+str(channels[channel]+1)+'.pck'
@@ -2482,13 +2547,15 @@ class _PhotExtr_vars_funct:
                 if channels[channel] == 0:
                     if not flim_data_stack.shape[3] % 2 == 0:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1+1:ULim_ch_1]
+                        frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_1+1:ULim_ch_1]
                         # raw_lifetime_data = lifetime_data.copy()
-                        xs = XS[np.where(XS>LLim_ch_1)[0]]
+                        xs = XS[LLim_ch_1+1:ULim_ch_1]
                     else:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                        frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_1:ULim_ch_1]
                         # raw_lifetime_data = lifetime_data.copy()
                         
-                        xs = XS[np.where(XS>=LLim_ch_1)[0]]
+                        xs = XS[LLim_ch_1:ULim_ch_1]
                         
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     
@@ -2496,9 +2563,9 @@ class _PhotExtr_vars_funct:
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
                     if not flim_data_stack.shape[3] % 2 == 0:
-                        ys = ys[np.where(XS>LLim_ch_1)[0]]
+                        ys = ys[LLim_ch_1+1:ULim_ch_1]
                     else:
-                        ys = ys[np.where(XS>=LLim_ch_1)[0]]
+                        ys = ys[LLim_ch_1:ULim_ch_1]
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_1'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 1')
                         filtering_decays_ch_1 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,1)
@@ -2544,21 +2611,23 @@ class _PhotExtr_vars_funct:
                     if not flim_data_stack.shape[3] % 2 == 0:
                         
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2+1]
+                        frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_2:ULim_ch_2+1]
                         # raw_lifetime_data = lifetime_data.copy()
-                        xs = XS[np.where(XS<=ULim_ch_2)[0]]
+                        xs = XS[LLim_ch_2:ULim_ch_2+1]
                     else:
                         lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                        frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_2:ULim_ch_2]
                         # raw_lifetime_data = lifetime_data.copy()
-                        xs = XS[np.where(XS<ULim_ch_2)[0]]
+                        xs = XS[LLim_ch_2:ULim_ch_2]
                     
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     ys = np.sum(ys, axis = 0).astype(float)
                     fYS = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
                     fYS = np.sum(fYS, axis = 0).astype(float)
                     if not flim_data_stack.shape[3] % 2 == 0:
-                        ys = ys[np.where(XS<=ULim_ch_2)[0]]
+                        ys = ys[LLim_ch_2:ULim_ch_2+1]
                     else:
-                        ys = ys[np.where(XS<ULim_ch_2)[0]]
+                        ys = ys[LLim_ch_2:ULim_ch_2]
                     if dpg.get_value('use_as_statistical_filters_chkbx_ch_2'):
                         dpg.configure_item('loading_status',label='Calculating filters channel 2')
                         filtering_decays_ch_2 = self.prepare_input_to_calculate_filters_from_routine(xs,ys,self.ntchannels,tcspc_reolution,self.filtering_routine,2)
@@ -2604,6 +2673,7 @@ class _PhotExtr_vars_funct:
                 if channels[channel] == 0:
     
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_1:ULim_ch_1]
+                    frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_1:ULim_ch_1]
                     # raw_lifetime_data = lifetime_data.copy()
                     xs=XS
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
@@ -2642,6 +2712,7 @@ class _PhotExtr_vars_funct:
     
                 else:
                     lifetime_data = flim_data_stack[:,:,channels[channel],LLim_ch_2:ULim_ch_2]
+                    frame_microtime_bins = np.arange(self.ntchannels)[LLim_ch_2:ULim_ch_2]
                     # raw_lifetime_data = lifetime_data.copy()
                     xs=XS
                     ys = np.sum(flim_data_stack[:,:,channels[channel],:], axis=0)
@@ -2708,6 +2779,23 @@ class _PhotExtr_vars_funct:
     
             intensity = np.sum(lifetime_data, axis = 2)
             bgrnd = np.sum(background, axis = 2)
+            frame_data = None
+            if ptu_image.uses_phconvert:
+                foreground_weights = (
+                    np.ones(len(frame_microtime_bins), dtype=np.float64)
+                    if FWeight is None else np.asarray(FWeight, dtype=np.float64)
+                )
+                background_weights = (
+                    np.zeros(len(frame_microtime_bins), dtype=np.float64)
+                    if afterpulsing_weight is None
+                    else np.asarray(afterpulsing_weight, dtype=np.float64)
+                )
+                frame_data = ptu_image.frame_image_data(
+                    channels[channel],
+                    frame_microtime_bins,
+                    foreground_weights,
+                    background_weights,
+                )
             lifetime = np.zeros(lifetime_data.shape)
     
             if channels[channel] == 0:
@@ -2742,8 +2830,8 @@ class _PhotExtr_vars_funct:
     
                     lifetime[:,:,k]=lifetime_data[:,:,k]*t_chan*self.tau_resolution
     
-            inv_intensity = np.where(intensity.astype(int)!=0,1/intensity.astype(int),np.nan)
-            lifetimes = np.sum(lifetime, axis = 2)*inv_intensity
+            weighted_time_sum = np.sum(lifetime, axis=2)
+            lifetimes = self._weighted_lifetime_map(weighted_time_sum, intensity)
     
             channel_data = np.sum(flim_data_stack[:,:,channels[channel],:],axis=2)
     
@@ -2773,15 +2861,18 @@ class _PhotExtr_vars_funct:
             # )
             json_pickle_all['intensity_'+str(channels[channel]+1)]=intensity
             json_pickle_all['bgrnd_'+str(channels[channel]+1)]=bgrnd
+            if frame_data is not None:
+                json_pickle_all['frame_data_'+str(channels[channel]+1)] = frame_data
             json_pickle_all['filter_weight_'+str(channels[channel]+1)]= FWeight
             json_pickle_all['filter_afterpulsing_weight_'+str(channels[channel]+1)] = afterpulsing_weight
             json_pickle_all['special_markers_'+str(channels[channel]+1)] = special_markers
             json_pickle_all['filtered_taus_'+str(channels[channel]+1)] = filtered_taus_DF
             json_pickle_all['_meta'] = {
                 'format': 'pickle',
-                'version': 1,
+                'version': 2,
                 'numpy': np.__version__,
-                'pandas': pd.__version__
+                'pandas': pd.__version__,
+                'frame_resolved': bool(ptu_image.uses_phconvert)
                 
             }
            

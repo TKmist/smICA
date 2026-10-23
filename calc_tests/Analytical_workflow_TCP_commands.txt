@@ -1,0 +1,443 @@
+#!/usr/bin/env bash
+
+# This file is part of the smICA repository that is distributed under the MIT license; see below.
+#
+#
+# ############################################################################
+#
+# MIT License
+#
+# Copyright (c) 2026 Tomasz Kalwarczyk
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# Reproduce the Analytical_workflow.ipynb processing with the smICA TCP API.
+#
+# Start smICA in another terminal before running this file:
+#   run_smICA --automation-server --automation-port 8765
+#
+# The directory name "tcscp" is preserved because it is the name used in the
+# reference-data tree. It denotes TCSPC statistical filtering.
+
+set -euo pipefail
+
+PORT="${SMICA_AUTOMATION_PORT:-8765}"
+TIMEOUT="${SMICA_AUTOMATION_TIMEOUT:-3600}"
+SCRIPT_DIRECTORY="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPOSITORY_ROOT="$(cd -- "$SCRIPT_DIRECTORY/.." && pwd)"
+DATA_ROOT="$REPOSITORY_ROOT/calc_tests/REFERENCE_DATA/TypeOfFiltering"
+RAW_ROOT="$DATA_ROOT/raw"
+GATING_ROOT="$DATA_ROOT/gating"
+TCSPC_ROOT="$DATA_ROOT/tcscp"
+STATE_FILE="$SCRIPT_DIRECTORY/workflow_state.txt"
+REPORT_FILE="$SCRIPT_DIRECTORY/workflow_report.txt"
+RESUME="${RESUME_WORKFLOW:-true}"
+START_TIME="$(date +%s)"
+STARTED_AT="$(date --iso-8601=seconds 2>/dev/null || date)"
+COMPLETED_EXTRACTIONS=0
+SKIPPED_EXTRACTIONS=0
+COMPLETED_CALCULATIONS=0
+SKIPPED_CALCULATIONS=0
+
+touch "$STATE_FILE"
+
+call() {
+    local command="$1"
+    local parameters="${2-}"
+    if [[ -z "$parameters" ]]; then
+        parameters='{}'
+    fi
+    smica-call --port "$PORT" --timeout "$TIMEOUT" "$command" "$parameters"
+}
+
+resume_has() {
+    [[ "$RESUME" == true ]] && grep -Fqx -- "$1" "$STATE_FILE"
+}
+
+mark_done() {
+    if ! grep -Fqx -- "$1" "$STATE_FILE"; then
+        printf '%s\n' "$1" >> "$STATE_FILE"
+    fi
+}
+
+begin_extraction() {
+    local key="$1"
+    if resume_has "$key"; then
+        printf 'RESUME: skipping extraction %s\n' "$key"
+        ((SKIPPED_EXTRACTIONS += 1))
+        return 1
+    fi
+    return 0
+}
+
+finish_extraction() {
+    mark_done "$1"
+    ((COMPLETED_EXTRACTIONS += 1))
+}
+
+begin_calculation() {
+    local key="$1"
+    local output="$2"
+    if resume_has "$key" && [[ -s "$output" ]]; then
+        printf 'RESUME: skipping calculation %s\n' "$key"
+        ((SKIPPED_CALCULATIONS += 1))
+        return 1
+    fi
+    return 0
+}
+
+finish_calculation() {
+    mark_done "$1"
+    ((COMPLETED_CALCULATIONS += 1))
+}
+
+write_report() {
+    local exit_code=$?
+    local finished_time elapsed status
+    trap - EXIT
+    finished_time="$(date +%s)"
+    elapsed=$((finished_time - START_TIME))
+    if ((exit_code == 0)); then
+        status=COMPLETED
+    else
+        status="FAILED (exit code $exit_code)"
+    fi
+    {
+        echo "smICA reference workflow report"
+        echo "Status: $status"
+        echo "Started: $STARTED_AT"
+        echo "Finished: $(date --iso-8601=seconds 2>/dev/null || date)"
+        printf 'Elapsed: %02d:%02d:%02d (%d seconds)\n' \
+            "$((elapsed / 3600))" "$(((elapsed % 3600) / 60))" "$((elapsed % 60))" "$elapsed"
+        echo "Completed extraction batches: $COMPLETED_EXTRACTIONS"
+        echo "Skipped extraction batches: $SKIPPED_EXTRACTIONS"
+        echo "Completed calculation batches: $COMPLETED_CALCULATIONS"
+        echo "Skipped calculation batches: $SKIPPED_CALCULATIONS"
+        echo "Resume state: $STATE_FILE"
+        echo "Host: $(hostname 2>/dev/null || echo unavailable)"
+        echo "Operating system: $(uname -s 2>/dev/null || echo unavailable)"
+        echo "Kernel: $(uname -r 2>/dev/null || echo unavailable)"
+        echo "Architecture: $(uname -m 2>/dev/null || echo unavailable)"
+        echo "CPU: $(lscpu 2>/dev/null | awk -F: '/Model name/{sub(/^[[:space:]]+/, "", $2); print $2; exit}' || echo unavailable)"
+        echo "Logical CPUs: $(getconf _NPROCESSORS_ONLN 2>/dev/null || echo unavailable)"
+        echo "Memory: $(awk '/MemTotal/{printf "%.2f GiB", $2 / 1024 / 1024}' /proc/meminfo 2>/dev/null || echo unavailable)"
+        echo "Python: $(${PYTHON_EXECUTABLE:-python} --version 2>&1 || echo unavailable)"
+    } | tee "$REPORT_FILE"
+    exit "$exit_code"
+}
+trap write_report EXIT
+
+load_extract_directory() {
+    local directory="$1"
+    local skip_rows="$2"
+    shift 2
+    call extract.load_directory "{\"directory\":\"$directory\"}"
+    call extract.set_rows_to_skip "{\"enabled\":$skip_rows,\"rows\":15}"
+
+    local channel
+    for channel in "$@"; do
+        call extract.set_statistical_filter "{\"channel\":$channel,\"enabled\":false}"
+    done
+}
+
+extract_raw_standard() {
+    local directory="$1" key="extraction:raw:${1#$RAW_ROOT/}"
+    begin_extraction "$key" || return 0
+    load_extract_directory "$directory" false 1
+    call extract.apply_all
+    finish_extraction "$key"
+}
+
+extract_raw_pie() {
+    local directory="$1"
+    local key="extraction:raw:${1#$RAW_ROOT/}"
+    local channel_1="$2"
+    local channel_2="$3"
+    begin_extraction "$key" || return 0
+    local channels=()
+    if [[ "$channel_1" == true ]]; then
+        channels+=(1)
+    fi
+    if [[ "$channel_2" == true ]]; then
+        channels+=(2)
+    fi
+    load_extract_directory "$directory" true "${channels[@]}"
+
+    # set_gate requires both limits. The unchanged partner limit is repeated.
+    # In the no-filtering workflow only: Channel 1 Time>0, Channel 2 Time<50.
+    if [[ "$channel_1" == true ]]; then
+        call extract.set_gate '{"channel":1,"lower_ns":0,"upper_ns":50}'
+    fi
+    if [[ "$channel_2" == true ]]; then
+        call extract.set_gate '{"channel":2,"lower_ns":0,"upper_ns":50}'
+    fi
+    call extract.apply_all
+    finish_extraction "$key"
+}
+
+extract_gating_pie() {
+    local directory="$1"
+    local key="extraction:gating:${1#$GATING_ROOT/}"
+    begin_extraction "$key" || return 0
+    shift
+    load_extract_directory "$directory" true "$@"
+    # Loading a PIE directory initializes the standard PIE gates used by the notebook.
+    call extract.apply_all
+    finish_extraction "$key"
+}
+
+extract_tcspc() {
+    local directory="$1"
+    local key="extraction:tcscp:${1#$TCSPC_ROOT/}"
+    local skip_rows="$2"
+    shift 2
+    local channels=("$@")
+    begin_extraction "$key" || return 0
+    load_extract_directory "$directory" "$skip_rows" "${channels[@]}"
+
+    if [[ "$(find "$directory" -maxdepth 1 -type f -name '*.ptu' -printf '.' | wc -c)" -eq 0 ]]; then
+        printf 'No PTU files found in: %s\n' "$directory" >&2
+        return 1
+    fi
+
+    # The first sorted PTU defines the gates and statistical-filter routine.
+    # The native batch callback recalculates file-specific weights for all PTUs.
+    local channel
+    for channel in "${channels[@]}"; do
+        call extract.set_statistical_filter "{\"channel\":$channel,\"enabled\":true}"
+        call extract.open_filter_setup "{\"channel\":$channel}"
+        call extract.set_background_range "{\"channel\":$channel,\"enabled\":true}"
+        call extract.calculate_filters "{\"channel\":$channel}"
+        call extract.accept_filters "{\"channel\":$channel}"
+    done
+    call extract.apply_all
+    finish_extraction "$key"
+}
+
+load_calibration() {
+    call phot2conc.load_calibration "{\"path\":\"$1\"}"
+}
+
+load_phot_directory() {
+    local directory="$1"
+    call phot2conc.load_directory "{\"directory\":\"$directory\"}"
+    call phot2conc.set_roi_source '{"source":"none"}'
+}
+
+export_results() {
+    local directory="$1"
+    call phot2conc.export_results "{\"path\":\"$directory/results.csv\"}"
+}
+
+calculate_standard() {
+    local directory="$1"
+    local calibration="$2"
+    local output="$directory/results.csv"
+    local key="calculation:${directory#$DATA_ROOT/}/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$calibration"
+    call phot2conc.calculate_all
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+calculate_raw_mrna() {
+    local directory="$RAW_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration"
+    local output="$directory/results.csv" key="calculation:raw/pie_mrna_256x256_200_frames/shared_pie_calibration/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$directory/calib.json"
+    call phot2conc.set_roi_source '{"source":"auto"}'
+
+    call phot2conc.select_file '{"filename":"cell3-1240-cyt1-mRNA-None_200nm_4.36us_4uW.ptu"}'
+    call phot2conc.set_auto_roi '{"channel":1,"cell_threshold":0.1}'
+    call phot2conc.calculate
+    call phot2conc.add_result
+
+    call phot2conc.select_file '{"filename":"cell3-1910-cyt1-mRNA-None_200nm_4.36us_4uW.ptu"}'
+    call phot2conc.set_auto_roi '{"channel":1,"cell_threshold":0.05}'
+    call phot2conc.calculate
+    call phot2conc.add_result
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+calculate_raw_gfp() {
+    local directory="$RAW_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration"
+    local output="$directory/results.csv" key="calculation:raw/pie_gfp_256x256_200_frames/shared_pie_calibration/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$directory/calib.json"
+    call phot2conc.set_roi_source '{"source":"auto"}'
+    call phot2conc.set_auto_roi '{"channel":2,"cell_threshold":1}'
+    call phot2conc.calculate_all
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+calculate_raw_dual_new() {
+    local directory="$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu"
+    local output="$directory/results.csv" key="calculation:raw/pie_dual_channel_128x128_100_frames/imaging_new_ptu/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$directory/calib_imaging_new_ptu.json"
+    call phot2conc.set_roi_source '{"source":"auto"}'
+
+    call phot2conc.select_file '{"filename":"cell-108-01252-400nm_8.ptu"}'
+    call phot2conc.set_auto_roi '{"channel":1,"cell_threshold":1}'
+    call phot2conc.set_auto_roi '{"channel":2,"cell_threshold":1}'
+    call phot2conc.calculate
+    call phot2conc.add_result
+
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+calculate_raw_dual_imaging2() {
+    local directory="$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23"
+    local output="$directory/results.csv" key="calculation:raw/pie_dual_channel_128x128_100_frames/imaging2_17_07_23/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$directory/calib_imaging2_17_07_23.json"
+    call phot2conc.set_roi_source '{"source":"auto"}'
+    call phot2conc.select_file '{"filename":"cell-604-02105.ptu"}'
+    call phot2conc.set_auto_roi '{"channel":2,"cell_threshold":1}'
+    call phot2conc.set_auto_roi '{"channel":1,"copy_from_other":true}'
+    call phot2conc.set_auto_roi '{"channel":1,"roi_mode":"subtract dark","object_threshold":1.036}'
+    call phot2conc.calculate
+    call phot2conc.add_result
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+calculate_with_raw_rois() {
+    local directory="$1"
+    local raw_roi_directory="$2"
+    local calibration="$3" output="$1/results.csv"
+    local key="calculation:${1#$DATA_ROOT/}/results.csv"
+    begin_calculation "$key" "$output" || return 0
+    load_phot_directory "$directory"
+    load_calibration "$calibration"
+    call phot2conc.load_roi_directory "{\"directory\":\"$raw_roi_directory\"}"
+    call phot2conc.set_roi_source '{"source":"file"}'
+    call phot2conc.calculate_all
+    export_results "$directory"
+    finish_calculation "$key"
+}
+
+# Confirm that the server is ready and exposes the expected command set.
+call system.health
+call system.version
+call system.capabilities
+
+# -----------------------------------------------------------------------------
+# 1. Extract from PTU: no filtering (raw)
+# -----------------------------------------------------------------------------
+
+call gui.select_mode '{"mode":"extract"}'
+
+extract_raw_standard "$RAW_ROOT/standard_2022_10_frames/5uW"
+extract_raw_standard "$RAW_ROOT/standard_2022_10_frames/10uW"
+extract_raw_standard "$RAW_ROOT/standard_2022_10_frames/20uW"
+extract_raw_standard "$RAW_ROOT/standard_2022_10_frames/40uW"
+extract_raw_standard "$RAW_ROOT/standard_2025_frame_series/19_09_60"
+extract_raw_standard "$RAW_ROOT/standard_2025_frame_series/19_09_80"
+extract_raw_standard "$RAW_ROOT/standard_2025_frame_series/19_09_100"
+extract_raw_standard "$RAW_ROOT/standard_2025_frame_series/22_09_60"
+extract_raw_standard "$RAW_ROOT/standard_2025_frame_series/22_09_100"
+
+extract_raw_pie "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu" true true
+extract_raw_pie "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23" true true
+extract_raw_pie "$RAW_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration" false true
+extract_raw_pie "$RAW_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration" true false
+
+# -----------------------------------------------------------------------------
+# 2. Extract from PTU: standard PIE gating
+# -----------------------------------------------------------------------------
+
+extract_gating_pie "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu" 1 2
+extract_gating_pie "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23" 1 2
+extract_gating_pie "$GATING_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration" 2
+extract_gating_pie "$GATING_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration" 1
+
+# -----------------------------------------------------------------------------
+# 3. Extract from PTU: TCSPC filtering with existing automatic background
+# -----------------------------------------------------------------------------
+
+extract_tcspc "$TCSPC_ROOT/standard_2022_10_frames/5uW" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2022_10_frames/10uW" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2022_10_frames/20uW" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2022_10_frames/40uW" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2025_frame_series/19_09_60" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2025_frame_series/19_09_80" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2025_frame_series/19_09_100" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2025_frame_series/22_09_60" false 1
+extract_tcspc "$TCSPC_ROOT/standard_2025_frame_series/22_09_100" false 1
+
+extract_tcspc "$TCSPC_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration" true 1
+extract_tcspc "$TCSPC_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration" true 2
+extract_tcspc "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu" true 1 2
+extract_tcspc "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23" true 1 2
+
+# -----------------------------------------------------------------------------
+# 4. Phot2conc calculations and results.csv exports
+# -----------------------------------------------------------------------------
+
+call gui.select_mode '{"mode":"phot2conc"}'
+# Disable "Errors as SEM" so the end-to-end test uses combined uncertainty.
+call phot2conc.set_error_mode '{"sem":false}'
+
+calculate_standard "$RAW_ROOT/standard_2022_10_frames/5uW" "$RAW_ROOT/standard_2022_10_frames/5uW/Calib_5uW.json"
+calculate_standard "$RAW_ROOT/standard_2022_10_frames/10uW" "$RAW_ROOT/standard_2022_10_frames/10uW/Calib_10uW.json"
+calculate_standard "$RAW_ROOT/standard_2022_10_frames/20uW" "$RAW_ROOT/standard_2022_10_frames/20uW/Calib_20uW.json"
+calculate_standard "$RAW_ROOT/standard_2022_10_frames/40uW" "$RAW_ROOT/standard_2022_10_frames/40uW/Calib_40uW.json"
+calculate_standard "$RAW_ROOT/standard_2025_frame_series/19_09_60" "$RAW_ROOT/standard_2025_frame_series/19_09_60/calib_19_09_60.json"
+calculate_standard "$RAW_ROOT/standard_2025_frame_series/19_09_80" "$RAW_ROOT/standard_2025_frame_series/19_09_80/calib_19_09_80.json"
+calculate_standard "$RAW_ROOT/standard_2025_frame_series/19_09_100" "$RAW_ROOT/standard_2025_frame_series/19_09_100/calib_19_09_100.json"
+calculate_standard "$RAW_ROOT/standard_2025_frame_series/22_09_60" "$RAW_ROOT/standard_2025_frame_series/22_09_60/calib_22_09_60.json"
+calculate_standard "$RAW_ROOT/standard_2025_frame_series/22_09_100" "$RAW_ROOT/standard_2025_frame_series/22_09_100/calib_22_09_100.json"
+
+calculate_standard "$TCSPC_ROOT/standard_2022_10_frames/5uW" "$TCSPC_ROOT/standard_2022_10_frames/5uW/Calib_5uW.json"
+calculate_standard "$TCSPC_ROOT/standard_2022_10_frames/10uW" "$TCSPC_ROOT/standard_2022_10_frames/10uW/Calib_10uW.json"
+calculate_standard "$TCSPC_ROOT/standard_2022_10_frames/20uW" "$TCSPC_ROOT/standard_2022_10_frames/20uW/Calib_20uW.json"
+calculate_standard "$TCSPC_ROOT/standard_2022_10_frames/40uW" "$TCSPC_ROOT/standard_2022_10_frames/40uW/Calib_40uW.json"
+calculate_standard "$TCSPC_ROOT/standard_2025_frame_series/19_09_60" "$TCSPC_ROOT/standard_2025_frame_series/19_09_60/calib_19_09_60.json"
+calculate_standard "$TCSPC_ROOT/standard_2025_frame_series/19_09_80" "$TCSPC_ROOT/standard_2025_frame_series/19_09_80/calib_19_09_80.json"
+calculate_standard "$TCSPC_ROOT/standard_2025_frame_series/19_09_100" "$TCSPC_ROOT/standard_2025_frame_series/19_09_100/calib_19_09_100.json"
+calculate_standard "$TCSPC_ROOT/standard_2025_frame_series/22_09_60" "$TCSPC_ROOT/standard_2025_frame_series/22_09_60/calib_22_09_60.json"
+calculate_standard "$TCSPC_ROOT/standard_2025_frame_series/22_09_100" "$TCSPC_ROOT/standard_2025_frame_series/22_09_100/calib_22_09_100.json"
+
+calculate_raw_mrna
+calculate_raw_gfp
+calculate_raw_dual_new
+calculate_raw_dual_imaging2
+
+calculate_with_raw_rois "$GATING_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration" "$RAW_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration/ROI" "$GATING_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration/calib.json"
+calculate_with_raw_rois "$GATING_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration" "$RAW_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration/ROI" "$GATING_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration/calib.json"
+calculate_with_raw_rois "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu" "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu/ROI" "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu/calib_imaging_new_ptu.json"
+calculate_with_raw_rois "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23" "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23/ROI" "$GATING_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23/calib_imaging2_17_07_23.json"
+
+calculate_with_raw_rois "$TCSPC_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration" "$RAW_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration/ROI" "$TCSPC_ROOT/pie_mrna_256x256_200_frames/shared_pie_calibration/calib.json"
+calculate_with_raw_rois "$TCSPC_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration" "$RAW_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration/ROI" "$TCSPC_ROOT/pie_gfp_256x256_200_frames/shared_pie_calibration/calib.json"
+calculate_with_raw_rois "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu" "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu/ROI" "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging_new_ptu/calib_imaging_new_ptu.json"
+calculate_with_raw_rois "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23" "$RAW_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23/ROI" "$TCSPC_ROOT/pie_dual_channel_128x128_100_frames/imaging2_17_07_23/calib_imaging2_17_07_23.json"
+
+printf 'Analytical workflow completed.\n'

@@ -20,8 +20,12 @@ basic_packages = [
         "scikit-image==0.25.2",
         "requests==2.32.3",
         "matplotlib==3.9.2",
+        "seaborn==0.13.2",
+        "scikit-learn==1.5.2",
         "numba==0.60.0",
         "scipy==1.15.3",
+        "phconvert==0.10.1",
+        "jupyter-book==2.1.2",
 ]
 req_pack = []
 if os.name == 'nt':
@@ -69,7 +73,8 @@ class runInstall(install):
 setup(
     name='smICA',
     version=VERSION,
-    packages=find_packages(),
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     install_requires=req_pack,
     python_requires='>=3.11.5',

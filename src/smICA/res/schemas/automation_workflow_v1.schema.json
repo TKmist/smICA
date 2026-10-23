@@ -1,0 +1,606 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smica.local/schemas/automation-workflow-v1.schema.json",
+  "title": "smICA reproducible analysis workflow version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflow_schema_version",
+    "inputs",
+    "reconstruction",
+    "filtering",
+    "calibration",
+    "roi",
+    "concentration",
+    "exports",
+    "output",
+    "batch"
+  ],
+  "properties": {
+    "workflow_schema_version": {
+      "const": 1
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "ptu_files"
+          ]
+        },
+        {
+          "required": [
+            "input_directory",
+            "file_pattern"
+          ]
+        }
+      ],
+      "properties": {
+        "ptu_files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "input_directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "file_pattern": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "reconstruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend_policy",
+        "channels",
+        "rows_to_skip",
+        "frame_range"
+      ],
+      "properties": {
+        "backend_policy": {
+          "enum": [
+            "automatic",
+            "phconvert_picoharp_t3",
+            "legacy"
+          ]
+        },
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "enum": [
+              1,
+              2
+            ]
+          }
+        },
+        "rows_to_skip": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frame_range": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "start",
+                "stop"
+              ],
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "stop": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "filtering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channels"
+      ],
+      "properties": {
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "channel",
+              "decay_gate_ns",
+              "statistical_filter"
+            ],
+            "properties": {
+              "channel": {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2
+                ]
+              },
+              "decay_gate_ns": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "lower",
+                  "upper"
+                ],
+                "properties": {
+                  "lower": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "upper": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "statistical_filter": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "background_source",
+                      "background_range_ns",
+                      "background_level_counts",
+                      "afterpulsing_fraction"
+                    ],
+                    "properties": {
+                      "background_source": {
+                        "enum": [
+                          "measured_range",
+                          "library"
+                        ]
+                      },
+                      "background_range_ns": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "lower",
+                              "upper"
+                            ],
+                            "properties": {
+                              "lower": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "upper": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "background_level_counts": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "afterpulsing_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "library_entry": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "source_file"
+          ],
+          "properties": {
+            "source_file": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "channels"
+          ],
+          "properties": {
+            "channels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "channel",
+                  "lateral_radius_um",
+                  "lateral_radius_error_um",
+                  "axial_ratio",
+                  "axial_ratio_error",
+                  "molecular_brightness_hz",
+                  "molecular_brightness_error_hz"
+                ],
+                "properties": {
+                  "channel": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2
+                    ]
+                  },
+                  "lateral_radius_um": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "lateral_radius_error_um": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "axial_ratio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "axial_ratio_error": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "molecular_brightness_hz": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "molecular_brightness_error_hz": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "source_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "channel",
+              "lateral_radius_um",
+              "lateral_radius_error_um",
+              "axial_ratio",
+              "axial_ratio_error",
+              "molecular_brightness_hz",
+              "molecular_brightness_error_hz"
+            ],
+            "properties": {
+              "channel": {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2
+                ]
+              },
+              "lateral_radius_um": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "lateral_radius_error_um": {
+                "type": "number",
+                "minimum": 0
+              },
+              "axial_ratio": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "axial_ratio_error": {
+                "type": "number",
+                "minimum": 0
+              },
+              "molecular_brightness_hz": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "molecular_brightness_error_hz": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "roi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "per_channel"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "none",
+            "files",
+            "automatic"
+          ]
+        },
+        "directory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "per_channel": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "channel"
+            ],
+            "properties": {
+              "channel": {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2
+                ]
+              },
+              "file": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "image_source": {
+                "enum": [
+                  "foreground_intensity",
+                  "decay_time"
+                ]
+              },
+              "decay_range_ns": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "lower",
+                      "upper"
+                    ],
+                    "properties": {
+                      "lower": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "upper": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              "cell_threshold_scale": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "nucleus_threshold_scale": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mode": {
+                "enum": [
+                  "cell",
+                  "cell_without_nucleus"
+                ]
+              },
+              "many_cells": {
+                "type": "boolean"
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "strategy"
+                    ],
+                    "properties": {
+                      "strategy": {
+                        "enum": [
+                          "largest",
+                          "component_index",
+                          "contains_point"
+                        ]
+                      },
+                      "component_index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "point_xy": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        ],
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              "copy_from_channel": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  1,
+                  2,
+                  null
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "concentration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uncertainty_mode"
+      ],
+      "properties": {
+        "uncertainty_mode": {
+          "enum": [
+            "propagated",
+            "sem"
+          ]
+        }
+      }
+    },
+    "exports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_tables",
+        "arrays",
+        "heatmaps",
+        "roi_masks",
+        "frame_series"
+      ],
+      "properties": {
+        "result_tables": {
+          "type": "boolean"
+        },
+        "arrays": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "photons",
+              "molecules",
+              "concentration"
+            ]
+          }
+        },
+        "heatmaps": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "photons",
+              "molecules",
+              "concentration",
+              "decay_time"
+            ]
+          }
+        },
+        "roi_masks": {
+          "type": "boolean"
+        },
+        "frame_series": {
+          "type": "boolean"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directory",
+        "overwrite"
+      ],
+      "properties": {
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "overwrite": {
+          "const": false
+        }
+      }
+    },
+    "batch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordering",
+        "continue_on_error"
+      ],
+      "properties": {
+        "ordering": {
+          "const": "normalized_path_lexicographic"
+        },
+        "continue_on_error": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

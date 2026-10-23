@@ -6,12 +6,10 @@ src/smICA/Required/readPTU_FLIM.py
 .virtual_documents
 testing_things.ipynb
 python_embedded/
-
-
 /.scripts/
 /.build/
 #/.github/
-/release/
+#/release/
 /poligon/
 /
 
