@@ -7,6 +7,7 @@ project:
     - file: Main_title.ipynb
     - file: Release_notes.ipynb
     - file: Installation.ipynb
+    - file: Supported_equipment.ipynb
     - file: Usage.ipynb
       children:
          - file: PTUExtract.ipynb
