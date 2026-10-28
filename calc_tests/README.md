@@ -1,11 +1,11 @@
 # smICA calculation and end-to-end tests
 
-This directory contains numerical calculation tests and a reference analytical
+This directory contains calculation unit tests and a reference analytical
 workflow that exercises smICA through its public TCP automation interface.
 
 ## Directory layout
 
-- `unity_test` contains small standalone numerical tests. They do not start the
+- `unit_test` contains small standalone unit tests. They do not start the
   GUI and do not require pytest.
 - `REFERENCE_DATA` contains source PTU measurements, calibration JSON files,
   ROI definitions, working datasets grouped by filtering method, and the
@@ -42,12 +42,12 @@ cd calc_tests\REFERENCE_DATA
 for %F in (*.zip) do tar -xf "%F"
 ```
 
-## Numerical unit tests
+## Calculation unit tests
 
-Run all standalone calculation tests from the repository root:
+Run all standalone calculation unit tests from the repository root:
 
 ```bash
-python calc_tests/unity_test/run_all.py
+python calc_tests/unit_test/run_all.py
 ```
 
 The runner executes every `test_*.py` file in a deterministic order and prints

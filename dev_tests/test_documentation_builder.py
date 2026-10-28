@@ -70,6 +70,8 @@ def test_build_documentation_replaces_stale_help(monkeypatch, tmp_path) -> None:
     assert commands[0][0] == ["python-for-test", "-c", "import jupyter_book"]
     assert commands[1][0][-5:] == ["clean", "--html", "--site", "--temp", "--yes"]
     assert commands[2][0][-2:] == ["build", "--html"]
+    assert commands[1][1]["env"]["JB_ALLOW_NODEENV"] == "1"
+    assert commands[2][1]["env"]["JB_ALLOW_NODEENV"] == "1"
 
 
 def test_build_documentation_requires_myst_configuration(tmp_path) -> None:

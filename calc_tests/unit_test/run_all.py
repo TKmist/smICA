@@ -33,19 +33,32 @@ import subprocess
 import sys
 
 
-test_directory = os.path.dirname(os.path.abspath(__file__))
-test_files = sorted(
-    os.path.join(test_directory, name)
-    for name in os.listdir(test_directory)
-    if name.startswith("test_") and name.endswith(".py") and name != "test_support.py"
-)
+def discover_test_files(test_directory):
+    """Return executable test scripts without including shared helpers."""
+    return sorted(
+        os.path.join(test_directory, name)
+        for name in os.listdir(test_directory)
+        if name.startswith("test_")
+        and name.endswith(".py")
+        and name != "test_support.py"
+    )
 
-for test_file in test_files:
-    print("=" * 72, flush=True)
-    print(f"Running {os.path.basename(test_file)}", flush=True)
-    print("=" * 72, flush=True)
-    subprocess.run([sys.executable, "-B", test_file], check=True)
-    print(flush=True)
 
-print("=" * 72)
-print(f"FINAL RESULT: all {len(test_files)} unit-test scripts passed.")
+def main():
+    """Run every standalone test script once in a separate process."""
+    test_directory = os.path.dirname(os.path.abspath(__file__))
+    test_files = discover_test_files(test_directory)
+
+    for test_file in test_files:
+        print("=" * 72, flush=True)
+        print(f"Running {os.path.basename(test_file)}", flush=True)
+        print("=" * 72, flush=True)
+        subprocess.run([sys.executable, "-B", test_file], check=True)
+        print(flush=True)
+
+    print("=" * 72)
+    print(f"FINAL RESULT: all {len(test_files)} unit-test scripts passed.")
+
+
+if __name__ == "__main__":
+    main()

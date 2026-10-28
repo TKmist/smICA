@@ -55,8 +55,10 @@ def _load_legacy_reader():
         from Required.Third_party.readPTU_FLIM import PTUreader
     except ImportError as error:
         raise ImportError(
-            'This PTU record type requires readPTU_FLIM. Install it in '
-            'Required/Third_party or enable its setup.py download.'
+            'This PTU record type is not supported by the phconvert backend '
+            'and requires the optional readPTU_FLIM fallback. Run the smICA '
+            'installer again and accept the legacy reader download, or place '
+            'readPTU_FLIM.py in Required/Third_party manually.'
         ) from error
     return PTUreader
 

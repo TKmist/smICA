@@ -1,6 +1,12 @@
 @echo off
 setlocal EnableExtensions
 
+cd /d "%~dp0"
+if errorlevel 1 (
+    echo ERROR: Cannot enter the installer directory: "%~dp0"
+    exit /b 1
+)
+
 :: ============================================================
 :: smICA installer (Windows)
 :: ============================================================
@@ -16,12 +22,20 @@ set "GET_PIP=%PYTHON_DIR%\get-pip.py"
 
 set "THIRD_PARTY_URL=https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
 set "THIRD_PARTY_TARGET_DIR=src\smICA\Required\Third_party"
+set "THIRD_PARTY_TARGET=%THIRD_PARTY_TARGET_DIR%\readPTU_FLIM.py"
 
 set "LAUNCHER_BAT=%~dp0smICA.bat"
 
-:: Default: do not download unless explicitly agreed (setup.py reads this)
-set "SMICA_DOWNLOAD_READPTU_FLIM=0"
-
+if exist "%LAUNCHER_BAT%" (
+    echo ERROR: An existing smICA installation was found in this directory.
+    echo Extract the release archive into a new, empty directory and run install_win.bat there.
+    exit /b 1
+)
+if exist "%~dp0smICA" (
+    echo ERROR: An existing smICA application directory was found.
+    echo Extract the release archive into a new, empty directory and run install_win.bat there.
+    exit /b 1
+)
 
 echo ------------------------------------------------------------
 echo smICA installer
@@ -62,47 +76,6 @@ echo Continuing installation.
 
 echo.
 echo ------------------------------------------------------------
-echo Optional component: PTU_Corr / readPTU_FLIM.py
-echo ------------------------------------------------------------
-echo.
-echo Some smICA functionalities rely on a third-party script:
-echo   - readPTU_FLIM.py
-echo   - Source URL:
-echo       %THIRD_PARTY_URL%
-echo.
-echo If you choose YES, the installer will attempt to download this file
-echo and place it in:
-echo   %THIRD_PARTY_TARGET_DIR%
-echo.
-echo If you choose NO, smICA will still be installed,
-echo BUT readPTU_FLIM.py-related functionality (EXTRACT from PTU and FILTER) WILL NOT work correctly and may raise errors.
-echo.
-
-:READPTU_PROMPT
-choice /c YN /n /m "Download readPTU_FLIM.py automatically now? [y/n]: "
-if errorlevel 2 goto READPTU_NO
-if errorlevel 1 goto READPTU_YES
-goto READPTU_PROMPT
-
-:READPTU_YES
-set "SMICA_DOWNLOAD_READPTU_FLIM=1"
-echo Accepted. readPTU_FLIM.py will be downloaded during installation.
-goto AFTER_READPTU
-
-:READPTU_NO
-set "SMICA_DOWNLOAD_READPTU_FLIM=0"
-echo Declined.
-echo WARNING:
-echo   smICA will be installed, but EXTRACT from PTU and FILTER features depending on readPTU_FLIM.py
-echo   WILL NOT work correctly.
-echo   You can install the missing component later manually.
-goto AFTER_READPTU
-
-:AFTER_READPTU
-
-
-echo.
-echo ------------------------------------------------------------
 echo Checking prerequisites
 echo ------------------------------------------------------------
 
@@ -110,6 +83,50 @@ if not exist "%PYTHON_EXE%" (
     echo Embedded Python not found at %PYTHON_EXE%. Exiting.
     exit /b 1
 )
+
+echo.
+echo ------------------------------------------------------------
+echo Optional legacy PTU reader: readPTU_FLIM.py
+echo ------------------------------------------------------------
+echo.
+echo smICA uses phconvert for supported PicoHarp 300 T3 files.
+echo The third-party readPTU_FLIM.py reader is only used as a fallback
+echo for PTU record types that are not supported by the phconvert backend.
+echo Source URL:
+echo   %THIRD_PARTY_URL%
+echo.
+
+if exist "%THIRD_PARTY_TARGET%" (
+    echo readPTU_FLIM.py is already present; no download is needed.
+    goto AFTER_READPTU
+)
+
+:READPTU_PROMPT
+choice /c YN /n /m "Install the optional legacy PTU fallback? [y/n]: "
+if errorlevel 2 goto READPTU_NO
+if errorlevel 1 goto READPTU_YES
+goto READPTU_PROMPT
+
+:READPTU_YES
+if not exist "%THIRD_PARTY_TARGET_DIR%" mkdir "%THIRD_PARTY_TARGET_DIR%"
+echo Downloading readPTU_FLIM.py...
+"%PYTHON_EXE%" -c "import urllib.request; urllib.request.urlretrieve(r'%THIRD_PARTY_URL%', r'%THIRD_PARTY_TARGET%')"
+if errorlevel 1 (
+    if exist "%THIRD_PARTY_TARGET%" del /f /q "%THIRD_PARTY_TARGET%"
+    echo WARNING: readPTU_FLIM.py could not be downloaded.
+    echo Installation will continue with the phconvert backend.
+    echo Only unsupported legacy PTU record types will be unavailable.
+) else (
+    echo Optional legacy PTU fallback installed successfully.
+)
+goto AFTER_READPTU
+
+:READPTU_NO
+echo Optional legacy PTU fallback skipped.
+echo Installation will continue with the phconvert backend.
+echo Only unsupported legacy PTU record types will be unavailable.
+
+:AFTER_READPTU
 
 :: ----------------------------
 :: 4) Virtual environment setup
@@ -149,7 +166,7 @@ if exist "%VENV_DIR%" (
 )
 
 echo Creating virtual environment in %VENV_DIR%...
-"%PYTHON_EXE%" -m virtualenv "%~dp0%VENV_DIR%"
+"%PYTHON_EXE%" -m virtualenv --copies "%~dp0%VENV_DIR%"
 if errorlevel 1 (
     echo Failed to create virtual environment. Exiting.
     exit /b 1
@@ -169,9 +186,6 @@ echo Upgrading pip in the virtual environment...
 :: 5) Install package
 :: ----------------------------
 echo Installing dependencies using pip...
-
-:: Make sure setup.py sees the flag (child processes inherit environment)
-set "SMICA_DOWNLOAD_READPTU_FLIM=%SMICA_DOWNLOAD_READPTU_FLIM%"
 
 "%~dp0%VENV_DIR%\Scripts\pip.exe" install . --no-warn-script-location --disable-pip-version-check --verbose >install.log 2>&1
 if errorlevel 1 (
@@ -210,19 +224,49 @@ echo ------------------------------------------------------------
 
 echo Creating run_smICA script...
 echo @echo off > "%LAUNCHER_BAT%"
-echo call "%~dp0%VENV_DIR%\Scripts\activate.bat" >> "%LAUNCHER_BAT%"
+echo setlocal EnableExtensions >> "%LAUNCHER_BAT%"
+echo set "SMICA_INSTALLATION=%%~dp0" >> "%LAUNCHER_BAT%"
+echo set "SMICA_PYTHON=%%SMICA_INSTALLATION%%v_smICA_env\Scripts\python.exe" >> "%LAUNCHER_BAT%"
+echo if exist "%%SMICA_PYTHON%%" goto PARSE_ARGUMENTS >> "%LAUNCHER_BAT%"
+echo echo ERROR: The smICA Python environment was not found. >> "%LAUNCHER_BAT%"
+echo echo Expected: "%%SMICA_PYTHON%%" >> "%LAUNCHER_BAT%"
+echo exit /b 1 >> "%LAUNCHER_BAT%"
+echo :PARSE_ARGUMENTS >> "%LAUNCHER_BAT%"
+echo if "%%~1"=="--demo" goto RUN_DEMO >> "%LAUNCHER_BAT%"
 echo if not "%%~1"=="--test" goto RUN_GUI >> "%LAUNCHER_BAT%"
-echo python "%~dp0smICA\calc_tests\unity_test\run_all.py" >> "%LAUNCHER_BAT%"
+echo set "SMICA_TEST_RUNNER=%%SMICA_INSTALLATION%%smICA\calc_tests\unit_test\run_all.py" >> "%LAUNCHER_BAT%"
+echo if exist "%%SMICA_TEST_RUNNER%%" goto RUN_TESTS >> "%LAUNCHER_BAT%"
+echo echo ERROR: Unit test runner was not found. >> "%LAUNCHER_BAT%"
+echo echo Checked: "%%SMICA_INSTALLATION%%smICA\calc_tests\unit_test\run_all.py" >> "%LAUNCHER_BAT%"
+echo exit /b 1 >> "%LAUNCHER_BAT%"
+echo :RUN_TESTS >> "%LAUNCHER_BAT%"
+echo "%%SMICA_PYTHON%%" "%%SMICA_TEST_RUNNER%%" >> "%LAUNCHER_BAT%"
 echo set "TEST_STATUS=%%ERRORLEVEL%%" >> "%LAUNCHER_BAT%"
-echo call "%~dp0%VENV_DIR%\Scripts\deactivate.bat" >> "%LAUNCHER_BAT%"
 echo exit /b %%TEST_STATUS%% >> "%LAUNCHER_BAT%"
+echo :RUN_DEMO >> "%LAUNCHER_BAT%"
+echo set "SMICA_DEMO=%%SMICA_INSTALLATION%%smICA\calc_tests\demo_data\run_demo.py" >> "%LAUNCHER_BAT%"
+echo if exist "%%SMICA_DEMO%%" goto START_DEMO >> "%LAUNCHER_BAT%"
+echo echo ERROR: The bundled smICA demo was not found. >> "%LAUNCHER_BAT%"
+echo echo Expected: "%%SMICA_DEMO%%" >> "%LAUNCHER_BAT%"
+echo exit /b 1 >> "%LAUNCHER_BAT%"
+echo :START_DEMO >> "%LAUNCHER_BAT%"
+echo "%%SMICA_PYTHON%%" "%%SMICA_DEMO%%" >> "%LAUNCHER_BAT%"
+echo set "DEMO_STATUS=%%ERRORLEVEL%%" >> "%LAUNCHER_BAT%"
+echo exit /b %%DEMO_STATUS%% >> "%LAUNCHER_BAT%"
 echo :RUN_GUI >> "%LAUNCHER_BAT%"
-echo cd /d "%~dp0smICA\smICA" >> "%LAUNCHER_BAT%"
-echo python "%~dp0smICA\smICA\smICA_tool.py" %%* >> "%LAUNCHER_BAT%"
-echo call "%~dp0%VENV_DIR%\Scripts\deactivate.bat" >> "%LAUNCHER_BAT%"
+echo set "SMICA_APP=%%SMICA_INSTALLATION%%smICA\smICA\smICA_tool.py" >> "%LAUNCHER_BAT%"
+echo if exist "%%SMICA_APP%%" goto START_GUI >> "%LAUNCHER_BAT%"
+echo echo ERROR: The smICA application entry point was not found. >> "%LAUNCHER_BAT%"
+echo echo Expected: "%%SMICA_APP%%" >> "%LAUNCHER_BAT%"
+echo exit /b 1 >> "%LAUNCHER_BAT%"
+echo :START_GUI >> "%LAUNCHER_BAT%"
+echo cd /d "%%SMICA_INSTALLATION%%smICA\smICA" >> "%LAUNCHER_BAT%"
+echo "%%SMICA_PYTHON%%" "%%SMICA_APP%%" %%* >> "%LAUNCHER_BAT%"
+echo exit /b %%ERRORLEVEL%% >> "%LAUNCHER_BAT%"
 
 echo run_smICA script created and made executable.
 echo Use smICA.bat --test to run the standalone unit tests.
+echo Use smICA.bat --demo to run the bundled end-to-end demonstration.
 echo Use smICA.bat --automation-server to start the local automation server.
 echo The text-based smica-call.bat and smica_call.bat clients are installed in %~dp0%VENV_DIR%\Scripts\.
 
@@ -265,13 +309,24 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: Move files to the smICA directory
+:: Move payload directories and files to the smICA directory.
+echo Moving directories to smICA directory...
+for /d %%d in (*) do (
+    if /i not "%%d" == "smICA" if /i not "%%d" == "%VENV_DIR%" if /i not "%%d" == "%PYTHON_DIR%" (
+        move "%%d" smICA\
+        if errorlevel 1 (
+            echo Failed to move directory %%d to smICA. Exiting.
+            exit /b 1
+        )
+    )
+)
+
 echo Moving files to smICA directory...
-for %%f in (*) do (
-    if not "%%f" == "install_win.bat" if not "%%f" == "setup.py" if not "%%f" == "smICA.bat" if not "%%f" == "smICA" if not "%%f" == "%VENV_DIR%" if not "%%f" == "%PYTHON_DIR%" if not "%%f" == "REWRITE_ROI" if not "%%f" == "Docs" (
+for /f "delims=" %%f in ('dir /b /a-d') do (
+    if /i not "%%f" == "install_win.bat" if /i not "%%f" == "setup.py" if /i not "%%f" == "smICA.bat" (
         move "%%f" smICA\
         if errorlevel 1 (
-            echo Failed to move file %%f to FcsIT directory. Exiting.
+            echo Failed to move file %%f to smICA. Exiting.
             exit /b 1
         )
     )
@@ -286,7 +341,18 @@ if errorlevel 1 (
 )
 
 if exist "python_embedded" (
+    attrib -r -s -h "python_embedded\*" /s /d >nul 2>&1
     rmdir /s /q python_embedded
+    if exist "python_embedded" (
+        echo Failed to remove the embedded Python bootstrap directory. Exiting.
+        exit /b 1
+    )
+)
+
+"%~dp0%VENV_DIR%\Scripts\python.exe" -c "import sys; print('smICA Python environment verified:', sys.executable)"
+if errorlevel 1 (
+    echo The installed Python environment is not usable after cleanup. Exiting.
+    exit /b 1
 )
 
 echo.

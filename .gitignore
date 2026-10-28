@@ -11,6 +11,8 @@ python_embedded/
 #/.github/
 #/release/
 /poligon/
+/calc_tests/demo_data/**/*.pkl
+/calc_tests/demo_data/**/results.csv
 /
 
 

@@ -1,10 +1,10 @@
-# smICA standalone calculation tests
+# smICA standalone calculation unit tests
 
 The scripts validate selected numerical functions without starting the GUI and do
 not require pytest. Run the complete set from a source checkout with:
 
 ```bash
-python calc_tests/unity_test/run_all.py
+python calc_tests/unit_test/run_all.py
 ```
 
 After installing smICA, use the generated launcher:

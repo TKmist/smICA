@@ -6,6 +6,7 @@ LICENSE_FILE="LICENSE"
 
 THIRD_PARTY_URL="https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
 THIRD_PARTY_TARGET_DIR="src/smICA/Required/Third_party"
+THIRD_PARTY_TARGET="$THIRD_PARTY_TARGET_DIR/readPTU_FLIM.py"
 
 
 PAGER_CMD=""
@@ -91,57 +92,60 @@ done
 
 echo
 echo "------------------------------------------------------------"
-echo "Optional component: PTU_Corr / readPTU_FLIM.py"
-echo "------------------------------------------------------------"
-echo
-echo "Some smICA functionalities rely on a third-party script:"
-echo "  - readPTU_FLIM.py"
-echo "  - Source URL:"
-echo "      $THIRD_PARTY_URL"
-echo
-echo "If you choose YES, the installer will attempt to download this file"
-echo "and place it in:"
-echo "  $THIRD_PARTY_TARGET_DIR"
-echo
-echo "If you choose NO, smICA will still be installed,"
-echo "BUT readPTU_FLIM.py-related functionality (EXTRACT from PTU and FILTER) WILL NOT work correctly and may raise errors."
-echo
-
-
-export SMICA_DOWNLOAD_READPTU_FLIM="0"
-
-prompt_choice "Download readPTU_FLIM.py automatically now? [y/n]:" "yn"
-if [ "$REPLY" = "y" ]; then
-    export SMICA_DOWNLOAD_READPTU_FLIM="1"
-    echo "Accepted. readPTU_FLIM.py will be downloaded during installation."
-
-    echo "Downloading readPTU_FLIM.py..."
-    if command -v curl >/dev/null 2>&1; then
-        curl -fsSL "$THIRD_PARTY_URL" -o "$THIRD_PARTY_TARGET_DIR/readPTU_FLIM.py"
-    elif command -v wget >/dev/null 2>&1; then
-        wget -q "$THIRD_PARTY_URL" -O "$THIRD_PARTY_TARGET_DIR/readPTU_FLIM.py"
-    else
-        echo "ERROR: Neither curl nor wget is available. Cannot download readPTU_FLIM.py."
-        echo "smICA will be installed, but PTU functionality will NOT work correctly."
-    fi
-else
-    export SMICA_DOWNLOAD_READPTU_FLIM="0"
-    echo "Declined."
-    echo "WARNING:"
-    echo "  smICA will be installed, but EXTRACT from PTU and FILTER features depending on readPTU_FLIM.py"
-    echo "  WILL NOT work correctly."
-    echo "  You can install the missing component later manually."
-fi
-
-
-echo
-echo "------------------------------------------------------------"
 echo "Checking prerequisites"
 echo "------------------------------------------------------------"
 
 if ! command -v python3 >/dev/null 2>&1; then
     echo "Python3 is not installed. Please install Python 3.6 or higher and re-run this script."
     exit 1
+fi
+
+
+echo
+echo "------------------------------------------------------------"
+echo "Optional legacy PTU reader: readPTU_FLIM.py"
+echo "------------------------------------------------------------"
+echo
+echo "smICA uses phconvert for supported PicoHarp 300 T3 files."
+echo "The third-party readPTU_FLIM.py reader is only used as a fallback"
+echo "for PTU record types that are not supported by the phconvert backend."
+echo "Source URL:"
+echo "  $THIRD_PARTY_URL"
+echo
+
+if [ -f "$THIRD_PARTY_TARGET" ]; then
+    echo "readPTU_FLIM.py is already present; no download is needed."
+else
+    prompt_choice "Install the optional legacy PTU fallback? [y/n]:" "yn"
+    if [ "$REPLY" = "y" ]; then
+        echo "Downloading readPTU_FLIM.py..."
+        mkdir -p "$THIRD_PARTY_TARGET_DIR"
+        download_succeeded=0
+
+        if command -v curl >/dev/null 2>&1; then
+            if curl -fsSL "$THIRD_PARTY_URL" -o "$THIRD_PARTY_TARGET"; then
+                download_succeeded=1
+            fi
+        fi
+        if [ "$download_succeeded" -eq 0 ] && command -v wget >/dev/null 2>&1; then
+            if wget -q "$THIRD_PARTY_URL" -O "$THIRD_PARTY_TARGET"; then
+                download_succeeded=1
+            fi
+        fi
+
+        if [ "$download_succeeded" -eq 1 ]; then
+            echo "Optional legacy PTU fallback installed successfully."
+        else
+            rm -f "$THIRD_PARTY_TARGET"
+            echo "WARNING: readPTU_FLIM.py could not be downloaded."
+            echo "Installation will continue with the phconvert backend."
+            echo "Only unsupported legacy PTU record types will be unavailable."
+        fi
+    else
+        echo "Optional legacy PTU fallback skipped."
+        echo "Installation will continue with the phconvert backend."
+        echo "Only unsupported legacy PTU record types will be unavailable."
+    fi
 fi
 
 
@@ -232,10 +236,16 @@ cat <<EOL > run_smICA
 #!/bin/bash
 source "$PWD/$VENV_DIR/bin/activate"
 if [ "\${1:-}" = "--test" ]; then
-    python "$PWD/smICA/calc_tests/unity_test/run_all.py"
+    python "$PWD/smICA/calc_tests/unit_test/run_all.py"
     TEST_STATUS=\$?
     deactivate
     exit \$TEST_STATUS
+fi
+if [ "\${1:-}" = "--demo" ]; then
+    python "$PWD/smICA/calc_tests/demo_data/run_demo.py"
+    DEMO_STATUS=\$?
+    deactivate
+    exit \$DEMO_STATUS
 fi
 cd smICA/smICA
 python "$PWD/smICA/smICA/smICA_tool.py" "\$@"
@@ -245,6 +255,7 @@ EOL
 chmod +x run_smICA
 echo "run_smICA script created and made executable."
 echo "Use 'run_smICA --test' to run the standalone unit tests."
+echo "Use 'run_smICA --demo' to run the bundled end-to-end demonstration."
 echo "Use 'run_smICA --automation-server' to start the local automation server."
 echo "The text-based smica-call and smica_call Bash clients are installed in $PWD/$VENV_DIR/bin/."
 

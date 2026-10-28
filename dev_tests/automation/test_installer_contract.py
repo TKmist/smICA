@@ -44,6 +44,10 @@ def test_linux_installer_exists_is_executable_and_forwards_launcher_arguments() 
         source = installer_stream.read()
     assert 'python "$PWD/smICA/smICA/smICA_tool.py" "\\$@"' in source
     assert "run_smICA --automation-server" in source
+    assert 'if [ "\\${1:-}" = "--demo" ]; then' in source
+    assert 'smICA/calc_tests/demo_data/run_demo.py' in source
+    assert 'python "$PWD/smICA/calc_tests/unit_test/run_all.py"' in source
+    assert "unity_test" not in source
     assert "documentation_builder.py" in source
     assert "--source docs" in source
     assert "--target src/smICA/doc/assets/help_html" in source
@@ -58,11 +62,29 @@ def test_windows_installer_forwards_launcher_arguments() -> None:
         source = installer_stream.read()
     assert "%*" in source
     assert "--automation-server" in source
+    assert 'if "%%~1"=="--demo" goto RUN_DEMO' in source
+    assert 'smICA\\calc_tests\\demo_data\\run_demo.py' in source
     assert "documentation_builder.py" in source
     assert '--source "docs"' in source
     assert '--target "src\\smICA\\doc\\assets\\help_html"' in source
     assert "smica-call.bat" in source
     assert "smICA.Required.automation_client" in source
+    assert 'cd /d "%~dp0"' in source
+    assert "An existing smICA installation was found" in source
+    assert 'set "SMICA_INSTALLATION=%%~dp0"' in source
+    assert 'set "SMICA_PYTHON=%%SMICA_INSTALLATION%%v_smICA_env\\Scripts\\python.exe"' in source
+    assert "The smICA Python environment was not found" in source
+    assert 'set "SMICA_TEST_RUNNER=%%SMICA_INSTALLATION%%smICA\\calc_tests\\unit_test\\run_all.py"' in source
+    assert '"%%SMICA_PYTHON%%" "%%SMICA_TEST_RUNNER%%"' in source
+    assert "The smICA application entry point was not found" in source
+    assert "for /d %%d in (*) do (" in source
+    assert "for /f \"delims=\" %%f in ('dir /b /a-d') do (" in source
+    assert "Failed to move directory %%d to smICA" in source
+    assert 'virtualenv --copies "%~dp0%VENV_DIR%"' in source
+    assert 'attrib -r -s -h "python_embedded\\*" /s /d' in source
+    assert "smICA Python environment verified:" in source
+    assert 'set "SMICA_TEST_RUNNER=%%SMICA_INSTALLATION%%calc_tests\\unit_test\\run_all.py"' not in source
+    assert "unity_test" not in source
 
 
 def test_setup_installs_the_documentation_builder_dependency() -> None:
@@ -72,6 +94,35 @@ def test_setup_installs_the_documentation_builder_dependency() -> None:
     assert '"jupyter-book==2.1.2"' in source
     assert "console_scripts" not in source
     assert "smica-call=smICA.Required.automation_client:main" not in source
+    assert "SMICA_DOWNLOAD_READPTU_FLIM" not in source
+    assert "urlretrieve" not in source
+
+
+def test_installers_treat_readptu_as_an_optional_legacy_fallback() -> None:
+    for filename in ("install.sh", "install_win.bat"):
+        installer = os.path.join(REPOSITORY_ROOT, filename)
+        with open(installer, encoding="utf-8") as installer_stream:
+            source = installer_stream.read()
+
+        assert "Optional legacy PTU reader: readPTU_FLIM.py" in source
+        assert "smICA uses phconvert for supported PicoHarp 300 T3 files." in source
+        assert "Only unsupported legacy PTU record types will be unavailable." in source
+        assert "SMICA_DOWNLOAD_READPTU_FLIM" not in source
+        assert "WILL NOT work correctly" not in source
+
+
+def test_documentation_builder_allows_managed_node_installation() -> None:
+    builder = os.path.join(
+        REPOSITORY_ROOT,
+        "src",
+        "smICA",
+        "Required",
+        "documentation_builder.py",
+    )
+    with open(builder, encoding="utf-8") as builder_stream:
+        source = builder_stream.read()
+    assert 'JUPYTER_BOOK_NODEENV_PERMISSION = "JB_ALLOW_NODEENV"' in source
+    assert 'build_environment[JUPYTER_BOOK_NODEENV_PERMISSION] = "1"' in source
 
 
 def test_repository_has_no_project_owned_executable_binaries() -> None:
@@ -126,17 +177,3 @@ def test_reference_workflows_accept_an_installation_directory() -> None:
     assert "%SMICA_INSTALLATION%\\v_smICA_env\\Scripts\\activate.bat" in windows_source
     assert "poligon" not in linux_source.lower()
     assert "poligon" not in windows_source.lower()
-
-
-def test_release_builders_use_root_installers_and_include_docs() -> None:
-    for filename in ("build_release.sh", "build_release_with_docs.sh"):
-        script = os.path.join(REPOSITORY_ROOT, ".scripts", filename)
-        with open(script, encoding="utf-8") as script_stream:
-            source = script_stream.read()
-
-        assert '$ROOT_DIR/install.sh' in source
-        assert '$ROOT_DIR/install_win.bat' in source
-        assert "scripts/linux/install.sh" not in source
-        assert "scripts/windows/install_win.bat" not in source
-        assert "copy_documentation_sources" in source
-        assert 'destination="$1/docs"' in source

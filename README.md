@@ -26,6 +26,7 @@
   <a href="#information">Information</a> •
   <a href="#installation">Installation</a> •
   <a href="#testing">Testing</a> •
+  <a href="#bundled-demonstration">Demo</a> •
   <a href="#developing-analytical-add-ons">Developing add-ons</a> •
   <a href="#release-notes">Release notes</a> •
   <a href="#license">License</a>
@@ -89,7 +90,7 @@ python dev_tests/run_tests.py -k tcp
 
 ### Calculation and end-to-end tests
 
-The `calc_tests` directory contains standalone numerical unit tests, reference
+The `calc_tests` directory contains standalone calculation unit tests, reference
 PTU measurements, calibration files, ROI definitions, expected results, and a
 complete TCP-driven end-to-end analytical workflow. The source dataset
 directories located directly under `calc_tests/REFERENCE_DATA` contain the
@@ -99,13 +100,13 @@ variant and contain only PTU files, calibration JSON files, and ROI
 directories. The neutral reference output is stored as
 `calc_tests/REFERENCE_DATA/REFERENCE_output/reference_results.csv`.
 
-Run all numerical unit tests directly from a source checkout:
+Run all calculation unit tests directly from a source checkout:
 
 ```bash
-python calc_tests/unity_test/run_all.py
+python calc_tests/unit_test/run_all.py
 ```
 
-The same numerical tests are available after installation:
+The same unit tests are available after installation:
 
 ```bash
 # Linux
@@ -116,6 +117,35 @@ The same numerical tests are available after installation:
 :: Windows
 smICA.bat --test
 ```
+
+### Bundled demonstration
+
+Release archives include four compact PTU measurements under
+`calc_tests/demo_data`: two moderate-concentration dextran measurements in the
+`in_vitro` branch and two cell measurements without mRNA in the `in_cellulo`
+branch. Their calibration JSON files and a readable, explicit TCP automation
+script are included with both platform packages.
+
+Run the complete extraction-to-concentration workflow after installation:
+
+```bash
+# Linux
+./run_smICA --demo
+```
+
+```bat
+:: Windows
+smICA.bat --demo
+```
+
+The command starts its own local smICA automation server, extracts all four PTU
+files, applies TCSPC statistical background filtering to both channels of the
+cellular measurements, loads the matching calibrations, performs dextran and
+automatic cellular ROI calculations, and writes `results.csv` into each dataset
+directory. It additionally repeats the `imaging_new_ptu` cell measurement with
+standard PIE time gating and writes separate `results_tcspc.csv` and
+`results_gating.csv` files for that measurement. The full
+`calc_tests/REFERENCE_DATA` collection remains excluded from releases.
 
 To run the complete end-to-end reference analysis, first start the installed
 application with its automation server in one terminal:
@@ -156,18 +186,14 @@ testing, and optional TCP automation.
 
 ## Release notes
 #### v2.2.0
-- Added a phconvert reader for PicoHarp 300 T3 measurements, marker validation and integration of every reconstructed frame. Unsupported record types retain an explicit fallback to readPTU_FLIM.
-- Introduced version-2 PKL output with integrated foreground, background and fluorescence-lifetime maps plus sparse frame-resolved foreground/background products.
-- Added export-only frame columns for weighted counts, background, molecule number and concentration. Frame-wise information is intentionally not displayed in the GUI.
-- Added foreground-intensity, background-intensity and foreground-lifetime display modes. Automatic ROI detection uses foreground intensity.
-- Added a versioned loopback TCP/JSON server and `smica-call` client. Commands call the same Dear PyGui callbacks as manual controls, including native **Apply to all** and **Calculate all** operations with GUI progress feedback. Batch responses also expose per-PTU file size and measured wall time for reproducibility and performance reporting.
-- Added commands for automatic background-range selection, decay-library import and accepted foreground-filter selection.
-- Improved error responses for automated TCP/JSON communication, so an internal failure identifies the command in `message` and `details.command`, while the traceback remains in the local application log.
-- Added resumable workflows and a final report containing processed/reused counts, elapsed time and machine information.
-- Added installed numerical tests available through `--test`; reports show expected values, calculated values, units and tolerances.
-- Added `calc_tests/REFERENCE_DATA` containing raw PTU data, results obtained from those data, and a workflow to reproduce the results.
-- Added a validated analytical add-on template, automatic updater support for official add-ons, and a developer guide for new analytical methods.
- - See [Changelog.md](Changelog.md) for the complete list of changes.
+- Added a `phconvert` backend for PicoHarp 300 T3 acquisitions and extended PKL output with acquisition metadata and compact frame-resolved foreground/background data. Other record types retain an explicit fallback to the optional `readPTU_FLIM` reader.
+- Extended Phot2conc with foreground, background, and lifetime image products; export-only frame-resolved results; and overlap-corrected uncertainty estimates based on the effective number of independent pixels.
+- Added a versioned TCP/JSON automation interface whose commands use the same Dear PyGui callbacks as interactive operation, including complete statistical-filter, batch extraction, ROI, calculation, and export workflows.
+- Added validated analytical add-on discovery and templates, cross-platform developer and calculation unit tests, and resumable end-to-end reference workflows. Installed unit-test validation can be run with `--test` without starting the GUI.
+- Added a bundled, cross-platform `--demo` analysis with two in-vitro dextran measurements, two TCSPC-filtered dual-channel in-cellulo measurements without mRNA, a separate standard-PIE-gated pass for one selected cell measurement, matching calibrations, and automatic result export.
+- Updated cross-platform installation and bundled documentation, including automatic Jupyter Book builds and guidance for automation, add-on development, supported equipment, uncertainty calculations, and exported data.
+
+See [Changelog.md](Changelog.md) for the complete list of changes.
 #### V2.1.2
  - Fixed problems with the Python embedded folder.
 #### V2.1.1
@@ -211,8 +237,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ### Third-party components
 
 
-During installation, this program may optionally download the `readPTU_FLIM.py`
-component from an [external repository](https://github.com/TKmist/readPTU_FLIM/tree/NIKON_correction).
+The platform installers may optionally download the `readPTU_FLIM.py` component
+from an [external repository](https://github.com/TKmist/readPTU_FLIM/tree/NIKON_correction).
+It is only used as a legacy fallback for PTU record types that are not supported
+by the primary `phconvert` backend. Declining this download does not prevent
+installation or processing of supported PicoHarp 300 T3 files.
 
 This component is licensed under the MIT License and is not distributed with this repository.
 

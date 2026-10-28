@@ -39,6 +39,7 @@ import tempfile
 
 
 JUPYTER_BOOK_REQUIREMENT = "jupyter-book==2.1.2"
+JUPYTER_BOOK_NODEENV_PERMISSION = "JB_ALLOW_NODEENV"
 
 
 def _absolute_path(path: str) -> str:
@@ -132,6 +133,11 @@ def build_documentation(
 
     executable = python_executable or sys.executable
     ensure_jupyter_book(executable, install_missing=install_missing)
+    build_environment = os.environ.copy()
+    # Jupyter Book uses nodeenv to install its pinned Node.js runtime when no
+    # compatible system installation is available.  Installation and updater
+    # builds are non-interactive, so explicitly permit that managed download.
+    build_environment[JUPYTER_BOOK_NODEENV_PERMISSION] = "1"
     subprocess.run(
         [
             executable,
@@ -144,11 +150,13 @@ def build_documentation(
             "--yes",
         ],
         cwd=source_directory,
+        env=build_environment,
         check=True,
     )
     subprocess.run(
         [executable, "-m", "jupyter_book", "build", "--html"],
         cwd=source_directory,
+        env=build_environment,
         check=True,
     )
 

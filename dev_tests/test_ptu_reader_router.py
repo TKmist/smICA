@@ -94,6 +94,24 @@ def test_unsupported_record_uses_legacy_route(monkeypatch: pytest.MonkeyPatch) -
     assert metadata["Integrated frames"] == 2
 
 
+def test_missing_legacy_reader_explains_that_phconvert_remains_available(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def reject_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "Required.Third_party.readPTU_FLIM":
+            raise ImportError("optional reader is absent")
+        return original_import(name, *args, **kwargs)
+
+    original_import = __import__
+    monkeypatch.setattr("builtins.__import__", reject_import)
+
+    with pytest.raises(
+        ImportError,
+        match="not supported by the phconvert backend.*optional readPTU_FLIM fallback",
+    ):
+        router_module._load_legacy_reader()
+
+
 def test_picoharp_validation_error_is_not_hidden(monkeypatch: pytest.MonkeyPatch) -> None:
     def invalid_picoharp(source_path: str) -> None:
         raise ValueError("missing raster markers")
