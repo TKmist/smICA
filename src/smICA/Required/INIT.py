@@ -45,9 +45,15 @@ import shutil
 import http.server
 import socketserver
 import threading
-from pathlib import Path
 
 import cv2
+
+from .documentation_builder import build_documentation
+from .mode_plugins import (
+    discover_mode_directories,
+    load_mode_definition,
+    synchronize_repository_modes,
+)
 
 class _updater:
     
@@ -65,7 +71,7 @@ class _updater:
 
         self.owner = "TKmist"
         self.repo = "smICA"
-        self.branch = "many_cells_auto_roi"
+        self.branch = "main"
         self.path = "VERSION"
 
     def _parse_version(self, ver: str):
@@ -277,7 +283,7 @@ class _updater:
 
         os.makedirs(bckp_dir, exist_ok=True)
         metafiles = ["LICENSE", "README.md", "VERSION"]
-        FoldersToBackup = ["REWRITE_ROI", "smICA"]
+        FoldersToBackup = ["smICA"]
 
         for f in metafiles:
             # print("[Updater] Removing old backup directory...")
@@ -330,7 +336,7 @@ class _updater:
             target = os.path.join(current_dir, "..", f)
             shutil.copy(source, target)
 
-        FoldersToBackup = ["REWRITE_ROI", "smICA"]
+        FoldersToBackup = ["smICA"]
         for d in FoldersToBackup:
             dpg.set_item_label("progress_button", "Updating software directories")
             source = os.path.join(updt_dir, "src", d)
@@ -344,8 +350,47 @@ class _updater:
                 ),
             )
 
+        dpg.set_item_label("progress_button", "Installing analytical add-ons")
+        application_directory = os.path.join(current_dir, "..", "smICA")
+        mode_summary = self.synchronize_repository_modes(
+            updt_dir,
+            application_directory,
+        )
+        changed_modes = mode_summary["installed"] + mode_summary["updated"]
+        if changed_modes:
+            print(
+                "[Updater] Analytical modes installed or updated: "
+                + ", ".join(changed_modes)
+            )
+        if mode_summary["skipped"]:
+            print(
+                "[Updater] Incomplete analytical mode directories skipped: "
+                + ", ".join(mode_summary["skipped"])
+            )
+
+        dpg.set_item_label("progress_button", "Building updated documentation")
+        documentation_source = os.path.join(updt_dir, "docs")
+        installed_package_directory = os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))
+        )
+        documentation_target = os.path.join(
+            installed_package_directory,
+            "doc",
+            "assets",
+            "help_html",
+        )
+        build_documentation(
+            documentation_source,
+            documentation_target,
+            install_missing=True,
+        )
+
         dpg.set_item_label("progress_button", "Removing temporary files")
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    @staticmethod
+    def synchronize_repository_modes(repository_root, application_directory):
+        return synchronize_repository_modes(repository_root, application_directory)
 
     def download_update(
         self,
@@ -498,66 +543,28 @@ class _basicF:
         if i == 5: return (255*v, 255*p, 255*q)
 
     def search_for_methods(self):
-        path = 'Modes'
-        methods = os.listdir(path)
-        ind = []
-        methods = [os.path.join(path,ad) for ad in methods if os.path.isdir(os.path.join(path,ad))]
-        for i, method in enumerate(methods):
-            met_files = os.listdir(method)
-            met_files = [f for f in met_files if f.endswith('_config.json')]
-            if len(met_files) == 1:
-                ind.append(i)
-        methods = list(np.array(methods)[ind])
-        return methods
+        return discover_mode_directories("Modes")
     def ifso(self,f):
-            if type(f)  == bytes:
-                f = f.decode("utf-8")
-            else:
-                pass
-            return f
-    
+        if type(f) == bytes:
+            f = f.decode("utf-8")
+        return f
+
     def path_to_method_anal_menu_item(self,method_dir):
-        met_files = os.listdir(method_dir)
-        
-        
-            
-            
-        
-        met_files = [ self.ifso(f) for f in met_files]
-        met_files = [f for f in met_files if f.endswith('_config.json')]
-        met_file = met_files[0]
-        path = os.path.join(method_dir,met_file)
-
-        with open(path) as json_settings:
-            method_tree = json.load(json_settings)
-
+        method_tree = self.method_config_dict(method_dir)
         return method_tree['ANAL_MENU_ITEM']
 
     def method_config_dict(self,method_dir):
-        met_files = os.listdir(method_dir)
-        met_files = [ self.ifso(f) for f in met_files]
-        met_files = [str(f) for f in met_files if str(f).endswith('_config.json')]
-        met_file = met_files[0]
-        path = os.path.join(method_dir,met_file)
-        with open(path) as json_settings:
-            method_tree = json.load(json_settings)
-
+        method_tree = load_mode_definition(method_dir)
+        if method_tree is None:
+            raise ValueError(
+                "The analytical mode directory is incomplete or has an invalid config: "
+                + str(method_dir)
+            )
         return method_tree
     
     
     def path_to_method_anal_layout(self,method_dir):
-        
-        met_files = os.listdir(method_dir)
-            
-            
-        
-        met_files = [ self.ifso(f) for f in met_files]
-        met_files = [f for f in met_files if f.endswith('_config.json')]
-        met_file = met_files[0]
-        path = os.path.join(method_dir,met_file)
-        with open(path) as json_settings:
-            method_tree = json.load(json_settings)
-
+        method_tree = self.method_config_dict(method_dir)
         return method_tree['LAYOUT']
     
     
@@ -1155,7 +1162,7 @@ class rewrite_roi:
         df = pd.read_csv(infile)
         
         new_file = file.replace('.csv','.tmp')
-        final_roi = new_file.split('/')[-1]
+        final_roi = os.path.basename(new_file)
         zeros = np.zeros(shape)
         zeros = pd.DataFrame(zeros)
         if df.columns[1].startswith('X'): 
@@ -1239,9 +1246,9 @@ class SPARequestHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=directory, **kwargs)
 
     def do_GET(self):
-        path = Path(self.directory) / self.path.lstrip("/")
+        path = os.path.join(self.directory, self.path.lstrip("/"))
 
-        if path.exists():
+        if os.path.exists(path):
             return super().do_GET()
 
         self.path = "/index.html"
@@ -1253,7 +1260,7 @@ class LocalDocsServer:
     """
 
     def __init__(self, root_dir, host="127.0.0.1", port=0):
-        self.root_dir = Path(root_dir).resolve()
+        self.root_dir = os.path.abspath(os.path.expanduser(os.fspath(root_dir)))
         self.host = host
         self.port = port
         self.httpd = None
@@ -1263,7 +1270,7 @@ class LocalDocsServer:
     def start(self):
         handler = lambda *args, **kwargs: SPARequestHandler(
             *args,
-            directory=str(self.root_dir),
+            directory=self.root_dir,
             **kwargs
         )
 
@@ -1697,7 +1704,7 @@ class Roi_mixer:
 
 
         new_file = input_file.replace('.dat','.tmp')
-        final_roi = new_file.split('/')[-1]
+        final_roi = os.path.basename(new_file)
         newfile = os.path.join(output_roi_path,final_roi)
         print(newfile)
         df.to_csv(newfile, sep = '\t',index=False,header=False)

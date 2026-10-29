@@ -7,12 +7,19 @@ project:
     - file: Main_title.ipynb
     - file: Release_notes.ipynb
     - file: Installation.ipynb
+    - file: Demo.ipynb
+    - file: Supported_equipment.ipynb
     - file: Usage.ipynb
       children:
          - file: PTUExtract.ipynb
          - file: Phot2conc.ipynb
          - file: RwROI.ipynb
          - file: MXROI.ipynb
+    - file: Automation_server.ipynb
+      children:
+         - file: Automation_commands.ipynb
+         - file: Automation_design_and_coverage.ipynb
+    - file: For_developers.ipynb
     - file: Credits.ipynb
     
 
@@ -40,4 +47,3 @@ site:
           © 2026
           </div>
     
-

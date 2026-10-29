@@ -1,8 +1,5 @@
-import sys
 from setuptools import setup, find_packages
-from setuptools.command.install import install
 import os
-import urllib.request
 
 version_path='VERSION'
 
@@ -20,8 +17,12 @@ basic_packages = [
         "scikit-image==0.25.2",
         "requests==2.32.3",
         "matplotlib==3.9.2",
+        "seaborn==0.13.2",
+        "scikit-learn==1.5.2",
         "numba==0.60.0",
         "scipy==1.15.3",
+        "phconvert==0.10.1",
+        "jupyter-book==2.1.2",
 ]
 req_pack = []
 if os.name == 'nt':
@@ -30,52 +31,14 @@ elif os.name == 'posix':
     req_pack = basic_packages
 
 
-class runInstall(install):
-    """Download `readPTU_FLIM.py` from GitHub."""
-
-        
-    def run(self):
-        
-        install.run(self)
-
-        # Read installer decision from environment
-        flag = os.environ.get("SMICA_DOWNLOAD_READPTU_FLIM", "").strip().lower()
-        download_enabled = flag in ("1", "true", "yes", "y", "on")
-        
-        if not download_enabled:
-            print("Skipping download of readPTU_FLIM.py (SMICA_DOWNLOAD_READPTU_FLIM=0).")
-            return
-        
-        url = "https://raw.githubusercontent.com/TKmist/readPTU_FLIM/refs/heads/NIKON_correction/readPTU_FLIM.py"
-        
-        
-        target_directory = os.path.join(os.path.dirname(__file__), "src/smICA/Required/Third_party")
-        target_file = os.path.join(target_directory, "readPTU_FLIM.py")
-        
-        
-        os.makedirs(target_directory, exist_ok=True)
-        
-        
-        try:
-            print(f"Downloading `readPTU_FLIM.py` from {url} to {target_file}...")
-            urllib.request.urlretrieve(url, target_file)
-            print("\nDownload complete.\n")
-        except Exception as e:
-            print(f"\nFailed to download `readPTU_FLIM.py`: {e}")
-            print(f"Please manually download the file from: {url}")
-            print(f"Once downloaded, place it in the following directory: {target_directory}\n")
-
-
 setup(
     name='smICA',
     version=VERSION,
-    packages=find_packages(),
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     install_requires=req_pack,
     python_requires='>=3.11.5',
-    cmdclass={
-        'install': runInstall, 
-    },
     author='TKmist',
     license='MIT',
 

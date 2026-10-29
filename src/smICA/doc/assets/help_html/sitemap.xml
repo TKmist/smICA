@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://localhost:3004/sitemap_style.xsl" ?>
+<?xml-stylesheet type="text/xsl" href="http://localhost:3001/sitemap_style.xsl" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://localhost:3004</loc>
+    <loc>http://localhost:3001</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/release-notes</loc>
+    <loc>http://localhost:3001/release-notes</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/installation</loc>
+    <loc>http://localhost:3001/installation</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/usage</loc>
+    <loc>http://localhost:3001/usage</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/ptuextract</loc>
+    <loc>http://localhost:3001/ptuextract</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/phot2conc</loc>
+    <loc>http://localhost:3001/phot2conc</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/rwroi</loc>
+    <loc>http://localhost:3001/rwroi</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/mxroi</loc>
+    <loc>http://localhost:3001/mxroi</loc>
   </url>
   <url>
-    <loc>http://localhost:3004/credits</loc>
+    <loc>http://localhost:3001/automation-server</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3001/automation-commands</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3001/automation-design-and-coverage</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3001/for-developers</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3001/credits</loc>
   </url>
 </urlset>

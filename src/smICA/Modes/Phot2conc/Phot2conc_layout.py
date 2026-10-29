@@ -32,6 +32,66 @@ import numpy as np
 import cv2
 
 
+def _decay_control_width(window_width, font_size):
+    """Leave enough horizontal room for both decay-range labels."""
+    label_and_spacing_width = max(96, int(round(7 * font_size)))
+    return max(48, int((window_width - label_and_spacing_width) / 2))
+
+
+def _rebuild_decay_scale(channel):
+    """Resize and redraw a horizontal decay-time legend using current UI ratios."""
+    window = getattr(mode_init, f'hist_window_ch{channel}')
+    scale_width = window['width'] - 24
+    font_size = max(1, mode_init.font_size)
+    bar_height = max(1, int(round(font_size * 0.9)))
+    text_y = bar_height + max(1, int(round(font_size * 0.2)))
+    scale_height = text_y + font_size + max(1, int(round(font_size * 0.25)))
+    scale_tag = f'decay_scale_ch_{channel}'
+
+    dpg.configure_item(scale_tag, width=scale_width, height=scale_height)
+    dpg.delete_item(scale_tag, children_only=True)
+
+    scale_indices = np.arange(64, dtype=np.uint8).reshape(64, 1) * 4
+    scale_colors = cv2.applyColorMap(scale_indices, cv2.COLORMAP_VIRIDIS).reshape(64, 3)
+    for color_index, color_bgr in enumerate(scale_colors):
+        color_rgba = tuple(int(value) for value in color_bgr[::-1]) + (255,)
+        segment_start = color_index * scale_width / 64
+        segment_end = (color_index + 1) * scale_width / 64 + 1
+        dpg.draw_rectangle(
+            (segment_start, 0),
+            (segment_end, bar_height),
+            tag=f'decay_scale_segment_ch_{channel}_{color_index}',
+            color=color_rgba,
+            fill=color_rgba,
+            parent=scale_tag,
+        )
+
+    label_color = (235, 235, 235, 255)
+    dpg.draw_text(
+        (0, text_y),
+        '0',
+        tag=f'decay_scale_min_ch_{channel}',
+        size=font_size,
+        color=label_color,
+        parent=scale_tag,
+    )
+    dpg.draw_text(
+        (scale_width / 2 - 1.35 * font_size, text_y),
+        '0.5',
+        tag=f'decay_scale_mid_ch_{channel}',
+        size=font_size,
+        color=label_color,
+        parent=scale_tag,
+    )
+    dpg.draw_text(
+        (scale_width - 3.5 * font_size, text_y),
+        '1',
+        tag=f'decay_scale_max_ch_{channel}',
+        size=font_size,
+        color=label_color,
+        parent=scale_tag,
+    )
+
 
 def Phot2conc_resizer(sender, app_data):
     init_resizable_items = []
@@ -138,6 +198,19 @@ def Phot2conc_resizer(sender, app_data):
             dpg.configure_item(item, height=props['height'])
         if 'pos' in props.keys():
             dpg.configure_item(item, pos=props['pos'])
+
+    for channel in ('1', '2'):
+        scale_tag = f'decay_scale_ch_{channel}'
+        if scale_tag in dpg.get_aliases():
+            _rebuild_decay_scale(channel)
+            control_width = _decay_control_width(
+                getattr(mode_init, f'hist_window_ch{channel}')['width'],
+                mode_init.font_size,
+            )
+            dpg.configure_item(f'decay_range_min_ch_{channel}', width=control_width)
+            dpg.configure_item(f'decay_range_max_ch_{channel}', width=control_width)
+    if 'decay_scale_ch_1' in dpg.get_aliases():
+        mode_cmn._update_decay_color_scales()
 
 
 dpg.set_viewport_resize_callback(Phot2conc_resizer)
@@ -640,6 +713,13 @@ with dpg.window(label='Channel 1',
                                parent='handler_image_1')
     dpg.add_item_clicked_handler(tag='img1_click_hand', callback=mode_cmn.on_image_click,
                                  user_data=('texture_CH_1', None), parent='handler_image_1')
+    dpg.add_item_double_clicked_handler(
+        button=dpg.mvMouseButton_Left,
+        tag='img1_double_click_hand',
+        callback=mode_cmn.on_image_double_click,
+        user_data=('texture_CH_1', None),
+        parent='handler_image_1',
+    )
     dpg.bind_item_handler_registry("texture_CH_1", "handler_image_1")
 
 
@@ -656,7 +736,8 @@ globalITEMS.windows.extend(['image_window_ch1',
                             'img_Brightness_1',
                             'img_roi_alpha_1',
                             'img1_hover_hand',
-                            'img1_click_hand'
+                            'img1_click_hand',
+                            'img1_double_click_hand'
 
                             ])
 '''Image 2 window items'''
@@ -723,6 +804,13 @@ with dpg.window(label='Channel 2',
     dpg.add_item_hover_handler(tag='img2_hover_hand', callback=mode_cmn.onHover, user_data="texture_CH_2",
                                parent='handler_image_2')
     dpg.add_item_clicked_handler(tag='img2_click_hand', callback=mode_cmn.on_image_click, user_data=('texture_CH_2',None), parent='handler_image_2')
+    dpg.add_item_double_clicked_handler(
+        button=dpg.mvMouseButton_Left,
+        tag='img2_double_click_hand',
+        callback=mode_cmn.on_image_double_click,
+        user_data=('texture_CH_2', None),
+        parent='handler_image_2',
+    )
     dpg.bind_item_handler_registry("texture_CH_2", "handler_image_2")
 
 globalITEMS.windows.extend(['image_window_ch2',
@@ -738,7 +826,8 @@ globalITEMS.windows.extend(['image_window_ch2',
                             'img_Brightness_2',
                             'img_roi_alpha_2',
                             'img2_hover_hand',
-                            'img2_click_hand'
+                            'img2_click_hand',
+                            'img2_double_click_hand'
 
                             ])
 '''Histogram 1 window items'''
@@ -756,6 +845,41 @@ with dpg.window(label='Results channel 1',
                 show=True
                 ):
     dpg.add_separator(tag='HIST_CH1_top_sep', show=True)
+    with dpg.group(tag='decay_scale_group_ch_1', show=False):
+        dpg.add_text('Decay time [ns]', tag='decay_scale_label_ch_1')
+        with dpg.drawlist(
+                width=1,
+                height=1,
+                tag='decay_scale_ch_1'):
+            pass
+        _rebuild_decay_scale('1')
+        with dpg.group(horizontal=True, tag='decay_range_controls_ch_1'):
+            decay_control_width_ch_1 = _decay_control_width(
+                mode_init.hist_window_ch1['width'],
+                mode_init.font_size,
+            )
+            dpg.add_drag_float(
+                tag='decay_range_min_ch_1',
+                label='Min',
+                default_value=0.0,
+                format='%.3f ns',
+                width=decay_control_width_ch_1,
+                speed=0.01,
+                clamped=True,
+                callback=mode_cmn.callback_decay_time_range,
+                user_data='1',
+            )
+            dpg.add_drag_float(
+                tag='decay_range_max_ch_1',
+                label='Max',
+                default_value=1.0,
+                format='%.3f ns',
+                width=decay_control_width_ch_1,
+                speed=0.01,
+                clamped=True,
+                callback=mode_cmn.callback_decay_time_range,
+                user_data='1',
+            )
     with dpg.tab_bar(tag='tab_bar_h1'):
         with dpg.tab(label="Concentration/pixel", tag='tab_bar_conc_h1'):
             with dpg.plot(label="",
@@ -811,8 +935,21 @@ with dpg.window(label='Results channel 1',
                 dpg.add_stem_series(np.empty(10), np.empty(10), parent='hist_xphot_axis_ch1', label='Median = ',
                                     tag='phot_med_ser_ch_1')
 
+globalITEMS.windows.extend([
+    f'decay_scale_segment_ch_1_{segment_index}'
+    for segment_index in range(64)
+])
 globalITEMS.windows.extend(['hist_window_ch1',
                             'HIST_CH1_top_sep',
+                            'decay_scale_group_ch_1',
+                            'decay_scale_label_ch_1',
+                            'decay_scale_ch_1',
+                            'decay_scale_min_ch_1',
+                            'decay_scale_mid_ch_1',
+                            'decay_scale_max_ch_1',
+                            'decay_range_controls_ch_1',
+                            'decay_range_min_ch_1',
+                            'decay_range_max_ch_1',
                             'tab_bar_h1',
                             'tab_bar_conc_h1',
                             'hist_conc_plot_ch1',
@@ -855,6 +992,41 @@ with dpg.window(label='Results channel 2',
                 show=True
                 ):
     dpg.add_separator(tag='HIST_CH2_top_sep', show=True)
+    with dpg.group(tag='decay_scale_group_ch_2', show=False):
+        dpg.add_text('Decay time [ns]', tag='decay_scale_label_ch_2')
+        with dpg.drawlist(
+                width=1,
+                height=1,
+                tag='decay_scale_ch_2'):
+            pass
+        _rebuild_decay_scale('2')
+        with dpg.group(horizontal=True, tag='decay_range_controls_ch_2'):
+            decay_control_width_ch_2 = _decay_control_width(
+                mode_init.hist_window_ch2['width'],
+                mode_init.font_size,
+            )
+            dpg.add_drag_float(
+                tag='decay_range_min_ch_2',
+                label='Min',
+                default_value=0.0,
+                format='%.3f ns',
+                width=decay_control_width_ch_2,
+                speed=0.01,
+                clamped=True,
+                callback=mode_cmn.callback_decay_time_range,
+                user_data='2',
+            )
+            dpg.add_drag_float(
+                tag='decay_range_max_ch_2',
+                label='Max',
+                default_value=1.0,
+                format='%.3f ns',
+                width=decay_control_width_ch_2,
+                speed=0.01,
+                clamped=True,
+                callback=mode_cmn.callback_decay_time_range,
+                user_data='2',
+            )
     with dpg.tab_bar(tag='tab_bar_h2'):
         with dpg.tab(label="Concentration/pixel", tag='tab_bar_conc_h2'):
             with dpg.plot(label="",
@@ -909,8 +1081,21 @@ with dpg.window(label='Results channel 2',
                                     tag='phot_mean_ser_ch_2')
                 dpg.add_stem_series(np.empty(10), np.empty(10), parent='hist_xphot_axis_ch2', label='Median = ',
                                     tag='phot_med_ser_ch_2')
+globalITEMS.windows.extend([
+    f'decay_scale_segment_ch_2_{segment_index}'
+    for segment_index in range(64)
+])
 globalITEMS.windows.extend(['hist_window_ch2',
                             'HIST_CH2_top_sep',
+                            'decay_scale_group_ch_2',
+                            'decay_scale_label_ch_2',
+                            'decay_scale_ch_2',
+                            'decay_scale_min_ch_2',
+                            'decay_scale_mid_ch_2',
+                            'decay_scale_max_ch_2',
+                            'decay_range_controls_ch_2',
+                            'decay_range_min_ch_2',
+                            'decay_range_max_ch_2',
                             'tab_bar_h2',
                             'tab_bar_conc_h2',
                             'hist_conc_plot_ch2',
@@ -938,6 +1123,32 @@ globalITEMS.windows.extend(['hist_window_ch2',
                             'phot_med_ser_ch_2'
                             ])
 
+'''DISPLAY OPTIONS window items'''
+with dpg.window(label='',
+                pos=mode_init.DISP_OPT_window['pos'],
+                width=mode_init.DISP_OPT_window['width'],
+                height=mode_init.DISP_OPT_window['height'],
+                no_move=True,
+                no_close=True,
+                no_collapse=True,
+                no_title_bar=True,
+                no_resize=True,
+                tag='DISP_OPT_window',
+                show=True
+                ):
+    dpg.add_text(default_value='DISPLAY OPTIONS', show=True, tag='DISP_OPT_HEADER')
+    dpg.add_separator(tag='DISP_OPT_top_sep', show=True)
+    dpg.add_combo(tag=mode_init.DISP_OPT_combo['name'],
+                  items=mode_init.DISP_OPT_combo['items'],
+                  default_value=mode_init.DISP_OPT_combo['items'][0],
+                  width=mode_init.DISP_OPT_combo['width'],
+                  callback=mode_cmn.callback_DISP_OPT_combo,
+                  show=True)
+globalITEMS.windows.extend(['DISP_OPT_window',
+                            'DISP_OPT_HEADER',
+                            'DISP_OPT_top_sep',
+                            mode_init.DISP_OPT_combo['name']
+                            ])
 '''FCS window items'''
 with dpg.window(label='',
                 pos=mode_init.FCS_window['pos'],
@@ -1675,5 +1886,3 @@ mode_cmn.DialWinList = ['ROI_folder_dialog_id',
                             'Calib_file_dialog_id']
 
 globalITEMS.windows.extend(mode_cmn.DialWinList)
-
-

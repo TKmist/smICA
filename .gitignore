@@ -5,14 +5,14 @@ src/smICA/Required/readPTU_FLIM.py
 .ipynb_checkpoints
 .virtual_documents
 testing_things.ipynb
-#/python_embedded/
-
-
+python_embedded/
 /.scripts/
 /.build/
 #/.github/
-/release/
+#/release/
 /poligon/
+/calc_tests/demo_data/**/*.pkl
+/calc_tests/demo_data/**/results.csv
 /
 
 

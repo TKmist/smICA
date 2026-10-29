@@ -12,12 +12,12 @@
   </p>
 <p align="center">
 
-  <img src="https://img.shields.io/badge/version-v2.1.2-green" style="display:inline-block; margin:0 2px; vertical-align:middle;">
+  <img src="https://img.shields.io/badge/version-v2.2.0-green" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   <a href="https://github.com/TKmist/smICA/releases/latest">
     <img src="https://img.shields.io/github/v/release/TKmist/smICA?label=download" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   </a>
-  <a href="https://zenodo.org/records/20134967">
-    <img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20134967-blue" style="display:inline-block; margin:0 2px; vertical-align:middle;">
+  <a href="https://zenodo.org/records/18456909">
+    <img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.18456909-blue" style="display:inline-block; margin:0 2px; vertical-align:middle;">
   </a>
 </p>
 
@@ -25,6 +25,9 @@
 <p align="center">
   <a href="#information">Information</a> •
   <a href="#installation">Installation</a> •
+  <a href="#testing">Testing</a> •
+  <a href="#bundled-demonstration">Demo</a> •
+  <a href="#developing-analytical-add-ons">Developing add-ons</a> •
   <a href="#release-notes">Release notes</a> •
   <a href="#license">License</a>
 </p>
@@ -33,7 +36,7 @@
 ## Information
 This repository provides software for calculating fluorophore concentrations from FLIM images stored in the PTU format (PicoQuant, Germany). The software allows the extraction of information about registered photons from the _.ptu_ file, filtering them using statistical filters based on fluorescence decay time and autodetection of the region of interest (ROI), and finally creating a map of the absolute concentration of the fluorophore. The GUI is powered by [Dear PyGui](https://github.com/hoffstadt/DearPyGui).   
 
-
+The software was developed and tested on PTU files created with the PicoHarp 300 TTTR system (PicoQuant, Germany). Further development to include other file formats is possible depending on the data availability. If you think this program might be useful in your studies but your system is not yet supported, feel free to contact the [author](mailto:tkalwarczyk@ichf.edu.pl). The list of supported hardware is provided [here](https://tkmist.github.io/smICA/supported-equipment/).
 
 ## Installation
 
@@ -51,10 +54,146 @@ The software is written in Python, and its graphical interface is based on [Dear
   
 The installation script will download all required packages, create the run_smICA script or run_smICA.bat (on Windows), and create the shortcuts. 
 
+All project-owned launchers and command-line clients are plain Python, Bash, or
+Windows Batch scripts. The bundled third-party `python_embedded` runtime is the
+only repository exception to the no-executable-binaries rule.
+
 By default, smICA uses dark theme. The light theme can be activated by modifying the [settings.json](https://github.com/TKmist/smICA/tree/main/src/smICA/res/settings.json) file. To do that replace *'dark'* with '*light'*.
 
 
+## Testing
+
+The repository provides two complementary test suites.
+
+### Developer tests
+
+The `dev_tests` directory contains lightweight `pytest` regression tests for
+the PTU reader, frame-resolved calculations, automatic ROI handling,
+documentation builder, installers, and TCP/GUI automation infrastructure.
+These tests validate the source repository and are not part of the installed
+end-user validation command.
+
+From the repository root, install pytest and run the cross-platform test
+launcher:
+
+```bash
+python -m pip install pytest
+python dev_tests/run_tests.py
+```
+
+Additional pytest arguments can be appended, for example:
+
+```bash
+python dev_tests/run_tests.py -q
+python dev_tests/run_tests.py -k tcp
+```
+
+### Calculation and end-to-end tests
+
+The `calc_tests` directory contains standalone calculation unit tests, reference
+PTU measurements, calibration files, ROI definitions, expected results, and a
+complete TCP-driven end-to-end analytical workflow. The source dataset
+directories located directly under `calc_tests/REFERENCE_DATA` contain the
+unprocessed PTU measurements and their calibration JSON files. Working copies
+under `calc_tests/REFERENCE_DATA/TypeOfFiltering` are organized by analysis
+variant and contain only PTU files, calibration JSON files, and ROI
+directories. The neutral reference output is stored as
+`calc_tests/REFERENCE_DATA/REFERENCE_output/reference_results.csv`.
+
+Run all calculation unit tests directly from a source checkout:
+
+```bash
+python calc_tests/unit_test/run_all.py
+```
+
+The same unit tests are available after installation:
+
+```bash
+# Linux
+./run_smICA --test
+```
+
+```bat
+:: Windows
+smICA.bat --test
+```
+
+### Bundled demonstration
+
+Release archives include four compact PTU measurements under
+`calc_tests/demo_data`: two moderate-concentration dextran measurements in the
+`in_vitro` branch and two cell measurements without mRNA in the `in_cellulo`
+branch. Their calibration JSON files and a readable, explicit TCP automation
+script are included with both platform packages.
+
+Run the complete extraction-to-concentration workflow after installation:
+
+```bash
+# Linux
+./run_smICA --demo
+```
+
+```bat
+:: Windows
+smICA.bat --demo
+```
+
+The command starts its own local smICA automation server, extracts all four PTU
+files, applies TCSPC statistical background filtering to both channels of the
+cellular measurements, loads the matching calibrations, performs dextran and
+automatic cellular ROI calculations, and writes `results.csv` into each dataset
+directory. It additionally repeats the `imaging_new_ptu` cell measurement with
+standard PIE time gating and writes separate `results_tcspc.csv` and
+`results_gating.csv` files for that measurement. The full
+`calc_tests/REFERENCE_DATA` collection remains excluded from releases.
+
+To run the complete end-to-end reference analysis, first start the installed
+application with its automation server in one terminal:
+
+```bash
+./run_smICA --automation-server --automation-port 8765
+```
+
+Then run the workflow from a second terminal at the repository root:
+
+```bash
+bash calc_tests/run_Analytical_workflow_TCP.sh
+```
+
+On Windows, run the application with
+`smICA.bat --automation-server --automation-port 8765`. The installed TCP
+client is the text script `v_smICA_env\Scripts\smica-call.bat`; smICA does not
+install a compiled client launcher. If the client is not available in `PATH`,
+use its full script path. Run the native end-to-end test with
+`calc_tests\run_Analytical_workflow_TCP.bat`. The workflow processes the datasets under
+`calc_tests/REFERENCE_DATA`, exports `results.csv` files, and stops immediately
+if any TCP command fails.
+
+
+## Developing analytical add-ons
+
+Directory-based analytical methods can be created from
+[`templates/add_on_template`](templates/add_on_template). A complete method
+copied to `src/smICA/Modes` is discovered automatically and added to the
+**Analysis** menu. The updater also installs new valid modes distributed by the
+official repository while preserving local modes that are not part of the
+update.
+
+The built-in manual contains a separate **For developers** chapter covering
+the mode contract, file responsibilities, GUI lifecycle, updater behavior,
+testing, and optional TCP automation.
+
+
 ## Release notes
+#### v2.2.0
+- Added a `phconvert` backend for PicoHarp 300 T3 acquisitions and extended PKL output with acquisition metadata and compact frame-resolved foreground/background data. Other record types retain an explicit fallback to the optional `readPTU_FLIM` reader. Installation of this legacy fallback is handled conditionally by the installers; declining it or an installation failure does not block installation or PicoHarp 300 T3 processing through the primary `phconvert` backend.
+- Extended Phot2conc with foreground, background, and lifetime image products; export-only frame-resolved results; and overlap-corrected uncertainty estimates based on the effective number of independent pixels.
+- Added a versioned TCP/JSON automation interface whose commands use the same Dear PyGui callbacks as interactive operation, including complete statistical-filter, batch extraction, ROI, calculation, and export workflows.
+- Added validated analytical add-on discovery and templates, cross-platform developer and calculation unit tests, and resumable end-to-end reference workflows. Installed unit-test validation can be run with `--test` without starting the GUI.
+- Added a bundled, cross-platform `--demo` analysis with two in-vitro dextran measurements, two TCSPC-filtered dual-channel in-cellulo measurements without mRNA, a separate standard-PIE-gated pass for one selected cell measurement, matching calibrations, and automatic result export.
+- Updated cross-platform installation and bundled documentation, including automatic Jupyter Book builds and guidance for automation, add-on development, supported equipment, uncertainty calculations, and exported data.
+
+See [Changelog.md](Changelog.md) for the complete list of changes.
 #### V2.1.2
  - Fixed problems with the Python embedded folder.
 #### V2.1.1
@@ -98,8 +237,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ### Third-party components
 
 
-During installation, this program may optionally download the `readPTU_FLIM.py`
-component from an [external repository](https://github.com/TKmist/readPTU_FLIM/tree/NIKON_correction).
+The platform installers may optionally download the `readPTU_FLIM.py` component
+from an [external repository](https://github.com/TKmist/readPTU_FLIM/tree/NIKON_correction).
+It is only used as a legacy fallback for PTU record types that are not supported
+by the primary `phconvert` backend. Declining this download does not prevent
+installation or processing of supported PicoHarp 300 T3 files.
 
 This component is licensed under the MIT License and is not distributed with this repository.
 
